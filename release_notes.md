@@ -3,3 +3,12 @@
 
 # Microchip MPLAB® Harmony 3 Release Notes
 
+## Harmony 3 Smart Energy PRIME v1.0.0
+
+### New Features
+
+- None
+
+### Known Issues
+
+- None
