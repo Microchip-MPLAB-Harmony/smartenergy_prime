@@ -42,6 +42,7 @@ def primeAddBnFiles():
     global pPrime14BnLibFile
     global pPrime14SnLibFile
     global primeConfigVersion
+    global primeConfigBnSlaveEn
     
     # SN only 
     pPrimeApiAsFile.setEnabled(False)
@@ -60,26 +61,24 @@ def primeAddBnFiles():
     pCl432ApiHeaderFile.setEnabled(True)
     pHalApiSourceFile.setEnabled(True)
     
+    # No libraries by default
+    pPrime13BnLibFile.setEnabled(False)
+    pPrime13BnSlaveLibFile.setEnabled(False)
+    pPrime13SnLibFile.setEnabled(False)
+    pPrime14BnLibFile.setEnabled(False)
+    pPrime14SnLibFile.setEnabled(False)
+    
     # BN library
     if (primeConfigVersion.getValue() == "1.3.6"): 
-        pPrime13BnLibFile.setEnabled(True)
-        pPrime13BnSlaveLibFile.setEnabled(False)
-        pPrime13SnLibFile.setEnabled(False)
-        pPrime14BnLibFile.setEnabled(False)
-        pPrime14SnLibFile.setEnabled(False)
+        if (primeConfigBnSlaveEn.getValue() == True):
+            pPrime13BnSlaveLibFile.setEnabled(True)
+        else:
+            pPrime13BnLibFile.setEnabled(True)
     elif (primeConfigVersion.getValue() == "1.4"): 
-        pPrime13BnLibFile.setEnabled(False)
-        pPrime13BnSlaveLibFile.setEnabled(False)
-        pPrime13SnLibFile.setEnabled(False)
         pPrime14BnLibFile.setEnabled(True)
-        pPrime14SnLibFile.setEnabled(False)
     else:
-        # Unknown option: no library
-        pPrime13BnLibFile.setEnabled(False)
-        pPrime13BnSlaveLibFile.setEnabled(False)
-        pPrime13SnLibFile.setEnabled(False)
-        pPrime14BnLibFile.setEnabled(False)
-        pPrime14SnLibFile.setEnabled(False)
+        # Unknown option: no library by default
+        pass
 
 def primeAddSnFiles():
 
@@ -110,6 +109,13 @@ def primeAddSnFiles():
     pClNullApiHeaderFile.setEnabled(False)
     pCl432ApiHeaderFile.setEnabled(False)
     
+    # No libraries by default
+    pPrime13BnLibFile.setEnabled(False)
+    pPrime13BnSlaveLibFile.setEnabled(False)
+    pPrime13SnLibFile.setEnabled(False)
+    pPrime14BnLibFile.setEnabled(False)
+    pPrime14SnLibFile.setEnabled(False)
+    
     if (primeConfigProject.getValue() == "bin project"):
         # SN API files in bin
         pPrimeApiSourceFile.setEnabled(True)
@@ -124,24 +130,12 @@ def primeAddSnFiles():
         
         # SN library
         if (primeConfigVersion.getValue() == "1.3.6"): 
-            pPrime13BnLibFile.setEnabled(False)
-            pPrime13BnSlaveLibFile.setEnabled(False)
             pPrime13SnLibFile.setEnabled(True)
-            pPrime14BnLibFile.setEnabled(False)
-            pPrime14SnLibFile.setEnabled(False)
         elif (primeConfigVersion.getValue() == "1.4"): 
-            pPrime13BnLibFile.setEnabled(False)
-            pPrime13BnSlaveLibFile.setEnabled(False)
-            pPrime13SnLibFile.setEnabled(False)
-            pPrime14BnLibFile.setEnabled(False)
             pPrime14SnLibFile.setEnabled(True)
         else:
-            # Unknown option: no library
-            pPrime13BnLibFile.setEnabled(False)
-            pPrime13BnSlaveLibFile.setEnabled(False)
-            pPrime13SnLibFile.setEnabled(False)
-            pPrime14BnLibFile.setEnabled(False)
-            pPrime14SnLibFile.setEnabled(False)
+            # Unknown option: no library by default
+            pass
     elif (primeConfigProject.getValue() == "application project"):
         # SN API files in application
         pPrimeApiSourceFile.setEnabled(False)
@@ -155,18 +149,10 @@ def primeAddSnFiles():
         pHalApiSourceFile.setEnabled(True)
         
         # No library in SN application
-        pPrime13BnLibFile.setEnabled(False)
-        pPrime13BnSlaveLibFile.setEnabled(False)
-        pPrime13SnLibFile.setEnabled(False)
-        pPrime14BnLibFile.setEnabled(False)
-        pPrime14SnLibFile.setEnabled(False)
+        pass
     else:
-        # Unknown option: no library
-        pPrime13BnLibFile.setEnabled(False)
-        pPrime13BnSlaveLibFile.setEnabled(False)
-        pPrime13SnLibFile.setEnabled(False)
-        pPrime14BnLibFile.setEnabled(False)
-        pPrime14SnLibFile.setEnabled(False)
+        # Unknown option: no library by default
+        pass
 
 def primeChangeMode(symbol, event):
 
@@ -191,12 +177,17 @@ def primeChangeMode(symbol, event):
         primeConfigComment.setVisible(False)
         # Add files for BN
         primeAddBnFiles()
+        
+def primeAddBnSlave(symbol, event):
+    # Add files for BN
+    primeAddBnFiles()
 
 def primeChangeProject(symbol, event):
 
     global primeConfigVersion
     global primeConfigOperationMode
     global primeConfigMaxNumNodes
+    global primeConfigBnSlaveEn
     
     if (event["value"] == "application project"):
         # Application project for SN: only config version and operation mode
@@ -212,6 +203,7 @@ def primeChangeProject(symbol, event):
         primeConfigMaxNumNodes.setVisible(False)
         primeConfigMaxNumNodes.setValue(0)
         primeConfigComment.setVisible(False)
+        primeConfigBnSlaveEn.setVisible(False)
     else:
         # Unknown option: hide all options
         primeHideAllOptions()
@@ -227,28 +219,34 @@ def primeChangeOperationMode(symbol, event):
 def primeChangeConfigVersion(symbol, event):
     global primeConfigOperationMode
     global primeConfigSecProfile
+    global primeConfigBnSlaveEn
     
     # No security and no hybrid or RF in 1.3
+    # No BN slave in 1.4
     if (event["value"] == "1.3.6"):
         primeConfigOperationMode.setValue("PLC")
         primeConfigOperationMode.setReadOnly(True)
         primeConfigSecProfile.setValue(0)
         primeConfigSecProfile.setReadOnly(True)
+        primeConfigBnSlaveEn.setReadOnly(False)
     elif (event["value"] == "1.4"):
         primeConfigOperationMode.setValue("Hybrid")
         primeConfigOperationMode.setReadOnly(False)
         primeConfigSecProfile.setReadOnly(False)
+        primeConfigBnSlaveEn.setReadOnly(True)
     else:
         #Unknown option
         primeConfigOperationMode.setValue("Hybrid")
         primeConfigOperationMode.setReadOnly(False)
         primeConfigSecProfile.setReadOnly(False)
+        primeConfigBnSlaveEn.setReadOnly(True)
     
     primeChangeFWVersion()
 
 def primeChangeFWVersion():
     global primeConfigMode
     global primeConfigVersion
+    global primeConfigBnSlaveEn
     
     # 1.4 versions are always hybrid
     if (primeConfigMode.getValue() == "SN"):
@@ -309,6 +307,7 @@ def primeShowSprofUsiInstance(symbol, event):
 def primeShowAllOptions():
 
     global primeConfigMode
+    global primeConfigBnSlaveEn
     global primeConfigVersion
     global primeConfigOperationMode
     global primeConfigFWVendor
@@ -329,6 +328,7 @@ def primeShowAllOptions():
     primeChangeFWVersion()
     
     primeConfigMode.setVisible(True)
+    primeConfigBnSlaveEn.setVisible(True)
     primeConfigVersion.setVisible(True)
     primeConfigOperationMode.setVisible(True)
     primeConfigFWVendor.setVisible(True)
@@ -352,6 +352,7 @@ def primeShowAllOptions():
 def primeHideAllOptions():
 
     global primeConfigMode
+    global primeConfigBnSlaveEn
     global primeConfigVersion
     global primeConfigOperationMode
     global primeConfigFWVendor
@@ -370,6 +371,7 @@ def primeHideAllOptions():
     global primeConfigSprofUsiPort
     
     primeConfigMode.setVisible(False)
+    primeConfigBnSlaveEn.setVisible(False)
     primeConfigVersion.setVisible(False)
     primeConfigOperationMode.setVisible(False)
     primeConfigFWVendor.setVisible(False)
@@ -407,6 +409,16 @@ def instantiateComponent(primeStackConfigComponent):
     primeConfigMode.setDefaultValue("SN")
     primeConfigMode.setDependencies(primeChangeMode, ["PRIME_MODE"])
     
+    # Enable BN slave
+    global primeConfigBnSlaveEn
+    primeConfigBnSlaveEn = primeStackConfigComponent.createBooleanSymbol("BN_SLAVE_EN", primeStackConfig)
+    primeConfigBnSlaveEn.setLabel("Enable BN Slave")
+    primeConfigBnSlaveEn.setDescription("Enable/disable the BN slave functionality")
+    primeConfigBnSlaveEn.setVisible(False)
+    primeConfigBnSlaveEn.setDefaultValue(False)
+    primeConfigBnSlaveEn.setReadOnly(True)
+    primeConfigBnSlaveEn.setDependencies(primeAddBnSlave, ["BN_SLAVE_EN"])
+    
     # Select type of project 
     global primeConfigProject
     primeProjectOptions = ["application project", "bin project"]
@@ -437,7 +449,7 @@ def instantiateComponent(primeStackConfigComponent):
     primeConfigOperationMode.setDefaultValue("Hybrid")
     primeConfigOperationMode.setDependencies(primeChangeOperationMode, ["PRIME_OPERATION_MODE"]) 
 
-    # Management Plane Serial Profile is always enabled
+    # The SN application project cannot configure more than the previous parameters
     global primeConfigComment
     primeConfigComment = primeStackConfigComponent.createCommentSymbol("PRIME_CONFIG_COMMENT", primeStackConfig)
     primeConfigComment.setLabel("*** Configure the PRIME Stack of the Service Node in the bin project ***")
