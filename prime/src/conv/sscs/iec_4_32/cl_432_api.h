@@ -46,8 +46,6 @@
 
 #include <stdint.h>
 #include "cl_432_defs.h"
-#include "conf_prime_stack.h"
-#include "conf_mac.h"
 
 /* @cond 0 */
 /**INDENT-OFF**/

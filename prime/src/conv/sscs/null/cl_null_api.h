@@ -53,7 +53,6 @@
 
 /* MAC includes */
 #include "mac_defs.h"
-#include "conf_mac.h"
 
 /* @cond 0 */
 /**INDENT-OFF**/

@@ -44,7 +44,6 @@
 #ifndef PRIME_API_H_INCLUDE
 #define PRIME_API_H_INCLUDE
 
-#include "conf_prime_stack.h"
 #include "prime_api_defs.h"
 
 /* @cond 0 */

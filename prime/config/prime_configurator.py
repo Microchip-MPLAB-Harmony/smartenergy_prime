@@ -710,6 +710,7 @@ def instantiateComponent(primeStackConfigComponent):
     pClNullApiHeaderFile.setProjectPath("config/" + configName + "/stack/prime/conv/sscs/null")
     pClNullApiHeaderFile.setType("HEADER")
     pClNullApiHeaderFile.setEnabled(False)
+    #pClNullApiHeaderFile.setMarkup(True)
     
     global pCl432HeaderFile
     pCl432HeaderFile = primeStackConfigComponent.createFileSymbol("CL_432_HEADER", None)
@@ -728,6 +729,7 @@ def instantiateComponent(primeStackConfigComponent):
     pCl432ApiHeaderFile.setProjectPath("config/" + configName + "/stack/prime/conv/sscs/iec_4_32")
     pCl432ApiHeaderFile.setType("HEADER")
     pCl432ApiHeaderFile.setEnabled(False)
+    #pCl432ApiHeaderFile.setMarkup(True)
     
     pCl432DefsHeaderFile = primeStackConfigComponent.createFileSymbol("CL_432_DEFS_HEADER", None)
     pCl432DefsHeaderFile.setSourcePath("prime/src/conv/sscs/iec_4_32/cl_432_defs.h")
@@ -736,6 +738,7 @@ def instantiateComponent(primeStackConfigComponent):
     pCl432DefsHeaderFile.setProjectPath("config/" + configName + "/stack/prime/conv/sscs/iec_4_32")
     pCl432DefsHeaderFile.setType("HEADER")
     pCl432DefsHeaderFile.setEnabled(True)
+    #pCl432DefsHeaderFile.setMarkup(True)
     
     ##### HAL API
     pHalApiHeaderFile = primeStackConfigComponent.createFileSymbol("HAL_API_HEADER", None)
@@ -795,7 +798,29 @@ def instantiateComponent(primeStackConfigComponent):
     
 #### FreeMaker System Files ######################################################
 
+    #primeStackSystemConfigFile = primeStackConfigComponent.createFileSymbol("PRIME_STACK_CONFIGURATION", None)
+    #primeStackSystemConfigFile.setType("STRING")
+    #primeStackSystemConfigFile.setOutputName("core.LIST_SYSTEM_CONFIG_H_MIDDLEWARE_CONFIGURATION")
+    #primeStackSystemConfigFile.setSourcePath("prime/templates/system/configuration.h.ftl")
+    #primeStackSystemConfigFile.setMarkup(True)
 
+    #primeStackSystemDefFile = primeStackConfigComponent.createFileSymbol("PRIME_STACK_DEF", None)
+    #primeStackSystemDefFile.setType("STRING")
+    #primeStackSystemDefFile.setOutputName("core.LIST_SYSTEM_DEFINITIONS_H_INCLUDES")
+    #primeStackSystemDefFile.setSourcePath("prime/templates/system/definitions.h.ftl")
+    #primeStackSystemDefFile.setMarkup(True)
+
+    #primeSystemInitFile = primeStackConfigComponent.createFileSymbol("PRIME_STACK_INIT", None)
+    #primeSystemInitFile.setType("STRING")
+    #primeSystemInitFile.setOutputName("core.LIST_SYSTEM_INIT_C_INITIALIZE_MIDDLEWARE")
+    #primeSystemInitFile.setSourcePath("prime/templates/system/initialize.c.ftl")
+    #primeSystemInitFile.setMarkup(True)
+
+    #primeSystemTasksFile = primeStackConfigComponent.createFileSymbol("PRIME_STACK_SYS_TASK", None)
+    #primeSystemTasksFile.setType("STRING")
+    #primeSystemTasksFile.setOutputName("core.LIST_SYSTEM_TASKS_C_CALL_LIB_TASKS")
+    #primeSystemTasksFile.setSourcePath("prime/templates/system/system_tasks.c.ftl")
+    #primeSystemTasksFile.setMarkup(True)
 
 
 ################################################################################

@@ -44,7 +44,6 @@
 #define CL_432_DEFS_H_INCLUDE
 
 #include <stdint.h>
-#include "conf_prime_stack.h"
 
 /* @cond 0 */
 /**INDENT-OFF**/

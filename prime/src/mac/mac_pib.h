@@ -51,7 +51,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "conf_prime_stack.h"
 
 /* @cond 0 */
 /**INDENT-OFF**/

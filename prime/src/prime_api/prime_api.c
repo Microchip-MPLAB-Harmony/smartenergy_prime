@@ -47,25 +47,9 @@
 #include "mac.h"
 #include "cl_null.h"
 #include "mngp.h"
-#include "conf_prime_stack.h"
-#if USED_SSCS == SSCS_432
 #include "cl_432.h"
-#elif USED_SSCS == SSCS_IPV6
-#include "cl_ipv6.h"
-#else
-#error No SSCS defined
-#endif
-#include "conf_mngp.h"
-#include "conf_pal.h"
-#include "conf_mac.h"
-
 #include "prime_api.h"
 #include "prime_hal_wrapper.h"
-
-/* ASF includes */
-#include "interrupt.h"
-
-#include "atpl360.h"
 
 #ifdef PAL_ENABLE_SER_PHY
 #include "phy_serial.h"

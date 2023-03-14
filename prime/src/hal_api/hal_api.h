@@ -48,7 +48,6 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include "conf_hal.h"
 
 /* @cond 0 */
 /**INDENT-OFF**/
@@ -67,140 +66,27 @@ extern "C" {
  * @{
  */
 
-/** \brief Register definition for NVIC */
-/* @{ */
-/** (NVIC) Interrupt Set-enable register */
-#define NVIC_ISER0        (0xE000E100U)
-/** (NVIC) Interrupt Clear-enable register */
-#define NVIC_ICER0        (0xE000E180U)
-/** (NVIC) Interrupt Set-pending register */
-#define NVIC_ISPR0        (0xE000E200U)
-/** (NVIC) Interrupt Clear-pending register */
-#define NVIC_ICPR0        (0xE000E280U)
-/* @} */
-
-/** \brief HAL_PLC interruption priority */
-/** \note In case of use of FreeRTOS, GROUP_PRIO is greater than configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY */
-/* @{ */
-#define HAL_PLC_PRIO                      11
-#define HAL_PLC_ADC_PRIO                  1
-/* @} */
-
-#ifdef HAL_ATPL360_INTERFACE
-/** \brief PLC communication parameters */
-/* @{ */
-#define HAL_PLC_DLYBS                       ATPL360_SPI_DLYBS
-#define HAL_PLC_DLYBCT                      ATPL360_SPI_DLYBCT
-/* @} */
-/** \brief PLC commands */
-/* @{ */
-#define HAL_PLC_CMD_READ                    ATPL360_CMD_READ
-#define HAL_PLC_CMD_WRITE                   ATPL360_CMD_WRITE
-#define HAL_PLC_WR_RD_POS                   ATPL360_WR_RD_POS
-#define HAL_PLC_LEN_MASK                    ATPL360_LEN_MASK
-
-/** SPI Header field when bootload is in the other side of spi*/
-#define HAL_PLC_SPI_HEADER_BOOT                     ATPL360_SPI_HEADER_BOOT
-/** SPI Header MASK for bootloader heade*/
-#define HAL_PLC_SPI_HEADER_BOOT_MASK                ATPL360_SPI_HEADER_BOOT_MASK
-/** SPI Header field when atpl360 is in the other side of spi*/
-#define HAL_PLC_SPI_HEADER_CORTEX                   ATPL360_SPI_HEADER_CORTEX
-
-#define HAL_PLC_GET_ID_HEADER(b0, b1)               ATPL360_GET_ID_HEADER(b0, b1)
-#define HAL_PLC_GET_FLAGS_FROM_BOOT(b0, b2, b3)     ATPL360_GET_FLAGS_FROM_BOOT(b0, b2, b3)
-#define HAL_PLC_GET_FLAGS_FROM_CORTEX(b2, b3)       ATPL360_GET_FLAGS_FROM_CORTEX(b2, b3)
-
-#define HAL_PLC_CHECK_ID_BOOT_HEADER(val)           ATPL360_CHECK_ID_BOOT_HEADER(val)
-#define HAL_PLC_CHECK_ID_CORTEX_HEADER(val)         ATPL360_CHECK_ID_CORTEX_HEADER(val)
-/* @} */
-typedef struct spi_data {
-	uint16_t us_len;
-	uint16_t us_address;
-	uint8_t *puc_data_buf;
-} spi_data_t;
-
-typedef struct spi_status_info {
-	uint32_t ul_flags;
-	uint16_t us_header_id;
-} spi_status_info_t;
-
-/* Avoid warning */
-#define HAL_PLC_CMD_WRITE_REP              0
-
-#else  /* !HAL_ATPL360_INTERFACE */
-/** \brief PLC communication parameters */
-/* @{ */
-#define HAL_PLC_DLYBS                     10
-#define HAL_PLC_DLYBCT                    0
-/* @} */
-/** Programmable Clock Settings (Hz) */
-#define HAL_PLC_CLOCK                     9000000
-/** \brief PLC commands */
-/* @{ */
-#define HAL_PLC_CMD_READ                   0x63
-#define HAL_PLC_CMD_WRITE                  0x2a
-#define HAL_PLC_CMD_WRITE_REP              0x1e
-#define HAL_PLC_CMD_AND                    0x4c
-#define HAL_PLC_CMD_OR                     0x71
-#define HAL_PLC_CMD_XOR                    0x6d
-/* @} */
-#endif
-
-/*
- * Monitoring Rate for Supply Monitor
- */
-#define CONTINUOUS_MONITORING                0x00000100
-#define MONITOR_ONE_OUT_OF_32SLCK_CYCLES     0x00000200
-#define MONITOR_ONE_OUT_OF_256SLCK_CYCLES    0x00000200
-#define MONITOR_ONE_OUT_OF_2048SLCK_CYCLES   0x00000200
-
-/*
- * Threshold for Supply Monitor (for PIC32CX, see SUPC file)
- */
-#define THRESHOLD_3V40                   0x0000000F
-#define THRESHOLD_3V28                   0x0000000E
-#define THRESHOLD_3V16                   0x0000000D
-#define THRESHOLD_3V04                   0x0000000C
-#define THRESHOLD_2V92                   0x0000000B
-#define THRESHOLD_2V80                   0x0000000A
-#define THRESHOLD_2V68                   0x00000009
-#define THRESHOLD_2V56                   0x00000008
-#define THRESHOLD_2V44                   0x00000007
-#define THRESHOLD_2V32                   0x00000006
-#define THRESHOLD_2V20                   0x00000005
-#define THRESHOLD_2V08                   0x00000004
-
-/** CRC types */
-enum HAL_PCRC_CRC_types {
-	HAL_PCRC_CRC_TYPE_8 = 0,
-	HAL_PCRC_CRC_TYPE_16 = 1,
-	HAL_PCRC_CRC_TYPE_24 = 2,
-	HAL_PCRC_CRC_TYPE_32 = 3,
-};
-
-/** \brief Header type */
-/* @{ */
-/** Header type: GENERIC PACKET */
-#define HAL_PCRC_HT_GENERIC                0
-/** Header type: PROMOTION PACKET */
-#define HAL_PCRC_HT_PROMOTION              1
-/** Header type: BEACON PACKET */
-#define HAL_PCRC_HT_BEACON                 2
-/** Header type: USI message */
-#define HAL_PCRC_HT_USI                    3
-/** Header type: SAR message */
-#define HAL_PCRC_HT_SAR                    4
-/* @} */
-
-/** Invalid CRC */
-#define HAL_PCRC_CRC_INVALID               0xFFFFFFFF
-
-/** Signature algorithms */
+/** \brief General Purpose Timers identificators */
 typedef enum {
-	HAL_FU_NO_SIGNATURE = 0,
-	HAL_FU_RSA3072_SHA256,
-	HAL_FU_ECDSA256_SHA256,
-} hal_fu_signature_algorithm_t;
+	HAL_GP_PLC_TIMER = 0,
+	HAL_GP_TIMER_NUM
+} hal_gp_timer_t;
+
+/** \brief Timer mode */
+typedef enum {
+	HAL_TIMER_MODE_16_BITS = 0,
+	HAL_TIMER_MODE_32_BITS,
+	HAL_TIMER_MODE_NUM
+} hal_timer_mode_t;
+
+/** \brief Timer CLK source */
+typedef enum {
+	HAL_TIMER_CLK_SRC_CLK1 = (0x0u << 0),  /* TC_CMR_TCCLKS_TIMER_CLOCK1 */
+	HAL_TIMER_CLK_SRC_CLK2 = (0x1u << 0),  /* TC_CMR_TCCLKS_TIMER_CLOCK2 */
+	HAL_TIMER_CLK_SRC_CLK3 = (0x2u << 0),  /* TC_CMR_TCCLKS_TIMER_CLOCK3 */
+	HAL_TIMER_CLK_SRC_CLK4 = (0x3u << 0),  /* TC_CMR_TCCLKS_TIMER_CLOCK4 */
+	HAL_TIMER_CLK_SRC_CLK5 = (0x4u << 0),  /* TC_CMR_TCCLKS_TIMER_CLOCK5 */
+} hal_timer_clk_src_t;
 
 /** FU information */
 typedef struct {
@@ -230,118 +116,16 @@ typedef enum {
 	HAL_FU_IMAGE_FAIL
 } hal_fu_verif_result_t;
 
-/** Frequency to poll internal usart buffer (Hz) */
-#define FREQ_TIMER_POLL_USART              100
-
-/** \brief Manage interruption priorities
- * \note In case of use of FreeRTOS, GROUP_PRIO has the same value as configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY
- */
-/* @{ */
-#define TIMER_USART_PRIO                   10
-#define USART0_PRIO                        10
-#define USART1_PRIO                        10
-#define USART2_PRIO                        10
-#define USART3_PRIO                        10
-#define USART4_PRIO                        10
-#define USART6_PRIO                        10
-/* @} */
-
-/** Frequency to poll internal uart buffer (Hz) */
-#define FREQ_TIMER_POLL_UART               100
-
-/** \brief Manage interruption priorities
- * \note In case of use of FreeRTOS, GROUP_PRIO has the same value as configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY
- */
-/* @{ */
-#define TIMER_UART_PRIO                    10
-#define UART0_PRIO                         10
-#define UART1_PRIO                         10
-/* @} */
-
-/** \brief UART definitions */
-/* @{ */
-#define SERIAL_UART_0                      0
-#define SERIAL_UART_1                      1
-/* @} */
-
-/** GPIO direction */
+/* Type of information relative to configuration parameters */
 typedef enum {
-	HAL_GPIO_DIR_INPUT = 0,
-	HAL_GPIO_DIR_OUTPUT
-} hal_gpio_dir_t;
-
-/** GPIO bank IDs */
-typedef enum {
-	/** ID_PIOA */
-	HAL_GPIO_BANK_ID_A =       11,
-	/** ID_PIOB */
-	HAL_GPIO_BANK_ID_B =       12,
-	/** ID_PIOC */
-	HAL_GPIO_BANK_ID_C =       37,
-	HAL_GPIO_BANK_ID_INVALID = 0xFF
-} hal_gpio_bank_id_t;
-
-/** \brief GPIO number of pins */
-/* @{ */
-#define HAL_GPIO_NUM_GPIOS_A               32
-#define HAL_GPIO_NUM_GPIOS_B               32
-#define HAL_GPIO_NUM_GPIOS_C               10
-/* @} */
-
-/** \brief USI Rx Errors */
-/* @{ */
-#define USI_NOT_ENOUGH_DATA                 9001
-#define USI_BAD_LENGTH                      9002
-#define USI_BAD_PROTOCOL                    9003
-#define USI_BAD_CRC                         9004
-#define USI_INVALID_LENGTH                  9005
-#define USI_INTEGRITY_LENGTH                9006
-#define USI_WARNING_MSG_NON_PROCESSED       9007
-#define USI_WARNING_MSG_NO_INI              9008
-#define USI_WARNING_MSG_NO_END              9009
-/* @} */
-
-/** \brief Critical system error */
-/* @{ */
-#define CRITICAL_ERROR                      9999
-/* @} */
-
-/** \brief General Purpose Timers identificators */
-typedef enum {
-	HAL_GP_PLC_TIMER = 0,
-	HAL_GP_TIMER_NUM
-} hal_gp_timer_t;
-
-/** \brief Timer mode */
-typedef enum {
-	HAL_TIMER_MODE_16_BITS = 0,
-	HAL_TIMER_MODE_32_BITS,
-	HAL_TIMER_MODE_NUM
-} hal_timer_mode_t;
-
-/** \brief Timer CLK source */
-typedef enum {
-	HAL_TIMER_CLK_SRC_CLK1 = (0x0u << 0),  /* TC_CMR_TCCLKS_TIMER_CLOCK1 */
-	HAL_TIMER_CLK_SRC_CLK2 = (0x1u << 0),  /* TC_CMR_TCCLKS_TIMER_CLOCK2 */
-	HAL_TIMER_CLK_SRC_CLK3 = (0x2u << 0),  /* TC_CMR_TCCLKS_TIMER_CLOCK3 */
-	HAL_TIMER_CLK_SRC_CLK4 = (0x3u << 0),  /* TC_CMR_TCCLKS_TIMER_CLOCK4 */
-	HAL_TIMER_CLK_SRC_CLK5 = (0x4u << 0),  /* TC_CMR_TCCLKS_TIMER_CLOCK5 */
-} hal_timer_clk_src_t;
-
-/** \brief Reset sources */
-enum {
-	GENERAL_RESET       = 0,
-	BACKUP_RESET        = 1,
-	WATCHDOG_RESET      = 2,
-	SOFTWARE_RESET      = 3,
-	USER_RESET          = 4,
-	FU_RESET            = 5,
-	USAGE_FAULT_RESET   = 6,
-	BUS_FAULT_RESET     = 7,
-	MEM_MANAGE_RESET    = 8,
-	HARD_FAULT_RESET    = 9,
-	VECTOR_FAULT_RESET  = 10,
-};
+	CONFIG_TYPE_MAC_INFO = 0,
+	CONFIG_TYPE_PHY_INFO = 1,
+	CONFIG_TYPE_BN_INFO  = 2,
+	CONFIG_TYPE_MODE_PRIME = 3,
+	CONFIG_TYPE_SECURITY = 4,
+	CONFIG_TYPE_BOOT_INFO = 5,
+	CONFIG_TYPE_END_LIST
+} config_info_type_t;
 
 /** \brief PLC Universal Serial Interface */
 /* @{ */
@@ -365,120 +149,6 @@ typedef enum {
 	PROTOCOL_INVALID              = 0xFF
 } usi_protocol_t;
 
-/** Number of USI supported protocols */
-#define USI_NUMBER_OF_PROTOCOLS            7
-/** Invalid protocol index */
-#define USI_INVALID_PROTOCOL_IDX           0xFF
-
-/** USI operation results */
-typedef enum {
-	USI_STATUS_PROTOCOL_NOT_FOUND,
-	USI_STATUS_PROTOCOL_NOT_REGISTERED,
-	USI_STATUS_TX_BUFFER_OVERFLOW,
-	USI_STATUS_TX_BUSY,
-	USI_STATUS_TX_BLOCKED,
-	USI_STATUS_RX_BUFFER_OVERFLOW,
-	USI_STATUS_RX_BLOCKED,
-	USI_STATUS_UART_ERROR,
-	USI_STATUS_FORMAT_ERROR,
-	USI_STATUS_OK,
-	USI_STATUS_INVALID
-} usi_status_t;
-
-/** Message Structure to communicate with USI layer */
-typedef struct {
-	uint8_t uc_protocol_type;    /* Protocol Type */
-	uint8_t *ptr_buf;            /* Pointer to data buffer */
-	uint16_t us_len;             /* Length of data */
-} x_usi_serial_cmd_params_t;
-
-/** \brief Types to manage commands */
-/* @{ */
-typedef uint8_t (*pf_usi_get_cmd)(void);
-typedef void (*pf_usi_set_cmd)(uint8_t);
-/* @} */
-/* @} */
-
-/** Configuration key to manage MAC address */
-#define HAL_MAC_CONFIG_KEY      0xAA55
-
-/** Type to manage MAC address */
-typedef struct {
-	uint16_t us_cfg_key;
-	uint8_t uc_mac[6];
-} x_mac_cfg_t;
-
-/** Configuration key to manage PHY params */
-#define HAL_PRIME_PHY_CONFIG_KEY  0xAA99
-
-/** Type to manage PHY params */
-typedef struct {
-	uint16_t ul_cfg_key;
-	uint16_t rfChannel;
-	uint8_t txrxChannel;
-	uint8_t txrxChannelList;
-	uint8_t txrxDoubleChannelList;
-} x_phy_cfg_t;
-
-/** Configuration key to manage BN params */
-#define HAL_PRIME_BN_INFO_CONFIG_KEY_13  0xAA55
-#define HAL_PRIME_BN_INFO_CONFIG_KEY_14  0xAA66
-
-/** Type to manage BN params */
-typedef struct {
-	uint16_t key;
-	uint16_t mac_lnid_offset;
-	uint8_t conf_sar;
-	uint8_t conf_mod_bcn_auto;
-	uint8_t conf_rm_forced;
-	uint8_t conf_bcn_switch_rate;
-	uint8_t conf_sec_prof;
-} x_bn_info_cfg_t;
-
-/** Configuration key to manage prime board mode configuration */
-#define HAL_PRIME_MODE_CONFIG_KEY  0xA55A
-
-/** Type to manage prime board mode configuration.
- *  board_mode indicates board function ( PRIME_BN or PRIME_SN )
- *  prime_version indicates prime version protocol  PRIME_1_3, PRIME_1_4 or PRIME_BC */
-typedef struct {
-	uint16_t key;
-	uint8_t prime_version;
-	uint8_t board_mode;
-} x_prime_mode_info_cfg_t;
-
-/** Configuration key to manage DUK */
-#define HAL_SEC_CONFIG_KEY      0x5AA5
-
-/** Type to manage DUK */
-typedef struct {
-	uint16_t us_cfg_key;
-	uint8_t duk[16];
-} x_sec_cfg_t;
-
-/** Configuration key to manage the boot information */
-#define HAL_BOOT_CONFIG_KEY      0x55AA55AA
-
-/** Type to manage the boot information */
-typedef struct {
-	uint32_t ul_cfg_key;
-	uint32_t ul_img_size;
-	uint32_t ul_orig_addr;
-	uint32_t ul_dest_addr;
-	uint8_t uc_pages_counter;
-	uint8_t uc_boot_state;
-} x_boot_info_cfg_t;
-
-/* Type of information relative to configuration parameters */
-typedef enum {
-	CONFIG_TYPE_MAC_INFO = 0,
-	CONFIG_TYPE_PHY_INFO = 1,
-	CONFIG_TYPE_BN_INFO  = 2,
-	CONFIG_TYPE_MODE_PRIME = 3,
-	CONFIG_TYPE_SECURITY = 4,
-	CONFIG_TYPE_BOOT_INFO = 5,
-	CONFIG_TYPE_END_LIST
-} config_info_type_t;
 
 /** \brief HAL functions interface */
 /* @{ */
@@ -539,13 +209,6 @@ bool hal_null_dev_set_read_callback(hal_null_dev_read_callback_t ptr_func);
 bool hal_null_dev_set_write_callback(hal_null_dev_write_callback_t ptr_func);
 
 #ifdef HAL_ATPL360_INTERFACE
-/** Time reference delay */
-typedef enum {
-	HAL_TREF_SEC = 0,
-	HAL_TREF_MS,
-	HAL_TREF_US
-} tref_delay_mode_t;
-
 typedef bool (*hal_plc_send_boot_cmd_t)(uint16_t us_cmd, uint32_t ul_addr, uint32_t ul_data_len, uint8_t *puc_data_buf, uint8_t *puc_data_read);
 typedef bool (*hal_plc_send_wrrd_cmd_t)(uint8_t uc_cmd, void *px_spi_data, void *px_spi_status_info);
 typedef void (*hal_plc_enable_interrupt_t)(bool enable);

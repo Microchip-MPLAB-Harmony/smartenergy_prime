@@ -52,7 +52,7 @@ extern "C" {
 /**INDENT-ON**/
 /* @endcond */
 
-#include "hal.h"
+#include "hal_api.h"
 
 /** HAL wrapper configuration */
 void prime_hal_config(hal_api_t *hal_api_ptr);
