@@ -43,18 +43,24 @@
 
 #include <stdio.h>
 #include "prime_hal_wrapper.h"
-#include "pal.h"
-#include "mac.h"
-#include "cl_null.h"
-#include "mngp.h"
-#include "cl_432.h"
 #include "prime_api.h"
-#include "prime_hal_wrapper.h"
+#include "pal.h"
+#include "stack/prime/mac/mac.h"
+#include "stack/prime/mngp/mngp.h"
+#include "stack/prime/conv/sscs/null/cl_null.h"
+#include "stack/prime/conv/sscs/iec_4_32/cl_432.h"
 
 #ifdef PAL_ENABLE_SER_PHY
 #include "phy_serial.h"
 #include "conf_phy_serial.h"
 #endif
+
+#define NUM_MAX_NODES            ${NUM_MAX_NODES}
+#define MAC_SECURITY_PROFILE     ${MAC_SECURITY_PROFILE}
+#define MNGP_SPROF_USI_PORT      ${MNGP_SPROF_USI_PORT}
+<#if MAC_SNIFFER_EN == true>
+#define MAC_SNIFFER_USI_PORT     ${MAC_SNIFFER_USI_PORT}
+</#if>
 
 /* @cond 0 */
 /**INDENT-OFF**/
@@ -68,8 +74,8 @@ extern "C" {
  * \weakgroup prime_api_group
  * @{
  */
-#ifdef PRIME_API_SEPARATED_APPS
-#ifdef __GNUC__
+<#if PRIME_MODE == "SN" && PRIME_PROJECT == "bin project">
+/* __GNUC__ */
 /** \brief Initialize segments */
 /* @{ */
 extern uint32_t _szero;
@@ -88,32 +94,7 @@ static void _prime_data_startup(void)
 		*pDest++ = 0;
 	}
 }
-
-#endif /* __GNUC__ */
-
-#ifdef __ICCARM__
-#pragma section = ".bss"
-
-/**
- * \brief PRIME data startup
- */
-static void _prime_data_startup(void)
-{
-	uint8_t *bss_start, *bss_end;
-	uint32_t n;
-
-	bss_start = __section_begin(".bss");
-	bss_end = __section_end(".bss");
-
-	/* Clear the zero-initialized data section */
-	n = bss_end - bss_start;
-	while (n--) {
-		*bss_start++ = 0;
-	}
-}
-
-#endif /* __ICCARM__ */
-#endif /* PRIME_API_SEPARATED_APPS */
+</#if>
 
 /**
  * \brief Set PRIME version
@@ -173,9 +154,9 @@ void prime_stack_init(void *px_hal_api)
 	/* set critical region */
 	__set_BASEPRI( 2 << (8 - __NVIC_PRIO_BITS));
 
-#ifdef PRIME_API_SEPARATED_APPS
+<#if PRIME_MODE == "SN" && PRIME_PROJECT == "bin project">
 	_prime_data_startup();
-#endif
+</#if>
 	/* Set PRIME HAL wrapper */
 	prime_hal_config(px_hal_api);
 
@@ -189,24 +170,16 @@ void prime_stack_init(void *px_hal_api)
 	phy_ser_init((uint8_t)PHY_USI_PORT);
 #endif
 
-#ifdef MAC_SNIFFER_USI_PORT
+<#if MAC_SNIFFER_EN == true>
 	mac_sniffer_if_init(MAC_SNIFFER_USI_PORT);
-#endif
+</#if>
 
 	/* Initialize MAC layer */
-#ifdef MAC_SECURITY_PROFILE
 	mac_init(&mac_info, (uint8_t)MAC_SECURITY_PROFILE);
-#else
-	mac_init(&mac_info, 0);
-#endif
 
 	/* Initialize CONV layer */
 	cl_null_init();
-#if USED_SSCS == SSCS_432
 	cl_432_init();
-#elif USED_SSCS == SSCS_IPV6
-	cl_ipv6_init();
-#endif
 
 	/* Initialize Management Plane */
 	mngp_init(&mac_info, (uint8_t)MNGP_SPROF_USI_PORT);
@@ -232,10 +205,10 @@ void prime_stack_process(void)
 	phy_ser_process();
 #endif
 
-#if PRIME_MODE == PRIME_SN
+<#if (PRIME_MODE == "SN") || (PRIME_MODE == "BN" && BN_SLAVE_EN == true)>
 	/* Process MNG layer */
 	mngp_process();
-#endif
+</#if>
 
 	/* set critical region */
 	__set_BASEPRI(0);

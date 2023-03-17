@@ -88,6 +88,28 @@ typedef enum {
 	HAL_TIMER_CLK_SRC_CLK5 = (0x4u << 0),  /* TC_CMR_TCCLKS_TIMER_CLOCK5 */
 } hal_timer_clk_src_t;
 
+/** USI operation results */
+typedef enum {
+	USI_STATUS_PROTOCOL_NOT_FOUND,
+	USI_STATUS_PROTOCOL_NOT_REGISTERED,
+	USI_STATUS_TX_BUFFER_OVERFLOW,
+	USI_STATUS_TX_BUSY,
+	USI_STATUS_TX_BLOCKED,
+	USI_STATUS_RX_BUFFER_OVERFLOW,
+	USI_STATUS_RX_BLOCKED,
+	USI_STATUS_UART_ERROR,
+	USI_STATUS_FORMAT_ERROR,
+	USI_STATUS_OK,
+	USI_STATUS_INVALID
+} usi_status_t;
+
+/** Signature algorithms */
+typedef enum {
+	HAL_FU_NO_SIGNATURE = 0,
+	HAL_FU_RSA3072_SHA256,
+	HAL_FU_ECDSA256_SHA256,
+} hal_fu_signature_algorithm_t;
+
 /** FU information */
 typedef struct {
 	uint32_t image_size;
@@ -208,7 +230,7 @@ typedef uint16_t (*hal_null_dev_write_callback_t)(uint8_t chn, const void *buffe
 bool hal_null_dev_set_read_callback(hal_null_dev_read_callback_t ptr_func);
 bool hal_null_dev_set_write_callback(hal_null_dev_write_callback_t ptr_func);
 
-#ifdef HAL_ATPL360_INTERFACE
+<#if PRIME_OPERATION_MODE == "Hybrid" || PRIME_OPERATION_MODE == "PLC">
 typedef bool (*hal_plc_send_boot_cmd_t)(uint16_t us_cmd, uint32_t ul_addr, uint32_t ul_data_len, uint8_t *puc_data_buf, uint8_t *puc_data_read);
 typedef bool (*hal_plc_send_wrrd_cmd_t)(uint8_t uc_cmd, void *px_spi_data, void *px_spi_status_info);
 typedef void (*hal_plc_enable_interrupt_t)(bool enable);
@@ -216,7 +238,7 @@ typedef void (*hal_plc_delay_t)(uint8_t uc_tref, uint32_t ul_delay);
 typedef bool (*hal_plc_get_cd_t)(void);
 typedef bool (*hal_plc_set_stby_mode_t)(bool sleep);
 typedef bool (*hal_plc_get_thermal_warning_t)(void);
-#endif
+</#if>
 
 #ifdef HAL_NWK_RECOVERY_INTERFACE
 typedef uint32_t (*hal_nwk_recovery_init_t)(void);
@@ -224,9 +246,7 @@ typedef void (*hal_nwk_recovery_read_t)(uint32_t addr, uint8_t *puc_buf, uint16_
 typedef uint8_t (*hal_nwk_recovery_write_t)(uint32_t addr, uint8_t *puc_buf, uint16_t us_size);
 #endif
 
-#ifdef HAL_ENABLE_DUAL_MODE
 typedef void (*hal_swap_stack_t)(uint8_t uc_traffic);
-#endif
 
 /* Timer of 1us service interface */
 typedef uint32_t (*hal_timer_1us_get_t)(void);
@@ -235,7 +255,7 @@ typedef bool (*hal_timer_1us_cancel_int_t)(uint32_t ul_int_id);
 typedef void (*hal_timer_1us_enable_interrupt_t)(bool b_enable);
 /* @} */
 
-#ifdef HAL_ENABLE_PHY_RF
+<#if PRIME_OPERATION_MODE == "Hybrid" || PRIME_OPERATION_MODE == "RF">
 typedef uint8_t (*hal_prf_if_init_t)(void);
 typedef void (*hal_prf_if_reset_t)(void);
 typedef void (*hal_prf_if_enable_interrupt_t)(bool b_enable);
@@ -243,8 +263,7 @@ typedef void (*hal_prf_if_set_handler_t)(void (*p_handler)(void));
 typedef bool (*hal_prf_if_send_spi_cmd_t)(uint8_t *puc_data_buf, uint16_t us_addr, uint16_t us_len, uint8_t uc_mode);
 typedef bool (*hal_prf_if_is_spi_busy_t)(void);
 typedef void (*hal_prf_if_led_t)(uint8_t uc_led_id, bool b_led_on);
-#endif
-
+</#if>
 
 /** Structure of HAL functions interface */
 typedef struct {
@@ -295,20 +314,13 @@ typedef struct {
 
 	hal_net_get_freq_t net_get_freq;
 
-#if !(defined(HAL_ENABLE_DUAL_MODE)) && PRIME_HAL_VERSION == HAL_PRIME_1_4
-	hal_aes_init_t aes_init;
-	hal_aes_set_callback_t aes_set_callback;
-	hal_aes_key_t aes_key;
-	hal_aes_crypt_t aes_crypt;
-#endif
-
-#ifdef HAL_ATPL360_INTERFACE
+<#if PRIME_OPERATION_MODE == "Hybrid" || PRIME_OPERATION_MODE == "PLC">
 	hal_plc_send_boot_cmd_t plc_send_boot_cmd;
 	hal_plc_send_wrrd_cmd_t plc_send_wrrd_cmd;
 	hal_plc_enable_interrupt_t plc_enable_int;
 	hal_plc_delay_t plc_delay;
 	hal_plc_get_cd_t plc_get_cd;
-#endif
+</#if>
 
 #ifdef HAL_NWK_RECOVERY_INTERFACE
 	hal_nwk_recovery_init_t nwk_recovery_init;
@@ -321,18 +333,16 @@ typedef struct {
 	hal_pib_set_request_t pib_set_request;
 	hal_pib_set_request_set_callback_t pib_set_request_set_callback;
 
-#ifdef HAL_ENABLE_DUAL_MODE
 	hal_aes_init_t aes_init;
 	hal_aes_set_callback_t aes_set_callback;
 	hal_aes_key_t aes_key;
 	hal_aes_crypt_t aes_crypt;
 	hal_swap_stack_t swap_stack;
-#endif
 
-#ifdef HAL_ATPL360_INTERFACE
+<#if PRIME_OPERATION_MODE == "Hybrid" || PRIME_OPERATION_MODE == "PLC">
 	hal_plc_set_stby_mode_t plc_set_stby_mode;
 	hal_plc_get_thermal_warning_t plc_get_thermal_warning;
-#endif
+</#if>
 
 	/* New functions must be added at the end */
 
@@ -342,7 +352,7 @@ typedef struct {
 	hal_timer_1us_cancel_int_t timer_1us_cancel_int;
 	hal_timer_1us_enable_interrupt_t timer_1us_enable_interrupt;
 
-#ifdef HAL_ENABLE_PHY_RF
+<#if PRIME_OPERATION_MODE == "Hybrid" || PRIME_OPERATION_MODE == "RF">
 	hal_prf_if_init_t prf_if_init;
 	hal_prf_if_reset_t prf_if_reset;
 	hal_prf_if_enable_interrupt_t prf_if_enable_interrupt;
@@ -350,7 +360,7 @@ typedef struct {
 	hal_prf_if_send_spi_cmd_t prf_if_send_spi_cmd;
 	hal_prf_if_is_spi_busy_t prf_if_is_spi_busy;
 	hal_prf_if_led_t prf_if_led;
-#endif
+</#if>
 
 } hal_api_t;
 

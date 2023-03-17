@@ -195,8 +195,7 @@ typedef void (*cl_432_dl_data_ind_cb_t)(uint8_t uc_dst_lsap, uint8_t uc_src_lsap
  */
 typedef void (*cl_432_dl_data_cfm_cb_t)(uint8_t uc_dst_lsap, uint8_t uc_src_lsap, uint16_t us_dst_address, dl_432_tx_status_t uc_tx_status);
 
-#ifdef PRIME_API_BN
-
+<#if PRIME_MODE == "BN" && BN_SLAVE_EN == false>  
 /**
  * CL 432 Join Indication
  *
@@ -214,8 +213,9 @@ typedef void (*cl_432_join_ind_cb_t)(uint8_t *puc_device_id, uint8_t uc_device_i
  * - us_dst_address:   Destination 432 Address
  */
 typedef void (*cl_432_leave_ind_cb_t)(uint16_t us_dst_address);
-#else
+</#if>
 
+<#if (PRIME_MODE == "SN") || (PRIME_MODE == "BN" &&  BN_SLAVE_EN == true)>
 /**
  * CL 432 Release confirm
  *
@@ -223,19 +223,20 @@ typedef void (*cl_432_leave_ind_cb_t)(uint16_t us_dst_address);
  * - uc_result:        Confirmation result
  */
 typedef void (*cl_432_release_cfm_cb_t)(uint16_t us_dst_address, dl_432_result_t uc_result);
-#endif
+</#if>
 
 /** CL432 callbacks configuration */
 typedef struct {
 	cl_432_dl_data_ind_cb_t cl_432_dl_data_ind_cb;
 	cl_432_dl_data_cfm_cb_t cl_432_dl_data_cfm_cb;
-#ifdef PRIME_API_BN
+<#if PRIME_MODE == "BN" && BN_SLAVE_EN == false>  
 	cl_432_join_ind_cb_t cl_432_join_ind_cb;
 	cl_432_leave_ind_cb_t cl_432_leave_ind_cb;
-#else
-	cl_432_establish_cfm_cb_t cl_432_establish_cfm_cb;
+</#if>
+<#if (PRIME_MODE == "SN") || (PRIME_MODE == "BN" &&  BN_SLAVE_EN == true)>
+    cl_432_establish_cfm_cb_t cl_432_establish_cfm_cb;
 	cl_432_release_cfm_cb_t cl_432_release_cfm_cb;
-#endif
+</#if>
 } cl_432_callbacks_t;
 
 /**

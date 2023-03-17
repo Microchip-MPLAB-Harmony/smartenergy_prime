@@ -111,7 +111,7 @@ void prime_hal_set_plc_timer_handler(void (*p_handler)(void))
 
 /* @} */
 
-/** \brief ABSP interface */
+/** \brief PCRC interface */
 /* @{ */
 uint32_t prime_hal_pcrc_calc(uint8_t *puc_buf, uint32_t ul_len, uint8_t uc_header_type, uint8_t uc_crc_type, bool b_v14_mode)
 {
@@ -157,7 +157,7 @@ void prime_hal_plc_rx_signal(void)
 	p_hal_api->plc_rx_signal();
 }
 
-#ifdef HAL_ATPL360_INTERFACE
+<#if PRIME_OPERATION_MODE == "Hybrid" || PRIME_OPERATION_MODE == "PLC">
 bool prime_hal_plc_send_boot_cmd(uint16_t us_cmd, uint32_t ul_addr, uint32_t ul_data_len, uint8_t *puc_data_buf, uint8_t *puc_data_read)
 {
 	return p_hal_api->plc_send_boot_cmd(us_cmd, ul_addr, ul_data_len, puc_data_buf, puc_data_read);
@@ -192,8 +192,7 @@ bool prime_hal_plc_get_thermal_warning(void)
 {
 	return p_hal_api->plc_get_thermal_warning();
 }
-
-#endif
+</#if>
 
 /* @} */
 
@@ -344,15 +343,6 @@ void prime_hal_debug_report(uint32_t ul_err_type)
 
 /* @} */
 
-#if PRIME_HAL_VERSION == HAL_PRIME_1_4
-/** \brief Network Frequency Interface */
-/* @{ */
-uint32_t prime_hal_net_get_freq(void)
-{
-	return p_hal_api->net_get_freq();
-}
-
-/* @} */
 
 /** \brief AES Interface */
 /* @{ */
@@ -377,7 +367,6 @@ void prime_hal_aes_crypt(bool b_crypt_mode, uint8_t *puc_in_text, uint8_t *puc_o
 }
 
 /* @} */
-#endif
 
 /** \brief Parameter Information Base Interface */
 /* @{ */
@@ -404,11 +393,7 @@ void prime_hal_pib_set_request_set_callback(void (*p_handler)(uint8_t uc_result)
 
 void prime_hal_swap_stack(uint8_t uc_traffic)
 {
-#ifdef HAL_ENABLE_DUAL_MODE
 	p_hal_api->swap_stack(uc_traffic);
-#else
-	(void)uc_traffic;
-#endif
 }
 
 /** \brief Parameter Information Base Interface */
@@ -435,9 +420,9 @@ bool prime_hal_timer_1us_cancel_int(uint32_t ul_int_id)
 /* @} */
 
 
-/** \brief Parameter Information Base Interface */
+/** \brief RF Interface */
 /* @{ */
-#ifdef HAL_ENABLE_PHY_RF
+<#if PRIME_OPERATION_MODE == "Hybrid" || PRIME_OPERATION_MODE == "RF">
 uint8_t prime_hal_prf_if_init(void)
 {
 	return p_hal_api->prf_if_init();
@@ -472,7 +457,8 @@ void prime_hal_prf_if_led(uint8_t uc_led_id, bool b_led_on)
 {
 	p_hal_api->prf_if_led(uc_led_id, b_led_on);
 }
-#endif
+</#if>
+
 	/* @} */
 
 

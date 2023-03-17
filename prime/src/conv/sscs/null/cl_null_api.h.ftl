@@ -52,7 +52,7 @@
 #include <string.h>
 
 /* MAC includes */
-#include "mac_defs.h"
+#include "stack/prime/mac/mac_defs.h"
 
 /* @cond 0 */
 /**INDENT-OFF**/
@@ -99,11 +99,11 @@ void cl_null_leave_request(uint16_t us_con_handle, uint8_t *puc_eui48);
 
 /* @} */
 
-#ifdef PRIME_API_BN
+<#if PRIME_MODE == "BN" && BN_SLAVE_EN == false>
 /** \brief CL NULL SIGNALING PRIMITIVES */
 /* @{ */
 void cl_null_redirect_response(uint16_t us_con_handle, uint8_t *puc_eui48, uint8_t *puc_data, uint16_t us_data_len);
-#endif
+</#if>
 
 /* @} */
 
@@ -126,11 +126,11 @@ void cl_null_plme_set_request(uint16_t us_pib_attrib, void *pv_pib_value, uint8_
 
 /** \brief CL NULL MLME PRIMITIVES */
 /* @{ */
-#if (PRIME_MODE == PRIME_SN)
+<#if (PRIME_MODE == "SN") || (PRIME_MODE == "BN" &&  BN_SLAVE_EN == true)>
 void cl_null_mlme_register_request(uint8_t *puc_sna, uint8_t uc_sid);
 void cl_null_mlme_unregister_request(void);
 void cl_null_mlme_demote_request(void);
-#endif
+</#if>
 
 void cl_null_mlme_promote_request(uint8_t *puc_eui48, uint8_t uc_bcn_mode);
 void cl_null_mlme_reset_request(void);

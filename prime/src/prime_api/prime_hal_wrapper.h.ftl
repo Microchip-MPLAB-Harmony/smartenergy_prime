@@ -52,7 +52,7 @@ extern "C" {
 /**INDENT-ON**/
 /* @endcond */
 
-#include "hal_api.h"
+#include "stack/prime/hal_api/hal_api.h"
 
 /** HAL wrapper configuration */
 void prime_hal_config(hal_api_t *hal_api_ptr);
@@ -72,7 +72,7 @@ void prime_hal_set_plc_timer_handler(void (*p_handler)(void));
 
 /* @} */
 
-/** \brief ABSP interface */
+/** \brief PCRC interface */
 /* @{ */
 uint32_t prime_hal_pcrc_calc(uint8_t *puc_buf, uint32_t ul_len, uint8_t uc_header_type, uint8_t uc_crc_type, bool b_v14_mode);
 void prime_hal_pcrc_config_sna(uint8_t *puc_sna);
@@ -88,17 +88,15 @@ void prime_hal_plc_set_handler(void (*p_handler)(void));
 void prime_hal_plc_tx_signal(void);
 void prime_hal_plc_rx_signal(void);
 
-#ifdef HAL_ATPL360_INTERFACE
+<#if PRIME_OPERATION_MODE == "Hybrid" || PRIME_OPERATION_MODE == "PLC">
 bool prime_hal_plc_send_boot_cmd(uint16_t us_cmd, uint32_t ul_addr, uint32_t ul_data_len, uint8_t *puc_data_buf, uint8_t *puc_data_read);
 bool prime_hal_plc_send_wrrd_cmd(uint8_t uc_cmd, void *px_spi_data, void *px_spi_status_info);
 void prime_hal_plc_enable_interrupt(bool enable);
 void prime_hal_plc_delay(uint8_t uc_tref, uint32_t ul_delay);
 bool prime_hal_plc_get_cd(void);
-
 bool prime_hal_plc_set_stby_mode(bool sleep);
 bool prime_hal_plc_get_thermal_warning(void);
-
-#endif
+</#if>
 
 /* @} */
 
@@ -149,13 +147,6 @@ void prime_hal_debug_report(uint32_t ul_err_type);
 
 /* @} */
 
-/** \brief Network Frequency Interface */
-/* @{ */
-uint32_t prime_hal_net_get_freq(void);
-
-/* @} */
-
-#if PRIME_HAL_VERSION == HAL_PRIME_1_4
 /** \brief AES Interface */
 /* @{ */
 void prime_hal_aes_init(void);
@@ -164,7 +155,6 @@ void prime_hal_aes_key(uint8_t *puc_key, uint8_t uc_key_len);
 void prime_hal_aes_crypt(bool b_crypt_mode, uint8_t *puc_plain_text, uint8_t *puc_cipher_text);
 
 /* @} */
-#endif
 
 /** \brief Parameter Information Base Interface */
 /* @{ */
@@ -187,9 +177,9 @@ bool prime_hal_timer_1us_set_int(uint32_t ul_time_us, bool b_relative, void (*p_
 bool prime_hal_timer_1us_cancel_int(uint32_t ul_int_id);
 /* @} */
 
-/** \brief Parameter Information Base Interface */
+/** \brief RF Interface */
 /* @{ */
-#ifdef HAL_ENABLE_PHY_RF
+<#if PRIME_OPERATION_MODE == "Hybrid" || PRIME_OPERATION_MODE == "RF">
 uint8_t prime_hal_prf_if_init(void);
 void prime_hal_prf_if_reset(void);
 void prime_hal_prf_if_enable_interrupt(bool b_enable);
@@ -197,7 +187,7 @@ void prime_hal_prf_if_set_handler(void (*p_handler)(void));
 bool prime_hal_prf_if_send_spi_cmd(uint8_t *puc_data_buf, uint16_t us_addr, uint16_t us_len, uint8_t uc_mode);
 bool prime_hal_prf_if_is_spi_busy(void);
 void prime_hal_prf_if_led(uint8_t uc_led_id, bool b_led_on);
-#endif
+</#if>
 /* @} */
 
 /* @cond 0 */

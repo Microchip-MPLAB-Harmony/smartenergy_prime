@@ -45,7 +45,7 @@
 #define MNGP_H_INCLUDED
 
 /* MAC includes */
-#include "mac_defs.h"
+#include "stack/prime/mac/mac_defs.h"
 
 /* @cond 0 */
 /**INDENT-OFF**/
@@ -68,7 +68,10 @@ extern "C" {
 /** \brief Management Plane interface */
 /* @{ */
 void mngp_init(mac_version_info_t *px_mac_info, uint8_t uc_usi_port);
+
+<#if (PRIME_MODE == "SN") || (PRIME_MODE == "BN" && BN_SLAVE_EN == true)>
 void mngp_process(void);
+</#if>
 
 /* @} */
 

@@ -69,6 +69,12 @@ extern "C" {
  * @{
  */
 
+#define PRIME_FW_VENDOR          "${PRIME_FW_VENDOR?string}"
+#define PRIME_FW_MODEL           "${PRIME_FW_MODEL?string}"
+#define PRIME_FW_VERSION         "${PRIME_FW_VERSION?string}"
+#define PRIME_PIB_VENDOR         ${PRIME_PIB_VENDOR}
+#define PRIME_PIB_MODEL          0x${PRIME_PIB_MODEL}
+
 /** \brief PRIME control interface */
 /* @{ */
 void prime_stack_init(void *px_hal_api);
@@ -76,23 +82,12 @@ void prime_stack_process(void);
 
 /* @} */
 
-#ifdef PRIME_API_SEPARATED_APPS
+<#if PRIME_MODE == "SN" && PRIME_PROJECT == "bin project">
 /** Pointer to the PRIME stack */
 extern uint32_t prime_api;
 #define PRIME_API_FUNCS_OFFSET                    0x18
 /** \brief PRIME constants located in header table (offset, type) duplets */
 /* @{ */
-/* define PRIME versions */
-#define PRIME_1_3                                 1
-#define PRIME_1_4                                 2
-
-
-/* define PRIME MODE */
-#define PRIME_BN                                  1
-#define PRIME_SN                                  2
-#define PRIME_GN                                  3
-
-#define PRIME_MODE                                PRIME_SN
 
 #define PRIME_VENDOR                              (*((uint16_t *)((prime_api) + (0x00))))
 #define PRIME_MODEL                               (*((uint16_t *)((prime_api) + (0x02))))
@@ -125,33 +120,20 @@ extern uint32_t prime_api;
 #define prime_cl_null_mlme_get_request                    ((mlme_get_request_t)(prime_api + ((uint32_t *)(prime_api + PRIME_API_FUNCS_OFFSET))[22]))
 #define prime_cl_null_mlme_list_get_request               ((mlme_list_get_request_t)(prime_api + ((uint32_t *)(prime_api + PRIME_API_FUNCS_OFFSET))[23]))
 #define prime_cl_null_mlme_set_request                    ((mlme_set_request_t)(prime_api + ((uint32_t *)(prime_api + PRIME_API_FUNCS_OFFSET))[24]))
-#if USED_SSCS == SSCS_432
 #define prime_cl_432_set_callbacks                        ((cl_432_set_callbacks_t)(prime_api + ((uint32_t *)(prime_api + PRIME_API_FUNCS_OFFSET))[25]))
 #define prime_cl_432_establish_request                    ((cl_432_establish_request_t)(prime_api + ((uint32_t *)(prime_api + PRIME_API_FUNCS_OFFSET))[26]))
 #define prime_cl_432_release_request                      ((cl_432_release_request_t)(prime_api + ((uint32_t *)(prime_api + PRIME_API_FUNCS_OFFSET))[27]))
 #define prime_cl_432_dl_data_request                      ((cl_432_dl_data_request_t)(prime_api + ((uint32_t *)(prime_api + PRIME_API_FUNCS_OFFSET))[28]))
-#elif USED_SSCS == SSCS_IPV6
-#define prime_cl_ipv6_set_callbacks                       ((cl_ipv6_set_callbacks_t)(prime_api + ((uint32_t *)(prime_api + PRIME_API_FUNCS_OFFSET))[25]))
-#define prime_cl_ipv6_establish_request                   ((cl_ipv6_establish_request_t)(prime_api + ((uint32_t *)(prime_api + PRIME_API_FUNCS_OFFSET))[26]))
-#define prime_cl_ipv6_release_request                     ((cl_ipv6_release_request_t)(prime_api + ((uint32_t *)(prime_api + PRIME_API_FUNCS_OFFSET))[27]))
-#define prime_cl_ipv6_register_request                    ((cl_ipv6_register_request_t)(prime_api + ((uint32_t *)(prime_api + PRIME_API_FUNCS_OFFSET))[28]))
-#define prime_cl_ipv6_unregister_request                  ((cl_ipv6_unregister_request_t)(prime_api + ((uint32_t *)(prime_api + PRIME_API_FUNCS_OFFSET))[29]))
-#define prime_cl_ipv6_mul_join_request                    ((cl_ipv6_mul_join_request_t)(prime_api + ((uint32_t *)(prime_api + PRIME_API_FUNCS_OFFSET))[30]))
-#define prime_cl_ipv6_mul_leave_request                   ((cl_ipv6_mul_leave_request_t)(prime_api + ((uint32_t *)(prime_api + PRIME_API_FUNCS_OFFSET))[31]))
-#define prime_cl_ipv6_data_request                        ((cl_ipv6_data_request_t)(prime_api + ((uint32_t *)(prime_api + PRIME_API_FUNCS_OFFSET))[32]))
-#else
-#error No SSCS defined
-#endif
 /* @} */
-#else
-#include "cl_null_api.h"
-#if USED_SSCS == SSCS_432
-#include "cl_432_api.h"
-#elif USED_SSCS == SSCS_IPV6
-#include "cl_ipv6_api.h"
-#else
-#error No SSCS defined
-#endif
+
+<#else>
+
+#include "stack/prime/conv/sscs/null/cl_null_api.h"
+#include "stack/prime/conv/sscs/iec_4_32/cl_432_api.h"
+<#if PRIME_MODE == "BN" && BN_SLAVE_EN == false>
+#include "stack/prime/mngp/bmng_api.h"
+</#if>
+
 /** \brief PRIME control functions interface. Direct Access to PRIME lib */
 /* @{ */
 #define prime_init                                        prime_stack_init
@@ -161,9 +143,9 @@ extern uint32_t prime_api;
 #define prime_cl_null_establish_response                  cl_null_establish_response
 #define prime_cl_null_release_request                     cl_null_release_request
 #define prime_cl_null_release_response                    cl_null_release_response
-#ifdef PRIME_API_BN
+<#if PRIME_MODE == "BN" && BN_SLAVE_EN == false>
 #define prime_cl_null_redirect_response                   cl_null_redirect_response
-#endif
+</#if>
 #define prime_cl_null_join_request                        cl_null_join_request
 #define prime_cl_null_join_response                       cl_null_join_response
 #define prime_cl_null_leave_request                       cl_null_leave_request
@@ -174,36 +156,25 @@ extern uint32_t prime_api;
 #define prime_cl_null_plme_testmode_request               cl_null_plme_testmode_request
 #define prime_cl_null_plme_get_request                    cl_null_plme_get_request
 #define prime_cl_null_plme_set_request                    cl_null_plme_set_request
-#ifndef PRIME_API_BN
+<#if (PRIME_MODE == "SN" && PRIME_PROJECT == "appplication project") || (PRIME_MODE == "BN" && BN_SLAVE_EN == true)>
 #define prime_cl_null_mlme_register_request               cl_null_mlme_register_request
 #define prime_cl_null_mlme_unregister_request             cl_null_mlme_unregister_request
-#endif
+</#if>
 #define prime_cl_null_mlme_promote_request                cl_null_mlme_promote_request
-#ifndef PRIME_API_BN
+<#if (PRIME_MODE == "SN" && PRIME_PROJECT == "appplication project") || (PRIME_MODE == "BN" && BN_SLAVE_EN == true)>
 #define prime_cl_null_mlme_demote_request                 cl_null_mlme_demote_request
-#endif
+</#if>
 #define prime_cl_null_mlme_reset_request                  cl_null_mlme_reset_request
 #define prime_cl_null_mlme_get_request                    cl_null_mlme_get_request
 #define prime_cl_null_mlme_list_get_request               cl_null_mlme_list_get_request
 #define prime_cl_null_mlme_set_request                    cl_null_mlme_set_request
 #define prime_cl_432_set_callbacks                        cl_432_set_callbacks
-#ifndef PRIME_API_BN
+<#if (PRIME_MODE == "SN" && PRIME_PROJECT == "appplication project") || (PRIME_MODE == "BN" && BN_SLAVE_EN == true)>
 #define prime_cl_432_establish_request                    cl_432_establish_request
-#endif
+</#if>
 #define prime_cl_432_release_request                      cl_432_release_request
 #define prime_cl_432_dl_data_request                      cl_432_dl_data_request
-#define prime_cl_ipv6_set_callbacks                       cl_ipv6_set_callbacks
-#ifndef PRIME_API_BN
-#define prime_cl_ipv6_establish_request                   cl_ipv6_establish_request
-#define prime_cl_ipv6_register_request                    cl_ipv6_register_request
-#define prime_cl_ipv6_unregister_request                  cl_ipv6_unregister_request
-#endif
-#define prime_cl_ipv6_release_request                     cl_ipv6_release_request
-#define prime_cl_ipv6_mul_join_request                    cl_ipv6_mul_join_request
-#define prime_cl_ipv6_mul_leave_request                   cl_ipv6_mul_leave_request
-#define prime_cl_ipv6_data_request                        cl_ipv6_data_request
-#ifdef PRIME_API_BN
-#include "bmng_api.h"
+<#if PRIME_MODE == "BN" && BN_SLAVE_EN == false>
 #define prime_bmng_set_callbacks                          bmng_set_callbacks
 #define prime_bmng_fup_clear_target_list_request          bmng_fup_clear_target_list_request
 #define prime_bmng_fup_add_target_request                 bmng_fup_add_target_request
@@ -226,9 +197,10 @@ extern uint32_t prime_api;
 #define prime_bmng_pprof_zc_diff_request                  bmng_pprof_zc_diff_request
 #define prime_bmng_whitelist_add_request                  bmng_whitelist_add_request
 #define prime_bmng_whitelist_remove_request               bmng_whitelist_remove_request
-#endif
+</#if>
+
 /* @} */
-#endif
+</#if>
 
 /* @} */
 

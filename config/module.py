@@ -39,7 +39,7 @@ def loadModule():
     #primePalRfComponent.setDisplayType("PRIME PAL RF")
 
     ###########  PRIME Stack Configurations  ###########
-    primeStackConfigComponent = Module.CreateComponent("prime_stack_config", "PRIME Stack Configurator", "/SmartEnergy/PRIME Stack", "prime/config/prime_configurator.py")
-    primeStackConfigComponent.setDisplayType("PRIME Stack")
+    primeStackConfigComponent = Module.CreateComponent("prime_stack_config", "PRIME Stack", "/SmartEnergy/PRIME Stack", "prime/config/prime_configurator.py")
+    primeStackConfigComponent.setDisplayType("PRIME Stack Configurator")
     
     

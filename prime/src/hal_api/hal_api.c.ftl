@@ -44,10 +44,6 @@
 
 #include "hal_api.h"
 
-#ifdef PRIME_DEBUG_REPORT
-#include "modem.h"
-#endif
-
 /* @cond 0 */
 /**INDENT-OFF**/
 #ifdef __cplusplus
@@ -98,50 +94,36 @@ const hal_api_t hal_api = {
 	hal_trng_read,
 	hal_debug_report,
 	hal_net_get_freq,
-#if !(defined(HAL_ENABLE_DUAL_MODE)) && PRIME_HAL_VERSION == HAL_PRIME_1_4
-	hal_aes_init,
-	hal_aes_set_callback,
-	hal_aes_key,
-	hal_aes_crypt,
-#endif
-#ifdef HAL_ATPL360_INTERFACE
+<#if PRIME_OPERATION_MODE == "Hybrid" || PRIME_OPERATION_MODE == "PLC">
 	hal_plc_send_boot_cmd,
 	hal_plc_send_wrrd_cmd,
 	hal_plc_enable_interrupt,
 	hal_plc_delay,
 	hal_plc_get_cd,
-#endif
+</#if>
 #ifdef HAL_NWK_RECOVERY_INTERFACE
 	hal_nwk_recovery_init,
 	hal_nwk_recovery_read,
 	hal_nwk_recovery_write,
 #endif
-
 	hal_pib_get_request,
 	hal_pib_get_request_set_callback,
 	hal_pib_set_request,
 	hal_pib_set_request_set_callback,
-
-#ifdef HAL_ENABLE_DUAL_MODE
 	hal_aes_init,
 	hal_aes_set_callback,
 	hal_aes_key,
 	hal_aes_crypt,
 	hal_swap_stack,
-#endif
-
-#ifdef HAL_ATPL360_INTERFACE
+<#if PRIME_OPERATION_MODE == "Hybrid" || PRIME_OPERATION_MODE == "PLC">
 	hal_plc_set_stby_mode,
 	hal_plc_get_thermal_warning,
-#endif
-
-
+</#if>
 	timer_1us_get,
 	timer_1us_set_int,
 	timer_1us_cancel_int,
 	timer_1us_enable_interrupt,
-
-#ifdef HAL_ENABLE_PHY_RF
+<#if PRIME_OPERATION_MODE == "Hybrid" || PRIME_OPERATION_MODE == "RF">
 	prf_if_init,
 	prf_if_reset,
 	prf_if_enable_interrupt,
@@ -149,51 +131,8 @@ const hal_api_t hal_api = {
 	prf_if_send_spi_cmd,
 	prf_if_is_spi_busy,
 	prf_if_led,
-#endif
-
+</#if>
 };
-
-
-/**
- * \brief Restart program
- *
- */
-void hal_restart_system(void)
-{
-#if (!PIC32CX)
-	NVIC_SystemReset();
-#else
-	hal_reset_trigger(USER_RESET);
-#endif
-}
-
-
-
-#ifdef HAL_ENABLE_DUAL_MODE
-/** Callback function pointer for stack swap request */
-static void (*_swap_stack_cb_function)(uint8_t uc_traffic);
-
-/**
- * \brief Request to swap stack
- *
- * \param uc_traffic   Detected traffic (1 = PRIME_1_3, 2 = PRIME_1_4)
- */
-void hal_swap_stack(uint8_t uc_traffic)
-{
-	/* check callback is initialized */
-	if (_swap_stack_cb_function) {
-		_swap_stack_cb_function(uc_traffic);
-	}
-}
-
-/**
- * \brief Setup the callback for request of stack swap
- */
-void hal_swap_stack_set_callback(void (*p_handler)(uint8_t uc_traffic))
-{
-	_swap_stack_cb_function = p_handler;
-}
-#endif
 
 /* @} */
 
