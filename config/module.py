@@ -21,7 +21,7 @@
 * THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
 *****************************************************************************"""
 
-###################### G3 STACK  ######################
+###################### PRIME STACK  ######################
 def loadModule():
 
     print("Load Module: Harmony Smart Energy PRIME Stack")
