@@ -41,5 +41,9 @@ def loadModule():
     ###########  PRIME Stack Configurations  ###########
     primeStackConfigComponent = Module.CreateComponent("prime_stack_config", "PRIME Stack", "/SmartEnergy/PRIME Stack", "prime/config/prime_configurator.py")
     primeStackConfigComponent.setDisplayType("PRIME Stack Configurator")
+
+    ## PRIME Storage Service
+    primeStorageComponent = Module.CreateComponent("PrimeStorage", "PRIME Storage", "/SmartEnergy/PRIME Stack/Services", "service/storage/config/srv_storage.py")
+    primeStorageComponent.setDisplayType("PRIME Service")
     
     

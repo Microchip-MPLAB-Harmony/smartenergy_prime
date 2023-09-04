@@ -138,17 +138,6 @@ typedef enum {
 	HAL_FU_IMAGE_FAIL
 } hal_fu_verif_result_t;
 
-/* Type of information relative to configuration parameters */
-typedef enum {
-	CONFIG_TYPE_MAC_INFO = 0,
-	CONFIG_TYPE_PHY_INFO = 1,
-	CONFIG_TYPE_BN_INFO  = 2,
-	CONFIG_TYPE_MODE_PRIME = 3,
-	CONFIG_TYPE_SECURITY = 4,
-	CONFIG_TYPE_BOOT_INFO = 5,
-	CONFIG_TYPE_END_LIST
-} config_info_type_t;
-
 /** \brief PLC Universal Serial Interface */
 /* @{ */
 /** Management Plane Protocol Spec and ATMEL serialized protocols */
@@ -207,8 +196,8 @@ typedef int8_t (*hal_plc_cmd_op_t)(uint8_t uc_cmd, uint16_t us_addr, uint16_t us
 typedef void (*hal_plc_set_handler_t)(void (*p_handler)(void));
 typedef void (*hal_plc_tx_signal_t)(void);
 typedef void (*hal_plc_rx_signal_t)(void);
-typedef bool (*hal_get_config_info_t)(config_info_type_t cfg_type, uint16_t us_size, void *pv_data);
-typedef bool (*hal_set_config_info_t)(config_info_type_t cfg_type, uint16_t us_size, void *pv_data);
+typedef bool (*hal_get_config_info_t)(config_info_type_t cfg_type, uint8_t us_size, void *pv_data);
+typedef bool (*hal_set_config_info_t)(config_info_type_t cfg_type, uint8_t us_size, void *pv_data);
 typedef usi_status_t (*hal_usi_set_callback_t)(usi_protocol_t protocol_id, bool (*p_handler)(uint8_t *puc_rx_msg, uint16_t us_len), uint8_t usi_port);
 typedef usi_status_t (*hal_usi_send_cmd_t)(void *msg);
 typedef void (*hal_trng_init_t)(void);
