@@ -1,5 +1,5 @@
 """*****************************************************************************
-* Copyright (C) 2023 Microchip Technology Inc. and its subsidiaries.
+* Copyright (C) 2024 Microchip Technology Inc. and its subsidiaries.
 *
 * Subject to your compliance with these terms, you may use Microchip software
 * and any derivatives exclusively with Microchip products. It is your
@@ -37,7 +37,6 @@ def primeAddBnFiles():
     global pCl432ApiHeaderFile
     global pHalApiSourceFile
     global pPrime13BnLibFile
-    global pPrime13BnSlaveLibFile
     global pPrime13SnLibFile
     global pPrime14BnLibFile
     global pPrime14SnLibFile
@@ -63,7 +62,6 @@ def primeAddBnFiles():
     
     # No libraries by default
     pPrime13BnLibFile.setEnabled(False)
-    pPrime13BnSlaveLibFile.setEnabled(False)
     pPrime13SnLibFile.setEnabled(False)
     pPrime14BnLibFile.setEnabled(False)
     pPrime14SnLibFile.setEnabled(False)
@@ -71,7 +69,7 @@ def primeAddBnFiles():
     # BN library
     if (primeConfigVersion.getValue() == "1.3.6"): 
         if (primeConfigBnSlaveEn.getValue() == True):
-            pPrime13BnSlaveLibFile.setEnabled(True)
+            pPrime13SnLibFile.setEnabled(True)
             pBmngApiHeaderFile.setEnabled(False)
             pBmngDefsHeaderFile.setEnabled(False)
         else:
@@ -98,7 +96,6 @@ def primeAddSnFiles():
     global pCl432ApiHeaderFile
     global pHalApiSourceFile
     global pPrime13BnLibFile
-    global pPrime13BnSlaveLibFile
     global pPrime13SnLibFile
     global pPrime14BnLibFile
     global pPrime14SnLibFile
@@ -113,7 +110,6 @@ def primeAddSnFiles():
     
     # No libraries by default
     pPrime13BnLibFile.setEnabled(False)
-    pPrime13BnSlaveLibFile.setEnabled(False)
     pPrime13SnLibFile.setEnabled(False)
     pPrime14BnLibFile.setEnabled(False)
     pPrime14SnLibFile.setEnabled(False)
@@ -200,7 +196,7 @@ def primeChangeProject(symbol, event):
         primeConfigOperationMode.setVisible(True)
         primeConfigComment.setVisible(True)
     elif (event["value"] == "bin project"):
-        # bin project for SN: config everything except number of nodes
+        # bin project for SN: config everything except number of nodes and BN Slave
         primeShowAllOptions()
         primeConfigMaxNumNodes.setVisible(False)
         primeConfigMaxNumNodes.setValue(0)
@@ -231,7 +227,13 @@ def primeChangeConfigVersion(symbol, event):
         primeConfigOperationMode.setReadOnly(True)
         primeConfigSecProfile.setValue(0)
         primeConfigSecProfile.setReadOnly(True)
-        primeConfigBnSlaveEn.setReadOnly(False)
+        # BN Slave depends on platform
+        if not ("ATSAME70Q21B" in processor):
+            primeConfigBnSlaveEn.setValue(False)
+            primeConfigBnSlaveEn.setReadOnly(False)
+        else:
+            primeConfigBnSlaveEn.setValue(False)
+            primeConfigBnSlaveEn.setReadOnly(True)
     elif (event["value"] == "1.4"):
         primeConfigOperationMode.setValue("Hybrid")
         primeConfigOperationMode.setReadOnly(False)
@@ -259,9 +261,10 @@ def primeChangeFWVersion():
             primeConfigFWVersion.setValue("HS14.01.01") 
         else:
             primeConfigFWVersion.setValue("S13.01.01") 
-        
+            
         # Add files for SN 
         primeAddSnFiles()
+           
     else:
         if (primeConfigVersion.getValue() == "1.4"):
             primeConfigFWVersion.setValue("HB14.01.01") 
@@ -270,25 +273,6 @@ def primeChangeFWVersion():
         
         # Add files for BN 
         primeAddBnFiles()
- 
-def primeShowMacSnifferUsiInstance(symbol, event):
-    global primeConfigMode
-    global primeConfigOperationMode
-    
-    symbol.setVisible(event["value"])
-    
-    if (primeConfigMode.getValue() == "BN"):
-        if (event["value"] == True):
-            usiInstances = filter(lambda k: "srv_usi_" in k, Database.getActiveComponentIDs())
-            symbol.setMax(len(usiInstances) - 1)
-    else:
-        if (primeConfigOperationMode.getValue() == "application project"):
-            if (event["value"] == True):
-                usiInstances = filter(lambda k: "srv_usi_" in k, Database.getActiveComponentIDs())
-                symbol.setMax(len(usiInstances) - 1)
-        else:
-            # In the SN bin project, there is no USI block
-            symbol.setMax(10)
 
 def primeShowSprofUsiInstance(symbol, event):
     global primeConfigMode
@@ -324,8 +308,6 @@ def primeShowAllOptions():
     global primeMacConfig
     global primeConfigSecProfile
     global primeConfigMaxNumNodes
-    global primeConfigMacSniffer
-    global primeConfigMacSnifferUsiPort
     global primeMngpConfig
     global primeConfigMngpSprof
     global primeConfigSprofUsiPort
@@ -345,11 +327,6 @@ def primeShowAllOptions():
     primeMacConfig.setVisible(True)
     primeConfigSecProfile.setVisible(True)
     primeConfigMaxNumNodes.setVisible(True)
-    primeConfigMacSniffer.setVisible(True)
-    if (primeConfigMacSniffer.getValue() == True):
-        primeConfigMacSnifferUsiPort.setVisible(True)
-    else:
-        primeConfigMacSnifferUsiPort.setVisible(False)
     primeMngpConfig.setVisible(True)
     primeConfigMngpSprof.setVisible(True)
     primeConfigSprofUsiPort.setVisible(True)
@@ -369,8 +346,6 @@ def primeHideAllOptions():
     global primeMacConfig
     global primeConfigSecProfile
     global primeConfigMaxNumNodes
-    global primeConfigMacSniffer
-    global primeConfigMacSnifferUsiPort
     global primeMngpConfig
     global primeConfigMngpSprof
     global primeConfigSprofUsiPort
@@ -388,8 +363,6 @@ def primeHideAllOptions():
     primeMacConfig.setVisible(False)
     primeConfigSecProfile.setVisible(False)
     primeConfigMaxNumNodes.setVisible(False)
-    primeConfigMacSniffer.setVisible(False)
-    primeConfigMacSnifferUsiPort.setVisible(False)
     primeMngpConfig.setVisible(False)
     primeConfigMngpSprof.setVisible(False)
     primeConfigSprofUsiPort.setVisible(False)
@@ -397,6 +370,8 @@ def primeHideAllOptions():
     
 def instantiateComponent(primeStackConfigComponent):
     Log.writeInfoMessage("Loading Stack Configurator for PRIME")
+    
+    processor = Variables.get("__PROCESSOR")
     
     # Configure PRIME Stack
     primeStackConfig = primeStackConfigComponent.createMenuSymbol("PRIME_Stack_Configuration", None)
@@ -474,7 +449,12 @@ def instantiateComponent(primeStackConfigComponent):
     primeConfigFWModel.setLabel("PRIME FW Model")
     primeConfigFWModel.setDescription("Select the PRIME FW model")
     primeConfigFWModel.setVisible(False)
-    primeConfigFWModel.setDefaultValue("PIC32CXMTG")    
+    if ("PIC32CX" in processor) and ("MT" in processor):
+        primeConfigFWModel.setDefaultValue("PIC32CXXPL460")
+    elif ("ATSAME70Q21B" in processor):
+        primeConfigFWModel.setDefaultValue("PL360BN")
+    else:
+        primeConfigFWModel.setDefaultValue("OTHER")
     
     # Select PRIME FW version
     global primeConfigFWVersion
@@ -502,7 +482,12 @@ def instantiateComponent(primeStackConfigComponent):
     primeConfigPIBModel.setVisible(False)
     primeConfigPIBModel.setMin(0x0000)
     primeConfigPIBModel.setMax(0xFFFF)
-    primeConfigPIBModel.setDefaultValue(0x3940)
+    if ("PIC32CX" in processor) and ("MT" in processor):
+        primeConfigPIBModel.setDefaultValue(0x3941)
+    elif ("ATSAME70Q21B" in processor):
+        primeConfigPIBModel.setDefaultValue(0x3D3F)
+    else:
+        primeConfigPIBModel.setDefaultValue(0xFFFF)
     
     # Configure PRIME MAC Layer
     global primeMacConfig
@@ -529,26 +514,7 @@ def instantiateComponent(primeStackConfigComponent):
     primeConfigMaxNumNodes.setVisible(False)
     primeConfigMaxNumNodes.setMin(0)
     primeConfigMaxNumNodes.setMax(2000)
-    primeConfigMaxNumNodes.setDefaultValue(15)
-    
-    # Enable MAC sniffer
-    global primeConfigMacSniffer
-    primeConfigMacSniffer = primeStackConfigComponent.createBooleanSymbol("MAC_SNIFFER_EN", primeMacConfig)
-    primeConfigMacSniffer.setLabel("Enable PRIME MAC Sniffer")
-    primeConfigMacSniffer.setDescription("Enable/disable the MAC sniffer through USI")
-    primeConfigMacSniffer.setVisible(False)
-    primeConfigMacSniffer.setDefaultValue(False)
-    
-    # Select MAC sniffer USI port
-    global primeConfigMacSnifferUsiPort
-    primeConfigMacSnifferUsiPort = primeStackConfigComponent.createIntegerSymbol("MAC_SNIFFER_USI_PORT", primeConfigMacSniffer)
-    primeConfigMacSnifferUsiPort.setLabel("USI Instance")
-    primeConfigMacSnifferUsiPort.setDescription("USI instance used for PRIME MAC Sniffer")
-    primeConfigMacSnifferUsiPort.setVisible(False)
-    primeConfigMacSnifferUsiPort.setDefaultValue(0)
-    primeConfigMacSnifferUsiPort.setMax(0)
-    primeConfigMacSnifferUsiPort.setMin(0)
-    primeConfigMacSnifferUsiPort.setDependencies(primeShowMacSnifferUsiInstance, ["MAC_SNIFFER_EN"])
+    primeConfigMaxNumNodes.setDefaultValue(25)
     
     # Configure PRIME Management Plane
     global primeMngpConfig
@@ -772,13 +738,6 @@ def instantiateComponent(primeStackConfigComponent):
     pPrime13BnLibFile.setOutputName("prime13_lib_bn.a")
     pPrime13BnLibFile.setDestPath("stack/prime/libs")
     pPrime13BnLibFile.setEnabled(False)
-    
-    global pPrime13BnSlaveLibFile
-    pPrime13BnSlaveLibFile = primeStackConfigComponent.createLibrarySymbol("PRIME_1_3_BN_SLAVE_LIBRARY", None)
-    pPrime13BnSlaveLibFile.setSourcePath("prime/libs/prime13_lib_bn_slave.a")
-    pPrime13BnSlaveLibFile.setOutputName("prime13_lib_bn_slave.a")
-    pPrime13BnSlaveLibFile.setDestPath("stack/prime/libs")
-    pPrime13BnSlaveLibFile.setEnabled(False)
     
     global pPrime13SnLibFile
     pPrime13SnLibFile = primeStackConfigComponent.createLibrarySymbol("PRIME_1_3_SN_LIBRARY", None)

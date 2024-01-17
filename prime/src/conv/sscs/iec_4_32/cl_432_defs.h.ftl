@@ -215,7 +215,7 @@ typedef void (*cl_432_join_ind_cb_t)(uint8_t *puc_device_id, uint8_t uc_device_i
 typedef void (*cl_432_leave_ind_cb_t)(uint16_t us_dst_address);
 </#if>
 
-<#if (PRIME_MODE == "SN") || (PRIME_MODE == "BN" &&  BN_SLAVE_EN == true)>
+<#if (PRIME_MODE == "SN") || (PRIME_MODE == "BN" && BN_SLAVE_EN == true)>
 /**
  * CL 432 Release confirm
  *
@@ -233,7 +233,7 @@ typedef struct {
 	cl_432_join_ind_cb_t cl_432_join_ind_cb;
 	cl_432_leave_ind_cb_t cl_432_leave_ind_cb;
 </#if>
-<#if (PRIME_MODE == "SN") || (PRIME_MODE == "BN" &&  BN_SLAVE_EN == true)>
+<#if (PRIME_MODE == "SN") || (PRIME_MODE == "BN" && BN_SLAVE_EN == true)>
     cl_432_establish_cfm_cb_t cl_432_establish_cfm_cb;
 	cl_432_release_cfm_cb_t cl_432_release_cfm_cb;
 </#if>

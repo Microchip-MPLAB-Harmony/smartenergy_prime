@@ -67,7 +67,7 @@ void cl_432_release_request(uint16_t us_dst_address);
 void cl_432_dl_data_request(uint8_t uc_dst_lsap, uint8_t uc_src_lsap, uint16_t us_dst_address, dl_432_buffer_t *px_buff, uint16_t us_lsdu_len,
 		uint8_t uc_link_class);
 
-<#if PRIME_MODE == "SN">
+<#if (PRIME_MODE == "SN") || (PRIME_MODE == "BN" && BN_SLAVE_EN == true)>
 void cl_432_establish_request(uint8_t *puc_device_id, uint8_t uc_device_id_len, uint8_t uc_ae);
 </#if>
 

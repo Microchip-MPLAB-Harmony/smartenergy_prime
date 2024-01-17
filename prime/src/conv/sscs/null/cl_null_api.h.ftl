@@ -126,7 +126,7 @@ void cl_null_plme_set_request(uint16_t us_pib_attrib, void *pv_pib_value, uint8_
 
 /** \brief CL NULL MLME PRIMITIVES */
 /* @{ */
-<#if (PRIME_MODE == "SN") || (PRIME_MODE == "BN" &&  BN_SLAVE_EN == true)>
+<#if (PRIME_MODE == "SN") || (PRIME_MODE == "BN" && BN_SLAVE_EN == true)>
 void cl_null_mlme_register_request(uint8_t *puc_sna, uint8_t uc_sid);
 void cl_null_mlme_unregister_request(void);
 void cl_null_mlme_demote_request(void);
