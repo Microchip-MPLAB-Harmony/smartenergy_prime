@@ -165,7 +165,6 @@ def primeChangeMode(symbol, event):
         primeConfigMode.setVisible(True)
         primeConfigProject.setValue("application project")
         primeConfigProject.setVisible(True)
-        primeConfigVersion.setVisible(True)
         primeConfigOperationMode.setVisible(True)
         primeConfigComment.setVisible(True)
     else:
@@ -188,11 +187,10 @@ def primeChangeProject(symbol, event):
     global primeConfigBnSlaveEn
     
     if (event["value"] == "application project"):
-        # Application project for SN: only config version and operation mode
+        # Application project for SN: only operation mode
         primeHideAllOptions()
         primeConfigMode.setVisible(True)
         primeConfigProject.setVisible(True)
-        primeConfigVersion.setVisible(True)
         primeConfigOperationMode.setVisible(True)
         primeConfigComment.setVisible(True)
     elif (event["value"] == "bin project"):
@@ -415,7 +413,7 @@ def instantiateComponent(primeStackConfigComponent):
     primeConfigVersion = primeStackConfigComponent.createComboSymbol("PRIME_VERSION", primeStackConfig, primeVersions)
     primeConfigVersion.setLabel("PRIME version")
     primeConfigVersion.setDescription("Select the PRIME version: 1.3.6 or 1.4")
-    primeConfigVersion.setVisible(True)
+    primeConfigVersion.setVisible(False)
     primeConfigVersion.setDefaultValue("1.4")
     primeConfigVersion.setDependencies(primeChangeConfigVersion, ["PRIME_VERSION"])    
     
