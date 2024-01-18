@@ -3,7 +3,7 @@
  *
  * \brief CL_NULL_API: PRIME NULL API Convergence Sublayer
  *
- * Copyright (c) 2021 Atmel Corporation. All rights reserved.
+ * Copyright (c) 2023 Atmel Corporation. All rights reserved.
  *
  * \asf_license_start
  *
@@ -130,9 +130,11 @@ void cl_null_plme_set_request(uint16_t us_pib_attrib, void *pv_pib_value, uint8_
 void cl_null_mlme_register_request(uint8_t *puc_sna, uint8_t uc_sid);
 void cl_null_mlme_unregister_request(void);
 void cl_null_mlme_demote_request(void);
+void cl_null_mlme_mp_demote_request(uint8_t uc_lsid);
 </#if>
 
 void cl_null_mlme_promote_request(uint8_t *puc_eui48, uint8_t uc_bcn_mode);
+void cl_null_mlme_mp_promote_request(uint8_t *puc_eui48, uint8_t uc_bcn_mode, uint16_t us_pch);
 void cl_null_mlme_reset_request(void);
 void cl_null_mlme_get_request(uint16_t us_pib_attrib);
 void cl_null_mlme_list_get_request(uint16_t us_pib_attrib);

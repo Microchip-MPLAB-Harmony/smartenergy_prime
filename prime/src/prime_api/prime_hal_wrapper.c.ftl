@@ -3,7 +3,7 @@
  *
  * \brief PRIME_HAL_WRAPPER : API wrapper to manage HAL functions
  *
- * Copyright (c) 2015 Atmel Corporation. All rights reserved.
+ * Copyright (c) 2024 Atmel Corporation. All rights reserved.
  *
  * \asf_license_start
  *
@@ -66,52 +66,15 @@ void prime_hal_config(hal_api_t *hal_api_ptr)
 	p_hal_api = hal_api_ptr;
 }
 
-/** System interface */
+/** System Interface */
 void prime_hal_restart_system(void)
 {
 	p_hal_api->restart_system();
 }
 
-/** \brief Timer Counters interface */
-/* @{ */
-void prime_hal_set_gp_timer_handler(hal_gp_timer_t gpt, void (*p_handler)(void))
-{
-	p_hal_api->set_gp_timer_handler(gpt, p_handler);
-}
-
-uint8_t prime_hal_timer_init(hal_gp_timer_t gpt, hal_timer_mode_t mode, hal_timer_clk_src_t clk_src)
-{
-	return p_hal_api->timer_init(gpt, mode, clk_src);
-}
-
-uint32_t prime_hal_timer_count_get(hal_gp_timer_t gpt)
-{
-	return p_hal_api->timer_count_get(gpt);
-}
-
-void prime_hal_timer_stop(hal_gp_timer_t gpt, hal_timer_mode_t mode)
-{
-	p_hal_api->timer_stop(gpt, mode);
-}
-
-void prime_hal_timer_plc_init(uint32_t uc_time_us)
-{
-	p_hal_api->timer_plc_init(uc_time_us);
-}
-
-void prime_hal_timer_plc_stop(void)
-{
-	p_hal_api->timer_plc_stop();
-}
-
-void prime_hal_set_plc_timer_handler(void (*p_handler)(void))
-{
-	p_hal_api->set_plc_timer_handler(p_handler);
-}
-
 /* @} */
 
-/** \brief PCRC interface */
+/** \brief CRC interface */
 /* @{ */
 uint32_t prime_hal_pcrc_calc(uint8_t *puc_buf, uint32_t ul_len, uint8_t uc_header_type, uint8_t uc_crc_type, bool b_v14_mode)
 {
@@ -135,11 +98,6 @@ void prime_hal_plc_init(void)
 void prime_hal_plc_reset(void)
 {
 	p_hal_api->plc_reset();
-}
-
-int8_t prime_hal_plc_cmd_op(uint8_t uc_cmd, uint16_t us_addr, uint16_t us_len, uint8_t *ptr_buf, uint8_t uc_bytes_rep)
-{
-	return p_hal_api->plc_cmd_op(uc_cmd, us_addr, us_len, ptr_buf, uc_bytes_rep);
 }
 
 void prime_hal_plc_set_handler(void (*p_handler)(void))
@@ -178,11 +136,6 @@ void prime_hal_plc_delay(uint8_t uc_tref, uint32_t ul_delay)
 	p_hal_api->plc_delay(uc_tref, ul_delay);
 }
 
-bool prime_hal_plc_get_cd(void)
-{
-	return p_hal_api->plc_get_cd();
-}
-
 bool prime_hal_plc_set_stby_mode(bool sleep)
 {
 	return p_hal_api->plc_set_stby_mode(sleep);
@@ -196,7 +149,7 @@ bool prime_hal_plc_get_thermal_warning(void)
 
 /* @} */
 
-/** \brief Permanent store of configuration parameters */
+/** \brief Interface for the permanent storage of configuration parameters */
 /* @{ */
 bool prime_hal_get_config_info(config_info_type_t cfg_type, uint16_t us_size, void *pv_data)
 {
@@ -242,7 +195,7 @@ uint8_t prime_hal_nwk_recovery_write(uint32_t addr, uint8_t *puc_buf, uint16_t u
 
 /* @} */
 
-/** \brief Firmware Upgrade interface */
+/** \brief Firmware Upgrade Interface */
 /* @{ */
 void prime_hal_fu_data_read(uint32_t addr, uint8_t *puc_buf, uint16_t us_size)
 {
@@ -320,7 +273,7 @@ usi_status_t prime_hal_usi_send_cmd(void *msg)
 
 /* @} */
 
-/** \brief True Random Number Generator */
+/** \brief True Random Number Generator Interface */
 /* @{ */
 void prime_hal_trng_init(void)
 {
@@ -342,7 +295,6 @@ void prime_hal_debug_report(uint32_t ul_err_type)
 }
 
 /* @} */
-
 
 /** \brief AES Interface */
 /* @{ */
@@ -396,7 +348,7 @@ void prime_hal_swap_stack(uint8_t uc_traffic)
 	p_hal_api->swap_stack(uc_traffic);
 }
 
-/** \brief Parameter Information Base Interface */
+/** \brief Timer 1us Interface */
 /* @{ */
 uint32_t prime_hal_timer_1us_get(void)
 {

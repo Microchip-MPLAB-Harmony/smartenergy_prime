@@ -3,7 +3,7 @@
  *
  * \brief PRIME_API : PRIME WRAPPER API joins a library's existing interface into a global interface
  *
- * Copyright (c) 2015 Atmel Corporation. All rights reserved.
+ * Copyright (c) 2023 Atmel Corporation. All rights reserved.
  *
  * \asf_license_start
  *
@@ -124,6 +124,8 @@ extern uint32_t prime_api;
 #define prime_cl_432_establish_request                    ((cl_432_establish_request_t)(prime_api + ((uint32_t *)(prime_api + PRIME_API_FUNCS_OFFSET))[26]))
 #define prime_cl_432_release_request                      ((cl_432_release_request_t)(prime_api + ((uint32_t *)(prime_api + PRIME_API_FUNCS_OFFSET))[27]))
 #define prime_cl_432_dl_data_request                      ((cl_432_dl_data_request_t)(prime_api + ((uint32_t *)(prime_api + PRIME_API_FUNCS_OFFSET))[28]))
+#define prime_cl_null_mlme_mp_promote_request             ((mlme_mp_promote_request_t)(prime_api + ((uint32_t *)(prime_api + PRIME_API_FUNCS_OFFSET))[29]))
+#define prime_cl_null_mlme_mp_demote_request              ((mlme_mp_demote_request_t)(prime_api + ((uint32_t *)(prime_api + PRIME_API_FUNCS_OFFSET))[30]))
 /* @} */
 
 <#else>
@@ -161,8 +163,10 @@ extern uint32_t prime_api;
 #define prime_cl_null_mlme_unregister_request             cl_null_mlme_unregister_request
 </#if>
 #define prime_cl_null_mlme_promote_request                cl_null_mlme_promote_request
+#define prime_cl_null_mlme_mp_promote_request             cl_null_mlme_mp_promote_request
 <#if (PRIME_MODE == "SN" && PRIME_PROJECT == "appplication project") || (PRIME_MODE == "BN" && BN_SLAVE_EN == true)>
 #define prime_cl_null_mlme_demote_request                 cl_null_mlme_demote_request
+#define prime_cl_null_mlme_mp_demote_request              cl_null_mlme_mp_demote_request
 </#if>
 #define prime_cl_null_mlme_reset_request                  cl_null_mlme_reset_request
 #define prime_cl_null_mlme_get_request                    cl_null_mlme_get_request

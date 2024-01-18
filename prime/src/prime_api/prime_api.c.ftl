@@ -3,7 +3,7 @@
  *
  * \brief PRIME_API : API joins a library's existing interface into a global interface
  *
- * Copyright (c) 2021 Atmel Corporation. All rights reserved.
+ * Copyright (c) 2023 Atmel Corporation. All rights reserved.
  *
  * \asf_license_start
  *
@@ -50,10 +50,6 @@
 #include "stack/prime/conv/sscs/null/cl_null.h"
 #include "stack/prime/conv/sscs/iec_4_32/cl_432.h"
 
-#ifdef PAL_ENABLE_SER_PHY
-#include "phy_serial.h"
-#include "conf_phy_serial.h"
-#endif
 
 #define NUM_MAX_NODES            ${NUM_MAX_NODES}
 #define MAC_SECURITY_PROFILE     ${MAC_SECURITY_PROFILE}
@@ -166,14 +162,6 @@ void prime_stack_init(void *px_hal_api)
 	/* Initialize PAL layer */
 	pal_init();
 
-#ifdef PAL_ENABLE_SER_PHY
-	phy_ser_init((uint8_t)PHY_USI_PORT);
-#endif
-
-<#if MAC_SNIFFER_EN == true>
-	mac_sniffer_if_init(MAC_SNIFFER_USI_PORT);
-</#if>
-
 	/* Initialize MAC layer */
 	mac_init(&mac_info, (uint8_t)MAC_SECURITY_PROFILE);
 
@@ -200,10 +188,6 @@ void prime_stack_process(void)
 	pal_process();
 
 	mac_process();
-
-#ifdef PAL_ENABLE_SER_PHY
-	phy_ser_process();
-#endif
 
 <#if (PRIME_MODE == "SN") || (PRIME_MODE == "BN" && BN_SLAVE_EN == true)>
 	/* Process MNG layer */

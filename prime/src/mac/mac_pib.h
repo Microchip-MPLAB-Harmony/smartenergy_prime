@@ -3,7 +3,7 @@
  *
  * \brief MAC_PIB: PRIME MAC information base
  *
- * Copyright (c) 2022 Atmel Corporation. All rights reserved.
+ * Copyright (c) 2023 Atmel Corporation. All rights reserved.
  *
  * \asf_license_start
  *
@@ -74,6 +74,11 @@ extern "C" {
 #define PIB_PHY_STATS_RX_TOTAL_COUNT            0x00A4
 #define PIB_PHY_STATS_BLK_AVG_EVM               0x00A5
 #define PIB_PHY_EMA_SMOOTHING                   0x00A8
+#define PIB_PHY_RF_STATS_CRC_INCORRECT          0x101A
+#define PIB_PHY_RF_STATS_TX_DROP_COUNT          0x101B
+#define PIB_PHY_RF_STATS_RX_DROP_COUNT          0x101C
+#define PIB_PHY_RF_STATS_RX_TOTAL_COUNT         0x101D
+
 /* @} */
 
 /** \brief PHY implementation PIB attributes */
@@ -89,7 +94,18 @@ extern "C" {
 
 /** \brief PHY PIB attributes of RF */
 /* @{ */
+#define PIB_MAX_PHY_PACKET_SIZE                 0x1000
+#define PIB_TURNAROUND_TIME                     0x1001
 #define PIB_PHY_RF_CHANNEL                      0x1010
+#define PIB_PHY_TX_POWER                        0x1011
+#define PIB_PHY_FSK_FEC_ENABLED                 0x1012
+#define PIB_PHY_FSK_FEC_INTERLEAVING_RSC        0x1013
+#define PIB_PHY_FSK_FEC_SCHEME                  0x1014
+#define PIB_PHY_FSK_PREAMBLE_LENGTH             0x1015
+#define PIB_PHY_SUN_FSK_SFD                     0x1016
+#define PIB_PHY_FSK_SCRAMBLE_PSDU               0x1017
+#define PIB_PHY_CCA_DURATION                    0x1018
+#define PIB_PHY_CCA_THRESHOLD                   0x1019
 /* @} */
 
 /** \brief MAC variable PIB attributes */
@@ -102,13 +118,16 @@ extern "C" {
 #define PIB_MAC_SCP_MAX_TX_ATTEMPTS             0x0014
 #define PIB_MAC_CTL_RE_TX_TIMER                 0x0015  /* v1.3 */
 #define PIB_MAC_MIN_CTL_RE_TX_TIMER             0x0015  /* v1.4 */
-#define PIB_MAC_SCP_RBO                         0x0016  /* v1.3 */
+#define PIB_MAC_TRAFFIC_BAND_TIMEOUT            0x0016  /* v1.4 */
 #define PIB_MAC_SCP_CH_SENSE_COUNT              0x0017
 #define PIB_MAC_MAX_CTL_RE_TX                   0x0018  /* v1.3 */
 #define PIB_MAC_CTL_MSG_FAIL_TIME               0x0018  /* v1.4 */
 #define PIB_MAC_EMA_SMOOTHING                   0x0019
 #define PIB_MAC_MIN_BAND_SEARCH_TIME            0x001A  /* v1.4 */
+#define PIB_MAC_PROMOTION_MAX_TX_PERIOD         0x001B  /* v1.4 */
+#define PIB_MAC_PROMOTION_MIN_TX_PERIOD         0x001C  /* v1.4 */
 #define PIB_MAC_SAR_SIZE                        0x001D  /* v1.4 */
+#define PIB_MAC_MAX_BAND_SEARCH_TIME            0x001E  /* v1.4 */
 #define PIB_MAC_EUI_48                          0x001F  /* v1.4 */
 #define PIB_MAC_CSMA_R1                         0x0034  /* v1.4 */
 #define PIB_MAC_CSMA_R2                         0x0035  /* v1.4 */
@@ -120,9 +139,20 @@ extern "C" {
 #define PIB_MAC_ACTION_ROBUSTNESS_MGMT          0x004A  /* v1.4 */
 #define PIB_MAC_UPDATED_RM_TIMEOUT              0x004B  /* v1.4 */
 #define PIB_MAC_ALV_HOP_REPETITIONS             0x004C  /* v1.4 */
-#define PIB_MAC_MIN_BE                          0x004D  /* v1.4 */
-#define PIB_MAC_MAX_BE                          0x004E  /* v1.4 */
-#define PIB_MAC_MAX_CSMA_BACKOFFS               0x004F  /* v1.4 */
+#define PIB_MAC_PHY_CHN_CHANGE                  0x004D  /* v1.4 */
+#define PIB_MAC_HOPPING_NUMBER_RF_CHANNELS      0x0090  /* v1.4 */
+#define PIB_MAC_HOPPING_SEQUENCE_LENGTH         0x0091  /* v1.4 */
+#define PIB_MAC_HOPPING_SEQUENCE_POSITION       0x0092  /* v1.4 Non used*/
+#define PIB_MAC_HOPPING_BCN_SEQUENCE_LENGTH     0x0093  /* v1.4 */
+#define PIB_MAC_HOPPING_BCN_SEQUENCE_POSITION   0x0094  /* v1.4 */
+#define PIB_MAC_MIN_BE                          0x0098  /* v1.4 */
+#define PIB_MAC_MAX_BE                          0x0099  /* v1.4 */
+#define PIB_MAC_MAX_CSMA_BACKOFFS               0x009A  /* v1.4 */
+#define PIB_MAC_HOPPING_PROMOTION_MAX_TX_PERIOD 0x009B  /* v1.4 */
+#define PIB_MAC_HOPPING_PROMOTION_MIN_TX_PERIOD 0x009C  /* v1.4 */
+#define PIB_MAC_HOPPING_INIT_CHANNEL_LIST       0x009D  /* v1.4 */
+#define PIB_MAC_HOPPING_INIT_BCN_CHANNEL_LIST   0x009E  /* v1.4 */
+
 /* @} */
 
 /** \brief MAC functional PIB attributes */
@@ -176,6 +206,7 @@ extern "C" {
 #define PIB_MAC_LIST_PHY_COMM_1_4               0x0059  /* v1.4 */
 #define PIB_MAC_LIST_ACTIVE_CONN_EX             0x0058
 #define PIB_MAC_LIST_SWITCHES_MP                0x2000  /* v1.4 */
+#define PIB_MAC_LIST_REGISTER_DEVICES_MP        0x2050  /* v1.4 */
 #define PIB_MAC_LIST_AVAILABLE_SWITCHES_MP      0x2056  /* v1.4 */
 #define PIB_MAC_LIST_PHY_COMM_MP                0x2059  /* v1.4 */
 /* @} */
@@ -221,23 +252,23 @@ extern "C" {
 #define PIB_MAC_APP_FW_VERSION                  0x0075
 #define PIB_MAC_APP_VENDOR_ID                   0x0076
 #define PIB_MAC_APP_PRODUCT_ID                  0x0077
-#define PIB_MAC_APP_LIST_ZC_STATUS              0x0078  /* v1.4 */
+#define PIB_MAC_APP_LIST_ZC_STATUS              0x0078
 /* @} */
 
-/** \brief Propietary MAC certification PIB attributes */
+/** \brief Proprietary MAC certification PIB attributes */
 /* @{ */
 #define PIB_MAC_ACTION_CFP_LENGTH               0x810D
-#define PIB_MAC_ACTION_ARQ_WIN_SIZE             0x8124
 #define PIB_MAC_ACTION_BCN_SLOT_COUNT           0x810E  /* v1.3 */
 #define PIB_MAC_ALV_MIN_LEVEL                   0x810F  /* v1.4 */
 #define PIB_MAC_ACTION_FRAME_LENGTH             0x8110  /* v1.4 */
 #define PIB_CERTIFICATION_MODE                  0x8120
 #define PIB_CERTIFICATION_SEND_MSG              0x8121
+#define PIB_MAC_ACTION_ARQ_WIN_SIZE             0x8124
 #define PIB_CERT_MIN_LEVEL_TO_REG               0x8130  /* v1.4 */
 #define PIB_BCN_SLOTS_BUSY                      0x8131  /* v1.3 */
 /* @} */
 
-/** \brief Propietary MAC manufacturing test process (MTP) PIB attributes */
+/** \brief Proprietary MAC manufacturing test process (MTP) PIB attributes */
 /* @{ */
 #define PIB_MTP_PHY_TX_TIME                     0x8085
 #define PIB_MTP_PHY_RMS_CALC_CORRECTED          0x8086
@@ -245,12 +276,8 @@ extern "C" {
 #define PIB_MTP_PHY_RX_PARAMS                   0x8088
 #define PIB_MTP_PHY_TX_PARAMS                   0x8089
 #define PIB_MTP_PHY_CONTINUOUS_TX               0x808A
-#define PIB_PHY_TX_CHANNEL                      0x8090
-#define PIB_PHY_TXRX_CHANNEL_LIST               0x8092
-#define PIB_PHY_TXRX_DOUBLE_CHANNEL_LIST        0x8093
 #define PIB_MTP_PHY_ENABLE                      0x808E
-#define PIB_MTP_PHY_DRV_AUTO                    0x8301
-#define PIB_MTP_PHY_DRV_IMPEDANCE               0x8302
+#define PIB_MTP_MAC_EUI_48                      0x8100
 #define PIB_MTP_MAC_WRITE_SNA                   0x8123
 /* @} */
 
@@ -265,29 +292,32 @@ extern "C" {
 #define PIB_PHY_SW_RF_VERSION                   0x9080  /* v1.4 */
 #define PIB_PHY_ZCT                             0x8081
 #define PIB_PHY_HOST_VERSION                    0x8082
-#define PIB_PHY_SERIAL_ENABLED                  0x8091
-#define PIB_MTP_MAC_EUI_48                      0x8100
+#define PIB_PHY_TX_CHANNEL                      0x8090
+#define PIB_PHY_TXRX_CHANNEL_LIST               0x8092
+#define PIB_PHY_TXRX_DOUBLE_CHANNEL_LIST        0x8093
 #define PIB_MAC_PLC_STATE                       0x8101
 #define PIB_MAC_SERVICE_STATE                   0x8102
 #define PIB_MAC_REG_RSS                         0x8103
-#define PIB_MAC_BCN_AVG_EN                      0x8104
 #define PIB_PHY_SNIFFER_ENABLED                 0x8106
 #define PIB_MAC_INTERNAL_SW_VERSION             0x8126
-#define PIB_432_CON_STATE                       0x8200
-#define PIB_CL_INTERNAL_SW_VERSION              0x8201
-#define PIB_432_LIST_NODES                      0x8250
-#define PIB_MAC_SEC_DUK_BN                      0x8140  /* v1.4 */
-#define PIB_MAC_SEC_PROFILE_USED                0x8141  /* v1.4 */
-#define PIB_MAC_SEC_OLD_SWK_TIME                0x8142  /* v1.4 */
 #define PIB_MAC_ACTION_MGMT_MUL_SEND_DATA       0x8132  /* v1.4 */
 #define PIB_MAC_ACTION_CFG_BCN_TX_SCHEME        0x8133  /* v1.4 */
 #define PIB_MAC_ACTION_ALV_TYPE                 0x8134  /* v1.4 */
 #define PIB_MAC_CHN_SCANNING_MODE               0x8135  /* v1.4 */
 #define PIB_MAC_ACTION_CFG_BCN_SWITCH_RATE      0x8136  /* v1.4 */
 #define PIB_MAC_ACTION_CFG_SEC_PROF             0x8137  /* v1.4 */
+#define PIB_MAC_SEC_DUK_BN                      0x8140  /* v1.4 */
+#define PIB_MAC_SEC_PROFILE_USED                0x8141  /* v1.4 */
+#define PIB_MAC_SEC_OLD_SWK_TIME                0x8142  /* v1.4 */
 #define PIB_MAC_WHITELIST                       0x8150
 #define PIB_MAC_WHITELIST_ENABLED               0x8151
 #define PIB_MAC_ACTION_CLEAR_NWK_STRUCTURE      0x8152
+#define PIB_432_CON_STATE                       0x8200
+#define PIB_CL_INTERNAL_SW_VERSION              0x8201
+#define PIB_432_LIST_NODES                      0x8250
+#define PIB_PHY_DRV_AUTODETECT_BRANCH           0x8301
+#define PIB_PHY_DRV_IMPEDANCE                   0x8302
+#define PIB_PHY_DRV_ATTENUATION                 0x8303
 /* @} */
 
 /* @} */

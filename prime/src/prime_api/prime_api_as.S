@@ -44,6 +44,8 @@
   .extern cl_432_establish_request
   .extern cl_432_release_request
   .extern cl_432_dl_data_request
+  .extern cl_null_mlme_mp_promote_request
+  .extern cl_null_mlme_mp_demote_request
 
   .section .prmwrp
 prime_header:
@@ -91,3 +93,5 @@ prime_functions:
   .word cl_432_establish_request - prime_header
   .word cl_432_release_request - prime_header
   .word cl_432_dl_data_request - prime_header
+  .word cl_null_mlme_mp_promote_request - prime_header
+  .word cl_null_mlme_mp_demote_request - prime_header

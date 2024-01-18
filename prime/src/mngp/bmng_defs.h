@@ -144,6 +144,8 @@ typedef struct {
 	uint8_t alv_rx_cnt;
 	uint8_t alv_tx_cnt;
 	uint8_t alv_time;
+    uint16_t us_pch;
+	uint16_t us_pch_lsid;
 } bmng_net_event_t;
 
 /** PRIME Profile ACK codes  */

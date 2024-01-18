@@ -3,7 +3,7 @@
  *
  * \brief HAL: PRIME Hardware Abstraction Layer.
  *
- * Copyright (c) 2021 Atmel Corporation. All rights reserved.
+ * Copyright (c) 2024 Atmel Corporation. All rights reserved.
  *
  * \asf_license_start
  *
@@ -58,14 +58,6 @@ extern "C" {
  */
 const hal_api_t hal_api = {
 	hal_restart_system,
-	hal_set_gp_timer_handler,
-	hal_clear_gp_timer_handler,
-	hal_timer_init,
-	hal_timer_count_get,
-	hal_timer_stop,
-	hal_timer_plc_init,
-	hal_timer_plc_stop,
-	hal_set_plc_timer_handler,
 	hal_pcrc_calc,
 	hal_pcrc_config_sna,
 	hal_fu_data_read,
@@ -82,7 +74,6 @@ const hal_api_t hal_api = {
 	hal_fu_get_bitmap,
 	hal_plc_init,
 	hal_plc_reset,
-	hal_plc_cmd_op,
 	hal_plc_set_handler,
 	hal_plc_tx_signal,
 	hal_plc_rx_signal,
@@ -99,7 +90,6 @@ const hal_api_t hal_api = {
 	hal_plc_send_wrrd_cmd,
 	hal_plc_enable_interrupt,
 	hal_plc_delay,
-	hal_plc_get_cd,
 </#if>
 #ifdef HAL_NWK_RECOVERY_INTERFACE
 	hal_nwk_recovery_init,

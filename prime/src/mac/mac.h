@@ -3,7 +3,7 @@
  *
  * \brief MAC: PRIME MAC control interface
  *
- * Copyright (c) 2015 Atmel Corporation. All rights reserved.
+ * Copyright (c) 2023 Atmel Corporation. All rights reserved.
  *
  * \asf_license_start
  *
@@ -72,8 +72,6 @@ extern "C" {
 
 void mac_init(mac_version_info_t *px_mac_info, uint8_t uc_sec_profile);
 void mac_process(void);
-
-void mac_sniffer_if_init(uint8_t uc_usi_port);
 
 /* @} */
 

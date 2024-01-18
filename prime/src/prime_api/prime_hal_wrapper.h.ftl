@@ -3,7 +3,7 @@
  *
  * \brief PRIME_HAL_WRAPPER : API wrapper to manage HAL functions
  *
- * Copyright (c) 2015 Atmel Corporation. All rights reserved.
+ * Copyright (c) 2024 Atmel Corporation. All rights reserved.
  *
  * \asf_license_start
  *
@@ -57,22 +57,10 @@ extern "C" {
 /** HAL wrapper configuration */
 void prime_hal_config(hal_api_t *hal_api_ptr);
 
-/** System interface */
+/** System Interface */
 void prime_hal_restart_system(void);
 
-/** \brief Timer Counters interface */
-/* @{ */
-void prime_hal_set_gp_timer_handler(hal_gp_timer_t gpt, void (*p_handler)(void));
-uint8_t prime_hal_timer_init(hal_gp_timer_t gpt, hal_timer_mode_t mode, hal_timer_clk_src_t clk_src);
-uint32_t prime_hal_timer_count_get(hal_gp_timer_t gpt);
-void prime_hal_timer_stop(hal_gp_timer_t gpt, hal_timer_mode_t mode);
-void prime_hal_timer_plc_init(uint32_t uc_time_us);
-void prime_hal_timer_plc_stop(void);
-void prime_hal_set_plc_timer_handler(void (*p_handler)(void));
-
-/* @} */
-
-/** \brief PCRC interface */
+/** \brief CRC interface */
 /* @{ */
 uint32_t prime_hal_pcrc_calc(uint8_t *puc_buf, uint32_t ul_len, uint8_t uc_header_type, uint8_t uc_crc_type, bool b_v14_mode);
 void prime_hal_pcrc_config_sna(uint8_t *puc_sna);
@@ -83,7 +71,6 @@ void prime_hal_pcrc_config_sna(uint8_t *puc_sna);
 /* @{ */
 void prime_hal_plc_init(void);
 void prime_hal_plc_reset(void);
-int8_t prime_hal_plc_cmd_op(uint8_t uc_cmd, uint16_t us_addr, uint16_t us_len, uint8_t *ptr_buf, uint8_t uc_bytes_rep);
 void prime_hal_plc_set_handler(void (*p_handler)(void));
 void prime_hal_plc_tx_signal(void);
 void prime_hal_plc_rx_signal(void);
@@ -93,14 +80,14 @@ bool prime_hal_plc_send_boot_cmd(uint16_t us_cmd, uint32_t ul_addr, uint32_t ul_
 bool prime_hal_plc_send_wrrd_cmd(uint8_t uc_cmd, void *px_spi_data, void *px_spi_status_info);
 void prime_hal_plc_enable_interrupt(bool enable);
 void prime_hal_plc_delay(uint8_t uc_tref, uint32_t ul_delay);
-bool prime_hal_plc_get_cd(void);
+
 bool prime_hal_plc_set_stby_mode(bool sleep);
 bool prime_hal_plc_get_thermal_warning(void);
 </#if>
 
 /* @} */
 
-/** \brief Permanent store of configuration parameters */
+/** \brief Interface for the permanent storage of configuration parameters */
 /* @{ */
 bool prime_hal_get_config_info(config_info_type_t cfg_type, uint16_t us_size, void *pv_data);
 bool prime_hal_set_config_info(config_info_type_t cfg_type, uint16_t us_size, void *pv_data);
@@ -110,7 +97,7 @@ uint8_t prime_hal_nwk_recovery_write(uint32_t addr, uint8_t *puc_buf, uint16_t u
 
 /* @} */
 
-/** \brief Firmware Upgrade interface */
+/** \brief Firmware Upgrade Interface */
 /* @{ */
 void prime_hal_fu_data_read(uint32_t addr, uint8_t *puc_buf, uint16_t us_size);
 uint8_t prime_hal_fu_data_write(uint32_t addr, uint8_t *puc_buf, uint16_t us_size);
@@ -134,7 +121,7 @@ usi_status_t prime_hal_usi_send_cmd(void *msg);
 
 /* @} */
 
-/** \brief True Random Number Generator */
+/** \brief True Random Number Generator Interface */
 /* @{ */
 void prime_hal_trng_init(void);
 uint32_t prime_hal_trng_read(void);
@@ -164,12 +151,12 @@ void prime_hal_pib_set_request(uint16_t us_pib_attrib, void *pv_pib_value, uint8
 void prime_hal_pib_set_request_set_callback(void (*p_handler)(uint8_t uc_result));
 /* @} */
 
-/** \brief Parameter Information Base Interface */
+/** \brief Stack swap Interface */
 /* @{ */
 void prime_hal_swap_stack(uint8_t uc_traffic);
 /* @} */
 
-/** \brief Parameter Information Base Interface */
+/** \brief Timer 1us Interface */
 /* @{ */
 uint32_t prime_hal_timer_1us_get(void);
 void prime_hal_timer_1us_enable_interrupt(bool b_enable);

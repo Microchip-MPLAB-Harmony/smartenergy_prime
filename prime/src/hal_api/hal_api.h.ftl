@@ -3,7 +3,7 @@
  *
  * \brief HAL: PRIME Hardware Abstraction Layer Header
  *
- * Copyright (c) 2021 Atmel Corporation. All rights reserved.
+ * Copyright (c) 2024 Atmel Corporation. All rights reserved.
  *
  * \asf_license_start
  *
@@ -65,28 +65,6 @@ extern "C" {
  *
  * @{
  */
-
-/** \brief General Purpose Timers identificators */
-typedef enum {
-	HAL_GP_PLC_TIMER = 0,
-	HAL_GP_TIMER_NUM
-} hal_gp_timer_t;
-
-/** \brief Timer mode */
-typedef enum {
-	HAL_TIMER_MODE_16_BITS = 0,
-	HAL_TIMER_MODE_32_BITS,
-	HAL_TIMER_MODE_NUM
-} hal_timer_mode_t;
-
-/** \brief Timer CLK source */
-typedef enum {
-	HAL_TIMER_CLK_SRC_CLK1 = (0x0u << 0),  /* TC_CMR_TCCLKS_TIMER_CLOCK1 */
-	HAL_TIMER_CLK_SRC_CLK2 = (0x1u << 0),  /* TC_CMR_TCCLKS_TIMER_CLOCK2 */
-	HAL_TIMER_CLK_SRC_CLK3 = (0x2u << 0),  /* TC_CMR_TCCLKS_TIMER_CLOCK3 */
-	HAL_TIMER_CLK_SRC_CLK4 = (0x3u << 0),  /* TC_CMR_TCCLKS_TIMER_CLOCK4 */
-	HAL_TIMER_CLK_SRC_CLK5 = (0x4u << 0),  /* TC_CMR_TCCLKS_TIMER_CLOCK5 */
-} hal_timer_clk_src_t;
 
 /** USI operation results */
 typedef enum {
@@ -168,14 +146,6 @@ typedef void (*hal_wrp_iface_t)(void);
 /** HAL functions wrapper interface */
 /* @{ */
 typedef void (*hal_restart_system_t)(void);
-typedef void (*hal_set_gp_timer_handler_t)(hal_gp_timer_t gpt, void (*p_handler)(void));
-typedef void (*hal_clear_gp_timer_handler_t)(hal_gp_timer_t gpt);
-typedef uint8_t (*hal_timer_init_t)(hal_gp_timer_t gpt, hal_timer_mode_t mode, hal_timer_clk_src_t clk_src);
-typedef uint32_t (*hal_timer_count_get_t)(hal_gp_timer_t gpt);
-typedef void (*hal_timer_stop_t)(hal_gp_timer_t gpt, hal_timer_mode_t mode);
-typedef void (*hal_timer_plc_init_t)(uint32_t uc_time_us);
-typedef void (*hal_timer_plc_stop_t)(void);
-typedef void (*hal_set_plc_timer_handler_t)(void (*p_handler)(void));
 typedef uint32_t (*hal_pcrc_calc_t)(uint8_t *puc_buf, uint32_t ul_len, uint8_t uc_header_type, uint8_t uc_crc_type, bool b_v14_mode);
 typedef void (*hal_pcrc_config_sna_t)(uint8_t *puc_sna);
 typedef void (*hal_fu_data_read_t)(uint32_t addr, uint8_t *puc_buf, uint16_t us_size);
@@ -192,7 +162,6 @@ typedef void (*hal_fu_signature_image_check_set_callback_t)(void (*p_handler)(ha
 typedef uint16_t (*hal_fu_get_bitmap_t)(uint8_t *puc_bitmap, uint32_t *pus_num_rcv_pages);
 typedef void (*hal_plc_init_t)(void);
 typedef void (*hal_plc_reset_t)(void);
-typedef int8_t (*hal_plc_cmd_op_t)(uint8_t uc_cmd, uint16_t us_addr, uint16_t us_len, uint8_t *ptr_buf, uint8_t uc_bytes_rep);
 typedef void (*hal_plc_set_handler_t)(void (*p_handler)(void));
 typedef void (*hal_plc_tx_signal_t)(void);
 typedef void (*hal_plc_rx_signal_t)(void);
@@ -224,7 +193,6 @@ typedef bool (*hal_plc_send_boot_cmd_t)(uint16_t us_cmd, uint32_t ul_addr, uint3
 typedef bool (*hal_plc_send_wrrd_cmd_t)(uint8_t uc_cmd, void *px_spi_data, void *px_spi_status_info);
 typedef void (*hal_plc_enable_interrupt_t)(bool enable);
 typedef void (*hal_plc_delay_t)(uint8_t uc_tref, uint32_t ul_delay);
-typedef bool (*hal_plc_get_cd_t)(void);
 typedef bool (*hal_plc_set_stby_mode_t)(bool sleep);
 typedef bool (*hal_plc_get_thermal_warning_t)(void);
 </#if>
@@ -258,15 +226,6 @@ typedef void (*hal_prf_if_led_t)(uint8_t uc_led_id, bool b_led_on);
 typedef struct {
 	hal_restart_system_t restart_system;
 
-	hal_set_gp_timer_handler_t set_gp_timer_handler;
-	hal_clear_gp_timer_handler_t clear_gp_timer_handler;
-	hal_timer_init_t timer_init;
-	hal_timer_count_get_t timer_count_get;
-	hal_timer_stop_t timer_stop;
-	hal_timer_plc_init_t timer_plc_init;
-	hal_timer_plc_stop_t timer_plc_stop;
-	hal_set_plc_timer_handler_t set_plc_timer_handler;
-
 	hal_pcrc_calc_t pcrc_calc;
 	hal_pcrc_config_sna_t pcrc_config_sna;
 
@@ -285,7 +244,6 @@ typedef struct {
 
 	hal_plc_init_t plc_init;
 	hal_plc_reset_t plc_reset;
-	hal_plc_cmd_op_t plc_cmd_op;
 	hal_plc_set_handler_t plc_set_handler;
 	hal_plc_tx_signal_t plc_tx_signal;
 	hal_plc_rx_signal_t plc_rx_signal;
@@ -308,7 +266,6 @@ typedef struct {
 	hal_plc_send_wrrd_cmd_t plc_send_wrrd_cmd;
 	hal_plc_enable_interrupt_t plc_enable_int;
 	hal_plc_delay_t plc_delay;
-	hal_plc_get_cd_t plc_get_cd;
 </#if>
 
 #ifdef HAL_NWK_RECOVERY_INTERFACE

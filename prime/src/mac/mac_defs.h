@@ -3,7 +3,7 @@
  *
  * \brief MAC_DEFS: PRIME MAC definitions
  *
- * Copyright (c) 2021 Atmel Corporation. All rights reserved.
+ * Copyright (c) 2023 Atmel Corporation. All rights reserved.
  *
  * \asf_license_start
  *
@@ -121,10 +121,12 @@ typedef enum {
 	MLME_RESULT_NOSUCHDEVICE  = 4,
 	MLME_RESULT_NOSNA         = 8,
 	MLME_RESULT_NOSWITCH      = 9,
+	MLME_RESULT_WRONGMEDIUM   = 9,
 	MLME_RESULT_REDUNDANT     = 10,
 	MLME_RESULT_BADATTR       = 11,
 	MLME_RESULT_OUTOFRANGE    = 12,
-	MLME_RESULT_READONLY      = 13
+	MLME_RESULT_READONLY      = 13,
+	MLME_RESULT_WRONGLSID     = 15
 } mlme_result_t;
 
 /** Connection types */
@@ -251,6 +253,7 @@ typedef enum {
 	PHY_CERTIFICATION_MODE     = 1,
 	MAC_CERTIFICATION_MODE     = 2,
 	PHY_CERTIFICATION_MODE_1_4 = 3,
+	PHY_RF_CERTIFICATION_MODE  = 4,
 } cert_mode_t;
 
 /** Rejection actions */
@@ -583,6 +586,26 @@ typedef void (*mlme_promote_cfm_cb_t)(mlme_result_t x_result);
 typedef void (*mlme_promote_ind_cb_t)(void);
 
 /**
+ * MLME MultiPHY Promote Request  (v1.4)
+ * - puc_eui48:            Address of the node to be promoted (NULL in Service Node)
+ * - uc_bcn_mode:          Beacon mode
+ * - us_pch:               Channel of promotion
+ */
+typedef void (*mlme_mp_promote_request_t)(uint8_t *puc_eui48, uint8_t uc_bcn_mode, uint16_t us_pch);
+
+/**
+ * MLME MultiPHY Promote Confirm  (v1.4)
+ * - x_result:      Result
+ */
+typedef void (*mlme_mp_promote_cfm_cb_t)(mlme_result_t x_result);
+
+/**
+ * MLME MultiPHY Promote Indication  (v1.4)
+ * - us_pch:        Channel of promotion
+ */
+typedef void (*mlme_mp_promote_ind_cb_t)(uint16_t us_pch);
+
+/**
  * MLME Demote Request
  */
 typedef void (*mlme_demote_request_t)(void);
@@ -597,6 +620,23 @@ typedef void (*mlme_demote_cfm_cb_t)(mlme_result_t x_result);
  * MLME Demote Indication
  */
 typedef void (*mlme_demote_ind_cb_t)(void);
+
+/**
+ * MLME MultiPHY Demote Request
+ * - uc_lsid:      Local switch Identifier
+ */
+typedef void (*mlme_mp_demote_request_t)(uint8_t uc_lsid);
+
+/**
+ * MLME MultiPHY Demote Confirm
+ * - x_result:      Result
+ */
+typedef void (*mlme_mp_demote_cfm_cb_t)(mlme_result_t x_result);
+
+/**
+ * MLME MultiPHY Demote Indication
+ */
+typedef void (*mlme_mp_demote_ind_cb_t)(uint8_t uc_lsid);
 
 /**
  * MLME Reset Request
@@ -686,6 +726,10 @@ typedef struct {
 	mlme_get_cfm_cb_t mlme_get_cfm_cb;
 	mlme_list_get_cfm_cb_t mlme_list_get_cfm_cb;
 	mlme_set_cfm_cb_t mlme_set_cfm_cb;
+	mlme_mp_promote_ind_cb_t mlme_mp_promote_ind_cb;
+	mlme_mp_promote_cfm_cb_t mlme_mp_promote_cfm_cb;
+	mlme_mp_demote_ind_cb_t mlme_mp_demote_ind_cb;
+	mlme_mp_demote_cfm_cb_t mlme_mp_demote_cfm_cb;
 } mac_callbacks_t;
 
 /**
