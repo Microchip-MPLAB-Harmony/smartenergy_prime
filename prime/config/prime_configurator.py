@@ -217,6 +217,8 @@ def primeChangeConfigVersion(symbol, event):
     global primeConfigOperationMode
     global primeConfigSecProfile
     global primeConfigBnSlaveEn
+
+    processor = Variables.get("__PROCESSOR")
     
     # No security and no hybrid or RF in 1.3
     # No BN slave in 1.4
@@ -226,7 +228,7 @@ def primeChangeConfigVersion(symbol, event):
         primeConfigSecProfile.setValue(0)
         primeConfigSecProfile.setReadOnly(True)
         # BN Slave depends on platform
-        if not ("ATSAME70Q21B" in processor):
+        if ("ATSAME70Q21B" in processor):
             primeConfigBnSlaveEn.setValue(False)
             primeConfigBnSlaveEn.setReadOnly(False)
         else:
