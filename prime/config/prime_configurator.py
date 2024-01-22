@@ -228,7 +228,7 @@ def primeChangeConfigVersion(symbol, event):
         primeConfigSecProfile.setValue(0)
         primeConfigSecProfile.setReadOnly(True)
         # BN Slave depends on platform
-        if ("ATSAME70Q21B" in processor):
+        if ("ATSAME70" in processor):
             primeConfigBnSlaveEn.setValue(False)
             primeConfigBnSlaveEn.setReadOnly(False)
         else:
@@ -451,7 +451,7 @@ def instantiateComponent(primeStackConfigComponent):
     primeConfigFWModel.setVisible(False)
     if ("PIC32CX" in processor) and ("MT" in processor):
         primeConfigFWModel.setDefaultValue("PIC32CXXPL460")
-    elif ("ATSAME70Q21B" in processor):
+    elif ("ATSAME70" in processor):
         primeConfigFWModel.setDefaultValue("PL360BN")
     else:
         primeConfigFWModel.setDefaultValue("OTHER")
@@ -484,7 +484,7 @@ def instantiateComponent(primeStackConfigComponent):
     primeConfigPIBModel.setMax(0xFFFF)
     if ("PIC32CX" in processor) and ("MT" in processor):
         primeConfigPIBModel.setDefaultValue(0x3941)
-    elif ("ATSAME70Q21B" in processor):
+    elif ("ATSAME70" in processor):
         primeConfigPIBModel.setDefaultValue(0x3D3F)
     else:
         primeConfigPIBModel.setDefaultValue(0xFFFF)
