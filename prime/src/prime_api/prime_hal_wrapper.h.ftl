@@ -75,7 +75,7 @@ void prime_hal_plc_set_handler(void (*p_handler)(void));
 void prime_hal_plc_tx_signal(void);
 void prime_hal_plc_rx_signal(void);
 
-<#if PRIME_OPERATION_MODE == "Hybrid" || PRIME_OPERATION_MODE == "PLC">
+<#if PRIME_OPERATION_MODE == "Hybrid" || PRIME_OPERATION_MODE == "PLC" || PRIME_OPERATION_MODE == "PLC+Serial">
 bool prime_hal_plc_send_boot_cmd(uint16_t us_cmd, uint32_t ul_addr, uint32_t ul_data_len, uint8_t *puc_data_buf, uint8_t *puc_data_read);
 bool prime_hal_plc_send_wrrd_cmd(uint8_t uc_cmd, void *px_spi_data, void *px_spi_status_info);
 void prime_hal_plc_enable_interrupt(bool enable);

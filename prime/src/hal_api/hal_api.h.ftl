@@ -188,7 +188,7 @@ typedef uint16_t (*hal_null_dev_write_callback_t)(uint8_t chn, const void *buffe
 bool hal_null_dev_set_read_callback(hal_null_dev_read_callback_t ptr_func);
 bool hal_null_dev_set_write_callback(hal_null_dev_write_callback_t ptr_func);
 
-<#if PRIME_OPERATION_MODE == "Hybrid" || PRIME_OPERATION_MODE == "PLC">
+<#if PRIME_OPERATION_MODE == "Hybrid" || PRIME_OPERATION_MODE == "PLC" || PRIME_OPERATION_MODE == "PLC+Serial">
 typedef bool (*hal_plc_send_boot_cmd_t)(uint16_t us_cmd, uint32_t ul_addr, uint32_t ul_data_len, uint8_t *puc_data_buf, uint8_t *puc_data_read);
 typedef bool (*hal_plc_send_wrrd_cmd_t)(uint8_t uc_cmd, void *px_spi_data, void *px_spi_status_info);
 typedef void (*hal_plc_enable_interrupt_t)(bool enable);
@@ -261,7 +261,7 @@ typedef struct {
 
 	hal_net_get_freq_t net_get_freq;
 
-<#if PRIME_OPERATION_MODE == "Hybrid" || PRIME_OPERATION_MODE == "PLC">
+<#if PRIME_OPERATION_MODE == "Hybrid" || PRIME_OPERATION_MODE == "PLC" || PRIME_OPERATION_MODE == "PLC+Serial">
 	hal_plc_send_boot_cmd_t plc_send_boot_cmd;
 	hal_plc_send_wrrd_cmd_t plc_send_wrrd_cmd;
 	hal_plc_enable_interrupt_t plc_enable_int;
@@ -285,7 +285,7 @@ typedef struct {
 	hal_aes_crypt_t aes_crypt;
 	hal_swap_stack_t swap_stack;
 
-<#if PRIME_OPERATION_MODE == "Hybrid" || PRIME_OPERATION_MODE == "PLC">
+<#if PRIME_OPERATION_MODE == "Hybrid" || PRIME_OPERATION_MODE == "PLC" || PRIME_OPERATION_MODE == "PLC+Serial">
 	hal_plc_set_stby_mode_t plc_set_stby_mode;
 	hal_plc_get_thermal_warning_t plc_get_thermal_warning;
 </#if>

@@ -85,7 +85,7 @@ const hal_api_t hal_api = {
 	hal_trng_read,
 	hal_debug_report,
 	hal_net_get_freq,
-<#if PRIME_OPERATION_MODE == "Hybrid" || PRIME_OPERATION_MODE == "PLC">
+<#if PRIME_OPERATION_MODE == "Hybrid" || PRIME_OPERATION_MODE == "PLC" || PRIME_OPERATION_MODE == "PLC+Serial">
 	hal_plc_send_boot_cmd,
 	hal_plc_send_wrrd_cmd,
 	hal_plc_enable_interrupt,
@@ -105,7 +105,7 @@ const hal_api_t hal_api = {
 	hal_aes_key,
 	hal_aes_crypt,
 	hal_swap_stack,
-<#if PRIME_OPERATION_MODE == "Hybrid" || PRIME_OPERATION_MODE == "PLC">
+<#if PRIME_OPERATION_MODE == "Hybrid" || PRIME_OPERATION_MODE == "PLC" || PRIME_OPERATION_MODE == "PLC+Serial">
 	hal_plc_set_stby_mode,
 	hal_plc_get_thermal_warning,
 </#if>

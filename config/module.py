@@ -1,5 +1,5 @@
 """*****************************************************************************
-* Copyright (C) 2023 Microchip Technology Inc. and its subsidiaries.
+* Copyright (C) 2024 Microchip Technology Inc. and its subsidiaries.
 *
 * Subject to your compliance with these terms, you may use Microchip software
 * and any derivatives exclusively with Microchip products. It is your
@@ -26,22 +26,31 @@ def loadModule():
 
     print("Load Module: Harmony Smart Energy PRIME Stack")
 
+    ###########  PRIME PAL Configurations  ###########
     ## PRIME PAL PLC
-    #primePalPlcComponent = Module.CreateComponent("PrimePalPlc", "PRIME PAL PLC", "/SmartEnergy/PRIME Stack/PAL", "pal/plc/config/pal_plc.py")
-    #primePalPlcComponent.addCapability("PrimePalPlc", "PRIME_PAL_PLC", True) 
+    primePalPlcComponent = Module.CreateComponent("PrimePalPlc", "PRIME PAL PLC", "/SmartEnergy/PRIME Stack/PAL", "pal/plc/config/pal_plc.py")
+    primePalPlcComponent.addCapability("PrimePalPlc", "PRIME_PAL_PLC", True) 
     #primePalPlcComponent.addDependency("PrimePalPlc_PCoup_dependency", "PCOUP", True, True)
-    #primePalPlcComponent.setDisplayType("PRIME PAL PLC")
+    primePalPlcComponent.setDisplayType("PRIME PAL PLC")
 
     ## PRIME PAL RF
-    #primePalRfComponent = Module.CreateComponent("PrimePalRf", "PRIME PAL RF", "/SmartEnergy/PRIME Stack/PAL", "pal/rf/config/pal_rf.py")
-    #primePalRfComponent.addCapability("PrimePalRf", "PRIME_PAL_RF", True) 
+    primePalRfComponent = Module.CreateComponent("PrimePalRf", "PRIME PAL RF", "/SmartEnergy/PRIME Stack/PAL", "pal/rf/config/pal_rf.py")
+    primePalRfComponent.addCapability("PrimePalRf", "PRIME_PAL_RF", True) 
     #primePalRfComponent.addDependency("PrimePalRf_DrvRfPhy_dependency", "DRV_RF_PHY", False, True)
-    #primePalRfComponent.setDisplayType("PRIME PAL RF")
+    primePalRfComponent.setDisplayType("PRIME PAL RF")
+    
+    ## PRIME PAL Serial
+    primePalSerialComponent = Module.CreateComponent("PrimePalSerial", "PRIME PAL Serial", "/SmartEnergy/PRIME Stack/PAL", "pal/serial/config/pal_serial.py")
+    primePalSerialComponent.addCapability("PrimePalSerial", "PRIME_PAL_SERIAL", True) 
+    #primePalSerialComponent.addDependency("PrimePalSerial_DrvSerialPhy_dependency", "DRV_SERIAL_PHY", False, True)
+    primePalSerialComponent.setDisplayType("PRIME PAL SERIAL")
 
     ###########  PRIME Stack Configurations  ###########
+    global primeStackConfigComponent
     primeStackConfigComponent = Module.CreateComponent("prime_stack_config", "PRIME Stack", "/SmartEnergy/PRIME Stack", "prime/config/prime_configurator.py")
     primeStackConfigComponent.setDisplayType("PRIME Stack Configurator")
 
+    ###########  PRIME Service Configurations  ###########
     ## PRIME Storage Service
     primeStorageComponent = Module.CreateComponent("PrimeStorage", "PRIME Storage", "/SmartEnergy/PRIME Stack/Services", "service/storage/config/srv_storage.py")
     primeStorageComponent.setDisplayType("PRIME Service")

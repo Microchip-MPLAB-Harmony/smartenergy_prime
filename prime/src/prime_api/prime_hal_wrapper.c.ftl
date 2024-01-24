@@ -115,7 +115,7 @@ void prime_hal_plc_rx_signal(void)
 	p_hal_api->plc_rx_signal();
 }
 
-<#if PRIME_OPERATION_MODE == "Hybrid" || PRIME_OPERATION_MODE == "PLC">
+<#if PRIME_OPERATION_MODE == "Hybrid" || PRIME_OPERATION_MODE == "PLC" || PRIME_OPERATION_MODE == "PLC+Serial">
 bool prime_hal_plc_send_boot_cmd(uint16_t us_cmd, uint32_t ul_addr, uint32_t ul_data_len, uint8_t *puc_data_buf, uint8_t *puc_data_read)
 {
 	return p_hal_api->plc_send_boot_cmd(us_cmd, ul_addr, ul_data_len, puc_data_buf, puc_data_read);
