@@ -21,6 +21,9 @@
 * THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
 *****************************************************************************"""
 
+UPDATE_PAL_NO = 0
+UPDATE_PAL_YES = 1
+
 def primeAddBnFiles():
 
     global pPrimeApiSourceFile
@@ -152,6 +155,26 @@ def primeAddSnFiles():
         # Unknown option: no library by default
         pass
 
+def primeAddPal():
+
+    global primeConfigOperationMode
+
+    primePalGroup = Database.findGroup("PRIME PAL")
+    if (primePalGroup == None):
+        primePalGroup = Database.createGroup("PRIME STACK", "PRIME PAL")
+        primePalGroup.addComponent("prime_pal_config")
+        Database.activateComponents(["prime_pal_config"], "PRIME PAL")
+
+    primePalMode = Database.getSymbolValue("prime_pal_config", "PRIME_PAL_OPERATION_MODE")
+    if (primePalMode != primeConfigOperationMode.getValue()):
+        setVal("prime_pal_config", "PRIME_PAL_OPERATION_MODE", primeConfigOperationMode.getValue())
+
+def primeRemovePal():
+
+    primePalGroup = Database.findGroup("PRIME PAL")
+    if (primePalGroup != None):
+        Database.sendMessage("prime_pal_config", "PRIME_PAL_NONE", {})
+
 def primeChangeMode(symbol, event):
 
     global primeConfigMode
@@ -173,9 +196,12 @@ def primeChangeMode(symbol, event):
         primeConfigOperationMode14.setValue("Hybrid")
         primeConfigOperationMode.setValue("Hybrid")
         primeConfigComment.setVisible(True)
+         
+        # Add PAL
+        primeAddPal()
     else:
         # Config everything for BN, except SN options
-        primeShowAllOptions()
+        primeShowAllOptions(UPDATE_PAL_NO)
         primeConfigProject.setVisible(False)
         primeConfigComment.setVisible(False)
         if (primeConfigVersion.getValue() == "1.4"):
@@ -196,6 +222,9 @@ def primeChangeMode(symbol, event):
         # Add files for BN
         primeAddBnFiles()
         
+        # Add PAL
+        primeAddPal()
+        
 def primeAddBnSlave(symbol, event):
 
     global primeConfigOperationMode
@@ -210,6 +239,9 @@ def primeAddBnSlave(symbol, event):
     
     # Add files for BN
     primeAddBnFiles()
+    
+    # Add PAL
+    primeAddPal()
 
 def primeChangeProject(symbol, event):
 
@@ -231,9 +263,11 @@ def primeChangeProject(symbol, event):
         primeConfigOperationMode14.setValue("Hybrid")
         primeConfigOperationMode.setValue("Hybrid")
         primeConfigComment.setVisible(True)
+        # Add PAL
+        primeAddPal()
     elif (event["value"] == "bin project"):
         # bin project for SN: config everything except number of nodes and BN Slave
-        primeShowAllOptions()
+        primeShowAllOptions(UPDATE_PAL_NO)
         primeConfigMaxNumNodes.setVisible(False)
         primeConfigMaxNumNodes.setValue(0)
         primeConfigComment.setVisible(False)
@@ -248,10 +282,14 @@ def primeChangeProject(symbol, event):
             primeConfigOperationMode13.setValue("PLC")
             primeConfigOperationMode13.setReadOnly(True)
             primeConfigOperationMode.setValue("PLC")
+        # Remove PAL
+        primeRemovePal()
     else:
         # Unknown option: hide all options
         primeHideAllOptions()
         primeConfigMode.setVisible(True)
+        # Remove PAL
+        primeRemovePal()
         
     # Add files for SN 
     primeAddSnFiles()
@@ -260,19 +298,19 @@ def primeChangeOperationMode13(symbol, event):
     
     global primeConfigOperationMode
     
-    primeConfigOperationMode.setValue = event["value"]
+    primeConfigOperationMode.setValue(event["value"])
 
     # Adjust the version name (hybrid or not)
-    primeChangeFWVersion()
+    primeChangeFWVersion(UPDATE_PAL_YES)
     
 def primeChangeOperationMode14(symbol, event):
 
     global primeConfigOperationMode
     
-    primeConfigOperationMode.setValue = event["value"]
-    
+    primeConfigOperationMode.setValue(event["value"])
+
     # Adjust the version name (hybrid or not)
-    primeChangeFWVersion()
+    primeChangeFWVersion(UPDATE_PAL_YES)
 
 def primeChangeConfigVersion(symbol, event):
     
@@ -327,12 +365,12 @@ def primeChangeConfigVersion(symbol, event):
         primeConfigBnSlaveEn.setValue(False)
         primeConfigBnSlaveEn.setReadOnly(True)
     
-    primeChangeFWVersion()
+    primeChangeFWVersion(UPDATE_PAL_YES)
 
-def primeChangeFWVersion():
+def primeChangeFWVersion(change_pal):
     global primeConfigMode
     global primeConfigVersion
-    global primeConfigBnSlaveEn
+    global primeConfigProject
     
     # 1.4 versions are always hybrid
     if (primeConfigMode.getValue() == "SN"):
@@ -343,7 +381,14 @@ def primeChangeFWVersion():
             
         # Add files for SN 
         primeAddSnFiles()
-           
+        
+        if (change_pal == UPDATE_PAL_YES):
+            if (primeConfigProject.getValue() == "application project"):
+                # Add PAL
+                primeAddPal()
+            else:
+                # Remove PAL
+                primeRemovePal()
     else:
         if (primeConfigVersion.getValue() == "1.4"):
             primeConfigFWVersion.setValue("HB14.01.01") 
@@ -352,6 +397,10 @@ def primeChangeFWVersion():
         
         # Add files for BN 
         primeAddBnFiles()
+        
+        if (change_pal == UPDATE_PAL_YES):
+            # Add PAL
+            primeAddPal()
 
 def primeShowSprofUsiInstance(symbol, event):
     global primeConfigMode
@@ -372,7 +421,7 @@ def primeShowSprofUsiInstance(symbol, event):
             # In the SN bin project, there is no USI block
             symbol.setMax(10)
 
-def primeShowAllOptions():
+def primeShowAllOptions(changePal):
 
     global primeConfigMode
     global primeConfigBnSlaveEn
@@ -392,7 +441,7 @@ def primeShowAllOptions():
     global primeConfigMngpSprof
     global primeConfigSprofUsiPort
     
-    primeChangeFWVersion()
+    primeChangeFWVersion(changePal)
     
     primeConfigMode.setVisible(True)
     primeConfigBnSlaveEn.setVisible(True)
@@ -460,6 +509,12 @@ def instantiateComponent(primeStackConfigComponent):
     Database.setActiveGroup("PRIME STACK")
     primeStackGroup.addComponent("prime_stack_config")
     
+    primePalGroup = Database.findGroup("PRIME PAL")
+    if (primePalGroup == None):
+        primePalGroup = Database.createGroup("PRIME STACK", "PRIME PAL")
+    primePalGroup.addComponent("prime_pal_config")
+    Database.activateComponents(["prime_pal_config"], "PRIME PAL")
+    
     processor = Variables.get("__PROCESSOR")
     
     # Configure PRIME Stack
@@ -510,25 +565,24 @@ def instantiateComponent(primeStackConfigComponent):
     
     # Select operation mode - different for 1.3 and 1.4
     global primeConfigOperationMode
-    primeOperationModes = ["Hybrid", "PLC", "RF", "PLC+Serial"]
+    primeOperationModes = ["-- Select a PRIME operation mode from list --", "Hybrid", "PLC", "RF", "PLC+Serial"]
     primeConfigOperationMode = primeStackConfigComponent.createComboSymbol("PRIME_OPERATION_MODE", primeStackConfig, primeOperationModes)
     primeConfigOperationMode.setVisible(False)
     primeConfigOperationMode.setDefaultValue("Hybrid")
+    primeConfigOperationMode.setReadOnly(False)
     global primeConfigOperationMode14
-    primeOperationModes14 = ["Hybrid", "PLC", "RF"]
+    primeOperationModes14 = ["-- Select a PRIME operation mode from list --", "Hybrid", "PLC", "RF"]
     primeConfigOperationMode14 = primeStackConfigComponent.createComboSymbol("PRIME_OPERATION_MODE_14", primeStackConfig, primeOperationModes14)
     primeConfigOperationMode14.setLabel("PRIME operation mode")
     primeConfigOperationMode14.setDescription("Select the PRIME operation mode: Hybrid, only PLC or only RF")
     primeConfigOperationMode14.setVisible(True)
-    primeConfigOperationMode14.setDefaultValue("Hybrid")
     primeConfigOperationMode14.setDependencies(primeChangeOperationMode14, ["PRIME_OPERATION_MODE_14"]) 
     global primeConfigOperationMode13
-    primeOperationModes13 = ["PLC", "PLC+Serial"]
+    primeOperationModes13 = ["-- Select a PRIME operation mode from list --", "PLC", "PLC+Serial"]
     primeConfigOperationMode13 = primeStackConfigComponent.createComboSymbol("PRIME_OPERATION_MODE_13", primeStackConfig, primeOperationModes13)
     primeConfigOperationMode13.setLabel("PRIME operation mode")
     primeConfigOperationMode13.setDescription("Select the PRIME operation mode: only PLC or PLC with Serial")
     primeConfigOperationMode13.setVisible(False)
-    primeConfigOperationMode13.setDefaultValue("PLC")
     primeConfigOperationMode13.setDependencies(primeChangeOperationMode13, ["PRIME_OPERATION_MODE_13"]) 
 
     # The SN application project cannot configure more than the previous parameters

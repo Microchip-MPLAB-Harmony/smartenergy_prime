@@ -27,22 +27,26 @@ def loadModule():
     print("Load Module: Harmony Smart Energy PRIME Stack")
 
     ###########  PRIME PAL Configurations  ###########
+    global primePalConfigComponent
+    primePalConfigComponent = Module.CreateComponent("prime_pal_config", "PRIME PAL", "/SmartEnergy/PRIME Stack/PAL", "pal/config/pal_configurator.py")
+    primePalConfigComponent.setDisplayType("PRIME PAL Configurator")
+    
     ## PRIME PAL PLC
-    primePalPlcComponent = Module.CreateComponent("PrimePalPlc", "PRIME PAL PLC", "/SmartEnergy/PRIME Stack/PAL", "pal/plc/config/pal_plc.py")
-    primePalPlcComponent.addCapability("PrimePalPlc", "PRIME_PAL_PLC", True) 
-    #primePalPlcComponent.addDependency("PrimePalPlc_PCoup_dependency", "PCOUP", True, True)
+    primePalPlcComponent = Module.CreateComponent("primePalPlc", "PRIME PAL PLC", "/SmartEnergy/PRIME Stack/PAL", "pal/plc/config/pal_plc.py")
+    primePalPlcComponent.addCapability("primePalPlc", "PRIME_PAL_PLC", True) 
+    #primePalPlcComponent.addDependency("primePalPlc_PCoup_dependency", "PCOUP", True, True)
     primePalPlcComponent.setDisplayType("PRIME PAL PLC")
 
     ## PRIME PAL RF
-    primePalRfComponent = Module.CreateComponent("PrimePalRf", "PRIME PAL RF", "/SmartEnergy/PRIME Stack/PAL", "pal/rf/config/pal_rf.py")
-    primePalRfComponent.addCapability("PrimePalRf", "PRIME_PAL_RF", True) 
-    #primePalRfComponent.addDependency("PrimePalRf_DrvRfPhy_dependency", "DRV_RF_PHY", False, True)
+    primePalRfComponent = Module.CreateComponent("primePalRf", "PRIME PAL RF", "/SmartEnergy/PRIME Stack/PAL", "pal/rf/config/pal_rf.py")
+    primePalRfComponent.addCapability("primePalRf", "PRIME_PAL_RF", True) 
+    #primePalRfComponent.addDependency("primePalRf_DrvRfPhy_dependency", "DRV_RF_PHY", False, True)
     primePalRfComponent.setDisplayType("PRIME PAL RF")
     
     ## PRIME PAL Serial
-    primePalSerialComponent = Module.CreateComponent("PrimePalSerial", "PRIME PAL Serial", "/SmartEnergy/PRIME Stack/PAL", "pal/serial/config/pal_serial.py")
-    primePalSerialComponent.addCapability("PrimePalSerial", "PRIME_PAL_SERIAL", True) 
-    #primePalSerialComponent.addDependency("PrimePalSerial_DrvSerialPhy_dependency", "DRV_SERIAL_PHY", False, True)
+    primePalSerialComponent = Module.CreateComponent("primePalSerial", "PRIME PAL Serial", "/SmartEnergy/PRIME Stack/PAL", "pal/serial/config/pal_serial.py")
+    primePalSerialComponent.addCapability("primePalSerial", "PRIME_PAL_SERIAL", True) 
+    #primePalSerialComponent.addDependency("primePalSerial_DrvSerialPhy_dependency", "DRV_SERIAL_PHY", False, True)
     primePalSerialComponent.setDisplayType("PRIME PAL SERIAL")
 
     ###########  PRIME Stack Configurations  ###########
