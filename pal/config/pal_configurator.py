@@ -47,6 +47,7 @@ def instantiateComponent(primePalConfigComponent):
             primePalGroup = Database.createGroup("PRIME STACK", "PRIME PAL")
     
     # Configure PRIME PAL
+    global primePalConfig
     primePalConfig = primePalConfigComponent.createMenuSymbol("PRIME_PAL_Configuration", None)
     primePalConfig.setLabel("PRIME PAL Configuration")
     primePalConfig.setDescription("Configure the PRIME PAL")
@@ -90,7 +91,7 @@ def instantiateComponent(primePalConfigComponent):
     global pPrimePalHeaderFile
     pPrimePalHeaderFile = primePalConfigComponent.createFileSymbol("PRIME_PAL_HEADER", None)
     pPrimePalHeaderFile.setSourcePath("pal/pal.h")
-    pPrimePalHeaderFile.setOutputName("mal.h")
+    pPrimePalHeaderFile.setOutputName("pal.h")
     pPrimePalHeaderFile.setDestPath("stack/pal")
     pPrimePalHeaderFile.setProjectPath("config/" + configName + "/stack/pal")
     pPrimePalHeaderFile.setType("HEADER")
@@ -126,14 +127,13 @@ def instantiateComponent(primePalConfigComponent):
     
 def destroyComponent(primePalConfigComponent):
     # Deactivate PAL components
-    Database.deactivateComponents(["primePalPlc", "primePalRf", "primePalSerial"])
-    primePalPlcStatus.setValue(INACTIVE)
-    primePalRfStatus.setValue(INACTIVE)
-    primePalSerialStatus.setValue(INACTIVE)
+    primePalPlcDisable()
+    primePalRfDisable()
+    primePalSerialDisable() 
     primeRemoveMpalFiles()
+    Database.deactivateComponents(["prime_pal_config"])
     
 def primePalChangeOperationMode(symbol, event):
-    
     if (event["value"] == "Hybrid"):
         # Add PLC
         primePalPlcEnable()
@@ -172,10 +172,9 @@ def primePalChangeOperationMode(symbol, event):
         primeAddMpalFiles()   
     else:
         # Deactivate PAL components
-        Database.deactivateComponents(["primePalPlc", "primePalRf", "primePalSerial"])
-        primePalPlcStatus.setValue(INACTIVE)
-        primePalRfStatus.setValue(INACTIVE)
-        primePalSerialStatus.setValue(INACTIVE)
+        primePalPlcDisable()
+        primePalRfDisable()
+        primePalSerialDisable() 
         primeRemoveMpalFiles()
 
 def primePalPlcEnable():
@@ -186,7 +185,7 @@ def primePalPlcEnable():
         primePalPlcStatus.setValue(ACTIVE)
 
 def primePalPlcDisable():
-    if (primePalPlcStatus.geValue() == ACTIVE):
+    if (primePalPlcStatus.getValue() == ACTIVE):
         Database.deactivateComponents(["primePalPlc"])
         primePalPlcStatus.setValue(INACTIVE) 
 
@@ -239,21 +238,18 @@ def setVal(component, symbol, value):
 def handleMessage(messageID, args):
     retDict= {}
     if (messageID == "SET_SYMBOL"):
-        print "handleMessage: Set Symbol"
+        print "handleMessage: Set Symbol in PRIME PAL Configurator"
         retDict= {"Return": "Success"}
         Database.setSymbolValue(args["Component"], args["Id"], args["Value"])
         if (args["Id"] == "PRIME_PAL_OPERATION_MODE"):
             primePalConfigOperationMode.setVisible(False)
             primePalConfig.setVisible(False)
     elif (messageID == "PRIME_PAL_NONE"):
+        print "handleMessage: Remove all PRIME PAL layers"
         primePalConfigOperationMode.setVisible(False)
         primePalConfig.setVisible(False)
         # Deactivate PAL components
-        Database.deactivateComponents(["primePalPlc", "primePalRf", "primePalSerial"])
-        primePalPlcStatus.setValue(INACTIVE)
-        primePalRfStatus.setValue(INACTIVE)
-        primePalSerialStatus.setValue(INACTIVE)
-        primeRemoveMpalFiles()
+        primePalConfigOperationMode.setValue("-- Select a PRIME operation mode from list --")
         retDict= {"Return": "Success"}
     else:
         retDict= {"Return": "UnImplemented Command"}

@@ -24,14 +24,14 @@
 
 storage_helpkeyword = "mcc_h3_prime_storage_service_configurations"
 
-def instantiateComponent(storageComponent):
+def instantiateComponent(primeStorageComponent):
     
     Log.writeInfoMessage("Loading Storage PRIME Service")
 
     processor = Variables.get("__PROCESSOR")
 
     if ("PIC32CX" in processor) and ("MT" in processor):
-        userSignatureBlock = storageComponent.createIntegerSymbol("SRV_STORAGE_USER_SIGNATURE_BLOCK", None)
+        userSignatureBlock = primeStorageComponent.createIntegerSymbol("SRV_STORAGE_USER_SIGNATURE_BLOCK", None)
         userSignatureBlock.setLabel("User Signature Block")
         userSignatureBlock.setDescription("User Signature block index used to store non-volatile data")
         userSignatureBlock.setDefaultValue(1)
@@ -39,7 +39,7 @@ def instantiateComponent(storageComponent):
         userSignatureBlock.setMax(6)
         userSignatureBlock.setHelp(storage_helpkeyword)
 
-        userSignaturePage = storageComponent.createIntegerSymbol("SRV_STORAGE_USER_SIGNATURE_PAGE", None)
+        userSignaturePage = primeStorageComponent.createIntegerSymbol("SRV_STORAGE_USER_SIGNATURE_PAGE", None)
         userSignaturePage.setLabel("User Signature Page")
         userSignaturePage.setDescription("User Signature page index used to store non-volatile data")
         userSignaturePage.setDefaultValue(0)
@@ -53,7 +53,7 @@ def instantiateComponent(storageComponent):
     configName = Variables.get("__CONFIGURATION_NAME")
 
     # Storage Service Files
-    srvStorageSourceFile = storageComponent.createFileSymbol("SRV_STORAGE_SOURCE", None)
+    srvStorageSourceFile = primeStorageComponent.createFileSymbol("SRV_STORAGE_SOURCE", None)
     srvStorageSourceFile.setSourcePath("service/storage/srv_storage.c.ftl")
     srvStorageSourceFile.setOutputName("srv_storage.c")
     srvStorageSourceFile.setDestPath("service/storage")
@@ -63,7 +63,7 @@ def instantiateComponent(storageComponent):
     srvStorageSourceFile.setOverwrite(True)
     srvStorageSourceFile.setEnabled(True)
 
-    srvStorageHeaderFile = storageComponent.createFileSymbol("SRV_STORAGE_HEADER", None)
+    srvStorageHeaderFile = primeStorageComponent.createFileSymbol("SRV_STORAGE_HEADER", None)
     srvStorageHeaderFile.setSourcePath("service/storage/srv_storage.h")
     srvStorageHeaderFile.setOutputName("srv_storage.h")
     srvStorageHeaderFile.setDestPath("service/storage")
@@ -75,13 +75,13 @@ def instantiateComponent(storageComponent):
 
     #### FreeMaker System Files ######################################################
 
-    srvStorageSystemDefFile = storageComponent.createFileSymbol("SRV_STORAGE_SYSTEM_DEF", None)
+    srvStorageSystemDefFile = primeStorageComponent.createFileSymbol("SRV_STORAGE_SYSTEM_DEF", None)
     srvStorageSystemDefFile.setType("STRING")
     srvStorageSystemDefFile.setOutputName("core.LIST_SYSTEM_DEFINITIONS_H_INCLUDES")
     srvStorageSystemDefFile.setSourcePath("service/storage/templates/system/system_definitions.h.ftl")
     srvStorageSystemDefFile.setMarkup(True)
 
-    srvStorageSystemInitFile = storageComponent.createFileSymbol("SRV_STORAGE_SYSTEM_INIT", None)
+    srvStorageSystemInitFile = primeStorageComponent.createFileSymbol("SRV_STORAGE_SYSTEM_INIT", None)
     srvStorageSystemInitFile.setType("STRING")
     srvStorageSystemInitFile.setOutputName("core.LIST_SYSTEM_INIT_C_SYS_INITIALIZE_DRIVERS")
     srvStorageSystemInitFile.setSourcePath("service/storage/templates/system/system_initialize.c.ftl")

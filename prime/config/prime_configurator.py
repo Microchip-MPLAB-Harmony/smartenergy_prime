@@ -21,31 +21,50 @@
 * THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
 *****************************************************************************"""
 
-UPDATE_PAL_NO = 0
-UPDATE_PAL_YES = 1
+# Configuration parameters
+global primeConfigMode
+global primeConfigBnSlaveEn
+global primeConfigProject
+global primeConfigVersion
+global primeConfigOperationMode
+global primeConfigOperationMode14
+global primeConfigOperationMode13
+global primeConfigComment
+global primeConfigFWVendor
+global primeConfigFWModel
+global primeConfigFWVersion
+global primeConfigPIBVendor
+global primeConfigPIBModel
+global primeMacConfig
+global primeConfigSecProfile
+global primeConfigMaxNumNodes
+global primeMngpConfig
+global primeConfigMngpSprof
+global primeConfigSprofUsiPort
+   
+# Files  
+global pPrimeApiSourceFile
+global pPrimeApiAsFile
+global pPrimeHalWrapperHeaderFile
+global pPrimeHalWrapperSourceFile
+global pMacHeaderFile
+global pMngpHeaderFile
+global pBmngDefsHeaderFile
+global pBmngApiHeaderFile
+global pClNullHeaderFile
+global pClNullApiHeaderFile
+global pCl432HeaderFile
+global pCl432ApiHeaderFile
+global pHalApiSourceFile
+
+# Libraries
+global pPrime13BnLibFile
+global pPrime13SnLibFile
+global pPrime14BnLibFile
+global pPrime14SnLibFile
+
 
 def primeAddBnFiles():
-
-    global pPrimeApiSourceFile
-    global pPrimeApiAsFile
-    global pPrimeHalWrapperHeaderFile
-    global pPrimeHalWrapperSourceFile
-    global pMacHeaderFile
-    global pMngpHeaderFile
-    global pBmngApiHeaderFile
-    global pBmngDefsHeaderFile
-    global pClNullHeaderFile
-    global pClNullApiHeaderFile
-    global pCl432HeaderFile
-    global pCl432ApiHeaderFile
-    global pHalApiSourceFile
-    global pPrime13BnLibFile
-    global pPrime13SnLibFile
-    global pPrime14BnLibFile
-    global pPrime14SnLibFile
-    global primeConfigVersion
-    global primeConfigBnSlaveEn
-    
     # SN only 
     pPrimeApiAsFile.setEnabled(False)
     
@@ -84,27 +103,6 @@ def primeAddBnFiles():
         pass
 
 def primeAddSnFiles():
-
-    global pPrimeApiSourceFile
-    global pPrimeApiAsFile
-    global pPrimeHalWrapperHeaderFile
-    global pPrimeHalWrapperSourceFile
-    global pMacHeaderFile
-    global pMngpHeaderFile
-    global pBmngApiHeaderFile
-    global pBmngDefsHeaderFile
-    global pClNullHeaderFile
-    global pClNullApiHeaderFile
-    global pCl432HeaderFile
-    global pCl432ApiHeaderFile
-    global pHalApiSourceFile
-    global pPrime13BnLibFile
-    global pPrime13SnLibFile
-    global pPrime14BnLibFile
-    global pPrime14SnLibFile
-    global primeConfigVersion
-    global primeConfigProject
-    
     # BN only
     pBmngApiHeaderFile.setEnabled(False)
     pBmngDefsHeaderFile.setEnabled(False)
@@ -156,9 +154,6 @@ def primeAddSnFiles():
         pass
 
 def primeAddPal():
-
-    global primeConfigOperationMode
-
     primePalGroup = Database.findGroup("PRIME PAL")
     if (primePalGroup == None):
         primePalGroup = Database.createGroup("PRIME STACK", "PRIME PAL")
@@ -170,20 +165,53 @@ def primeAddPal():
         setVal("prime_pal_config", "PRIME_PAL_OPERATION_MODE", primeConfigOperationMode.getValue())
 
 def primeRemovePal():
-
     primePalGroup = Database.findGroup("PRIME PAL")
     if (primePalGroup != None):
         Database.sendMessage("prime_pal_config", "PRIME_PAL_NONE", {})
+        
+def primeAddServices():
+    primeServicesGroup = Database.findGroup("PRIME SERVICES")
+    if (primeServicesGroup == None):
+        primeServicesGroup = Database.createGroup("PRIME STACK", "PRIME SERVICES")
+        primeServicesGroup.addComponent("prime_srv_config")
+        Database.activateComponents(["prime_srv_config"], "PRIME SERVICES")
+        
+    Database.sendMessage("prime_srv_config", "PRIME_SERVICES_ACTIVATE", {})
 
+def primeRemoveServices():
+    primeServicesGroup = Database.findGroup("PRIME SERVICES")
+    if (primeServicesGroup != None):
+        Database.sendMessage("prime_srv_config", "PRIME_SERVICES_DEACTIVATE", {})
+
+def primeAddFiles():
+    if (primeConfigMode.getValue() == "SN"):
+        # Add files for SN 
+        primeAddSnFiles()
+        if (primeConfigProject.getValue() == "application project"):
+            # Add PAL
+            primeAddPal()
+            # Add Services
+            primeAddServices()
+        else:
+            # Remove PAL
+            primeRemovePal()
+            # Remove Services
+            primeRemoveServices()
+    elif (primeConfigMode.getValue() == "BN"):
+        # Add files for BN 
+        primeAddBnFiles()
+        # Add PAL
+        primeAddPal()
+        # Add Services
+        primeAddServices()
+    else:
+        # Unknown option
+        # Remove PAL
+        primeRemovePal()
+        # Remove Services
+        primeRemoveServices()
+        
 def primeChangeMode(symbol, event):
-
-    global primeConfigMode
-    global primeConfigProject
-    global primeConfigVersion
-    global primeConfigOperationMode
-    global primeConfigOperationMode13
-    global primeConfigOperationMode14
-    
     if (event["value"] == "SN"):
         # Need to config project type before showing further options
         primeHideAllOptions()
@@ -192,16 +220,13 @@ def primeChangeMode(symbol, event):
         primeConfigProject.setVisible(True)
         # Dual applications can only be hybrid (as of now, for Mistral)
         primeConfigOperationMode13.setVisible(False)
-        primeConfigOperationMode14.setVisible(True)
         primeConfigOperationMode14.setValue("Hybrid")
+        primeConfigOperationMode14.setVisible(True)
         primeConfigOperationMode.setValue("Hybrid")
         primeConfigComment.setVisible(True)
-         
-        # Add PAL
-        primeAddPal()
     else:
         # Config everything for BN, except SN options
-        primeShowAllOptions(UPDATE_PAL_NO)
+        primeShowAllOptions()
         primeConfigProject.setVisible(False)
         primeConfigComment.setVisible(False)
         if (primeConfigVersion.getValue() == "1.4"):
@@ -218,40 +243,16 @@ def primeChangeMode(symbol, event):
             else:
                 primeConfigBnSlaveEn.setReadOnly(True)
                 primeConfigOperationMode13.setReadOnly(True)
-            
-        # Add files for BN
-        primeAddBnFiles()
-        
-        # Add PAL
-        primeAddPal()
         
 def primeAddBnSlave(symbol, event):
-
-    global primeConfigOperationMode
-    global primeConfigOperationMode13
-    
     if (event["value"] == True):
         primeConfigOperationMode13.setValue("PLC+Serial");
         primeConfigOperationMode.setValue("PLC+Serial");
     else:
         primeConfigOperationMode13.setValue("PLC");
         primeConfigOperationMode.setValue("PLC");
-    
-    # Add files for BN
-    primeAddBnFiles()
-    
-    # Add PAL
-    primeAddPal()
 
 def primeChangeProject(symbol, event):
-
-    global primeConfigVersion
-    global primeConfigOperationMode
-    global primeConfigOperationMode13
-    global primeConfigOperationMode14
-    global primeConfigMaxNumNodes
-    global primeConfigBnSlaveEn
-    
     if (event["value"] == "application project"):
         # Application project for SN: only operation mode
         primeHideAllOptions()
@@ -259,15 +260,13 @@ def primeChangeProject(symbol, event):
         primeConfigProject.setVisible(True)
         # Dual applications can only be hybrid (as of now, for Mistral)
         primeConfigOperationMode13.setVisible(False)
-        primeConfigOperationMode14.setVisible(True)
         primeConfigOperationMode14.setValue("Hybrid")
+        primeConfigOperationMode14.setVisible(True)
         primeConfigOperationMode.setValue("Hybrid")
         primeConfigComment.setVisible(True)
-        # Add PAL
-        primeAddPal()
     elif (event["value"] == "bin project"):
         # bin project for SN: config everything except number of nodes and BN Slave
-        primeShowAllOptions(UPDATE_PAL_NO)
+        primeShowAllOptions()
         primeConfigMaxNumNodes.setVisible(False)
         primeConfigMaxNumNodes.setValue(0)
         primeConfigComment.setVisible(False)
@@ -282,47 +281,34 @@ def primeChangeProject(symbol, event):
             primeConfigOperationMode13.setValue("PLC")
             primeConfigOperationMode13.setReadOnly(True)
             primeConfigOperationMode.setValue("PLC")
-        # Remove PAL
-        primeRemovePal()
     else:
         # Unknown option: hide all options
         primeHideAllOptions()
         primeConfigMode.setVisible(True)
-        # Remove PAL
-        primeRemovePal()
-        
-    # Add files for SN 
-    primeAddSnFiles()
         
 def primeChangeOperationMode13(symbol, event):
-    
-    global primeConfigOperationMode
-    
+    # Set general value
     primeConfigOperationMode.setValue(event["value"])
 
     # Adjust the version name (hybrid or not)
-    primeChangeFWVersion(UPDATE_PAL_YES)
+    primeChangeFWVersion()
+    
+    # Add files
+    primeAddFiles()
     
 def primeChangeOperationMode14(symbol, event):
-
-    global primeConfigOperationMode
-    
+    # Set general value
     primeConfigOperationMode.setValue(event["value"])
 
     # Adjust the version name (hybrid or not)
-    primeChangeFWVersion(UPDATE_PAL_YES)
+    primeChangeFWVersion()
+    
+    # Add files
+    primeAddFiles()
 
 def primeChangeConfigVersion(symbol, event):
-    
-    global primeConfigMode
-    global primeConfigOperationMode
-    global primeConfigOperationMode13
-    global primeConfigOperationMode14
-    global primeConfigSecProfile
-    global primeConfigBnSlaveEn
-
     processor = Variables.get("__PROCESSOR")
-    
+
     # No security and no hybrid or RF in 1.3
     # No BN slave in 1.4 or in SN
     # Serial only in BN 1.3
@@ -350,8 +336,8 @@ def primeChangeConfigVersion(symbol, event):
     elif (event["value"] == "1.4"):
         primeConfigSecProfile.setReadOnly(False)
         primeConfigOperationMode13.setVisible(False)
-        primeConfigOperationMode14.setVisible(True)
         primeConfigOperationMode14.setValue("Hybrid")
+        primeConfigOperationMode14.setVisible(True)
         primeConfigOperationMode.setValue("Hybrid")
         primeConfigBnSlaveEn.setValue(False)
         primeConfigBnSlaveEn.setReadOnly(True)
@@ -364,48 +350,23 @@ def primeChangeConfigVersion(symbol, event):
         primeConfigOperationMode.setValue("Hybrid")
         primeConfigBnSlaveEn.setValue(False)
         primeConfigBnSlaveEn.setReadOnly(True)
-    
-    primeChangeFWVersion(UPDATE_PAL_YES)
 
-def primeChangeFWVersion(change_pal):
-    global primeConfigMode
-    global primeConfigVersion
-    global primeConfigProject
-    
+    primeChangeFWVersion()
+
+def primeChangeFWVersion():
     # 1.4 versions are always hybrid
     if (primeConfigMode.getValue() == "SN"):
         if (primeConfigVersion.getValue() == "1.4"):
             primeConfigFWVersion.setValue("HS14.01.01") 
         else:
             primeConfigFWVersion.setValue("S13.01.01") 
-            
-        # Add files for SN 
-        primeAddSnFiles()
-        
-        if (change_pal == UPDATE_PAL_YES):
-            if (primeConfigProject.getValue() == "application project"):
-                # Add PAL
-                primeAddPal()
-            else:
-                # Remove PAL
-                primeRemovePal()
     else:
         if (primeConfigVersion.getValue() == "1.4"):
             primeConfigFWVersion.setValue("HB14.01.01") 
         else:
             primeConfigFWVersion.setValue("B13.01.01") 
-        
-        # Add files for BN 
-        primeAddBnFiles()
-        
-        if (change_pal == UPDATE_PAL_YES):
-            # Add PAL
-            primeAddPal()
 
 def primeShowSprofUsiInstance(symbol, event):
-    global primeConfigMode
-    global primeConfigProject
-    
     symbol.setVisible(event["value"])
     
     if (primeConfigMode.getValue() == "BN"):
@@ -421,27 +382,8 @@ def primeShowSprofUsiInstance(symbol, event):
             # In the SN bin project, there is no USI block
             symbol.setMax(10)
 
-def primeShowAllOptions(changePal):
-
-    global primeConfigMode
-    global primeConfigBnSlaveEn
-    global primeConfigVersion
-    global primeConfigOperationMode13
-    global primeConfigOperationMode14
-    global primeConfigFWVendor
-    global primeConfigFWModel
-    global primeConfigFWVersion
-    global primeConfigPIBVendor
-    global primeConfigPIBModel
-    global primeConfigSecProfile
-    global primeMacConfig
-    global primeConfigSecProfile
-    global primeConfigMaxNumNodes
-    global primeMngpConfig
-    global primeConfigMngpSprof
-    global primeConfigSprofUsiPort
-    
-    primeChangeFWVersion(changePal)
+def primeShowAllOptions():
+    primeChangeFWVersion()
     
     primeConfigMode.setVisible(True)
     primeConfigBnSlaveEn.setVisible(True)
@@ -462,25 +404,6 @@ def primeShowAllOptions(changePal):
     primeConfigSprofUsiPort.setVisible(True)
     
 def primeHideAllOptions():
-
-    global primeConfigMode
-    global primeConfigBnSlaveEn
-    global primeConfigVersion
-    global primeConfigOperationMode13
-    global primeConfigOperationMode14
-    global primeConfigFWVendor
-    global primeConfigFWModel
-    global primeConfigFWVersion
-    global primeConfigPIBVendor
-    global primeConfigPIBModel
-    global primeConfigSecProfile
-    global primeMacConfig
-    global primeConfigSecProfile
-    global primeConfigMaxNumNodes
-    global primeMngpConfig
-    global primeConfigMngpSprof
-    global primeConfigSprofUsiPort
-    
     primeConfigMode.setVisible(False)
     primeConfigBnSlaveEn.setVisible(False)
     primeConfigVersion.setVisible(False)
@@ -514,6 +437,12 @@ def instantiateComponent(primeStackConfigComponent):
         primePalGroup = Database.createGroup("PRIME STACK", "PRIME PAL")
     primePalGroup.addComponent("prime_pal_config")
     Database.activateComponents(["prime_pal_config"], "PRIME PAL")
+    
+    primeServicesGroup = Database.findGroup("PRIME SERVICES")
+    if (primeServicesGroup == None):
+        primeServicesGroup = Database.createGroup("PRIME STACK", "PRIME SERVICES")
+    primeServicesGroup.addComponent("prime_srv_config")
+    Database.activateComponents(["prime_srv_config"], "PRIME SERVICES")
     
     processor = Variables.get("__PROCESSOR")
     
@@ -942,6 +871,8 @@ def instantiateComponent(primeStackConfigComponent):
     #primeSystemTasksFile.setSourcePath("prime/templates/system/system_tasks.c.ftl")
     #primeSystemTasksFile.setMarkup(True)
 
+def destroyComponent(primeStackConfigComponent):
+    Database.deactivateComponents(["prime_stack_config"]) 
 
 ################################################################################
 #### Business Logic ####
@@ -960,7 +891,7 @@ def setVal(component, symbol, value):
 def handleMessage(messageID, args):
     retDict= {}
     if (messageID == "SET_SYMBOL"):
-        print("handleMessage: Set Symbol")
+        print("handleMessage: Set Symbol in PRIME Stack")
         retDict= {"Return": "Success"}
         Database.setSymbolValue(args["Component"], args["Id"], args["Value"])
     else:
