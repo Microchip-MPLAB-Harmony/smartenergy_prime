@@ -71,10 +71,10 @@ about the modulation scheme to be used */
 // *****************************************************************************
 /* PAL PHY Timer Mode Macros
  Summary:
-    PAL PHY different time modes.
+    PAL PHY different timer modes.
 
  Description:
-    These time modes macros are used during PHY communication with MAC layer.
+    These timer modes macros are used during PHY communication with MAC layer.
 
  Remarks:
     None.
@@ -87,12 +87,12 @@ about the modulation scheme to be used */
 #define PAL_TX_MODE_CANCEL           2
 
 // *****************************************************************************
-/* PAL config success result macros
+/* PAL configuration success result macros
  Summary:
-    PAL config success results.
+    PAL configuration success results.
 
  Description:
-    PAL config output results
+    PAL configuration output results
 
  Remarks:
     None.
@@ -101,12 +101,12 @@ about the modulation scheme to be used */
 #define PAL_CFG_INVALID_INPUT        1
 
 // *****************************************************************************
-/* PAL TX Result Macros
+/* PAL TX result macros
  Summary:
-    PAL Transmission results.
+    PAL transmission results.
 
  Description:
-    These transmission result macros are used as the return types for data 
+    PAL transmission result macros are used as the return types for data 
     transmission.
 
  Remarks:
@@ -143,12 +143,10 @@ about the modulation scheme to be used */
 /* Transmission result: high temperature 
 (>110 Degree Centigrade) error (only with PL460) */
 #define PAL_TX_RESULT_HIGH_TEMP_110  13
-/* Transmission Result (only RF): invalid Parameter */
+/* Transmission Result (only RF): invalid parameter */
 #define PAL_TX_RESULT_INV_PARAM      20
 /* Transmission result: error in tx */
 #define PAL_TX_RESULT_PHY_ERROR      0xFE
-/* Transmission result: not use physical layer and no transmission ongoing*/
-#define PAL_TX_RESULT_PHY_UNUSED     0xFF
 
 // *****************************************************************************
 // *****************************************************************************
@@ -159,7 +157,7 @@ about the modulation scheme to be used */
 // *****************************************************************************
 /* PRIME mode type enumeration
  Summary:
-    Physical PRIME Mode of transmission
+    Physical PRIME mode of transmission
 
  Description:
     This mode type will be used to indicate the transfer of data.
@@ -177,32 +175,9 @@ typedef enum
     PAL_MODE_TEST    = 0xFF,  /* Not in PL360 */
 } PAL_PRIME_MODE_TYPE;
 
-/* PAL medium enumeration
- Summary:
-    Physical Layer Medium Identifier
-
- Description:
-    The medium identifier is used to indicate in which physical layer the data
-    is transmitted or received. 
-    Upon transmission, the PHY Abstraction Layer forwards the PHY frame to the
-    physical layer selected by the MAC layer.
-    Upon reception, the PHY Abstraction Layer indicates to the MAC layer the 
-    physical layer in which the PHY frame was received.
-
- Remarks:
-    None.
-*/
-typedef enum 
-{
-    PAL_PHY_PLC     = 0,
-    PAL_PHY_SERIAL  = 1,
-    PAL_PHY_RF      = 2,
-    PAL_PHY_UNKNOWN = 0xFF,
-} PAL_PHY_LAYER_IDENTIFIER;
-
 /* PAL PLC modulation scheme enumeration
  Summary:
-    PLC Physical Scheme of modulation
+    PLC physical scheme of modulation
 
  Description:
     Modulation scheme to be used for communicating with the selected node.
@@ -233,7 +208,7 @@ typedef enum
 /*PAL RF modulation scheme enumeration
 
  Summary:
-    RF Physical Scheme of modulation
+    RF physical scheme of modulation
 
  Description:
     RF modulation scheme to be used for communicating with the selected node.
@@ -247,7 +222,7 @@ typedef enum
 	PAL_RF_FSK_FEC_ON  = 1,
 } PAL_RF_MODULATION_SCHEME;
 
-/* PAL PLC Information Base enumeration
+/* PAL information base enumeration
  Summary:
     PHY parameter identifiers requested from the MAC layer
 
@@ -264,13 +239,13 @@ typedef enum
     PAL_ID_CONTINUOUS_TX_EN,
     /* Zero Crossing Period in PLC */
     PAL_ID_ZC_PERIOD,
-    /* Host Controller version identifier in PLC */
+    /* Host controller version identifier in PLC */
     PAL_ID_HOST_VERSION,
-    /* Maximum Transmission/Reception Number of Channels in PLC */
+    /* Maximum transmission/reception number of channels in PLC */
     PAL_ID_CFG_MAX_TXRX_NUM_CHANNELS,
     /* Attenuation to be applied to every message */
     PAL_ID_CFG_ATTENUATION,
-    /* List of available transmission/reception channels, Double combination in PLC */
+    /* List of available transmission/reception channels, double combination in PLC */
     PAL_ID_CFG_TXRX_DOUBLE_CHANNEL_LIST,
     /* Product identifier */
     PAL_ID_INFO_VERSION,
@@ -280,12 +255,12 @@ typedef enum
     PAL_ID_CFG_AUTODETECT_BRANCH,
     /* When branch auto detection disabled, indicate impedance to use in PLC */
     PAL_ID_CFG_IMPEDANCE,
-    /* Transmission/Reception Channel */
+    /* Transmission/Reception channel */
     PAL_ID_CFG_TXRX_CHANNEL,
     /* List of available transmission/reception channels 
     (depends on coupling and band plan) in PLC */
     PAL_ID_CFG_TXRX_CHANNEL_LIST,
-    /* RX Payload length in OFDM symbols */
+    /* RX payload length in OFDM symbols */
     PAL_ID_RX_PAYLOAD_LEN_SYM,
     /* Duration of channel senses in CSMA RF */
     PAL_ID_CSMA_RF_SENSE_TIME,
@@ -311,13 +286,13 @@ typedef enum
     PAL_ID_RF_MAC_HOPPING_BCN_SEQUENCE_LENGTH,
     /* Number of supported RF channels */
     PAL_ID_RF_NUM_CHANNELS,
-    /* The Maximum PSDU (PHY Service Data Unit) in Octets */
+    /* The maximum PSDU (PHY Service Data Unit) in octets */
     PAL_ID_MAX_PHY_PACKET_SIZE,
     /* Turn arround time for the SUN (Smart Utility Network) FSK PHY layer */
     PAL_ID_TURNAROUND_TIME,
     /* The transmit power of the device in dBm */
     PAL_ID_PHY_TX_POWER,
-    /* Status of FEC(Forward Error Correction) */
+    /* Status of FEC (Forward Error Correction) */
     PAL_ID_PHY_FSK_FEC_ENABLED,
     /* Status of the RSC (Recursive and Systematic Code) interleaving */
     PAL_ID_PHY_FSK_FEC_INTERLEAVING_RSC,
@@ -377,13 +352,14 @@ typedef struct
     uint8_t senseDelayMs;
 } PAL_MSG_REQUEST_DATA;
 
-/* PAL Confirm data structure
+/* PAL confirm data structure
  Summary:
     Data structure used to confirm the result of transmission request
 
  Description:
     This structure is used to indicate to the MAC layer the result of the 
     transmission request of the MAC Protocol Data Unit (MPDU).
+
  Remarks:
     None.
 */
@@ -403,9 +379,9 @@ typedef struct
     uint8_t result;
 } PAL_MSG_CONFIRM_DATA;
 
-/* PAL Indication data structure
+/* PAL indication data structure
  Summary:
-    Data structure used for PHY data Indication
+    Data structure used for PHY data indication
 
  Description:
     This structure contains the received MAC Protocol Data Unit (MPDU) and its
@@ -443,7 +419,7 @@ typedef struct
     uint8_t lqi;
 } PAL_MSG_INDICATION_DATA;
 
-/* PAL  PLC PHY receiver data structure
+/* PAL PLC PHY receiver data structure
  Summary:
     PLC PHY receiver parameters.
 
@@ -491,21 +467,21 @@ typedef struct
     uint8_t impPercent;
 } PAL_PLC_RX_PHY_PARAMS;
 
-/* PHY Attribute Layer Confirm data Transmission Function Pointer
+/* PHY Abstraction Layer confirm data transmission function pointer
 
   Summary:
     Callback used for confirm data transmission.
     
   Description:
     The confirm attribute is used  to tells the MAC layer if MAC Protocol Data
-	Unit(MPDU) request has been successfully transmitted.
+	Unit (MPDU) request has been successfully transmitted.
 
   Remarks:
     None.
 */
 typedef void (*PAL_DATA_CONFIRM_CB)(PAL_MSG_CONFIRM_DATA *dataConfirm);
 
-/* PHY Attribute Layer Indication Data Transmission Function Pointer
+/* PHY Abstraction Layer Indication Data Transmission Function Pointer
 
   Summary:
     Callback used for indication data transmission.
@@ -518,7 +494,7 @@ typedef void (*PAL_DATA_CONFIRM_CB)(PAL_MSG_CONFIRM_DATA *dataConfirm);
 */
 typedef void (*PAL_DATA_INDICATION_CB)(PAL_MSG_INDICATION_DATA *dataIndication);
 
-/* PHY Attribute Layer Switch RF Channel Function Pointer
+/* PHY Abstraction Layer switch RF channel function pointer
 
   Summary:
     Callback designed to inform the MAC layer the execution of a programmed 
@@ -534,7 +510,7 @@ typedef void (*PAL_DATA_INDICATION_CB)(PAL_MSG_INDICATION_DATA *dataIndication);
 typedef void (*PAL_SWITCH_RF_CH_CB)(void);
 
 // ****************************************************************************
-/* PRIME PAL Handlers Data
+/* PRIME PAL handlers data
 
   Summary:
     Defines the handlers required to manage the PRIME PAL module.
@@ -591,7 +567,6 @@ typedef struct
   Remarks:
     None
 */
-
 void PAL_Initialize(void);
 
 // ****************************************************************************
@@ -610,10 +585,10 @@ void PAL_Initialize(void);
     function.
 
   Parameters:
-    void
+    None
 
   Returns:
-    void
+    None
 
   Example:
     <code>
@@ -646,7 +621,7 @@ void PAL_Tasks(void);
     pal_cbs         Callbacks structure
 
   Returns:
-    void
+    None
 
   Example:
     <code>
@@ -701,11 +676,11 @@ void PAL_SetCallbacks(PAL_CALLBACKS *palCBs);
   Example:
     <code>
     uint8_t result=PAL_CFG_SUCCESS;
-    uint8_t phySnr=0;
-    uint8_t phyQt=5;
+    uint8_t snr=0;
+    uint8_t qt=5;
     uint16_t pch=16;
 
-    result = PAL_GetSNR(&phySnr, phyQt, pch);
+    result = PAL_GetSNR(&snr, qt, pch);
     </code>
 
   Remarks:
@@ -740,10 +715,10 @@ uint8_t PAL_GetSNR(uint8_t *snr, uint8_t qt, uint16_t pch);
   Example:
     <code>
     uint8_t result=PAL_CFG_SUCCESS;
-    uint8_t phyZct=0;
+    uint8_t zct=0;
     uint16_t pch=16;
 
-    result = PAL_GetZCT(&phyZct, pch);
+    result = PAL_GetZCT(&zct, pch);
     </code>
 
   Remarks:
@@ -753,7 +728,7 @@ uint8_t PAL_GetZCT(uint32_t *zct, uint16_t pch);
 
 // ****************************************************************************
 /* Function:
-    uint8_t PAL_GetCurrentTime(uint8_t *timer, uint16_t pch)
+    uint8_t PAL_GetTimer(uint32_t *timer, uint16_t pch)
 
   Summary:
     Get the current PHY time in us.
@@ -766,7 +741,7 @@ uint8_t PAL_GetZCT(uint32_t *zct, uint16_t pch);
     function.
 
   Parameters:
-    timer       Current output time  of PHY 
+    timer       Current output time of PHY 
     pch         Physical channel
 
   Returns:
@@ -776,20 +751,20 @@ uint8_t PAL_GetZCT(uint32_t *zct, uint16_t pch);
   Example:
     <code>
     uint8_t result=PAL_CFG_SUCCESS;
-    uint8_t phyTimer=0;
+    uint32_t timer=0;
     uint16_t pch=16;
 
-    result = PAL_GetCurrentTime(&phyTimer, pch);
+    result = PAL_GetTimer(&timer, pch);
     </code>
 
   Remarks:
     None
 */
-uint8_t PAL_GetCurrentTime(uint32_t *timer, uint16_t pch);
+uint8_t PAL_GetTimer(uint32_t *timer, uint16_t pch);
 
 // ****************************************************************************
 /* Function:
-    uint8_t PAL_GetCurrentTimeExtended(uint64_t *timer)
+    uint8_t PAL_GetTimerExtended(uint64_t *timer)
 
   Summary:
     Get the extended PHY time in us. 
@@ -811,19 +786,19 @@ uint8_t PAL_GetCurrentTime(uint32_t *timer, uint16_t pch);
   Example:
     <code>
     uint8_t result=PAL_CFG_SUCCESS;
-    uint8_t phyTimer=0;
+    uint8_t timer=0;
 
-    result = PAL_Extended_GetCurrentTime(&phyTimer);
+    result = PAL_GetTimerExtended(&timer);
     </code>
 
   Remarks:
     None
 */
-uint8_t PAL_Extended_GetCurrentTime(uint64_t *pull_timer);
+uint8_t PAL_GetTimerExtended(uint64_t *timer);
 
 // ****************************************************************************
 /* Function:
-    uint8_t PAL_GetCarrierDetect(
+    uint8_t PAL_GetCD(
         uint8_t *cd, 
         uint8_t *rssi, 
         uint32_t *time, 
@@ -854,23 +829,23 @@ uint8_t PAL_Extended_GetCurrentTime(uint64_t *pull_timer);
   Example:
     <code>
     uint8_t result=PAL_CFG_SUCCESS;
-    uint8_t phyCd=0;
+    uint8_t cd=0;
     uint8_t rssi=0;
     uint32_t time=0;
     uint8_t header=0;
     uint16_t pch=16;
 
-    result = PAL_GetCarrierDetect(&phyCd, &rssi, &time, &header, pch);
+    result = PAL_GetCD(&cd, &rssi, &time, &header, pch);
     </code>
 
   Remarks:
     Not available for both PHY Serial and PHY RF.
 */
-uint8_t PAL_GetCarrierDetect(uint8_t *cd, uint8_t *rssi, uint32_t *time, uint8_t *header, uint16_t pch);
+uint8_t PAL_GetCD(uint8_t *cd, uint8_t *rssi, uint32_t *time, uint8_t *header, uint16_t pch);
 
 // ****************************************************************************
 /* Function:
-    uint8_t PAL_GetNoiseLevel(uint8_t *noise, uint16_t pch)
+    uint8_t PAL_GetNL(uint8_t *noise, uint16_t pch)
 
   Summary:
     Get the noise floor level value. 
@@ -893,30 +868,27 @@ uint8_t PAL_GetCarrierDetect(uint8_t *cd, uint8_t *rssi, uint32_t *time, uint8_t
   Example:
     <code>
     uint8_t result=PAL_CFG_SUCCESS;
-    uint8_t phyNl=0;
+    uint8_t nl=0;
     uint16_t pch=16;
 
-    result = PAL_GetNoiseLevel(&phyNl, pch);
+    result = PAL_GetNL(&nl, pch);
     </code>
 
   Remarks:
     Not available for PHY Serial.
 */
-uint8_t PAL_GetNoiseLevel(uint8_t *noise, uint16_t pch);
+uint8_t PAL_GetNL(uint8_t *noise, uint16_t pch);
 
 // ****************************************************************************
 /* Function:
-    uint8_t PAL_GetAutoGainMode(uint8_t *mode, uint8_t *gain, uint16_t pch)
+    uint8_t PAL_GetAGC(uint8_t *mode, uint8_t *gain, uint16_t pch)
 
   Summary:
     Get the automatic gain mode of the PHY PLC layer. 
 
   Description:
     This routine is used to get Automatic Gain Mode (AGC) of the PHY PLC layer.
-    The Medium pch (Physical channel characteristics) used by the PHY to 
-    receive the PSDU. 
-    PLC channels range from 1..511 (0x01..0x1FF)
-
+   
   Precondition:
     The PAL_Initialize function should have been called before calling this 
     function.
@@ -933,21 +905,21 @@ uint8_t PAL_GetNoiseLevel(uint8_t *noise, uint16_t pch);
   Example:
     <code>
     uint8_t result=PAL_CFG_SUCCESS;
-    uint8_t phymode=0;
+    uint8_t mode=0;
     uint8_t gain=0;
     uint16_t pch=16;
 
-    result = PAL_GetAutoGainMode(&phymode, &gain, pch);
+    result = PAL_GetAGC(&mode, &gain, pch);
     </code>
 
   Remarks:
     Not available for PHY Serial and PHY RF.
 */
-uint8_t PAL_GetAutoGainMode(uint8_t *mode, uint8_t *gain, uint16_t pch);  
+uint8_t PAL_GetAGC(uint8_t *mode, uint8_t *gain, uint16_t pch);  
 
 // ****************************************************************************
 /* Function:
-    uint8_t PAL_SetAutoGainMode(uint8_t mode, uint8_t gain, uint16_t pch)
+    uint8_t PAL_SetAGC(uint8_t mode, uint8_t gain, uint16_t pch)
 
   Summary:
     Set the automatic gain mode of the PHY PLC layer. 
@@ -971,21 +943,21 @@ uint8_t PAL_GetAutoGainMode(uint8_t *mode, uint8_t *gain, uint16_t pch);
   Example:
     <code>
     uint8_t result=PAL_CFG_SUCCESS;
-    uint8_t phymode=0;
+    uint8_t mode=0;
     uint8_t gain=0;
     uint16_t pch=16;
 
-    result = PAL_SetAutoGainMode(&phymode, &gain, pch);
+    result = PAL_SetAGC(mode, gain, pch);
     </code>
 
   Remarks:
     Not available for PHY Serial and PHY RF.
 */
-uint8_t PAL_SetAutoGainMode(uint8_t mode, uint8_t gain, uint16_t pch);    
+uint8_t PAL_SetAGC(uint8_t mode, uint8_t gain, uint16_t pch);    
 
 // ****************************************************************************
 /* Function:
-    uint8_t PAL_GetClearChannelState(uint8_t *channelState)
+    uint8_t PAL_GetCCA(uint8_t *channelState)
 
   Summary:
     Get clear channel assessment mode value. 
@@ -1011,17 +983,17 @@ uint8_t PAL_SetAutoGainMode(uint8_t mode, uint8_t gain, uint16_t pch);
     uint8_t result=PAL_CFG_SUCCESS;
     uint8_t channelState=0;
 
-    result = PAL_GetNoiseLevel(&channelState);
+    result = PAL_GetCCA(&channelState);
     </code>
 
   Remarks:
     Only available for PHY RF.
 */
-uint8_t PAL_GetClearChannelState(uint8_t *channelState);
+uint8_t PAL_GetCCA(uint8_t *channelState);
 
 // ****************************************************************************
 /* Function:
-    uint8_t PAL_GetChannel(uint16_t *pch)
+    uint8_t PAL_GetCH(uint16_t *pch)
 
   Summary:
     Get the band (PLC) or the channel (RF). 
@@ -1045,20 +1017,20 @@ uint8_t PAL_GetClearChannelState(uint8_t *channelState);
     uint8_t result=PAL_CFG_SUCCESS;
     uint16_t pch=0;
 
-    result = PAL_GetChannel(&pch);
+    result = PAL_GetCH(&pch);
     </code>
 
   Remarks:
     Not available for PHY Serial.
 */
-uint8_t PAL_GetChannel(uint16_t *pch);
+uint8_t PAL_GetCH(uint16_t *pch);
 
 // ****************************************************************************
 /* Function:
-    uint8_t PAL_SetChannel(uint16_t pch)
+    uint8_t PAL_SetCH(uint16_t pch)
 
   Summary:
-    Get the band (PLC) or the channel (RF). 
+    Set the band (PLC) or the channel (RF). 
 
   Description:
     This routine is used to set the channel or band used for the communication.
@@ -1079,13 +1051,13 @@ uint8_t PAL_GetChannel(uint16_t *pch);
     uint8_t result=PAL_CFG_SUCCESS;
     uint16_t pch=16;
 
-    result = PAL_SetChannel(pch);
+    result = PAL_SetCH(pch);
     </code>
 
   Remarks:
     Not available for PHY Serial.
 */
-uint8_t PAL_SetChannel(uint16_t pch);
+uint8_t PAL_SetCH(uint16_t pch);
 
 // ****************************************************************************
 /* Function:
@@ -1108,6 +1080,7 @@ uint8_t PAL_SetChannel(uint16_t pch);
 
   Returns:
     PAL Transmission results.
+
   Example:
     <code>
     uint8_t result=PAL_TX_RESULT_SUCCESS;
@@ -1117,7 +1090,7 @@ uint8_t PAL_SetChannel(uint16_t pch);
     requestMsg.dataBuf = &msg;
     requestMsg.timeDelay = 10000;
     requestMsg.dataLen = sizeof(msg);
-    requestMsg.pch = 5;
+    requestMsg.pch = 16;
     requestMsg.buffIdentifier = 2;
     requestMsg.attLevel = 0;
     requestMsg.scheme = PAL_PLC_DBPSK_R;
@@ -1137,14 +1110,13 @@ uint8_t PAL_DataRequestTransmission(PAL_MSG_REQUEST_DATA *requestMsg);
 
 // ****************************************************************************
 /* Function:
-    void PAL_SetChannelRequest(uint32_t timeSync, uint16_t pch, uint8_t timeMode)
+    void PAL_ProgramChannelSwitch(uint32_t timeSync, uint16_t pch, uint8_t timeMode)
 
   Summary:
-    Set frequency channel switch for PHY RF. 
+    Program a channel switch in the given time. 
 
   Description:
-    This routine is used to set the frequency channel for the transmission 
-    process of data over a RF medium.
+    This routine is used to program a channel switch in the given time.
 
   Precondition:
     The PAL_Initialize function should have been called before calling this 
@@ -1164,13 +1136,13 @@ uint8_t PAL_DataRequestTransmission(PAL_MSG_REQUEST_DATA *requestMsg);
     uint16_t pch = 600;
     uint8_t timeMode = PAL_TX_MODE_ABSOLUTE;
     
-    PAL_SetChannelRequest(timeSync, pch, timeMode);
+    PAL_ProgramChannelSwitch(timeSync, pch, timeMode);
     </code>
 
   Remarks:
     Only available for PHY RF.
 */
-void PAL_SetChannelRequest(uint32_t timeSync, uint16_t pch, uint8_t timeMode);
+void PAL_ProgramChannelSwitch(uint32_t timeSync, uint16_t pch, uint8_t timeMode);
 
 // ****************************************************************************
 /* Function:
@@ -1235,7 +1207,7 @@ uint8_t PAL_GetConfiguration(uint16_t id, void *val, uint16_t len, uint16_t pch)
     function.
 
   Parameters:
-    id              PHy attribute identifier
+    id              PHY attribute identifier
     val             Input parameter value
     len             Length of the parameter
     pch             Physical channel
@@ -1263,7 +1235,7 @@ uint8_t PAL_SetConfiguration(uint16_t id, void *val, uint16_t len, uint16_t pch)
 // ****************************************************************************
 /* Function:
     uint16_t PAL_GetSignalCapture(
-        uint8_t *dst,
+        uint8_t *noiseCapture,
         uint8_t mode,
         uint32_t timeStart,
         uint32_t duration)
@@ -1279,8 +1251,8 @@ uint8_t PAL_SetConfiguration(uint16_t id, void *val, uint16_t len, uint16_t pch)
     function.
 
   Parameters:
-    dst             Pointer to destination buffer to store data
-    mode            Capture Mode
+    noiseCapture    Pointer to destination buffer to store data
+    mode            Capture mode
     timeStart       Start time in us based on PL360 timer reference
     duration        Duration time in us
 
@@ -1295,13 +1267,13 @@ uint8_t PAL_SetConfiguration(uint16_t id, void *val, uint16_t len, uint16_t pch)
     uint16_t noiseSize;
     uint8_t mode = PAL_MODE_TYPE_B;
 
-    noiseSize = PAL_GetSignalCapture(&dst, mode, timeStart, duration);
+    noiseSize = PAL_GetSignalCapture(&noiseCapture, mode, timeStart, duration);
     </code>
 
   Remarks:
     Only available for PHY PLC.
 */
-uint16_t PAL_GetSignalCapture(uint8_t *dst, uint8_t mode, uint32_t timeStart, uint32_t duration);
+uint16_t PAL_GetSignalCapture(uint8_t *noiseCapture, uint8_t mode, uint32_t timeStart, uint32_t duration);
 
 // ****************************************************************************
 /* Function:
@@ -1352,7 +1324,7 @@ uint8_t PAL_GetMsgDuration(uint16_t pch, uint16_t msgLen, uint8_t scheme, uint8_
 
 // ****************************************************************************
 /* Function:
-   bool PAL_RobustModulationQuality(
+   bool PAL_HasMinimumQuality(
     uint16_t pch, 
     uint8_t scheme, 
     uint8_t lessRobustMode)
@@ -1390,7 +1362,7 @@ uint8_t PAL_GetMsgDuration(uint16_t pch, uint16_t msgLen, uint8_t scheme, uint8_
   Remarks:
     Not available for PHY Serial.
 */
-bool PAL_RobustModulationQuality(uint16_t pch, uint8_t scheme, uint8_t lessRobustMode);
+bool PAL_HasMinimumQuality(uint16_t pch, uint8_t scheme, uint8_t lessRobustMode);
 
 // ****************************************************************************
 /* Function:
