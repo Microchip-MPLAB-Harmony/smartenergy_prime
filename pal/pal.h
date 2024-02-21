@@ -218,11 +218,11 @@ typedef enum
 	PAL_PLC_DQPSK        = 0x01,
 	/* Differential 8-Phase Shift Keying Scheme Modulation */
 	PAL_PLC_D8PSK        = 0x02,
-	/* Differential Binary Phase Shift Keying Scheme Modulation with Convolution */
+	/* Differential Binary Phase Shift Keying Scheme Modulation with Convolutional Encoder */
 	PAL_PLC_DBPSK_CC     = 0x04,
-	/* Differential Quaternary Phase Shift Keying Scheme Modulation with Convolution */
+	/* Differential Quaternary Phase Shift Keying Scheme Modulation with Convolutional Encoder */
 	PAL_PLC_DQPSK_CC     = 0x05,
-	/* Differential 8-Phase Shift Keying Scheme Modulation with Convolution*/
+	/* Differential 8-Phase Shift Keying Scheme Modulation with Convolutional Encoder*/
 	PAL_PLC_D8PSK_CC     = 0x06,
 	/* Robust Differential Binary Phase Shift Keying Scheme Modulation */
 	PAL_PLC_DBPSK_R      = 0x0C,
@@ -391,7 +391,7 @@ typedef struct
 {
     /* Transmission time in us */
     uint32_t txTime;
-    /* RMS value emitted (valid only when txQRMode is enable) */
+    /* RMS value */
     uint16_t rmsCalc;
     /* Physical channel where the message has been transmitted */
     uint16_t pch;
@@ -574,7 +574,6 @@ typedef struct
     the system can call the initialization functions for any modules.
     It is a single instance module, so this function should be called only once.
 
-
   Parameters:
     None
 
@@ -585,7 +584,7 @@ typedef struct
     <code>
     int main()
     {
-     PAL_Initialize();
+        PAL_Initialize();
     }
     </code>
 
@@ -597,7 +596,7 @@ void PAL_Initialize(void);
 
 // ****************************************************************************
 /* Function:
-    void PAL_Task(void)
+    void PAL_Tasks(void)
 
   Summary:
     Maintains the PAL state machine. 
@@ -620,14 +619,14 @@ void PAL_Initialize(void);
     <code>
     while (true)
     {
-       PAL_Tasks();
+        PAL_Tasks();
     }
     </code>
 
   Remarks:
     This function must be periodically called by the user application.
 */
-void PAL_Process(void);
+void PAL_Tasks(void);
 
 // ****************************************************************************
 /* Function:
