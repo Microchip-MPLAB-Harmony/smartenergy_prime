@@ -63,4 +63,8 @@ def loadModule():
     primeStorageComponent = Module.CreateComponent("primeStorage", "PRIME Storage", "/SmartEnergy/PRIME Stack/Services", "service/storage/config/srv_storage.py")
     primeStorageComponent.setDisplayType("PRIME Service")
     
+    ## PRIME User PIBs Service
+    primeUserPibComponent = Module.CreateComponent("primeUserPib", "PRIME User PIBs", "/SmartEnergy/PRIME Stack/Services", "service/user_pib/config/srv_user_pib.py")
+    primeUserPibComponent.addDependency("srv_user_pib_HarmonyCore_dependency", "Core Service", "Core Service", True, True)
+    primeUserPibComponent.setDisplayType("PRIME Service")
     

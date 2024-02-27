@@ -82,7 +82,7 @@ void prime_stack_process(void);
 
 /* @} */
 
-<#if PRIME_MODE == "SN" && PRIME_PROJECT == "bin project">
+<#if (PRIME_MODE == "SN") || (PRIME_MODE == "BN" && BN_SLAVE_EN == true)>
 /** Pointer to the PRIME stack */
 extern uint32_t prime_api;
 #define PRIME_API_FUNCS_OFFSET                    0x18
@@ -158,13 +158,13 @@ extern uint32_t prime_api;
 #define prime_cl_null_plme_testmode_request               cl_null_plme_testmode_request
 #define prime_cl_null_plme_get_request                    cl_null_plme_get_request
 #define prime_cl_null_plme_set_request                    cl_null_plme_set_request
-<#if (PRIME_MODE == "SN" && PRIME_PROJECT == "appplication project") || (PRIME_MODE == "BN" && BN_SLAVE_EN == true)>
+<#if (PRIME_MODE == "BN" && BN_SLAVE_EN == true)>
 #define prime_cl_null_mlme_register_request               cl_null_mlme_register_request
 #define prime_cl_null_mlme_unregister_request             cl_null_mlme_unregister_request
 </#if>
 #define prime_cl_null_mlme_promote_request                cl_null_mlme_promote_request
 #define prime_cl_null_mlme_mp_promote_request             cl_null_mlme_mp_promote_request
-<#if (PRIME_MODE == "SN" && PRIME_PROJECT == "appplication project") || (PRIME_MODE == "BN" && BN_SLAVE_EN == true)>
+<#if (PRIME_MODE == "BN" && BN_SLAVE_EN == true)>
 #define prime_cl_null_mlme_demote_request                 cl_null_mlme_demote_request
 #define prime_cl_null_mlme_mp_demote_request              cl_null_mlme_mp_demote_request
 </#if>
@@ -173,7 +173,7 @@ extern uint32_t prime_api;
 #define prime_cl_null_mlme_list_get_request               cl_null_mlme_list_get_request
 #define prime_cl_null_mlme_set_request                    cl_null_mlme_set_request
 #define prime_cl_432_set_callbacks                        cl_432_set_callbacks
-<#if (PRIME_MODE == "SN" && PRIME_PROJECT == "appplication project") || (PRIME_MODE == "BN" && BN_SLAVE_EN == true)>
+<#if (PRIME_MODE == "BN" && BN_SLAVE_EN == true)>
 #define prime_cl_432_establish_request                    cl_432_establish_request
 </#if>
 #define prime_cl_432_release_request                      cl_432_release_request

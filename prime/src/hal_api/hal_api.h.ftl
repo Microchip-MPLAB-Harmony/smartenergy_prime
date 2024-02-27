@@ -47,7 +47,8 @@
 /* System includes */
 #include <stdint.h>
 #include <stdbool.h>
-
+#include "service/storage/srv_storage.h"
+#include "service/user_pib/srv_user_pib.h"
 
 /* @cond 0 */
 /**INDENT-OFF**/
@@ -165,8 +166,8 @@ typedef void (*hal_plc_reset_t)(void);
 typedef void (*hal_plc_set_handler_t)(void (*p_handler)(void));
 typedef void (*hal_plc_tx_signal_t)(void);
 typedef void (*hal_plc_rx_signal_t)(void);
-typedef bool (*hal_get_config_info_t)(config_info_type_t cfg_type, uint8_t us_size, void *pv_data);
-typedef bool (*hal_set_config_info_t)(config_info_type_t cfg_type, uint8_t us_size, void *pv_data);
+typedef bool (*hal_get_config_info_t)(SRV_STORAGE_TYPE cfg_type, uint8_t us_size, void *pv_data);
+typedef bool (*hal_set_config_info_t)(SRV_STORAGE_TYPE cfg_type, uint8_t us_size, void *pv_data);
 typedef usi_status_t (*hal_usi_set_callback_t)(usi_protocol_t protocol_id, bool (*p_handler)(uint8_t *puc_rx_msg, uint16_t us_len), uint8_t usi_port);
 typedef usi_status_t (*hal_usi_send_cmd_t)(void *msg);
 typedef void (*hal_trng_init_t)(void);

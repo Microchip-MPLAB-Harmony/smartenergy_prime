@@ -89,8 +89,8 @@ bool prime_hal_plc_get_thermal_warning(void);
 
 /** \brief Interface for the permanent storage of configuration parameters */
 /* @{ */
-bool prime_hal_get_config_info(config_info_type_t cfg_type, uint16_t us_size, void *pv_data);
-bool prime_hal_set_config_info(config_info_type_t cfg_type, uint16_t us_size, void *pv_data);
+bool prime_hal_get_config_info(SRV_STORAGE_TYPE cfg_type, uint16_t us_size, void *pv_data);
+bool prime_hal_set_config_info(SRV_STORAGE_TYPE cfg_type, uint16_t us_size, void *pv_data);
 uint32_t prime_hal_nwk_recovery_init(void);
 void prime_hal_nwk_recovery_read(uint32_t addr, uint8_t *puc_buf, uint16_t us_size);
 uint8_t prime_hal_nwk_recovery_write(uint32_t addr, uint8_t *puc_buf, uint16_t us_size);
