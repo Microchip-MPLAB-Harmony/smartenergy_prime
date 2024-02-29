@@ -785,8 +785,8 @@ uint8_t PAL_GetTimer(uint32_t *timer, uint16_t pch);
     
   Example:
     <code>
-    uint8_t result=PAL_CFG_SUCCESS;
-    uint8_t timer=0;
+    uint8_t  result=PAL_CFG_SUCCESS;
+    uint64_t timer=0;
 
     result = PAL_GetTimerExtended(&timer);
     </code>
