@@ -49,6 +49,11 @@
 #include <stdbool.h>
 #include "service/storage/srv_storage.h"
 #include "service/user_pib/srv_user_pib.h"
+#include "service/reset_handler/srv_reset_handler.h"
+#include "service/pcrc/srv_pcrc.h"
+#include "service/random/srv_random.h"
+#include "service/log_report/srv_log_report.h"
+#include "service/usi/srv_usi.h"
 
 /* @cond 0 */
 /**INDENT-OFF**/
@@ -66,21 +71,6 @@ extern "C" {
  *
  * @{
  */
-
-/** USI operation results */
-typedef enum {
-	USI_STATUS_PROTOCOL_NOT_FOUND,
-	USI_STATUS_PROTOCOL_NOT_REGISTERED,
-	USI_STATUS_TX_BUFFER_OVERFLOW,
-	USI_STATUS_TX_BUSY,
-	USI_STATUS_TX_BLOCKED,
-	USI_STATUS_RX_BUFFER_OVERFLOW,
-	USI_STATUS_RX_BLOCKED,
-	USI_STATUS_UART_ERROR,
-	USI_STATUS_FORMAT_ERROR,
-	USI_STATUS_OK,
-	USI_STATUS_INVALID
-} usi_status_t;
 
 /** Signature algorithms */
 typedef enum {
@@ -117,37 +107,14 @@ typedef enum {
 	HAL_FU_IMAGE_FAIL
 } hal_fu_verif_result_t;
 
-/** \brief PLC Universal Serial Interface */
-/* @{ */
-/** Management Plane Protocol Spec and ATMEL serialized protocols */
-typedef enum {
-	PROTOCOL_MNGP_PRIME           = 0x00,
-	PROTOCOL_MNGP_PRIME_GETQRY    = 0x00,
-	PROTOCOL_MNGP_PRIME_GETRSP    = 0x01,
-	PROTOCOL_MNGP_PRIME_SET       = 0x02,
-	PROTOCOL_MNGP_PRIME_RESET     = 0x03,
-	PROTOCOL_MNGP_PRIME_REBOOT    = 0x04,
-	PROTOCOL_MNGP_PRIME_FU        = 0x05,
-	PROTOCOL_MNGP_PRIME_GETQRY_EN = 0x06,
-	PROTOCOL_MNGP_PRIME_GETRSP_EN = 0x07,
-	PROTOCOL_SNIF_PRIME           = 0x13,
-	PROTOCOL_PHY_SERIAL           = 0x1F,
-	PROTOCOL_PHY_TESTER           = 0x22,
-	PROTOCOL_PRIME_API            = 0x30,
-	PROTOCOL_INTERNAL             = 0x3F,
-	PROTOCOL_USER_DEFINED         = 0xFE,
-	PROTOCOL_INVALID              = 0xFF
-} usi_protocol_t;
-
-
 /** \brief HAL functions interface */
 /* @{ */
 typedef void (*hal_wrp_iface_t)(void);
 
 /** HAL functions wrapper interface */
 /* @{ */
-typedef void (*hal_restart_system_t)(void);
-typedef uint32_t (*hal_pcrc_calc_t)(uint8_t *puc_buf, uint32_t ul_len, uint8_t uc_header_type, uint8_t uc_crc_type, bool b_v14_mode);
+typedef void (*hal_restart_system_t)(SRV_RESET_HANDLER_RESET_CAUSE resetType);
+typedef uint32_t (*hal_pcrc_calc_t)(uint8_t *puc_buf, size_t ul_len, PCRC_HEADER_TYPE uc_header_type, PCRC_CRC_TYPE uc_crc_type, uint32_t initValue, bool b_v14_mode);
 typedef void (*hal_pcrc_config_sna_t)(uint8_t *puc_sna);
 typedef void (*hal_fu_data_read_t)(uint32_t addr, uint8_t *puc_buf, uint16_t us_size);
 typedef uint8_t (*hal_fu_data_write_t)(uint32_t addr, uint8_t *puc_buf, uint16_t us_size);
@@ -168,11 +135,11 @@ typedef void (*hal_plc_tx_signal_t)(void);
 typedef void (*hal_plc_rx_signal_t)(void);
 typedef bool (*hal_get_config_info_t)(SRV_STORAGE_TYPE cfg_type, uint8_t us_size, void *pv_data);
 typedef bool (*hal_set_config_info_t)(SRV_STORAGE_TYPE cfg_type, uint8_t us_size, void *pv_data);
-typedef usi_status_t (*hal_usi_set_callback_t)(usi_protocol_t protocol_id, bool (*p_handler)(uint8_t *puc_rx_msg, uint16_t us_len), uint8_t usi_port);
-typedef usi_status_t (*hal_usi_send_cmd_t)(void *msg);
-typedef void (*hal_trng_init_t)(void);
+typedef SRV_USI_HANDLE (*hal_usi_open_t)(const SYS_MODULE_INDEX index);
+typedef void (*hal_usi_set_callback_t)(SRV_USI_HANDLE handle, SRV_USI_PROTOCOL_ID protocol, SRV_USI_CALLBACK callback);
+typedef void (*hal_usi_send_cmd_t)(SRV_USI_HANDLE handle, SRV_USI_PROTOCOL_ID protocol, uint8_t *data, size_t length);
 typedef uint32_t (*hal_trng_read_t)(void);
-typedef void (*hal_debug_report_t)(uint32_t ul_err_type);
+typedef void (*hal_debug_report_t)(SRV_LOG_REPORT_LEVEL logLevel, SRV_LOG_REPORT_CODE code,const char *info, ...);
 typedef uint32_t (*hal_net_get_freq_t)(void);
 typedef void (*hal_pib_get_request_t)(uint16_t us_pib_attrib);
 typedef void (*hal_pib_get_request_set_callback_t)(void (*p_handler)(uint8_t uc_result, uint16_t us_pib_attrib, void *pv_pib_value, uint8_t uc_pib_size));
@@ -252,10 +219,10 @@ typedef struct {
 	hal_get_config_info_t get_config_info;
 	hal_set_config_info_t set_config_info;
 
+    hal_usi_open_t usi_open;
 	hal_usi_set_callback_t usi_set_callback;
 	hal_usi_send_cmd_t usi_send_cmd;
 
-	hal_trng_init_t trng_init;
 	hal_trng_read_t trng_read;
 
 	hal_debug_report_t debug_report;

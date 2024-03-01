@@ -57,9 +57,9 @@ extern "C" {
  * @{
  */
 const hal_api_t hal_api = {
-	hal_restart_system,
-	hal_pcrc_calc,
-	hal_pcrc_config_sna,
+	SRV_RESET_HANDLER_RestartSystem,
+	SRV_PCRC_GetValue,
+	SRV_PCRC_ConfigureSNA,
 	hal_fu_data_read,
 	hal_fu_data_write,
 	hal_fu_data_cfg_read,
@@ -79,11 +79,11 @@ const hal_api_t hal_api = {
 	hal_plc_rx_signal,
 	SRV_STORAGE_GetConfigInfo,
 	SRV_STORAGE_SetConfigInfo,
-	hal_usi_set_callback,
-	hal_usi_send_cmd,
-	hal_trng_init,
-	hal_trng_read,
-	hal_debug_report,
+    SRV_USI_Open,
+	SRV_USI_CallbackRegister,
+	SRV_USI_Send_Message,
+	SRV_RANDOM_Get32bits,
+	SRV_LOG_REPORT_Message_With_Code,
 	hal_net_get_freq,
 <#if PRIME_OPERATION_MODE == "Hybrid" || PRIME_OPERATION_MODE == "PLC" || PRIME_OPERATION_MODE == "PLC+Serial">
 	hal_plc_send_boot_cmd,

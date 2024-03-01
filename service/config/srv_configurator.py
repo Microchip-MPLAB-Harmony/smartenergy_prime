@@ -60,16 +60,16 @@ def primeSrvActivate():
         primeSrvGroup.addComponent("srv_usi")
         primeSrvGroup.addComponent("srvSecurity")
         #primeSrvGroup.addComponent("primeTimeMgmt")
-        #primeSrvGroup.addComponent("primeResetHandler")
         #primeSrvGroup.addComponent("primeFwMgmt")
         primeSrvGroup.addComponent("primeStorage")
-        primeSrvGroup.addComponent("primeUserPib")  
-        Database.activateComponents(["srvRandom", "srvQueue", "srvLogReport", "srv_pcrc", "srv_usi", "srvSecurity", "primeStorage", "primeUserPib"], "PRIME SERVICES")
+        primeSrvGroup.addComponent("primeUserPib")
+        primeSrvGroup.addComponent("primeResetHandler")        
+        Database.activateComponents(["srvRandom", "srvQueue", "srvLogReport", "srv_pcrc", "srv_usi", "srvSecurity", "primeStorage", "primeUserPib", "primeResetHandler"], "PRIME SERVICES")
         primeSrvStatus.setValue(ACTIVE)
         
 def primeSrvDeactivate():
     if (primeSrvStatus.getValue() == ACTIVE):
-        Database.deactivateComponents(["srvRandom", "srvQueue", "srvLogReport", "srv_pcrc", "srv_usi", "srvSecurity", "primeStorage"])
+        Database.deactivateComponents(["srvRandom", "srvQueue", "srvLogReport", "srv_pcrc", "srv_usi", "srvSecurity", "primeStorage", "primeUserPib", "primeResetHandler"])
         primeSrvStatus.setValue(INACTIVE) 
 
 

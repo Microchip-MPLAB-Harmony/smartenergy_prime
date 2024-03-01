@@ -76,9 +76,9 @@ void prime_hal_restart_system(void)
 
 /** \brief CRC interface */
 /* @{ */
-uint32_t prime_hal_pcrc_calc(uint8_t *puc_buf, uint32_t ul_len, uint8_t uc_header_type, uint8_t uc_crc_type, bool b_v14_mode)
+uint32_t prime_hal_pcrc_calc(uint8_t *puc_buf, size_t ul_len, PCRC_HEADER_TYPE uc_header_type, PCRC_CRC_TYPE uc_crc_type, uint32_t initValue, bool b_v14_mode);
 {
-	return p_hal_api->pcrc_calc(puc_buf, ul_len, uc_header_type, uc_crc_type, b_v14_mode);
+	return p_hal_api->pcrc_calc(puc_buf, ul_len, uc_header_type, uc_crc_type, initValue, b_v14_mode);
 }
 
 void prime_hal_pcrc_config_sna(uint8_t *puc_sna)
@@ -261,24 +261,25 @@ void prime_hal_fu_signature_image_check_set_callback(void (*p_handler)(hal_fu_ve
 
 /** \brief Universal Serial Interface */
 /* @{ */
-usi_status_t prime_hal_usi_set_callback(usi_protocol_t protocol_id, bool (*p_handler)(uint8_t *puc_rx_msg, uint16_t us_len), uint8_t usi_port)
+SRV_USI_HANDLE prime_hal_usi_open(const SYS_MODULE_INDEX index)
 {
-	return p_hal_api->usi_set_callback(protocol_id, p_handler, usi_port);
+    return p_hal_api->usi_open;
 }
 
-usi_status_t prime_hal_usi_send_cmd(void *msg)
+void prime_hal_usi_set_callback(SRV_USI_HANDLE handle, SRV_USI_PROTOCOL_ID protocol, SRV_USI_CALLBACK callback);
 {
-	return p_hal_api->usi_send_cmd(msg);
+    p_hal_api->usi_set_callback(handle, protocol, callback);
+}
+
+void prime_hal_usi_send_cmd(SRV_USI_HANDLE handle, SRV_USI_PROTOCOL_ID protocol, uint8_t *data, size_t length)
+{
+	p_hal_api->usi_send_cmd(handle, protocol, data, length);
 }
 
 /* @} */
 
 /** \brief True Random Number Generator Interface */
 /* @{ */
-void prime_hal_trng_init(void)
-{
-	p_hal_api->trng_init();
-}
 
 uint32_t prime_hal_trng_read(void)
 {
@@ -289,9 +290,9 @@ uint32_t prime_hal_trng_read(void)
 
 /** \brief Debug Interface */
 /* @{ */
-void prime_hal_debug_report(uint32_t ul_err_type)
+void prime_hal_debug_report(SRV_LOG_REPORT_LEVEL logLevel, SRV_LOG_REPORT_CODE code,const char *info, ...)
 {
-	p_hal_api->debug_report(ul_err_type);
+	p_hal_api->debug_report(logLevel, code, info);
 }
 
 /* @} */
