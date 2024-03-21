@@ -1,156 +1,1044 @@
-/**
- * \file
- *
- * \brief CL_NULL_API: PRIME NULL API Convergence Sublayer
- *
- * Copyright (c) 2023 Atmel Corporation. All rights reserved.
- *
- * \asf_license_start
- *
- * \page License
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- * 1. Redistributions of source code must retain the above copyright notice,
- *    this list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright notice,
- *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution.
- *
- * 3. The name of Atmel may not be used to endorse or promote products derived
- *    from this software without specific prior written permission.
- *
- * 4. This software may only be redistributed and used in connection with an
- *    Atmel microcontroller product.
- *
- * THIS SOFTWARE IS PROVIDED BY ATMEL "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT ARE
- * EXPRESSLY AND SPECIFICALLY DISCLAIMED. IN NO EVENT SHALL ATMEL BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
- * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
- * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- * \asf_license_stop
- *
- */
+/*******************************************************************************
+  PRIME NULL Convergence Sublayer API Header
 
-#ifndef CONV_CL_NULL_API_H
-#define CONV_CL_NULL_API_H
+  Company:
+    Microchip Technology Inc.
 
-/* System includes */
+  File Name:
+    cl_null_api.h
+
+  Summary:
+    PRIME NULL Convergence Sublayer API Header File
+
+  Description:
+    This file contains definitions of the PRIME Null Convergence Sublayer
+    primitives to be used by the PRIME application.
+*******************************************************************************/
+
+#ifndef CL_NULL_API_H
+#define CL_NULL_API_H
+
+// *****************************************************************************
+// *****************************************************************************
+// Section: File includes
+// *****************************************************************************
+// *****************************************************************************
+
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
+#include "../../../prime/mac/mac_defs.h"
 
-/* MAC includes */
-#include "stack/prime/mac/mac_defs.h"
+// DOM-IGNORE-BEGIN
+#ifdef __cplusplus  // Provide C++ Compatibility
 
-/* @cond 0 */
-/**INDENT-OFF**/
-#ifdef __cplusplus
-extern "C" {
+    extern "C" {
+
 #endif
-/**INDENT-ON**/
-/* @endcond */
+// DOM-IGNORE-END
 
-/**
- * \weakgroup prime_sscs_null_group
- * @{
- */
+// *****************************************************************************
+// *****************************************************************************
+// Section: PRIME NULL Convergence Sublayer Interface Primitives
+// *****************************************************************************
+// *****************************************************************************
 
-/** \brief CL NULL functions interface */
-/* @{ */
-void cl_null_set_callbacks(mac_callbacks_t *px_prime_cbs);
+// *****************************************************************************
+/* Function:
+    void CL_NULL_SetCallbacks
+    (
+        MAC_CALLBACKS *macCallbacks
+    )
 
-/** \brief CL NULL_ESTABLISH_PRIMITIVES */
-/* @{ */
-void cl_null_establish_request(uint8_t *puc_eui48, uint8_t uc_type, uint8_t *puc_data, uint16_t us_data_len, uint8_t uc_arq, uint8_t uc_cfbytes, uint8_t uc_ae);
-void cl_null_establish_response(uint16_t us_con_handle, mac_establish_response_answer_t uc_answer, uint8_t *puc_data, uint16_t us_data_len, uint8_t uc_ae);
+  Summary:
+    Sets the callbacks to the PRIME Null Convergence Sublayer.
 
-/* @} */
+  Description:
+    This routine sets the callbacks to the PRIME Null Convergence Sublayer.
+    
+  Precondition:
+    The CL_NULL_Initialize routine must have been called before.
 
-/** \brief CL NULL_RELEASE_PRIMITIVES */
-/* @{ */
-void cl_null_release_request(uint16_t us_con_handle);
-void cl_null_release_response(uint16_t us_con_handle, mac_release_response_answer_t uc_answer);
+  Parameters:
+    macCallbacks    - Pointer to the MAC callback structure.
 
-/* @} */
+  Returns:
+    None.
 
-/** \brief CL NULL JOIN PRIMITIVES */
-/* @{ */
-void cl_null_join_request(mac_join_mode_t us_broadcast, uint16_t us_con_handle, uint8_t *puc_eui48, uint8_t uc_con_type, uint8_t *puc_data,
-		uint16_t us_data_len, uint8_t uc_ae);
-void cl_null_join_response(uint16_t us_con_handle, uint8_t *puc_eui48, mac_join_response_answer_t uc_answer, uint8_t uc_ae);
+  Example:
+    <code>
+    MAC_CALLBACKS macCallbacks;
+    
+    memset(macCallbacks, NULL, sizeof(macCallbacks);
 
-/* @} */
+	macCallbacks.macDataConfirm = appDataConfirm;
+	macCallbacks.macDataIndication = appDataIndication;
+	macCallbacks.macEstablishConfirm = appEstablishConfirm;
+	macCallbacks.macEstablishIndication = appEstablishIndication;
+	macCallbacks.mlmeGetCofirm = appGetConfirm;
+	macCallbacks.mlmeListGetConfirm = appListGetCofirm;
+	macCallbacks.mlmeSetConfirm = appSetConfirm;
 
-/** \brief CL NULL LEAVE PRIMITIVES */
-/* @{ */
-void cl_null_leave_request(uint16_t us_con_handle, uint8_t *puc_eui48);
+	CL_NULL_SetCallbacks(&macCallbacks);
+    </code>
 
-/* @} */
+  Remarks:
+    Unused callbacks must be set to NULL.
+*/
+void CL_NULL_SetCallbacks(MAC_CALLBACKS *macCallbacks);
+
+// *****************************************************************************
+/* Function:
+    void CL_NULL_EstablishRequest
+    (
+        uint8_t *eui48, 
+        uint8_t type, 
+        uint8_t *data, 
+        uint16_t dataLen, 
+        uint8_t arq, 
+        uint8_t cfBytes, 
+        uint8_t ae
+    )
+
+  Summary:
+    Request a connection establishment.
+
+  Description:
+    This routine is used to request a connection establishment.
+    
+  Precondition:
+    The CL_NULL_Initialize routine must have been called before.
+
+  Parameters:
+    eui48       - Pointer to the address of the node to which this connection will be addressed
+    type        - Convergence Layer type of the connection
+    data        - Data associated with the connection establishment procedure
+    dataLen     - Length of the data in bytes
+    arq         - Flag to indicate whether or not the ARQ mechanism should be used 
+                  for this connection
+    cfBytes     - Flag to indicate whether or not the connection should use the contention 
+                  or contention-free channel access scheme
+    ae          - Flag to indicate that authentication and encryption is requested (v1.4)
+
+  Returns:
+    None.
+
+  Example:
+    <code>
+    uint8_t eui48[6];
+    memset(eui48, 0x12, 6);
+    
+	CL_NULL_EstablishRequest(eui48, 9, NULL, 0, 1, 0, 0);
+    </code>
+
+  Remarks:
+    The result of the request is returned in the confirm callback.
+*/
+void CL_NULL_EstablishRequest(uint8_t *eui48, uint8_t type, uint8_t *data, 
+    uint16_t dataLen, uint8_t arq, uint8_t cfBytes, uint8_t ae);
+
+// *****************************************************************************
+/* Function:
+    void CL_NULL_EstablishResponse
+    (
+        uint16_t connHandle, 
+        MAC_ESTABLISH_RESPONSE_ANSWER answer, 
+        uint8_t *data, 
+        uint16_t dataLen, 
+        uint8_t uc_ae
+    )
+
+  Summary:
+    Response to a connection establishment indication.
+
+  Description:
+    This routine is used to respond to a connection establishment indication.
+    
+  Precondition:
+    The CL_NULL_Initialize routine must have been called before.
+
+  Parameters:
+    connHandle  - Unique identifier of the connection
+    answer      - Action to be taken for this connection establishment
+    data        - Data associated with the connection establishment procedure
+    dataLen     - Length of the data in bytes
+    ae          - Flag to indicate that authentication and encryption is requested (v1.4)
+
+  Returns:
+    None.
+
+  Example:
+    <code>
+	CL_NULL_EstablishResponse(3, MAC_ESTABLISH_RESPONSE_ANSWER_ACCEPT, NULL, 0, 0);
+    </code>
+
+  Remarks:
+    None.
+*/
+void CL_NULL_EstablishResponse(uint16_t connHandle, MAC_ESTABLISH_RESPONSE_ANSWER answer, 
+    uint8_t *data, uint16_t dataLen, uint8_t uc_ae);
+
+// *****************************************************************************
+/* Function:
+    void CL_NULL_ReleaseRequest
+    (
+        uint16_t connHandle
+    )
+
+  Summary:
+    Request to release a connection.
+
+  Description:
+    This routine is used to request a connection release.
+    
+  Precondition:
+    The CL_NULL_Initialize routine must have been called before.
+
+  Parameters:
+    connHandle  - Unique identifier of the connection
+
+  Returns:
+    None.
+
+  Example:
+    <code>
+	CL_NULL_ReleaseRequest(3);
+    </code>
+
+  Remarks:
+    The result of the request is returned in the confirm callback.
+*/
+void CL_NULL_ReleaseRequest(uint16_t connHandle);
+
+// *****************************************************************************
+/* Function:
+    void CL_NULL_ReleaseResponse
+    (
+        uint16_t connHandle, 
+        MAC_RELEASE_RESPONSE_ANSWER answer
+    )
+
+  Summary:
+    Response to a connection release indication.
+
+  Description:
+    This routine is used to respond to a connection release indication.
+    
+  Precondition:
+    The CL_NULL_Initialize routine must have been called before.
+
+  Parameters:
+    connHandle  - Unique identifier of the connection
+    answer      - Action to be taken for this connection release
+
+  Returns:
+    None.
+
+  Example:
+    <code>
+	CL_NULL_ReleaseResponse(3, MAC_RELEASE_RESPONSE_ACCEPT);
+    </code>
+
+  Remarks:
+    None.
+*/
+void CL_NULL_ReleaseResponse(uint16_t connHandle, MAC_RELEASE_RESPONSE_ANSWER answer);
+
+// *****************************************************************************
+/* Function:
+    void CL_NULL_JoinRequest
+    (
+        MAC_JOIN_MODE connMode, 
+        uint16_t connHandle, 
+        uint8_t *eui48, 
+        uint8_t connType, 
+        uint8_t *data, 
+        uint16_t dataLen, 
+        uint8_t ae
+    )
+
+  Summary:
+    Request to join a multicast connection.
+
+  Description:
+    This routine is used to request to join a multicast connection.
+    
+  Precondition:
+    The CL_NULL_Initialize routine must have been called before.
+
+  Parameters:
+    connMode    - Connection type: broadcast or multicast
+    connHandle  - Unique identifier of the connection (only used in base node)
+    eui48       - Pointer to the address of the node to which this join is being requested 
+                  (only used in base node)
+    connType    - Connection type
+    data        - Data associated with the join request procedure
+    dataLen     - Length of the data in bytes
+    ae          - Flag to indicate that authentication and encryption is requested (v1.4)
+
+  Returns:
+    None.
+
+  Example:
+    <code>    
+	CL_NULL_JoinRequest(JOIN_REQUEST_BROADCAST, 0, NULL, 9, NULL, 0, 0);
+    </code>
+
+  Remarks:
+    The result of the request is returned in the confirm callback.
+*/
+void CL_NULL_JoinRequest(MAC_JOIN_MODE connMode, uint16_t connHandle, uint8_t *eui48, 
+    uint8_t connType, uint8_t *data, uint16_t dataLen, uint8_t ae);
+
+// *****************************************************************************
+/* Function:
+    void CL_NULL_JoinResponse
+    (
+        uint16_t connHandle, 
+        uint8_t *eui48, 
+        MAC_JOIN_RESPONSE_ANSWER answer, 
+        uint8_t ae
+    )
+
+  Summary:
+    Response to a connection join indication.
+
+  Description:
+    This routine is used to respond to a connection join indication.
+    
+  Precondition:
+    The CL_NULL_Initialize routine must have been called before.
+
+  Parameters:
+    connHandle  - Unique identifier of the connection
+    eui48       - Pointer to the address of the node which requested the multicast group join
+                  (only used in base node)
+    answer      - Action to be taken for this join request
+    ae          - Flag to indicate that authentication and encryption is requested (v1.4)
+    
+  Returns:
+    None.
+
+  Example:
+    <code>
+	CL_NULL_JoinResponse(0, NULL, JOIN_RESPONSE_ACCEPT, 0);
+    </code>
+
+  Remarks:
+    None.
+*/
+void CL_NULL_JoinResponse(uint16_t connHandle, uint8_t *eui48, 
+    MAC_JOIN_RESPONSE_ANSWER answer, uint8_t ae);
+
+// *****************************************************************************
+/* Function:
+    void CL_NULL_LeaveRequest
+    (
+        uint16_t connHandle, 
+        uint8_t *eui48
+    )
+
+  Summary:
+    Request to leave a multicast connection.
+
+  Description:
+    This routine is used to request to leave a multicast connection.
+    
+  Precondition:
+    The CL_NULL_Initialize routine must have been called before.
+
+  Parameters:
+    connHandle  - Unique identifier of the connection
+    eui48       - Pointer to the address of the node to be removed from the multicast group 
+                 (only used in base node)
+
+  Returns:
+    None.
+
+  Example:
+    <code>    
+	CL_NULL_LeaveRequest(0, NULL);
+    </code>
+
+  Remarks:
+    The result of the request is returned in the confirm callback.
+*/
+void CL_NULL_LeaveRequest(uint16_t connHandle, uint8_t *eui48);
 
 <#if PRIME_MODE == "BN" && BN_SLAVE_EN == false>
-/** \brief CL NULL SIGNALING PRIMITIVES */
-/* @{ */
-void cl_null_redirect_response(uint16_t us_con_handle, uint8_t *puc_eui48, uint8_t *puc_data, uint16_t us_data_len);
+// *****************************************************************************
+/* Function:
+    void CL_NULL_RedirectResponse
+    (
+        uint16_t connHandle, 
+        uint8_t *eui48, 
+        uint8_t *data,
+        uint16_t dataLen
+    )
+
+  Summary:
+    Response to a direct connection establishment indication.
+
+  Description:
+    This routine is used to respond to a direct connection establishment indication.
+    
+  Precondition:
+    The CL_NULL_Initialize routine must have been called before.
+
+  Parameters:
+    connHandle  - Unique identifier of the connection
+    eui48       - Pointer to the address of the node to which this connection will be "redirected"
+    data        - Data associated with the connection establishment procedure
+    dataLen     - Length of the data in bytes
+
+  Returns:
+    None.
+
+  Example:
+    <code>    
+    uint8_t eui48[6];
+    memset(eui48, 0x12, 6);
+    
+	CL_NULL_RedirectResponse(8, eui48, NULL, 0);
+    </code>
+
+  Remarks:
+    The result of the request is returned in the confirm callback.
+*/
+void CL_NULL_RedirectResponse(uint16_t connHandle, uint8_t *eui48, uint8_t *data,
+    uint16_t dataLen);
 </#if>
 
-/* @} */
+// *****************************************************************************
+/* Function:
+    void CL_NULL_DataRequest
+    (
+        uint16_t connHandle, 
+        uint8_t *data, 
+        uint16_t dataLen, 
+        uint8_t prio, 
+        uint32_t timeRef
+    )
 
-/** \brief CL NULL DATA PRIMITIVES */
-/* @{ */
-void cl_null_data_request(uint16_t us_con_handle, uint8_t *puc_data, uint16_t us_data_len, uint8_t uc_prio, uint32_t ul_time_ref);
+  Summary:
+    Request the transmission of data over a connection.
 
-/* @} */
+  Description:
+    This routine is used to request the transmission of data over a connection.
+    
+  Precondition:
+    The CL_NULL_Initialize routine must have been called before.
 
-/** \brief CL NULL PLME PRIMITIVES */
-/* @{ */
-void cl_null_plme_reset_request(uint16_t us_pch);
-void cl_null_plme_sleep_request(uint16_t us_pch);
-void cl_null_plme_resume_request(uint16_t us_pch);
-void cl_null_plme_testmode_request(uint8_t uc_enable, uint8_t uc_mode, uint8_t uc_modulation, uint8_t uc_pwr_level, uint16_t us_pch);
-void cl_null_plme_get_request(uint16_t us_pib_attrib, uint16_t us_pch);
-void cl_null_plme_set_request(uint16_t us_pib_attrib, void *pv_pib_value, uint8_t uc_pib_size, uint16_t us_pch);
+  Parameters:
+    connHandle  - Unique identifier of the connection
+    data        - Pointer to data to be transmitted through this connection
+    dataLen     - Length of the data in bytes
+    prio        - Priority of the data to be sent when using the CSMA access scheme
+    timeRef     - Time reference (in 10s of microseconds) (v1.4)
 
-/* @} */
+  Returns:
+    None.
 
-/** \brief CL NULL MLME PRIMITIVES */
-/* @{ */
+  Example:
+    <code>    
+    uint16_t msgLen = 20;
+    uint8_t msg[msgLen] = {0};
+    
+	CL_NULL_DataRequest(9, msg, msgLen, 1, 1000);
+    </code>
+
+  Remarks:
+    The result of the request is returned in the confirm callback.
+*/
+void CL_NULL_DataRequest(uint16_t connHandle, uint8_t *data, uint16_t dataLen, 
+    uint8_t prio, uint32_t timeRef);
+
+// *****************************************************************************
+/* Function:
+    void CL_NULL_PlmeResetRequest
+    (
+        uint16_t pch
+    )
+
+  Summary:
+    Request a reset of the functional state of the PHY layer.
+
+  Description:
+    This routine is used to request a reset of the functional state of the PHY layer.
+    
+  Precondition:
+    The CL_NULL_Initialize routine must have been called before.
+
+  Parameters:
+    pch     - Physical channel (v1.4)
+
+  Returns:
+    None.
+
+  Example:
+    <code>    
+	CL_NULL_PlmeResetRequest(16);
+    </code>
+
+  Remarks:
+    The result of the request is returned in the confirm callback.
+*/
+void CL_NULL_PlmeResetRequest(uint16_t pch);
+
+// *****************************************************************************
+/* Function:
+    void CL_NULL_PlmeSleepRequest
+    (
+        uint16_t pch
+    )
+
+  Summary:
+    Request a suspension of all present activities of the PHY layer.
+
+  Description:
+    This routine is used to request a suspension of all present activities of the 
+    PHY layer.
+    
+  Precondition:
+    The CL_NULL_Initialize routine must have been called before.
+
+  Parameters:
+    pch     - Physical channel (v1.4)
+
+  Returns:
+    None.
+
+  Example:
+    <code>    
+	CL_NULL_PlmeSleepRequest(16);
+    </code>
+
+  Remarks:
+    The result of the request is returned in the confirm callback.
+*/
+void CL_NULL_PlmeSleepRequest(uint16_t pch);
+
+// *****************************************************************************
+/* Function:
+    void CL_NULL_PlmeResumeRequest
+    (
+        uint16_t pch
+    )
+
+  Summary:
+    Request to resume all suspended actitivities of the PHY layer.
+
+  Description:
+    This routine is used to request to resume all suspended activities of the 
+    PHY layer.
+    
+  Precondition:
+    The CL_NULL_Initialize routine must have been called before.
+
+  Parameters:
+    pch     - Physical channel (v1.4)
+
+  Returns:
+    None.
+
+  Example:
+    <code>    
+	CL_NULL_PlmeResumeRequest(16);
+    </code>
+
+  Remarks:
+    The result of the request is returned in the confirm callback.
+*/
+void CL_NULL_PlmeResumeRequest(uint16_t us_pch);
+
+// *****************************************************************************
+/* Function:
+    void CL_NULL_PlmeTestModeRequest
+    (
+        uint8_t enable, 
+        uint8_t mode, 
+        uint8_t modulation, 
+        uint8_t pwrLevel, 
+        uint16_t pch
+    )
+
+  Summary:
+    Request the PHY layer to enter the given test mode.
+
+  Description:
+    This routine is used to request the PHY layer to enter the given test mode.
+    
+  Precondition:
+    The CL_NULL_Initialize routine must have been called before.
+
+  Parameters:
+    enable      - Start/Stop test mode
+    mode        - Transmission mode
+    modulation  - Transmission modulation
+    pwrLevel    - Transmission power level
+    pch         - Physical channel (v1.4)
+
+  Returns:
+    None.
+
+  Example:
+    <code>    
+	CL_NULL_PlmeTestModeRequest(0, PAL_MODE_TYPE_B, PAL_PLC_DBPSK_R, 10, 16);
+    </code>
+
+  Remarks:
+    The result of the request is returned in the confirm callback.
+*/
+void CL_NULL_PlmeTestModeRequest(uint8_t enable, uint8_t mode, uint8_t modulation, 
+    uint8_t pwrLevel, uint16_t pch);
+
+// *****************************************************************************
+/* Function:
+    void CL_NULL_PlmeGetRequest
+    (
+        uint16_t pibAttrib,
+        uint16_t pch
+    )
+
+  Summary:
+    Request information about a given PIB attribute of the PHY layer.
+
+  Description:
+    This routine is used to request information about a given PIB attribute of 
+    the PHY layer.
+    
+  Precondition:
+    The CL_NULL_Initialize routine must have been called before.
+
+  Parameters:
+    pibAttribute    - PIB attribute
+    pch             - Physical channel (v1.4)
+
+  Returns:
+    None.
+
+  Example:
+    <code>    
+	CL_NULL_PlmeGetRequest(PIB_PHY_STATS_RX_TOTAL_COUNT, 16);
+    </code>
+
+  Remarks:
+    The result of the request is returned in the confirm callback.
+*/
+void CL_NULL_PlmeGetRequest(uint16_t pibAttrib, uint16_t pch);
+
+// *****************************************************************************
+/* Function:
+    void CL_NULL_PlmeSetRequest
+    (
+        uint16_t pibAttrib, 
+        void *pibValue, 
+        uint8_t pibSize,
+        uint16_t pch
+    )
+
+  Summary:
+    Set a new value for a given PIB attribute of the PHY layer.
+
+  Description:
+    This routine is used to set a new value for a given PIB attribute of 
+    the PHY layer.
+    
+  Precondition:
+    The CL_NULL_Initialize routine must have been called before.
+
+  Parameters:
+    pibAttribute    - PIB attribute
+    pibValue        - PIB attribute value
+    pibSize         - PIB attribute value size
+    pch             - Physical channel (v1.4)
+
+  Returns:
+    None.
+
+  Example:
+    <code>   
+    uint8_t snifferEn = 1;
+	CL_NULL_PlmeSetRequest(PIB_PHY_SNIFFER_ENABLED, &snifferEn, sizeof(snifferEn), 16);
+    </code>
+
+  Remarks:
+    The result of the request is returned in the confirm callback.
+*/
+void CL_NULL_PlmeSetRequest(uint16_t pibAttrib, void *pibValue, uint8_t pibSize, 
+    uint16_t pch);
+
 <#if (PRIME_MODE == "SN") || (PRIME_MODE == "BN" && BN_SLAVE_EN == true)>
-void cl_null_mlme_register_request(uint8_t *puc_sna, uint8_t uc_sid);
-void cl_null_mlme_unregister_request(void);
-void cl_null_mlme_demote_request(void);
-void cl_null_mlme_mp_demote_request(uint8_t uc_lsid);
+// *****************************************************************************
+/* Function:
+    CL_NULL_MlmeRegisterRequest
+    (
+        uint8_t *sna,
+        uint8_t sid
+    )
+
+  Summary:
+    Request to trigger the registration process to a subnetwork through a 
+    specific switch node.
+
+  Description:
+    This routine is used to request to trigger the registration process to a 
+    subnetwork through a specific switch node.
+    
+  Precondition:
+    The CL_NULL_Initialize routine must have been called before.
+
+  Parameters:
+    sna             - Pointer to the subnetwork address
+    sid             - Switch identifier
+
+  Returns:
+    None.
+
+  Example:
+    <code>    
+	CL_NULL_MlmeRegisterRequest(NULL, 125);
+    </code>
+
+  Remarks:
+    The result of the request is returned in the confirm callback.
+*/
+void CL_NULL_MlmeRegisterRequest(uint8_t *sna, uint8_t sid);
+
+// *****************************************************************************
+/* Function:
+    CL_NULL_MlmeUnregisterRequest
+    (
+        void
+    )
+
+  Summary:
+    Request to trigger the unregistration process.
+
+  Description:
+    This routine is used to request to trigger the unregistration process.
+    
+  Precondition:
+    The CL_NULL_Initialize routine must have been called before.
+
+  Parameters:
+    None.
+
+  Returns:
+    None.
+
+  Example:
+    <code>    
+	CL_NULL_MlmeUnregisterRequest();
+    </code>
+
+  Remarks:
+    The result of the request is returned in the confirm callback.
+*/
+void CL_NULL_MlmeUnregisterRequest(void);
+
+// *****************************************************************************
+/* Function:
+    CL_NULL_MlmeDemoteRequest
+    (
+        void
+    )
+
+  Summary:
+    Request to trigger a demotion process in a Service Node that is in a Switch 
+    functional state.
+
+  Description:
+    This routine is used to request to trigger a demotion process in a Service 
+    Node that is in a Switch functional state
+    
+  Precondition:
+    The CL_NULL_Initialize routine must have been called before.
+
+  Parameters:
+    None.
+
+  Returns:
+    None.
+
+  Example:
+    <code>    
+	CL_NULL_MlmeDemoteRequest();
+    </code>
+
+  Remarks:
+    The result of the request is returned in the confirm callback.
+*/
+void CL_NULL_MlmeDemoteRequest(void);
+
+// *****************************************************************************
+/* Function:
+    CL_NULL_MlmeMpDemoteRequest
+    (
+        uint8_t lsid
+    )
+
+  Summary:
+    Request to trigger a demotion process in a Service Node that is in a Switch 
+    functional state and supports MultiPHY promotion.
+
+  Description:
+    This routine is used to request to trigger a demotion process in a Service 
+    Node that is in a Switch functional state and supports MultiPHY promotion.
+    This primitive only applies in PRIME v1.4.
+    
+  Precondition:
+    The CL_NULL_Initialize routine must have been called before.
+
+  Parameters:
+    lsid             - Local switch identifier
+
+  Returns:
+    None.
+
+  Example:
+    <code>    
+	CL_NULL_MlmeMpDemoteRequest(125);
+    </code>
+
+  Remarks:
+    The result of the request is returned in the confirm callback.
+*/
+void CL_NULL_MlmeMpDemoteRequest(uint8_t lsid);
 </#if>
 
-void cl_null_mlme_promote_request(uint8_t *puc_eui48, uint8_t uc_bcn_mode);
-void cl_null_mlme_mp_promote_request(uint8_t *puc_eui48, uint8_t uc_bcn_mode, uint16_t us_pch);
-void cl_null_mlme_reset_request(void);
-void cl_null_mlme_get_request(uint16_t us_pib_attrib);
-void cl_null_mlme_list_get_request(uint16_t us_pib_attrib);
-void cl_null_mlme_set_request(uint16_t us_pib_attrib, void *pv_pib_value, uint8_t uc_pib_size);
+// *****************************************************************************
+/* Function:
+    CL_NULL_MlmePromoteRequest
+    (
+        uint8_t *eui48,
+        uint8_t bcnMode
+    )
 
-/* @} */
+  Summary:
+    Request to trigger the promotion process in a Service Node that is in a 
+    Terminal functional state. 
 
-/* @} */
+  Description:
+    This routine is used to request to trigger the promotion process in a Service
+    Node that is in a Terminal functional state. 
+    
+  Precondition:
+    The CL_NULL_Initialize routine must have been called before.
 
-/* @} */
+  Parameters:
+    eui48           - Pointer to the address of the node to be promoted
+    bcnMode         - Beacon PDU modulation scheme
 
-/* @cond 0 */
-/**INDENT-OFF**/
+  Returns:
+    None.
+
+  Example:
+    <code>
+    uint8_t eui48[6];
+    memset(eui48, 0x12, 6);
+    
+	CL_NULL_MlmeRegisterRequest(eui48, 0);
+    </code>
+
+  Remarks:
+    The result of the request is returned in the confirm callback.
+*/
+void CL_NULL_MlmePromoteRequest(uint8_t *eui48, uint8_t bcnMode);
+
+// *****************************************************************************
+/* Function:
+    CL_NULL_MlmeMpPromoteRequest
+    (
+        uint8_t *eui48,
+        uint8_t bcnMode,
+        uint16_t pch
+    )
+
+  Summary:
+    Request to trigger the promotion process in a Service Node (Terminal or Switch) 
+    in a medium (PLC or RF) different from the one the node is connected to the 
+    network. 
+
+  Description:
+    This routine is used to request to trigger the promotion process in a Service
+    Node (Terminal or Switch) in a medium (PLC or RF) different from the one the 
+    node is connected to the network. This primitive only applies in PRIME v1.4.
+    
+  Precondition:
+    The CL_NULL_Initialize routine must have been called before.
+
+  Parameters:
+    eui48           - Pointer to the address of the node to be promoted
+    bcnMode         - Beacon PDU modulation scheme
+    pch             - Physical channel
+
+  Returns:
+    None.
+
+  Example:
+    <code>
+    uint8_t eui48[6];
+    memset(eui48, 0x12, 6);
+    
+	CL_NULL_MlmeRegisterRequest(eui48, 0, 16);
+    </code>
+
+  Remarks:
+    The result of the request is returned in the confirm callback.
+*/
+void CL_NULL_MlmeMpPromoteRequest(uint8_t *eui48, uint8_t bcnMode, uint16_t pch);
+
+// *****************************************************************************
+/* Function:
+    CL_NULL_MlmeResetRequest
+    (
+        void
+    )
+
+  Summary:
+    Request the flushing of all transmit and receive buffers and the resetting of 
+    all state variables.
+
+  Description:
+    This routine is used to request the flushing of all transmit and receive 
+    buffers and the resetting of all state variables. As a result, a Service Node 
+    will transit from its present functional state to the Disconnected functional 
+    state.
+    
+  Precondition:
+    The CL_NULL_Initialize routine must have been called before.
+
+  Parameters:
+    None.
+
+  Returns:
+    None.
+
+  Example:
+    <code>    
+	CL_NULL_MlmeResetRequest();
+    </code>
+
+  Remarks:
+    The result of the request is returned in the confirm callback.
+*/
+void CL_NULL_MlmeResetRequest(void);
+
+// *****************************************************************************
+/* Function:
+    void CL_NULL_MlmeGetRequest
+    (
+        uint16_t pibAttrib
+    )
+
+  Summary:
+    Request information about a given PIB attribute of the MAC layer.
+
+  Description:
+    This routine is used to request information about a given PIB attribute of 
+    the MAC layer.
+    
+  Precondition:
+    The CL_NULL_Initialize routine must have been called before.
+
+  Parameters:
+    pibAttribute    - PIB attribute
+
+  Returns:
+    None.
+
+  Example:
+    <code>    
+	CL_NULL_MlmeGetRequest(PIB_MAC_LNID);
+    </code>
+
+  Remarks:
+    The result of the request is returned in the confirm callback.
+*/
+void CL_NULL_MlmeGetRequest(uint16_t pibAttrib);
+
+// *****************************************************************************
+/* Function:
+    void CL_NULL_MlmeListGetRequest
+    (
+        uint16_t pibAttrib
+    )
+
+  Summary:
+    Request information about a given PIB list attribute of the MAC layer.
+
+  Description:
+    This routine is used to request information about a given PIB list attribute 
+    of the MAC layer.
+    
+  Precondition:
+    The CL_NULL_Initialize routine must have been called before.
+
+  Parameters:
+    pibAttribute    - PIB attribute
+
+  Returns:
+    None.
+
+  Example:
+    <code>    
+	CL_NULL_MlmeListGetRequest(PIB_MAC_LIST_AVAILABLE_SWITCHES);
+    </code>
+
+  Remarks:
+    The result of the request is returned in the confirm callback.
+*/
+void CL_NULL_MlmeListGetRequest(uint16_t pibAttrib);
+
+// *****************************************************************************
+/* Function:
+    void CL_NULL_PlmeSetRequest
+    (
+        uint16_t pibAttrib, 
+        void *pibValue, 
+        uint8_t pibSize
+    )
+
+  Summary:
+    Set a new value for a given PIB attribute of the MAC layer.
+
+  Description:
+    This routine is used to set a new value for a given PIB attribute of 
+    the MAC layer.
+    
+  Precondition:
+    The CL_NULL_Initialize routine must have been called before.
+
+  Parameters:
+    pibAttribute    - PIB attribute
+    pibValue        - PIB attribute value
+    pibSize         - PIB attribute value size
+
+  Returns:
+    None.
+
+  Example:
+    <code>   
+    uint8_t bandSearchTime = 25;
+	CL_NULL_MlmeSetRequest(PIB_MAC_MIN_BAND_SEARCH_TIME, &bandSearchTime, sizeof(bandSearchTime));
+    </code>
+
+  Remarks:
+    The result of the request is returned in the confirm callback.
+*/
+void CL_NULL_MlmeSetRequest(uint16_t pibAttrib, void *pibValue, uint8_t pibSize);
+
+//DOM-IGNORE-BEGIN
 #ifdef __cplusplus
 }
 #endif
-/**INDENT-ON**/
-/* @endcond */
-#endif /* CONV_CL_NULL_API_H */
+//DOM-IGNORE-END
+
+#endif /* CL_NULL_API_H */
+
+/*******************************************************************************
+ End of File
+*/
