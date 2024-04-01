@@ -15,6 +15,31 @@
     primitives to be used by the PRIME application.
 *******************************************************************************/
 
+//DOM-IGNORE-BEGIN
+/*******************************************************************************
+* Copyright (C) 2024 Microchip Technology Inc. and its subsidiaries.
+*
+* Subject to your compliance with these terms, you may use Microchip software
+* and any derivatives exclusively with Microchip products. It is your
+* responsibility to comply with third party license terms applicable to your
+* use of third party software (including open source software) that may
+* accompany Microchip software.
+*
+* THIS SOFTWARE IS SUPPLIED BY MICROCHIP "AS IS". NO WARRANTIES, WHETHER
+* EXPRESS, IMPLIED OR STATUTORY, APPLY TO THIS SOFTWARE, INCLUDING ANY IMPLIED
+* WARRANTIES OF NON-INFRINGEMENT, MERCHANTABILITY, AND FITNESS FOR A
+* PARTICULAR PURPOSE.
+*
+* IN NO EVENT WILL MICROCHIP BE LIABLE FOR ANY INDIRECT, SPECIAL, PUNITIVE,
+* INCIDENTAL OR CONSEQUENTIAL LOSS, DAMAGE, COST OR EXPENSE OF ANY KIND
+* WHATSOEVER RELATED TO THE SOFTWARE, HOWEVER CAUSED, EVEN IF MICROCHIP HAS
+* BEEN ADVISED OF THE POSSIBILITY OR THE DAMAGES ARE FORESEEABLE. TO THE
+* FULLEST EXTENT ALLOWED BY LAW, MICROCHIP'S TOTAL LIABILITY ON ALL CLAIMS IN
+* ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF ANY,
+* THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
+*******************************************************************************/
+//DOM-IGNORE-END
+
 #ifndef CL_NULL_API_H
 #define CL_NULL_API_H
 
@@ -29,7 +54,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
-#include "../../../prime/mac/mac_defs.h"
+#include "stack/prime/mac/mac_defs.h"
 
 // DOM-IGNORE-BEGIN
 #ifdef __cplusplus  // Provide C++ Compatibility
@@ -62,7 +87,7 @@
     The CL_NULL_Initialize routine must have been called before.
 
   Parameters:
-    macCallbacks    - Pointer to the MAC callback structure.
+    macCallbacks    - Pointer to the MAC callback structure
 
   Returns:
     None.
@@ -112,15 +137,17 @@ void CL_NULL_SetCallbacks(MAC_CALLBACKS *macCallbacks);
     The CL_NULL_Initialize routine must have been called before.
 
   Parameters:
-    eui48       - Pointer to the address of the node to which this connection will be addressed
+    eui48       - Pointer to the address of the node to which this connection 
+                  will be addressed
     type        - Convergence Layer type of the connection
     data        - Data associated with the connection establishment procedure
     dataLen     - Length of the data in bytes
-    arq         - Flag to indicate whether or not the ARQ mechanism should be used 
-                  for this connection
-    cfBytes     - Flag to indicate whether or not the connection should use the contention 
-                  or contention-free channel access scheme
-    ae          - Flag to indicate that authentication and encryption is requested (v1.4)
+    arq         - Flag to indicate whether or not the ARQ mechanism should be 
+                  used for this connection
+    cfBytes     - Flag to indicate whether or not the connection should use the 
+                  contention or contention-free channel access scheme
+    ae          - Flag to indicate that authentication and encryption is 
+                  requested (v1.4)
 
   Returns:
     None.
@@ -143,7 +170,7 @@ void CL_NULL_EstablishRequest(uint8_t *eui48, uint8_t type, uint8_t *data,
 /* Function:
     void CL_NULL_EstablishResponse
     (
-        uint16_t connHandle, 
+        uint16_t conHandle, 
         MAC_ESTABLISH_RESPONSE_ANSWER answer, 
         uint8_t *data, 
         uint16_t dataLen, 
@@ -160,11 +187,12 @@ void CL_NULL_EstablishRequest(uint8_t *eui48, uint8_t type, uint8_t *data,
     The CL_NULL_Initialize routine must have been called before.
 
   Parameters:
-    connHandle  - Unique identifier of the connection
+    conHandle   - Unique identifier of the connection
     answer      - Action to be taken for this connection establishment
     data        - Data associated with the connection establishment procedure
     dataLen     - Length of the data in bytes
-    ae          - Flag to indicate that authentication and encryption is requested (v1.4)
+    ae          - Flag to indicate that authentication and encryption is 
+                  requested (v1.4)
 
   Returns:
     None.
@@ -177,14 +205,15 @@ void CL_NULL_EstablishRequest(uint8_t *eui48, uint8_t type, uint8_t *data,
   Remarks:
     None.
 */
-void CL_NULL_EstablishResponse(uint16_t connHandle, MAC_ESTABLISH_RESPONSE_ANSWER answer, 
-    uint8_t *data, uint16_t dataLen, uint8_t uc_ae);
+void CL_NULL_EstablishResponse(uint16_t conHandle, 
+    MAC_ESTABLISH_RESPONSE_ANSWER answer, uint8_t *data, uint16_t dataLen, 
+    uint8_t uc_ae);
 
 // *****************************************************************************
 /* Function:
     void CL_NULL_ReleaseRequest
     (
-        uint16_t connHandle
+        uint16_t conHandle
     )
 
   Summary:
@@ -197,7 +226,7 @@ void CL_NULL_EstablishResponse(uint16_t connHandle, MAC_ESTABLISH_RESPONSE_ANSWE
     The CL_NULL_Initialize routine must have been called before.
 
   Parameters:
-    connHandle  - Unique identifier of the connection
+    conHandle   - Unique identifier of the connection
 
   Returns:
     None.
@@ -210,13 +239,13 @@ void CL_NULL_EstablishResponse(uint16_t connHandle, MAC_ESTABLISH_RESPONSE_ANSWE
   Remarks:
     The result of the request is returned in the confirm callback.
 */
-void CL_NULL_ReleaseRequest(uint16_t connHandle);
+void CL_NULL_ReleaseRequest(uint16_t conHandle);
 
 // *****************************************************************************
 /* Function:
     void CL_NULL_ReleaseResponse
     (
-        uint16_t connHandle, 
+        uint16_t conHandle, 
         MAC_RELEASE_RESPONSE_ANSWER answer
     )
 
@@ -230,7 +259,7 @@ void CL_NULL_ReleaseRequest(uint16_t connHandle);
     The CL_NULL_Initialize routine must have been called before.
 
   Parameters:
-    connHandle  - Unique identifier of the connection
+    conHandle   - Unique identifier of the connection
     answer      - Action to be taken for this connection release
 
   Returns:
@@ -244,14 +273,15 @@ void CL_NULL_ReleaseRequest(uint16_t connHandle);
   Remarks:
     None.
 */
-void CL_NULL_ReleaseResponse(uint16_t connHandle, MAC_RELEASE_RESPONSE_ANSWER answer);
+void CL_NULL_ReleaseResponse(uint16_t conHandle, 
+    MAC_RELEASE_RESPONSE_ANSWER answer);
 
 // *****************************************************************************
 /* Function:
     void CL_NULL_JoinRequest
     (
         MAC_JOIN_MODE connMode, 
-        uint16_t connHandle, 
+        uint16_t conHandle, 
         uint8_t *eui48, 
         uint8_t connType, 
         uint8_t *data, 
@@ -269,14 +299,15 @@ void CL_NULL_ReleaseResponse(uint16_t connHandle, MAC_RELEASE_RESPONSE_ANSWER an
     The CL_NULL_Initialize routine must have been called before.
 
   Parameters:
-    connMode    - Connection type: broadcast or multicast
-    connHandle  - Unique identifier of the connection (only used in base node)
-    eui48       - Pointer to the address of the node to which this join is being requested 
-                  (only used in base node)
-    connType    - Connection type
+    conMode     - Connection type: broadcast or multicast
+    conHandle   - Unique identifier of the connection (only used in base node)
+    eui48       - Pointer to the address of the node to which this join is 
+                  being requested (only used in base node)
+    conType     - Connection type
     data        - Data associated with the join request procedure
     dataLen     - Length of the data in bytes
-    ae          - Flag to indicate that authentication and encryption is requested (v1.4)
+    ae          - Flag to indicate that authentication and encryption is 
+                  requested (v1.4)
 
   Returns:
     None.
@@ -289,14 +320,15 @@ void CL_NULL_ReleaseResponse(uint16_t connHandle, MAC_RELEASE_RESPONSE_ANSWER an
   Remarks:
     The result of the request is returned in the confirm callback.
 */
-void CL_NULL_JoinRequest(MAC_JOIN_MODE connMode, uint16_t connHandle, uint8_t *eui48, 
-    uint8_t connType, uint8_t *data, uint16_t dataLen, uint8_t ae);
+void CL_NULL_JoinRequest(MAC_JOIN_MODE conMode, uint16_t conHandle, 
+    uint8_t *eui48, uint8_t conType, uint8_t *data, uint16_t dataLen, 
+    uint8_t ae);
 
 // *****************************************************************************
 /* Function:
     void CL_NULL_JoinResponse
     (
-        uint16_t connHandle, 
+        uint16_t conHandle, 
         uint8_t *eui48, 
         MAC_JOIN_RESPONSE_ANSWER answer, 
         uint8_t ae
@@ -312,11 +344,12 @@ void CL_NULL_JoinRequest(MAC_JOIN_MODE connMode, uint16_t connHandle, uint8_t *e
     The CL_NULL_Initialize routine must have been called before.
 
   Parameters:
-    connHandle  - Unique identifier of the connection
-    eui48       - Pointer to the address of the node which requested the multicast group join
-                  (only used in base node)
+    conHandle   - Unique identifier of the connection
+    eui48       - Pointer to the address of the node which requested the multicast 
+                  group join(only used in base node)
     answer      - Action to be taken for this join request
-    ae          - Flag to indicate that authentication and encryption is requested (v1.4)
+    ae          - Flag to indicate that authentication and encryption is 
+                  requested (v1.4)
     
   Returns:
     None.
@@ -329,14 +362,14 @@ void CL_NULL_JoinRequest(MAC_JOIN_MODE connMode, uint16_t connHandle, uint8_t *e
   Remarks:
     None.
 */
-void CL_NULL_JoinResponse(uint16_t connHandle, uint8_t *eui48, 
+void CL_NULL_JoinResponse(uint16_t conHandle, uint8_t *eui48, 
     MAC_JOIN_RESPONSE_ANSWER answer, uint8_t ae);
 
 // *****************************************************************************
 /* Function:
     void CL_NULL_LeaveRequest
     (
-        uint16_t connHandle, 
+        uint16_t conHandle, 
         uint8_t *eui48
     )
 
@@ -350,9 +383,9 @@ void CL_NULL_JoinResponse(uint16_t connHandle, uint8_t *eui48,
     The CL_NULL_Initialize routine must have been called before.
 
   Parameters:
-    connHandle  - Unique identifier of the connection
-    eui48       - Pointer to the address of the node to be removed from the multicast group 
-                 (only used in base node)
+    conHandle   - Unique identifier of the connection
+    eui48       - Pointer to the address of the node to be removed from the 
+                  multicast group (only used in base node)
 
   Returns:
     None.
@@ -365,14 +398,14 @@ void CL_NULL_JoinResponse(uint16_t connHandle, uint8_t *eui48,
   Remarks:
     The result of the request is returned in the confirm callback.
 */
-void CL_NULL_LeaveRequest(uint16_t connHandle, uint8_t *eui48);
+void CL_NULL_LeaveRequest(uint16_t conHandle, uint8_t *eui48);
 
 <#if PRIME_MODE == "BN" && BN_SLAVE_EN == false>
 // *****************************************************************************
 /* Function:
     void CL_NULL_RedirectResponse
     (
-        uint16_t connHandle, 
+        uint16_t conHandle, 
         uint8_t *eui48, 
         uint8_t *data,
         uint16_t dataLen
@@ -382,14 +415,16 @@ void CL_NULL_LeaveRequest(uint16_t connHandle, uint8_t *eui48);
     Response to a direct connection establishment indication.
 
   Description:
-    This routine is used to respond to a direct connection establishment indication.
+    This routine is used to respond to a direct connection establishment 
+    indication.
     
   Precondition:
     The CL_NULL_Initialize routine must have been called before.
 
   Parameters:
-    connHandle  - Unique identifier of the connection
-    eui48       - Pointer to the address of the node to which this connection will be "redirected"
+    conHandle   - Unique identifier of the connection
+    eui48       - Pointer to the address of the node to which this connection 
+                  will be "redirected"
     data        - Data associated with the connection establishment procedure
     dataLen     - Length of the data in bytes
 
@@ -407,7 +442,7 @@ void CL_NULL_LeaveRequest(uint16_t connHandle, uint8_t *eui48);
   Remarks:
     The result of the request is returned in the confirm callback.
 */
-void CL_NULL_RedirectResponse(uint16_t connHandle, uint8_t *eui48, uint8_t *data,
+void CL_NULL_RedirectResponse(uint16_t conHandle, uint8_t *eui48, uint8_t *data,
     uint16_t dataLen);
 </#if>
 
@@ -415,7 +450,7 @@ void CL_NULL_RedirectResponse(uint16_t connHandle, uint8_t *eui48, uint8_t *data
 /* Function:
     void CL_NULL_DataRequest
     (
-        uint16_t connHandle, 
+        uint16_t conHandle, 
         uint8_t *data, 
         uint16_t dataLen, 
         uint8_t prio, 
@@ -432,10 +467,11 @@ void CL_NULL_RedirectResponse(uint16_t connHandle, uint8_t *eui48, uint8_t *data
     The CL_NULL_Initialize routine must have been called before.
 
   Parameters:
-    connHandle  - Unique identifier of the connection
+    conHandle   - Unique identifier of the connection
     data        - Pointer to data to be transmitted through this connection
     dataLen     - Length of the data in bytes
-    prio        - Priority of the data to be sent when using the CSMA access scheme
+    prio        - Priority of the data to be sent when using the CSMA access 
+                  scheme
     timeRef     - Time reference (in 10s of microseconds) (v1.4)
 
   Returns:
@@ -452,7 +488,7 @@ void CL_NULL_RedirectResponse(uint16_t connHandle, uint8_t *eui48, uint8_t *data
   Remarks:
     The result of the request is returned in the confirm callback.
 */
-void CL_NULL_DataRequest(uint16_t connHandle, uint8_t *data, uint16_t dataLen, 
+void CL_NULL_DataRequest(uint16_t conHandle, uint8_t *data, uint16_t dataLen, 
     uint8_t prio, uint32_t timeRef);
 
 // *****************************************************************************
@@ -466,7 +502,8 @@ void CL_NULL_DataRequest(uint16_t connHandle, uint8_t *data, uint16_t dataLen,
     Request a reset of the functional state of the PHY layer.
 
   Description:
-    This routine is used to request a reset of the functional state of the PHY layer.
+    This routine is used to request a reset of the functional state of the PHY 
+    layer.
     
   Precondition:
     The CL_NULL_Initialize routine must have been called before.
@@ -498,8 +535,8 @@ void CL_NULL_PlmeResetRequest(uint16_t pch);
     Request a suspension of all present activities of the PHY layer.
 
   Description:
-    This routine is used to request a suspension of all present activities of the 
-    PHY layer.
+    This routine is used to request a suspension of all present activities of 
+    the PHY layer.
     
   Precondition:
     The CL_NULL_Initialize routine must have been called before.
@@ -822,14 +859,15 @@ void CL_NULL_MlmeMpDemoteRequest(uint8_t lsid);
     Terminal functional state. 
 
   Description:
-    This routine is used to request to trigger the promotion process in a Service
-    Node that is in a Terminal functional state. 
+    This routine is used to request to trigger the promotion process in a 
+    Service Node that is in a Terminal functional state. 
     
   Precondition:
     The CL_NULL_Initialize routine must have been called before.
 
   Parameters:
-    eui48           - Pointer to the address of the node to be promoted
+    eui48           - Pointer to the address of the node to be promoted (NULL in
+                      Service Node)
     bcnMode         - Beacon PDU modulation scheme
 
   Returns:
@@ -858,20 +896,22 @@ void CL_NULL_MlmePromoteRequest(uint8_t *eui48, uint8_t bcnMode);
     )
 
   Summary:
-    Request to trigger the promotion process in a Service Node (Terminal or Switch) 
-    in a medium (PLC or RF) different from the one the node is connected to the 
-    network. 
+    Request to trigger the promotion process in a Service Node (Terminal or 
+    Switch) in a medium (PLC or RF) different from the one the node is connected 
+    to the network. 
 
   Description:
-    This routine is used to request to trigger the promotion process in a Service
-    Node (Terminal or Switch) in a medium (PLC or RF) different from the one the 
-    node is connected to the network. This primitive only applies in PRIME v1.4.
+    This routine is used to request to trigger the promotion process in a 
+    Service Node (Terminal or Switch) in a medium (PLC or RF) different from the 
+    one the node is connected to the network. This primitive only applies in 
+    PRIME v1.4.
     
   Precondition:
     The CL_NULL_Initialize routine must have been called before.
 
   Parameters:
-    eui48           - Pointer to the address of the node to be promoted
+    eui48           - Pointer to the address of the node to be promoted (NULL in 
+                      Service Node)
     bcnMode         - Beacon PDU modulation scheme
     pch             - Physical channel
 
@@ -899,14 +939,14 @@ void CL_NULL_MlmeMpPromoteRequest(uint8_t *eui48, uint8_t bcnMode, uint16_t pch)
     )
 
   Summary:
-    Request the flushing of all transmit and receive buffers and the resetting of 
-    all state variables.
+    Request the flushing of all transmit and receive buffers and the resetting 
+    of all state variables.
 
   Description:
     This routine is used to request the flushing of all transmit and receive 
-    buffers and the resetting of all state variables. As a result, a Service Node 
-    will transit from its present functional state to the Disconnected functional 
-    state.
+    buffers and the resetting of all state variables. As a result, a Service 
+    Node will transit from its present functional state to the Disconnected 
+    functional state.
     
   Precondition:
     The CL_NULL_Initialize routine must have been called before.
@@ -995,7 +1035,7 @@ void CL_NULL_MlmeListGetRequest(uint16_t pibAttrib);
 
 // *****************************************************************************
 /* Function:
-    void CL_NULL_PlmeSetRequest
+    void CL_NULL_MlmeSetRequest
     (
         uint16_t pibAttrib, 
         void *pibValue, 
@@ -1023,7 +1063,8 @@ void CL_NULL_MlmeListGetRequest(uint16_t pibAttrib);
   Example:
     <code>   
     uint8_t bandSearchTime = 25;
-	CL_NULL_MlmeSetRequest(PIB_MAC_MIN_BAND_SEARCH_TIME, &bandSearchTime, sizeof(bandSearchTime));
+	CL_NULL_MlmeSetRequest(PIB_MAC_MIN_BAND_SEARCH_TIME, &bandSearchTime, 
+        sizeof(bandSearchTime));
     </code>
 
   Remarks:

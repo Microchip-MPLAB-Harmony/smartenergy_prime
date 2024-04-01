@@ -1,277 +1,965 @@
-/**
- * \file
- *
- * \brief BMNG_API: Base Management API header file
- *
- * Copyright (c) 2015 Atmel Corporation. All rights reserved.
- *
- * \asf_license_start
- *
- * \page License
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- * 1. Redistributions of source code must retain the above copyright notice,
- *    this list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright notice,
- *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution.
- *
- * 3. The name of Atmel may not be used to endorse or promote products derived
- *    from this software without specific prior written permission.
- *
- * 4. This software may only be redistributed and used in connection with an
- *    Atmel microcontroller product.
- *
- * THIS SOFTWARE IS PROVIDED BY ATMEL "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT ARE
- * EXPRESSLY AND SPECIFICALLY DISCLAIMED. IN NO EVENT SHALL ATMEL BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
- * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
- * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- * \asf_license_stop
- *
- */
+/*******************************************************************************
+  PRIME Base Management API Header
+
+  Company:
+    Microchip Technology Inc.
+
+  File Name:
+    bmng_api.h
+
+  Summary:
+    PRIME Base Management API Header File
+
+  Description:
+    This file contains definitions of the PRIME Base Management primitives to be 
+    used by the PRIME application in the Base Node.
+*******************************************************************************/
+
+//DOM-IGNORE-BEGIN
+/*******************************************************************************
+* Copyright (C) 2024 Microchip Technology Inc. and its subsidiaries.
+*
+* Subject to your compliance with these terms, you may use Microchip software
+* and any derivatives exclusively with Microchip products. It is your
+* responsibility to comply with third party license terms applicable to your
+* use of third party software (including open source software) that may
+* accompany Microchip software.
+*
+* THIS SOFTWARE IS SUPPLIED BY MICROCHIP "AS IS". NO WARRANTIES, WHETHER
+* EXPRESS, IMPLIED OR STATUTORY, APPLY TO THIS SOFTWARE, INCLUDING ANY IMPLIED
+* WARRANTIES OF NON-INFRINGEMENT, MERCHANTABILITY, AND FITNESS FOR A
+* PARTICULAR PURPOSE.
+*
+* IN NO EVENT WILL MICROCHIP BE LIABLE FOR ANY INDIRECT, SPECIAL, PUNITIVE,
+* INCIDENTAL OR CONSEQUENTIAL LOSS, DAMAGE, COST OR EXPENSE OF ANY KIND
+* WHATSOEVER RELATED TO THE SOFTWARE, HOWEVER CAUSED, EVEN IF MICROCHIP HAS
+* BEEN ADVISED OF THE POSSIBILITY OR THE DAMAGES ARE FORESEEABLE. TO THE
+* FULLEST EXTENT ALLOWED BY LAW, MICROCHIP'S TOTAL LIABILITY ON ALL CLAIMS IN
+* ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF ANY,
+* THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
+*******************************************************************************/
+//DOM-IGNORE-END
 
 #ifndef BMNG_API_H_
 #define BMNG_API_H_
 
+// *****************************************************************************
+// *****************************************************************************
+// Section: File includes
+// *****************************************************************************
+// *****************************************************************************
+
 #include <stdint.h>
 #include "bmng_defs.h"
 
-/* @cond 0 */
-/**INDENT-OFF**/
-#ifdef __cplusplus
-extern "C" {
+// DOM-IGNORE-BEGIN
+#ifdef __cplusplus  // Provide C++ Compatibility
+
+    extern "C" {
+
 #endif
-/**INDENT-ON**/
-/* @endcond */
+// DOM-IGNORE-END
 
-/**
- * \weakgroup prime_mngp_group
- * @{
- */
+// *****************************************************************************
+// *****************************************************************************
+// Section: PRIME Base Management Interface Primitives
+// *****************************************************************************
+// *****************************************************************************
 
-/** \brief Base Management functions interface */
-/* @{ */
+// *****************************************************************************
+/* Function:
+    void BMNG_SetCallbacks
+    (
+        BMNG_CALLBACKS *bmngCallbacks
+    )
 
-/**
- * \brief Function to establish Base Management callback functions
- *
- * \param px_base_mng_cbs      Pointer to the callback struct
- */
-void bmng_set_callbacks(bmng_callbacks_t *px_base_mng_cbs);
+  Summary:
+    Sets the callbacks to the PRIME Base Management.
 
-/**
- * \brief Base Management FUP Clear Target List Request
- *
- * \param uc_cmd             Command to acknowledge
- */
-void bmng_fup_clear_target_list_request(uint8_t uc_cmd);
+  Description:
+    This routine sets the callbacks to the PRIME Base Management.
+    
+  Precondition:
+    None.
 
-/**
- * \brief Base Management FUP Add Target Request
- *
- * \param uc_cmd             Command to acknowledge
- * \param puc_eui48          MAC address of the node to be added
- */
-void bmng_fup_add_target_request(uint8_t uc_cmd, uint8_t *puc_eui48);
+  Parameters:
+    bmngCallbacks    - Pointer to the Base Management callback structure
 
-/**
- * \brief Base Management FUP Set Firmware Data Request
- *
- * \param uc_cmd             Command to acknowledge
- * \param uc_vendor_len      Vendor ID length
- * \param pch_vendor         Vendor ID
- * \param uc_model_len       Model length
- * \param pch_model          Model
- * \param uc_version_len     Version length
- * \param pch_version        Version
- */
-void bmng_fup_set_fw_data_request(uint8_t uc_cmd, uint8_t uc_vendor_len, char *pch_vendor, uint8_t uc_model_len, char *pch_model, uint8_t uc_version_len,
-		char *pch_version);
+  Returns:
+    None.
 
-/**
- * \brief Base Management FUP Set Upgrade Options Request
- *
- * \param uc_cmd             Command to acknowledge
- * \param uc_arq_en          Enable/Disable ARQ protocol (1/0)
- * \param x_page_size        Page size
- * \param uc_multicast_en    Enable/Disable multicast (1/0)
- * \param ul_delay_restart   Delay restart time in seconds
- * \param ul_safety_timer    Safety timer in seconds
- */
-void bmng_fup_set_upg_options_request(uint8_t uc_cmd, uint8_t uc_arq_en, fup_page_size_t x_page_size, uint8_t uc_multicast_en, uint32_t ul_delay_restart,
-		uint32_t ul_safety_timer);
+  Example:
+    <code>
+    BMNG_CALLBACKS bmngCallbacks;
+    
+    memset(bmngCallbacks, NULL, sizeof(bmngCallbacks);
 
-/**
- * \brief Base Management FUP Init File Transmission Request
- *
- * \param uc_cmd             Command to acknowledge
- * \param us_frame_number    Frame number (0x0000)
- * \param ul_file_size       File size
- * \param us_frame_size      Frame size
- * \param ul_crc             File CRC-32
- */
-void bmng_fup_init_file_tx_request(uint8_t uc_cmd, uint16_t us_frame_number, uint32_t ul_file_size, uint16_t us_frame_size, uint32_t ul_crc);
+	bmngCallbacks.network_event_ind = netEventInd;
+	bmngCallbacks.pprof_ack = pprofACk;
+	bmngCallbacks.pprof_get_response = pprofGetResp;
 
-/**
- * \brief Base Management FUP Data Frame Request
- *
- * \param uc_cmd             Command to acknowledge
- * \param us_frame_number    Frame number
- * \param us_data_len        Date length
- * \param puc_data           Data frame
- */
-void bmng_fup_data_frame_request(uint8_t uc_cmd, uint16_t us_frame_number, uint16_t us_data_len, uint8_t *puc_data);
+	BMNG_SetCallbacks(&bmngCallbacks);
+    </code>
 
-/**
- * \brief Base Management CRC Request
- *
- * \param uc_cmd             Command to acknowledge
- */
-void bmng_fup_check_crc_request(uint8_t uc_cmd);
+  Remarks:
+    Unused callbacks must be set to NULL.
+*/
+void BMNG_SetCallbacks(BMNG_CALLBACKS *bmngCallbacks);
 
-/**
- * \brief Base Management FUP Abort FU Request
- *
- * \param uc_cmd             Command to acknowledge
- * \param puc_eui48          MAC address of the node to be added
- * \note If the MAC address is FF:FF:FF:FF:FF:FF, the FU is aborted for all nodes.
- */
-void bmng_fup_abort_fu_request(uint8_t uc_cmd, uint8_t *puc_eui48);
+// *****************************************************************************
+/* Function:
+    void BMNG_FUP_StartFuRequest
+    (
+        uint8_t cmd,
+        uint8_t enable
+    )
 
-/**
- * \brief Base Management FUP Start FU Request
- *
- * \param uc_cmd             Command to acknowledge
- * \param uc_enable          Enable/Disable FU (1/0)
- */
-void bmng_fup_start_fu_request(uint8_t uc_cmd, uint8_t uc_enable);
+  Summary:
+    Requests to start a firmware upgrade process.
 
-/**
- * \brief Base Management FUP Set Match Rule Request
- *
- * \param uc_cmd             Command to acknowledge
- * \param uc_rules           Match rules: 0000 0MV0
- * \note If M and/or V are set, only the nodes matching model and/or vendor will be upgraded.
- */
-void bmng_fup_set_match_rule_request(uint8_t uc_cmd, uint8_t uc_rules);
+  Description:
+    This routine requests the start of a firmware upgrade process.
+    
+  Precondition:
+    None.
 
-/**
- * \brief Base Management FUP Version Request
- *
- * \param uc_cmd             Command to acknowledge
- * \param puc_eui48          MAC address of the node to be added
- * \note If the MAC address is FF:FF:FF:FF:FF:FF, version information is asked to all registered nodes.
- */
-void bmng_fup_get_version_request(uint8_t uc_cmd, uint8_t *puc_eui48);
+  Parameters:
+    cmd     - Command to acknowledge
+    enable  - Enable (1) or disable (0) FU 
 
-/**
- * \brief Base Management FUP State Request
- *
- * \param uc_cmd             Command to acknowledge
- * \param puc_eui48          MAC address of the node
- * \note If the MAC address is FF:FF:FF:FF:FF:FF, state information will be asked to all registered nodes.
- */
-void bmng_fup_get_state_request(uint8_t uc_cmd, uint8_t *puc_eui48);
+  Returns:
+    None.
 
-/**
- * \brief Base Management FUP Set Signature Data Request
- *
- * \param uc_cmd               Command to acknowledge
- * \param uc_algorithm         Used algorithm to check signature
- * \param us_length            Signature length
- */
-void bmng_fup_set_signature_data_request(uint8_t uc_cmd, uint8_t uc_algorithm, uint16_t us_length);
+  Example:
+    <code>
+    BMNG_FUP_StartFuRequest(FUP_START_FU_REQUEST, 1);
+    </code>
 
-/**
- * \brief Base Management PRIME Profile Get Request
- *
- * \param uc_cmd               Command to acknowledge
- * \param puc_eui48            MAC address of the node
- * \param us_data_len          Data length
- * \param puc_data             Data
- */
-void bmng_pprof_get_request(uint8_t uc_cmd, uint8_t *puc_eui48, uint16_t us_data_len, uint8_t *puc_data);
+  Remarks:
+    The command is acknowledged with the FUP ACK callback.
+*/
+void BMNG_FUP_StartFuRequest(uint8_t cmd, uint8_t enable);
 
-/**
- * \brief Base Management PRIME Profile Set Request
- *
- * \param uc_cmd               Command to acknowledge
- * \param puc_eui48            MAC address of the node
- * \param us_data_len          Data length
- * \param puc_data             Data
- */
-void bmng_pprof_set_request(uint8_t uc_cmd, uint8_t *puc_eui48, uint16_t us_data_len, uint8_t *puc_data);
+// *****************************************************************************
+/* Function:
+    void BMNG_FUP_ClearTargetListRequest
+    (
+        uint8_t cmd
+    )
 
-/**
- * \brief Base Management PRIME Profile Reset Request
- *
- * \param uc_cmd               Command to acknowledge
- * \param puc_eui48            MAC address of the node
- */
-void bmng_pprof_reset_request(uint8_t uc_cmd, uint8_t *puc_eui48);
+  Summary:
+    Requests to clear the target list in a firmware upgrade process.
 
-/**
- * \brief Base Management PRIME Profile Reboot Request
- *
- * \param uc_cmd               Command to acknowledge
- * \param puc_eui48            MAC address of the node
- */
-void bmng_pprof_reboot_request(uint8_t uc_cmd, uint8_t *puc_eui48);
+  Description:
+    This routine requests to clear the target list in a firmware upgrade process.
+    
+  Precondition:
+    The firmware upgrade process must have been started before. 
 
-/**
- * \brief Base Management PRIME Profile Get Enhanced Request
- *
- * \param uc_cmd               Command to acknowledge
- * \param puc_eui48            MAC address of the node
- * \param us_data_len          Data length
- * \param puc_data             Data
- */
-void bmng_pprof_get_enhanced_request(uint8_t uc_cmd, uint8_t *puc_eui48, uint16_t us_data_len, uint8_t *puc_data);
+  Parameters:
+    cmd     - Command to acknowledge
 
-/**
- * \brief Base Management PRIME Profile Zero Crossing Difference between BN and SN Request
- *
- * \param uc_cmd               Command to acknowledge
- * \param puc_eui48            MAC address of the node
- */
-void bmng_pprof_zc_diff_request(uint8_t uc_cmd, uint8_t *puc_eui48);
+  Returns:
+    None.
 
-/**
- * Base Management Whitelist Add Request
- *
- * \param uc_cmd             Command to acknowledge
- * \param puc_eui48          MAC address of the node to be added
- */
-void bmng_whitelist_add_request(uint8_t uc_cmd, uint8_t *puc_eui48);
+  Example:
+    <code>
+    BMNG_FUP_ClearTargetListRequest(FUP_CLEAR_TARGET_LIST_REQUEST);
+    </code>
 
-/**
- * Base Management Whitelist Remove Request
- *
- * \param uc_cmd             Command to acknowledge
- * \param puc_eui48          MAC address of the node to be removed
- */
-void bmng_whitelist_remove_request(uint8_t uc_cmd, uint8_t *puc_eui48);
+  Remarks:
+    The command is acknowledged with the FUP ACK callback.
+*/
+void BMNG_FUP_ClearTargetListRequest(uint8_t ucmd);
 
-/* @} */
+// *****************************************************************************
+/* Function:
+    void BMNG_FUP_AddTargetRequest
+    (
+        uint8_t cmd
+        uint8_t *eui48
+    )
 
-/* @} */
+  Summary:
+    Requests to add a target node for a firmware upgrade process.
 
-/* @cond 0 */
-/**INDENT-OFF**/
+  Description:
+    This routine requests to add a target node for a firmware upgrade process.
+    
+  Precondition:
+    None. 
+
+  Parameters:
+    cmd     - Command to acknowledge
+    eui48   - Pointer to the address of the node to be added
+
+  Returns:
+    None.
+
+  Example:
+    <code>
+    uint8_t eui48[6];
+    memset(eui48, 0x12, 6);
+    
+    BMNG_FUP_AddTargetRequest(FUP_CLEAR_ADD_TARGET_REQUEST, eui48);
+    </code>
+
+  Remarks:
+    The command is acknowledged with the FUP ACK callback.
+*/
+void BMNG_FUP_AddTargetRequest(uint8_t cmd, uint8_t *eui48);
+
+// *****************************************************************************
+/* Function:
+    void BMNG_FUP_SetFwDataRequest
+    (
+        uint8_t cmd,
+        uint8_t vendorLen, 
+        char *vendor, 
+        uint8_t modelLen, 
+        char *model, 
+        uint8_t versionLen, 
+        char *version
+    )
+
+  Summary:
+    Requests to set the firmware data for a firmware upgrade process.
+
+  Description:
+    This routine requests to set the firmware data for a firmware upgrade process.
+    
+  Precondition:
+    The firmware upgrade process must have been started before. 
+
+  Parameters:
+    cmd         - Command to acknowledge
+    vendorLen   - Vendor length
+    vendor      - Pointer to the vendor identification
+    modelLen    - Model length
+    model       - Pointer to the model identification
+    versionLen  - Version length
+    version     - Pointer to the version identification
+
+  Returns:
+    None.
+
+  Example:
+    <code>
+    char vendor[] = "MCHP";
+    char model[] = "PIC32CXXPL460";
+    char version = "HS14.01.01\0\0\0\0\0\0";
+    
+    BMNG_FUP_SetFwDataRequest(FUP_SET_FW_DATA_REQUEST, sizeof(vendor), &vendor, 
+        sizeof(model), &model, sizeof(version), &version);
+    </code>
+
+  Remarks:
+    The command is acknowledged with the FUP ACK callback.
+*/
+void BMNG_FUP_SetFwDataRequest(uint8_t cmd, uint8_t vendorLen, char *vendor, 
+    uint8_t modelLen, char *model, uint8_t versionLen, char *version);
+
+// *****************************************************************************
+/* Function:
+    void BMNG_FUP_SetUpgradeOptionsRequest
+    (
+        uint8_t cmd,
+        uint8_t arqEn, 
+        BMNG_FUP_PAGE_SIZE pageSize, 
+        uint8_t multicastEn, 
+        uint32_t delayRestart, 
+        uint32_t safetyTimer
+    )
+
+  Summary:
+    Requests to set the upgrade options for a firmware upgrade process.
+
+  Description:
+    This routine requests to set the upgrade options for a firmware upgrade 
+    process.
+    
+  Precondition:
+    The firmware upgrade process must have been started before. 
+
+  Parameters:
+    cmd             - Command to acknowledge
+    arqEn           - Enable (1) or disable (0) ARQ protocol
+    pageSize        - Page size
+    multicastEn     - Enable (1) or disable (0) multicast
+    delayRestart    - Delay restart time in seconds
+    safetyTimer     - Safety timer in seconds
+
+  Returns:
+    None.
+
+  Example:
+    <code>
+    BMNG_FUP_SetUpgradeOptionsRequest(FUP_SET_UPG_OPTIONS_REQUEST, 0, 
+        BMNG_FUP_PAGE_SIZE_192, 1, 60, 200);
+    </code>
+
+  Remarks:
+    The command is acknowledged with the FUP ACK callback.
+*/
+void BMNG_FUP_SetUpgradeOptionsRequest(uint8_t cmd, uint8_t arqEn, 
+    BMNG_FUP_PAGE_SIZE pageSize, uint8_t multicastEn, uint32_t delayRestart, 
+    uint32_t safetyTimer);
+
+// *****************************************************************************
+/* Function:
+    void BMNG_FUP_InitFileTxRequest
+    (
+        uint8_t cmd,
+        uint16_t frameNumber, 
+        uint32_t fileSize, 
+        uint16_t frameSize, 
+        uint32_t crc
+    )
+
+  Summary:
+    Requests to initialize the file transmission for a firmware upgrade process.
+
+  Description:
+    This routine requests to initialize the file transmission for a firmware 
+    upgrade process.
+    
+  Precondition:
+    The firmware upgrade process must have been started before. 
+
+  Parameters:
+    cmd             - Command to acknowledge
+    frameNumber     - Frame number (0x0000)
+    fileSize        - File size
+    frameSize       - Frame size
+    crc             - File CRC-32
+
+  Returns:
+    None.
+
+  Example:
+    <code>
+    BMNG_FUP_InitFileTxRequest(FUP_INIT_FILE_TX_REQUEST, 0x0000, 0x4000, 0x200, 
+        0x34567421AABB0066);
+    </code>
+
+  Remarks:
+    The command is acknowledged with the FUP ACK callback.
+*/
+void BMNG_FUP_InitFileTxRequest(uint8_t cmd, uint16_t frameNumber, 
+    uint32_t fileSize, uint16_t frameSize, uint32_t crc);
+
+// *****************************************************************************
+/* Function:
+    void BMNG_FUP_DataFrameRequest
+    (
+        uint8_t cmd,
+        uint16_t frameNumber, 
+        uint16_t dataLen, 
+        uint8_t *data
+    )
+
+  Summary:
+    Requests to receive a data frame during the file transmission for a firmware 
+    upgrade process.
+
+  Description:
+    This routine requests to receive a data frame during the file transmission 
+    for a firmware upgrade process.
+    
+  Precondition:
+    The firmware upgrade process must have been started before. 
+
+  Parameters:
+    cmd             - Command to acknowledge
+    frameNumber     - Frame number
+    dataLen         - Data length
+    data            - Pointer to the data frame
+
+  Returns:
+    None.
+
+  Example:
+    <code>
+    uint8_t file[0x4000];
+    uint8_t frame[0x200];
+    memcpy(frame, &file[0x600], 0x200);
+    
+    BMNG_FUP_DataFrameRequest(FUP_DATA_FRAME_REQUEST, 0x600, 0x200, &frame);
+    </code>
+
+  Remarks:
+    The command is acknowledged with the FUP ACK callback.
+*/
+void BMNG_FUP_DataFrameRequest(uint8_t cmd, uint16_t frameNumber, 
+    uint16_t dataLen, uint8_t *data);
+
+// *****************************************************************************
+/* Function:
+    void BMNG_FUP_CheckCrcRequest
+    (
+        uint8_t cmd
+    )
+
+  Summary:
+    Requests to check the CRC of the transmitted file for a firmware upgrade 
+    process.
+
+  Description:
+    This routine requests to check the CRC of the transmitted file for a firmware 
+    upgrade process.
+    
+  Precondition:
+    The firmware upgrade process must have been started before. 
+
+  Parameters:
+    cmd             - Command to acknowledge
+
+  Returns:
+    None.
+
+  Example:
+    <code>
+    uint8_t file[0x4000];
+    uint8_t frame[0x200];
+    memcpy(frame, &file[0x600], 0x200);
+    
+    BMNG_FUP_CheckCrcRequest(FUP_CHECK_CRC_REQUEST);
+    </code>
+
+  Remarks:
+    The command is acknowledged with the FUP ACK callback.
+*/
+void BMNG_FUP_CheckCrcRequest(uint8_t cmd);
+
+// *****************************************************************************
+/* Function:
+    void BMNG_FUP_AbortFuRequest
+    (
+        uint8_t cmd,
+        uint8_t *eui48
+    )
+
+  Summary:
+    Requests to abort an ongoing firmware upgrade process.
+
+  Description:
+    This routine requests to abort an ongoing firmware upgrade process.
+    
+  Precondition:
+    The firmware upgrade process must have been started before. 
+
+  Parameters:
+    cmd     - Command to acknowledge
+    eui48   - Pointer to the address of the node to be aborted
+
+  Returns:
+    None.
+
+  Example:
+    <code>
+    uint8_t eui48[6];
+    memset(eui48, 0x12, 6);
+    
+    BMNG_FUP_AbortFuRequest(FUP_CLEAR_ADD_TARGET_REQUEST, eui48);
+    </code>
+
+  Remarks:
+    If the MAC address is FF:FF:FF:FF:FF:FF, the FU is aborted for all nodes.
+    The command is acknowledged with the FUP ACK callback.
+*/
+void BMNG_FUP_AbortFuRequest(uint8_t cmd, uint8_t *eui48);
+
+// *****************************************************************************
+/* Function:
+    void BMNG_FUP_SetMatchRuleRequest
+    (
+        uint8_t cmd,
+        uint8_t rules
+    )
+
+  Summary:
+    Requests to set the matching rules for a firmware upgrade process.
+
+  Description:
+    This routine requests to set the matching rules for a firmware upgrade process.
+    
+  Precondition:
+    The firmware upgrade process must have been started before. 
+
+  Parameters:
+    cmd     - Command to acknowledge
+    rules   - Match rules: 0000 0MV0
+
+  Returns:
+    None.
+
+  Example:
+    <code>
+    BMNG_FUP_SetMatchRuleRequest(FUP_SET_MACTH_RULE_REQUEST, 6);
+    </code>
+
+  Remarks:
+    If M and/or V are set, only the nodes matching model and/or vendor will be upgraded.
+    The command is acknowledged with the FUP ACK callback.
+*/
+void BMNG_FUP_SetMatchRuleRequest(uint8_t cmd, uint8_t rules);
+
+// *****************************************************************************
+/* Function:
+    void BMNG_FUP_SetSignatureDataRequest
+    (
+        uint8_t cmd,
+        uint8_t algorithm, 
+        uint16_t length
+    )
+
+  Summary:
+    Requests to set the signature data for a firmware upgrade process.
+
+  Description:
+    This routine requests to set the signature data for a firmware upgrade process.
+    
+  Precondition:
+    The firmware upgrade process must have been started before. 
+
+  Parameters:
+    cmd         - Command to acknowledge
+    algorithm   - Used algorithm to check signature
+    length      - Signature length in bytes
+
+  Returns:
+    None.
+
+  Example:
+    <code>
+    BMNG_FUP_SetSignatureDataRequest(FUP_SET_SIGNATURE_DATA_REQUEST, 2, 12);
+    </code>
+
+  Remarks:
+    The command is acknowledged with the FUP ACK callback.
+*/
+void BMNG_FUP_SetSignatureDataRequest(uint8_t cmd, uint8_t algorithm, 
+    uint16_t length);
+
+// *****************************************************************************
+/* Function:
+    void BMNG_FUP_GetVersionRequest
+    (
+        uint8_t cmd,
+        uint8_t *eui48
+    )
+
+  Summary:
+    Requests to get the firmware version.
+
+  Description:
+    This routine requests to get the firmware version.
+    
+  Precondition:
+    None. 
+
+  Parameters:
+    cmd     - Command to acknowledge
+    eui48   - Pointer to the address of the node to be asked
+
+  Returns:
+    None.
+
+  Example:
+    <code>
+    uint8_t eui48[6];
+    memset(eui48, 0x12, 6);
+    
+    BMNG_FUP_GetVersionRequest(FUP_GET_VERSION_REQUEST, eui48);
+    </code>
+
+  Remarks:
+    If the MAC address is FF:FF:FF:FF:FF:FF, the version information is asked to 
+    all registered nodes.
+    The command is acknowledged with the FUP ACK callback.
+    The result of the request is returned in the FUP version indication callback.
+*/
+void BMNG_FUP_GetVersionRequest(uint8_t cmd, uint8_t *eui48);
+
+// *****************************************************************************
+/* Function:
+    void BMNG_FUP_GetStateRequest
+    (
+        uint8_t cmd,
+        uint8_t *eui48
+    )
+
+  Summary:
+    Requests to get the firmware upgrade state.
+
+  Description:
+    This routine requests to get the firmware upgrade state.
+    
+  Precondition:
+    None. 
+
+  Parameters:
+    cmd     - Command to acknowledge
+    eui48   - Pointer to the address of the node to be asked
+
+  Returns:
+    None.
+
+  Example:
+    <code>
+    uint8_t eui48[6];
+    memset(eui48, 0x12, 6);
+    
+    BMNG_FUP_GetStateRequest(FUP_GET_STATE_REQUEST, eui48);
+    </code>
+
+  Remarks:
+    If the MAC address is FF:FF:FF:FF:FF:FF, the state information is asked to 
+    all registered nodes.
+    The command is acknowledged with the FUP ACK callback.
+    The result of the request is returned in the FUP state indication callback.
+*/
+void BMNG_FUP_GetStateRequest(uint8_t cmd, uint8_t *eui48);
+
+// *****************************************************************************
+/* Function:
+    void BMNG_PPROF_GetRequest
+    (
+        uint8_t cmd,
+        uint8_t *eui48,
+        uint16_t dataLen, 
+        uint8_t *data
+    )
+
+  Summary:
+    Requests to get a PIB attribute from a node using the PRIME Profile.
+
+  Description:
+    This routine requests to get a PIB attribute from a node using the PRIME 
+    Profile.
+    
+  Precondition:
+    None. 
+
+  Parameters:
+    cmd     - Command to acknowledge
+    eui48   - Pointer to the address of the node to be asked
+    dataLen - Data length
+    data    - Pointer to the data
+
+  Returns:
+    None.
+
+  Example:
+    <code>
+    uint8_t data[3] = {0x00, 0x20, 0};
+    uint8_t eui48[6];
+    memset(eui48, 0x12, 6);
+    
+    BMNG_PPROF_GetRequest(PPROF_GET_REQUEST, eui48, sizeof(data), &data);
+    </code>
+
+  Remarks:
+    The command is acknowledged with the PPROF ACK callback.
+    The result of the request is returned in the PPROF response indication 
+    callback.
+*/
+void BMNG_PPROF_GetRequest(uint8_t cmd, uint8_t *eui48, uint16_t dataLen, 
+    uint8_t *data);
+
+// *****************************************************************************
+/* Function:
+    void BMNG_PPROF_SetRequest
+    (
+        uint8_t cmd,
+        uint8_t *eui48,
+        uint16_t dataLen, 
+        uint8_t *data
+    )
+
+  Summary:
+    Requests to set a PIB attribute in a node using the PRIME Profile.
+
+  Description:
+    This routine requests to set a PIB attribute in a node using the PRIME 
+    Profile.
+    
+  Precondition:
+    None. 
+
+  Parameters:
+    cmd     - Command to acknowledge
+    eui48   - Pointer to the address of the node to be asked
+    dataLen - Data length
+    data    - Pointer to the data
+
+  Returns:
+    None.
+
+  Example:
+    <code>
+    uint8_t data[3] = {0x00, 0x1A, 25};
+    uint8_t eui48[6];
+    memset(eui48, 0x12, 6);
+    
+    BMNG_PPROF_SetRequest(PPROF_SET_REQUEST, eui48, sizeof(data), &data);
+    </code>
+
+  Remarks:
+    The command is acknowledged with the PPROF ACK callback.
+*/
+void BMNG_PPROF_SetRequest(uint8_t cmd, uint8_t *eui48, uint16_t dataLen, 
+    uint8_t *data);
+
+// *****************************************************************************
+/* Function:
+    void BMNG_PPROF_ResetRequest
+    (
+        uint8_t cmd,
+        uint8_t *eui48
+    )
+
+  Summary:
+    Requests to reset all PIB statistics attributes of a node using the PRIME 
+    Profile.
+
+  Description:
+    This routine requests to reset all PIB statistics attributes of a node 
+    using the PRIME Profile.
+    
+  Precondition:
+    None. 
+
+  Parameters:
+    cmd     - Command to acknowledge
+    eui48   - Pointer to the address of the node to be reset
+
+  Returns:
+    None.
+
+  Example:
+    <code>
+    uint8_t eui48[6];
+    memset(eui48, 0x12, 6);
+    
+    BMNG_PPROF_ResetRequest(PPROF_RESET_REQUEST, eui48);
+    </code>
+
+  Remarks:
+    The command is acknowledged with the PPROF ACK callback.
+*/
+void BMNG_PPROF_ResetRequest(uint8_t cmd, uint8_t *eui48);
+
+// *****************************************************************************
+/* Function:
+    void BMNG_PPROF_RebootRequest
+    (
+        uint8_t cmd,
+        uint8_t *eui48
+    )
+
+  Summary:
+    Requests to reboot a node using the PRIME Profile.
+
+  Description:
+    This routine requests to reboot a node using the PRIME Profile.
+    
+  Precondition:
+    None. 
+
+  Parameters:
+    cmd     - Command to acknowledge
+    eui48   - Pointer to the address of the node to be rebooted
+
+  Returns:
+    None.
+
+  Example:
+    <code>
+    uint8_t eui48[6];
+    memset(eui48, 0x12, 6);
+    
+    BMNG_PPROF_RebootRequest(PPROF_REBOOT_REQUEST, eui48);
+    </code>
+
+  Remarks:
+    The command is acknowledged with the PPROF ACK callback.
+*/
+void BMNG_PPROF_RebootRequest(uint8_t cmd, uint8_t *eui48);
+
+// *****************************************************************************
+/* Function:
+    void BMNG_PPROF_GetEnhancedRequest
+    (
+        uint8_t cmd,
+        uint8_t *eui48,
+        uint16_t dataLen, 
+        uint8_t *data
+    )
+
+  Summary:
+    Requests to get a PIB attribute from a node using the PRIME Profile.
+
+  Description:
+    This routine requests to get a PIB attribute from a node using the PRIME 
+    Profile.
+    
+  Precondition:
+    None. 
+
+  Parameters:
+    cmd     - Command to acknowledge
+    eui48   - Pointer to the address of the node to be asked
+    dataLen - Data length
+    data    - Pointer to the data
+
+  Returns:
+    None.
+
+  Example:
+    <code>
+    uint8_t data[3] = {0x00, 0x20, 0};
+    uint8_t eui48[6];
+    memset(eui48, 0x12, 6);
+    
+    BMNG_PPROF_GetEnhancedRequest(PPROF_GET_ENHANCED_REQUEST, eui48, sizeof(data), 
+        &data);
+    </code>
+
+  Remarks:
+    The command is acknowledged with the PPROF ACK callback.
+    The result of the request is returned in the PPROF enhanced response
+    indication callback.
+*/
+void BMNG_PPROF_GetEnhancedRequest(uint8_t cmd, uint8_t *eui48, uint16_t dataLen, 
+    uint8_t *data);
+
+// *****************************************************************************
+/* Function:
+    void BMNG_PPROF_GetZcDiffRequest
+    (
+        uint8_t cmd,
+        uint8_t *eui48
+    )
+
+  Summary:
+    Requests to get the zero cross difference between BN and SN using the PRIME 
+    Profile.
+
+  Description:
+    This routine requests to get the zero cross difference between BN and SN using 
+    the PRIME Profile.
+    
+  Precondition:
+    None. 
+
+  Parameters:
+    cmd     - Command to acknowledge
+    eui48   - Pointer to the address of the node to be asked
+
+  Returns:
+    None.
+
+  Example:
+    <code>
+    uint8_t data[3] = {0x00, 0x20, 0};
+    uint8_t eui48[6];
+    memset(eui48, 0x12, 6);
+    
+    BMNG_PPROF_GetZcDiffRequest(PPROF_GET_ZC_DIFF_REQUEST, eui48);
+    </code>
+
+  Remarks:
+    The command is acknowledged with the PPROF ACK callback.
+    The result of the request is returned in the PPROF zero cross difference 
+    response indication callback.
+*/
+void BMNG_PPROF_GetZcDiffRequest(uint8_t cmd, uint8_t *eui48);
+
+// *****************************************************************************
+/* Function:
+    void BMNG_WHITELIST_AddRequest
+    (
+        uint8_t cmd,
+        uint8_t *eui48
+    )
+
+  Summary:
+    Requests to add a node in the Whitelist.
+
+  Description:
+    This routine requests to add a node in the Whitelist.
+    
+  Precondition:
+    None. 
+
+  Parameters:
+    cmd     - Command to acknowledge
+    eui48   - Pointer to the address of the node to be added
+
+  Returns:
+    None.
+
+  Example:
+    <code>
+    uint8_t data[3] = {0x00, 0x20, 0};
+    uint8_t eui48[6];
+    memset(eui48, 0x12, 6);
+    
+    BMNG_WHITELIST_AddRequest(PPROF_GET_ZC_DIFF_REQUEST, eui48);
+    </code>
+
+  Remarks:
+    The command is acknowledged with the Whitelist ACK callback.
+*/
+void BMNG_WHITELIST_AddRequest(uint8_t cmd, uint8_t *eui48);
+
+// *****************************************************************************
+/* Function:
+    void BMNG_WHITELIST_RemoveRequest
+    (
+        uint8_t cmd,
+        uint8_t *eui48
+    )
+
+  Summary:
+    Requests to remove a node from the Whitelist.
+
+  Description:
+    This routine requests to remove a node from the Whitelist.
+    
+  Precondition:
+    None. 
+
+  Parameters:
+    cmd     - Command to acknowledge
+    eui48   - Pointer to the address of the node to be removed
+
+  Returns:
+    None.
+
+  Example:
+    <code>
+    uint8_t data[3] = {0x00, 0x20, 0};
+    uint8_t eui48[6];
+    memset(eui48, 0x12, 6);
+    
+    BMNG_WHITELIST_RemoveRequest(PPROF_GET_ZC_DIFF_REQUEST, eui48);
+    </code>
+
+  Remarks:
+    The command is acknowledged with the Whitelist ACK callback.
+*/
+void BMNG_WHITELIST_RemoveRequest(uint8_t cmd, uint8_t *eui48);
+
+//DOM-IGNORE-BEGIN
 #ifdef __cplusplus
 }
 #endif
-/**INDENT-ON**/
-/* @endcond */
+//DOM-IGNORE-END
+
 #endif /* BMNG_API_H_ */
+
+/*******************************************************************************
+ End of File
+*/

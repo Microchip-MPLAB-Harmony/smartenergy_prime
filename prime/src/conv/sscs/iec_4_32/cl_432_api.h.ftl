@@ -1,85 +1,246 @@
-/**
- * \file
- *
- * \brief CL_432_API: CONV 432 layer
- *
- * Copyright (c) 2015 Atmel Corporation. All rights reserved.
- *
- * \asf_license_start
- *
- * \page License
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- * 1. Redistributions of source code must retain the above copyright notice,
- *    this list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright notice,
- *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution.
- *
- * 3. The name of Atmel may not be used to endorse or promote products derived
- *    from this software without specific prior written permission.
- *
- * 4. This software may only be redistributed and used in connection with an
- *    Atmel microcontroller product.
- *
- * THIS SOFTWARE IS PROVIDED BY ATMEL "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT ARE
- * EXPRESSLY AND SPECIFICALLY DISCLAIMED. IN NO EVENT SHALL ATMEL BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
- * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
- * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- * \asf_license_stop
- *
- */
+/*******************************************************************************
+  PRIME 4.32 Convergence Sublayer API Header
+
+  Company:
+    Microchip Technology Inc.
+
+  File Name:
+    cl_432_api.h
+
+  Summary:
+    PRIME 4-32 Convergence Sublayer API Header File
+
+  Description:
+    This file contains definitions of the PRIME 4-32 Convergence Sublayer
+    primitives to be used by the PRIME application.
+*******************************************************************************/
+
+//DOM-IGNORE-BEGIN
+/*******************************************************************************
+* Copyright (C) 2024 Microchip Technology Inc. and its subsidiaries.
+*
+* Subject to your compliance with these terms, you may use Microchip software
+* and any derivatives exclusively with Microchip products. It is your
+* responsibility to comply with third party license terms applicable to your
+* use of third party software (including open source software) that may
+* accompany Microchip software.
+*
+* THIS SOFTWARE IS SUPPLIED BY MICROCHIP "AS IS". NO WARRANTIES, WHETHER
+* EXPRESS, IMPLIED OR STATUTORY, APPLY TO THIS SOFTWARE, INCLUDING ANY IMPLIED
+* WARRANTIES OF NON-INFRINGEMENT, MERCHANTABILITY, AND FITNESS FOR A
+* PARTICULAR PURPOSE.
+*
+* IN NO EVENT WILL MICROCHIP BE LIABLE FOR ANY INDIRECT, SPECIAL, PUNITIVE,
+* INCIDENTAL OR CONSEQUENTIAL LOSS, DAMAGE, COST OR EXPENSE OF ANY KIND
+* WHATSOEVER RELATED TO THE SOFTWARE, HOWEVER CAUSED, EVEN IF MICROCHIP HAS
+* BEEN ADVISED OF THE POSSIBILITY OR THE DAMAGES ARE FORESEEABLE. TO THE
+* FULLEST EXTENT ALLOWED BY LAW, MICROCHIP'S TOTAL LIABILITY ON ALL CLAIMS IN
+* ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF ANY,
+* THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
+*******************************************************************************/
+//DOM-IGNORE-END
 
 #ifndef CL_432_API_H_INCLUDE
 #define CL_432_API_H_INCLUDE
 
+// *****************************************************************************
+// *****************************************************************************
+// Section: File includes
+// *****************************************************************************
+// *****************************************************************************
+
 #include <stdint.h>
 #include "cl_432_defs.h"
 
-/* @cond 0 */
-/**INDENT-OFF**/
-#ifdef __cplusplus
-extern "C" {
+// DOM-IGNORE-BEGIN
+#ifdef __cplusplus  // Provide C++ Compatibility
+
+    extern "C" {
+
 #endif
-/**INDENT-ON**/
-/* @endcond */
+// DOM-IGNORE-END
 
-/**
- * \weakgroup prime_sscs_432_group
- * @{
- */
+// *****************************************************************************
+// *****************************************************************************
+// Section: PRIME 4-32 Convergence Sublayer Interface Primitives
+// *****************************************************************************
+// *****************************************************************************
 
-/** \brief DL432 interface */
-/* @{ */
-void cl_432_set_callbacks(cl_432_callbacks_t *px_cl_432_cbs);
-void cl_432_release_request(uint16_t us_dst_address);
-void cl_432_dl_data_request(uint8_t uc_dst_lsap, uint8_t uc_src_lsap, uint16_t us_dst_address, dl_432_buffer_t *px_buff, uint16_t us_lsdu_len,
-		uint8_t uc_link_class);
+// ****************************************************************************
+/* Function:
+    void CL_432_SetCallbacks(CL_432_CALLBACKS *cl432cbs)
+
+  Summary:
+    Sets 4-32 Convergence layer callback functions. 
+
+  Description:
+    This routine links callback functions between upper layer and the CL-432 
+    Convergence layer.
+
+  Precondition:
+    The CL_432_Initialize function should have been called before calling this 
+    function.
+
+  Parameters:
+    cl432cbs         Callbacks structure
+
+  Returns:
+    None
+
+  Example:
+    <code>
+    static void _dl_data_ind((uint8_t dstLsap, uint8_t srcLsap, uint16_t dstAddress, 
+        uint16_t srcAddress, uint8_t *data, uint16_t lsduLen, uint8_t link_Class)
+    {
+        ...
+    }
+    
+    void main(void) 
+    {
+        CL_432_CALLBACKS cl432cbs;
+    
+        CL_432_Initialize();
+    
+        memset(cl432cbs, NULL, sizeof(cl432cbs));
+        cl432cbs.cl_432_dl_data_ind = _dl_data_ind;
+
+        CL_432_SetCallbacks(&cl432cbs);
+    }
+    </code>
+
+  Remarks:
+    None
+*/
+void CL_432_SetCallbacks(CL_432_CALLBACKS *cl432cbs);
+
+// *****************************************************************************
+/* Function:
+    void CL_432_ReleaseRequest
+    (
+        uint16_t dstAddress
+    )
+
+  Summary:
+    Request to release a CL-432 connection.
+
+  Description:
+    This routine is used to request a CL-432 connection release.
+    
+  Precondition:
+    The CL_432_Initialize routine must have been called before.
+
+  Parameters:
+    dstAddress  - Address to disconnect
+
+  Returns:
+    None.
+
+  Example:
+    <code>
+	CL_432_ReleaseRequest(300);
+    </code>
+
+  Remarks:
+    The result of the request is returned in the confirm callback.
+*/
+void CL_432_ReleaseRequest(uint16_t dstAddress);
+
+// *****************************************************************************
+/* Function:
+    void CL_432_DlDataRequest
+    (
+        uint8_t dstLsap, 
+        uint8_t srcLsap, 
+        uint16_t dstAddress, 
+        DL_432_BUFFER *buff, 
+        uint16_t lsduLen, 
+        uint8_t linkClass
+    )
+
+  Summary:
+    Request the transmission of data over a CL-432 connection.
+
+  Description:
+    This routine is used to request the transmission of data over a CL-432 connection.
+    
+  Precondition:
+    The CL_432_Initialize routine must have been called before.
+
+  Parameters:
+    dstLsap     - Destination LSAP
+    srcLsap     - Source LSAP
+    dstAddress  - Destination 4-32 address
+    buff        - Pointer to the data buffer
+    lsduLen     - Length of the data
+    linkClass   - Link class (not used)
+
+  Returns:
+    None.
+
+  Example:
+    <code>    
+    uint16_t msgLen = 20;
+    DL_432_BUFFER msg[msgLen] = {0};
+    
+    CL_432_DlDataRequest(2, 0, 300, msg, msgLen, 0);
+    </code>
+
+  Remarks:
+    The result of the request is returned in the confirm callback.
+*/
+void CL_432_DlDataRequest(uint8_t dstLsap, uint8_t srcLsap, uint16_t dstAddress, 
+    DL_432_BUFFER *buff, uint16_t lsduLen, uint8_t linkClass);
 
 <#if (PRIME_MODE == "SN") || (PRIME_MODE == "BN" && BN_SLAVE_EN == true)>
-void cl_432_establish_request(uint8_t *puc_device_id, uint8_t uc_device_id_len, uint8_t uc_ae);
+// *****************************************************************************
+/* Function:
+    void CL_432_EstablishRequest
+    (
+        uint8_t *deviceId, 
+        uint8_t deviceIdLen, 
+        uint8_t ae
+    )
+
+  Summary:
+    Request a CL-432 connection establishment.
+
+  Description:
+    This routine is used to request a CL-432 connection establishment.
+    
+  Precondition:
+    The CL_432_Initialize routine must have been called before.
+
+  Parameters:
+    deviceId        - Pointer to the device identifier data
+    deviceIdLen     - Length of the device identifier
+    ae              -  Flag to indicate that authentication and encryption is 
+                    requested (v1.4)
+
+  Returns:
+    None.
+
+  Example:
+    <code>    
+    uint8_t eui48[6];
+    memset(eui48, 0x12, 6);
+    
+    CL_432_EstablishRequest(eui48, 6, 0);
+    </code>
+
+  Remarks:
+    The result of the request is returned in the confirm callback.
+*/
+void CL_432_EstablishRequest(uint8_t *deviceId, uint8_t deviceIdLen, uint8_t ae);
 </#if>
 
-/* @} */
-
-/* @} */
-
-/* / @cond 0 */
-/**INDENT-OFF**/
+//DOM-IGNORE-BEGIN
 #ifdef __cplusplus
 }
 #endif
-/**INDENT-ON**/
-/* / @endcond */
-#endif
+//DOM-IGNORE-END
+
+#endif /* CL_432_API_H_INCLUDE */
+
+/*******************************************************************************
+ End of File
+*/

@@ -1,87 +1,155 @@
-/**
- * \file
- *
- * \brief MAC: PRIME MAC control interface
- *
- * Copyright (c) 2023 Atmel Corporation. All rights reserved.
- *
- * \asf_license_start
- *
- * \page License
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- * 1. Redistributions of source code must retain the above copyright notice,
- *    this list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright notice,
- *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution.
- *
- * 3. The name of Atmel may not be used to endorse or promote products derived
- *    from this software without specific prior written permission.
- *
- * 4. This software may only be redistributed and used in connection with an
- *    Atmel microcontroller product.
- *
- * THIS SOFTWARE IS PROVIDED BY ATMEL "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT ARE
- * EXPRESSLY AND SPECIFICALLY DISCLAIMED. IN NO EVENT SHALL ATMEL BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
- * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
- * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- * \asf_license_stop
- *
- */
+/*******************************************************************************
+  PRIME MAC Control Interface Header
+
+  Company:
+    Microchip Technology Inc.
+
+  File Name:
+    mac.h
+
+  Summary:
+    PRIME MAC Control Interface Header File
+
+  Description:
+    This file contains definitions of the PRIME MAC control functions to be used 
+    by the PRIME stack when managing the PRIME MAC layer.
+*******************************************************************************/
+
+//DOM-IGNORE-BEGIN
+/*******************************************************************************
+* Copyright (C) 2024 Microchip Technology Inc. and its subsidiaries.
+*
+* Subject to your compliance with these terms, you may use Microchip software
+* and any derivatives exclusively with Microchip products. It is your
+* responsibility to comply with third party license terms applicable to your
+* use of third party software (including open source software) that may
+* accompany Microchip software.
+*
+* THIS SOFTWARE IS SUPPLIED BY MICROCHIP "AS IS". NO WARRANTIES, WHETHER
+* EXPRESS, IMPLIED OR STATUTORY, APPLY TO THIS SOFTWARE, INCLUDING ANY IMPLIED
+* WARRANTIES OF NON-INFRINGEMENT, MERCHANTABILITY, AND FITNESS FOR A
+* PARTICULAR PURPOSE.
+*
+* IN NO EVENT WILL MICROCHIP BE LIABLE FOR ANY INDIRECT, SPECIAL, PUNITIVE,
+* INCIDENTAL OR CONSEQUENTIAL LOSS, DAMAGE, COST OR EXPENSE OF ANY KIND
+* WHATSOEVER RELATED TO THE SOFTWARE, HOWEVER CAUSED, EVEN IF MICROCHIP HAS
+* BEEN ADVISED OF THE POSSIBILITY OR THE DAMAGES ARE FORESEEABLE. TO THE
+* FULLEST EXTENT ALLOWED BY LAW, MICROCHIP'S TOTAL LIABILITY ON ALL CLAIMS IN
+* ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF ANY,
+* THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
+*******************************************************************************/
+//DOM-IGNORE-END
 
 #ifndef MAC_H_INCLUDE
 #define MAC_H_INCLUDE
 
-/* System includes */
+// *****************************************************************************
+// *****************************************************************************
+// Section: File includes
+// *****************************************************************************
+// *****************************************************************************
+
 #include <stdint.h>
 #include <stdlib.h>
-#include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
-
-/* MAC includes */
 #include "mac_defs.h"
 
-/* @cond 0 */
-/**INDENT-OFF**/
-#ifdef __cplusplus
-extern "C" {
+// DOM-IGNORE-BEGIN
+#ifdef __cplusplus  // Provide C++ Compatibility
+
+    extern "C" {
+
 #endif
-/**INDENT-ON**/
-/* @endcond */
+// DOM-IGNORE-END
 
-/**
- * \weakgroup prime_mac_group
- * @{
- */
+// *****************************************************************************
+// *****************************************************************************
+// Section: PRIME MAC Control Interface Routines
+// *****************************************************************************
+// *****************************************************************************
 
-/** \brief MAC control interface */
-/* @{ */
+// *****************************************************************************
+/* Function:
+    void MAC_Initialize(MAC_VERSION_INFO *macInfo, uint8_t secProfile)
 
-void mac_init(mac_version_info_t *px_mac_info, uint8_t uc_sec_profile);
-void mac_process(void);
+  Summary:
+    Initializes the PRIME MAC layer.
 
-/* @} */
+  Description:
+    This routine initializes the PRIME MAC layer.
 
-/* @} */
+  Precondition:
+    None.
 
-/* @cond 0 */
-/**INDENT-OFF**/
+  Parameters:
+    macInfo     - Pointer to the MAC version information
+    secProfile  - Security profile (0-2)
+
+  Returns:
+    None.
+
+  Example:
+    <code>
+    MAC_VERSION_INFO macInfo;
+    
+    macInfo.fwVersion = "HS14.01.01\0\0\0\0\0\0";
+    macInfo.fwModel = "PIC32CXXPL460";
+    macInfo.fwVendor = "MCHP";
+    macInfo.pibVendor = 0;
+    macInfo.pibModel = 0x3941;
+    
+    MAC_Initialize(&macInfo, 0);
+    </code>
+
+  Remarks:
+    This routine is normally not called directly by an application. It is 
+    called by the PRIME stack initalization routine.
+*/
+void MAC_Initialize(MAC_VERSION_INFO *macInfo, uint8_t secProfile);
+
+// ****************************************************************************
+/* Function:
+    void MAC_Tasks(void)
+
+  Summary:
+    Maintains the MAC layer state machine. 
+
+  Description:
+    This function is used to maintain the MAC layer internal state machine and 
+    generate callbacks.
+
+  Precondition:
+    The MAC_Initialize function should have been called before calling this 
+    function.
+
+  Parameters:
+    None
+
+  Returns:
+    None
+
+  Example:
+    <code>
+    while (true)
+    {
+        MAC_Tasks();
+    }
+    </code>
+
+  Remarks:
+    This function must be periodically called by the user application.
+*/
+void MAC_Tasks(void);
+
+//DOM-IGNORE-BEGIN
 #ifdef __cplusplus
 }
 #endif
-/**INDENT-ON**/
-/* @endcond */
+//DOM-IGNORE-END
+
 #endif /* MAC_H_INCLUDE */
+
+/*******************************************************************************
+ End of File
+*/

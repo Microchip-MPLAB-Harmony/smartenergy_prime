@@ -1,128 +1,179 @@
-/**
- * \file
- *
- * \brief BMNG_DEFS: Base Management Definitions header file
- *
- * Copyright (c) 2021 Atmel Corporation. All rights reserved.
- *
- * \asf_license_start
- *
- * \page License
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- * 1. Redistributions of source code must retain the above copyright notice,
- *    this list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright notice,
- *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution.
- *
- * 3. The name of Atmel may not be used to endorse or promote products derived
- *    from this software without specific prior written permission.
- *
- * 4. This software may only be redistributed and used in connection with an
- *    Atmel microcontroller product.
- *
- * THIS SOFTWARE IS PROVIDED BY ATMEL "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT ARE
- * EXPRESSLY AND SPECIFICALLY DISCLAIMED. IN NO EVENT SHALL ATMEL BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
- * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
- * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- * \asf_license_stop
- *
- */
+/*******************************************************************************
+  PRIME Base Management Definitions Header
+
+  Company:
+    Microchip Technology Inc.
+
+  File Name:
+    bmng_defs.h
+
+  Summary:
+    PRIME MAC Definitions Header File
+
+  Description:
+    This file contains definitions of the PRIME Base Management primitives to be 
+    used by the PRIME application in the Base Node.
+*******************************************************************************/
+
+//DOM-IGNORE-BEGIN
+/*******************************************************************************
+* Copyright (C) 2024 Microchip Technology Inc. and its subsidiaries.
+*
+* Subject to your compliance with these terms, you may use Microchip software
+* and any derivatives exclusively with Microchip products. It is your
+* responsibility to comply with third party license terms applicable to your
+* use of third party software (including open source software) that may
+* accompany Microchip software.
+*
+* THIS SOFTWARE IS SUPPLIED BY MICROCHIP "AS IS". NO WARRANTIES, WHETHER
+* EXPRESS, IMPLIED OR STATUTORY, APPLY TO THIS SOFTWARE, INCLUDING ANY IMPLIED
+* WARRANTIES OF NON-INFRINGEMENT, MERCHANTABILITY, AND FITNESS FOR A
+* PARTICULAR PURPOSE.
+*
+* IN NO EVENT WILL MICROCHIP BE LIABLE FOR ANY INDIRECT, SPECIAL, PUNITIVE,
+* INCIDENTAL OR CONSEQUENTIAL LOSS, DAMAGE, COST OR EXPENSE OF ANY KIND
+* WHATSOEVER RELATED TO THE SOFTWARE, HOWEVER CAUSED, EVEN IF MICROCHIP HAS
+* BEEN ADVISED OF THE POSSIBILITY OR THE DAMAGES ARE FORESEEABLE. TO THE
+* FULLEST EXTENT ALLOWED BY LAW, MICROCHIP'S TOTAL LIABILITY ON ALL CLAIMS IN
+* ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF ANY,
+* THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
+*******************************************************************************/
+//DOM-IGNORE-END
 
 #ifndef BMNG_DEFS_H_
 #define BMNG_DEFS_H_
 
-/* @cond 0 */
-/**INDENT-OFF**/
-#ifdef __cplusplus
-extern "C" {
+// DOM-IGNORE-BEGIN
+#ifdef __cplusplus  // Provide C++ Compatibility
+
+    extern "C" {
+
 #endif
-/**INDENT-ON**/
-/* @endcond */
+// DOM-IGNORE-END
 
-/**
- * \ingroup prime_ng_group
- * \defgroup prime_mngp_group PRIME Base Management
- *
- * This module provides configuration and utils for the Base
- * Management in PRIME.
- *
- * @{
- */
+// *****************************************************************************
+// *****************************************************************************
+// Section: Data Types
+// *****************************************************************************
+// *****************************************************************************
 
-/** Page size for FU */
+// *****************************************************************************
+/* Page sizes for Firmware Upgrade Protocol
+
+ Summary:
+    Defines the page sizes for Firmware Upgrade Protocol.
+
+ Description:
+    This enumeration defines the page sizes used in the Firmware Upgrade Protocol.
+
+ Remarks:
+    None.
+*/
 typedef enum {
-	PAGE_SIZE_AUTO = 0,
-	PAGE_SIZE_32,
-	PAGE_SIZE_64,
-	PAGE_SIZE_128,
-	PAGE_SIZE_192
-} fup_page_size_t;
+	BMNG_FUP_PAGE_SIZE_AUTO = 0,
+	BMNG_FUP_PAGE_SIZE_32,
+	BMNG_FUP_PAGE_SIZE_64,
+	BMNG_FUP_PAGE_SIZE_128,
+	BMNG_FUP_PAGE_SIZE_192
+} BMNG_FUP_PAGE_SIZE;
 
-/** FUP ACK codes  */
+// *****************************************************************************
+/* Acknowledgement codes for Firmware Upgrade Protocol
+
+ Summary:
+    Defines the acknowledgement codes for Firmware Upgrade Protocol.
+
+ Description:
+    This enumeration defines the acknowledgement codes used in the Firmware 
+    Upgrade Protocol.
+
+ Remarks:
+    None.
+*/
 typedef enum {
-	FUP_ACK_OK = 0,
-	FUP_ACK_ERROR,
-	FUP_ACK_ERROR_MAC,
-	FUP_ACK_ERROR_MODEL,
-	FUP_ACK_ERROR_CRC,
-	FUP_ACK_ERROR_DATA,
-	FUP_ACK_ERROR_CRC_FILE,
-	FUP_ACK_CRC_ONGOING,
-	FUP_ACK_FU_ONGOING
-} fup_ack_code_t;
+	BMNG_FUP_ACK_OK = 0,
+	BMNG_FUP_ACK_ERROR,
+	BMNG_FUP_ACK_ERROR_MAC,
+	BMNG_FUP_ACK_ERROR_MODEL,
+	BMNG_FUP_ACK_ERROR_CRC,
+	BMNG_FUP_ACK_ERROR_DATA,
+	BMNG_FUP_ACK_ERROR_CRC_FILE,
+	BMNG_FUP_ACK_CRC_ONGOING,
+	BMNG_FUP_ACK_FU_ONGOING
+} BMNG_FUP_ACK;
 
-/** FUP error codes  */
+// *****************************************************************************
+/* Error codes for Firmware Upgrade Protocol
+
+ Summary:
+    Defines the error codes for Firmware Upgrade Protocol.
+
+ Description:
+    This enumeration defines the error codes used in the Firmware Upgrade 
+    Protocol.
+
+ Remarks:
+    None.
+*/
 typedef enum {
-	FUP_ERROR_NODE_NO_ERROR = 0,
-	FUP_ERROR_NODE_WRONGSTATE_EXEC,
-	FUP_ERROR_NODE_WRONGSTATE_UPG,
-	FUP_ERROR_NODE_WRONGSTATE,
-	FUP_ERROR_NODE_WRONGSTATE_RCV,
-	FUP_ERROR_NODE_WRONGSTATE_CNTDWN,
-	FUP_ERROR_NODE_FW_NOTMATCH,
-	FUP_ERROR_NODE_REVERT_ERRORINIT,
-	FUP_ERROR_NODE_REVERT_ERR7,
-	FUP_ERROR_NODE_RETRY_KILL,
-	FUP_ERROR_NODE_UNICAST_TIMEOUT,
-	FUP_ERROR_NODE_CONFIRM_IND,
-	FUP_ERROR_NODE_REVERT_CRCNOK,
-	FUP_ERROR_NODE_RESTART,
-	FUP_ERROR_NODE_WRONG_MISS_BITMAP,
-	FUP_ERROR_NODE_WRONG_MISS_LIST,
-	FUP_ERROR_NODE_VENDOR_INVALID,
-	FUP_ERROR_NODE_MODEL_NOTMATCH,
-	FUP_WARNING_NODE_ALREADY_UPDATED,
-	FUP_WARNING_NODE_ALREADY_EXECUTED,
-	FUP_WARNING_NODE_LINK_QUALITY
-} fup_error_code_t;
+	BMNG_FUP_ERROR_NODE_NO_ERROR = 0,
+	BMNG_FUP_ERROR_NODE_WRONGSTATE_EXEC,
+	BMNG_FUP_ERROR_NODE_WRONGSTATE_UPG,
+	BMNG_FUP_ERROR_NODE_WRONGSTATE,
+	BMNG_FUP_ERROR_NODE_WRONGSTATE_RCV,
+	BMNG_FUP_ERROR_NODE_WRONGSTATE_CNTDWN,
+	BMNG_FUP_ERROR_NODE_FW_NOTMATCH,
+	BMNG_FUP_ERROR_NODE_REVERT_ERRORINIT,
+	BMNG_FUP_ERROR_NODE_REVERT_ERR7,
+	BMNG_FUP_ERROR_NODE_RETRY_KILL,
+	BMNG_FUP_ERROR_NODE_UNICAST_TIMEOUT,
+	BMNG_FUP_ERROR_NODE_CONFIRM_IND,
+	BMNG_FUP_ERROR_NODE_REVERT_CRCNOK,
+	BMNG_FUP_ERROR_NODE_RESTART,
+	BMNG_FUP_ERROR_NODE_WRONG_MISS_BITMAP,
+	BMNG_FUP_ERROR_NODE_WRONG_MISS_LIST,
+	BMNG_FUP_ERROR_NODE_VENDOR_INVALID,
+	BMNG_FUP_ERROR_NODE_MODEL_NOTMATCH,
+	BMNG_FUP_WARNING_NODE_ALREADY_UPDATED,
+	BMNG_FUP_WARNING_NODE_ALREADY_EXECUTED,
+	BMNG_FUP_WARNING_NODE_LINK_QUALITY
+} BMNG_FUP_ERROR;
 
-#define FUP_STATE_ENDED_NOTIFICATION 0x80
+// *****************************************************************************
+/* Node states for Firmware Upgrade Protocol
 
-/** Valid node upgrade state */
+ Summary:
+    Defines the node states for Firmware Upgrade Protocol.
+
+ Description:
+    This enumeration defines the node states used in the Firmware Upgrade 
+    Protocol.
+
+ Remarks:
+    None.
+*/
 typedef enum {
-	FUP_NODE_STATE_IDLE        = 0,
-	FUP_NODE_STATE_RECEIVING   = 1,
-	FUP_NODE_STATE_COMPLETE    = 2,
-	FUP_NODE_STATE_COUNTDOWN   = 3,
-	FUP_NODE_STATE_UPGRADE     = 4,
-	FUP_NODE_STATE_EXCEPTION   = 5, /* Only 1.4 */
-	FUP_NODE_STATE_UNKNOWN     = 0x7F
-} fup_node_state_t;
+	BMNG_FUP_NODE_STATE_IDLE        = 0,
+	BMNG_FUP_NODE_STATE_RECEIVING   = 1,
+	BMNG_FUP_NODE_STATE_COMPLETE    = 2,
+	BMNG_FUP_NODE_STATE_COUNTDOWN   = 3,
+	BMNG_FUP_NODE_STATE_UPGRADE     = 4,
+	BMNG_FUP_NODE_STATE_EXCEPTION   = 5,   /* Only 1.4 */
+	BMNG_FUP_NODE_STATE_UNKNOWN     = 0x7F
+} BMNG_FUP_NODE_STATE;
 
-/** Network events */
+// *****************************************************************************
+/* Network events
+
+ Summary:
+    Defines the network events.
+
+ Description:
+    This enumeration defines the network events.
+
+ Remarks:
+    None.
+*/
 typedef enum {
 	BMNG_NET_EVENT_REGISTER,
 	BMNG_NET_EVENT_UNREGISTER,
@@ -130,155 +181,320 @@ typedef enum {
 	BMNG_NET_EVENT_DEMOTE,
 	BMNG_NET_EVENT_ALIVE,
 	BMNG_NET_EVENT_REBOOT,
-	BMNG_NET_EVENT_NO_DUK, /* Only 1.4 */
+	BMNG_NET_EVENT_NO_DUK,   /* Only 1.4 */
 	BMNG_NET_EVENT_UNKNOWN_NODE
-} bmng_event_t;
+} BMNG_NET_EVENT;
 
-/** Network event information */
+// *****************************************************************************
+/* Network Event information
+
+ Summary:
+    Defines the Network Event information.
+
+ Description:
+    This structure defines the Network Event information.
+
+ Remarks:
+    None.
+*/
 typedef struct {
-	bmng_event_t net_event;
-	uint8_t puc_eui48[6];
+	BMNG_NET_EVENT netEvent;
+	uint8_t eui48[6];
 	uint8_t sid;
 	uint16_t lnid;
 	uint8_t lsid;
-	uint8_t alv_rx_cnt;
-	uint8_t alv_tx_cnt;
-	uint8_t alv_time;
-    uint16_t us_pch;
-	uint16_t us_pch_lsid;
-} bmng_net_event_t;
+	uint8_t alvRxCnt;
+	uint8_t alvTxCnt;
+	uint8_t alvTime;
+    uint16_t pch;
+	uint16_t pchLsid;
+} BMNG_NET_EVENT_INFO;
 
-/** PRIME Profile ACK codes  */
+// *****************************************************************************
+/* Acknowledgement codes for PRIME Profile
+
+ Summary:
+    Defines the acknowledgement codes for PRIME Profile.
+
+ Description:
+    This enumeration defines the acknowledgement codes to be used in the PRIME 
+    Profile.
+
+ Remarks:
+    None.
+*/
 typedef enum {
-	PPROF_ACK_OK = 0,
-	PPROF_ACK_ERROR
-} pprof_ack_code_t;
+	BMNG_PPROF_ACK_OK = 0,
+	BMNG_PPROF_ACK_ERROR
+} BMNG_PPROF_ACK;
 
-/** PRIME Whitelist ACK codes  */
+// *****************************************************************************
+/* Acknowledgement codes for the Whitelist
+
+ Summary:
+    Defines the acknowledgement codes for the Whitelist.
+
+ Description:
+    This enumeration defines the acknowledgement codes to be used when handling
+    the Whitelist.
+
+ Remarks:
+    None.
+*/
 typedef enum {
-	WHITELIST_ACK_OK = 0,
-	WHITELIST_ACK_ERROR
-} whitelist_ack_code_t;
+	BMNG_WHITELIST_ACK_OK = 0,
+	BMNG_WHITELIST_ACK_ERROR
+} BMNG_WHITELIST_ACK;
 
-/** PRIME BMNG declarations */
+// *****************************************************************************
+/* Firmware Upgrade Protocol acknowledgement
 
-/**
- * Base Management FUP Acknowledgement
- * - uc_cmd:             Command being acknowledged
- * - x_ack_code:         ACK returned code
- * - us_extra_info:      Extra information
- */
-typedef void (*bmng_fup_ack_cb_t)(uint8_t uc_cmd, fup_ack_code_t x_ack_code, uint16_t us_extra_info);
+  Summary:
+    Callback function pointer for the Firmware Upgrade Protocol acknowledgement.
 
-/**
- * Base Management FUP Status Indication
- * - x_fup_node_state:   Node upgrade state
- * - ul_pages:           Pages received by the SN according to the BN
- * - puc_eui48:          MAC address of the node
- */
-typedef void (*bmng_fup_status_ind_cb_t)(fup_node_state_t x_state, uint16_t ul_pages, uint8_t *puc_eui48);
+  Description:
+    This callback is used for the Firmware Upgrade Protocol acknowledgement.
+    cmd         - Command being acknowledged
+    ackCode     - ACK returned code
+    extraInfo   - Extra information
 
-/**
- * Base Management FUP Error Indication
- * - x_error_code:       Error code
- * - puc_eui48:          MAC address of the node
- */
-typedef void (*bmng_fup_error_ind_cb_t)(fup_error_code_t x_error_code, uint8_t *puc_eui48);
+  Remarks:
+    None.
+*/
+typedef void (*BMNG_FUP_ACK_CB)(uint8_t cmd, BMNG_FUP_ACK ackCode, 
+    uint16_t extraInfo);
 
-/**
- * Base Management FUP Version Indication
- * - puc_eui48:          MAC address of the node
- * - uc_vendor_len:      Vendor ID length
- * - pch_vendor:         Vendor ID
- * - uc_model_len:       Model length
- * - pch_model:          Model
- * - uc_version_len:     Version length
- * - pch_version:        Version
- */
-typedef void (*bmng_fup_version_ind_cb_t)(uint8_t *puc_eui48, uint8_t uc_vendor_len, char *pch_vendor, uint8_t uc_model_len,
-		char *pch_model, uint8_t uc_version_len, char *pch_version);
+// *****************************************************************************
+/* Firmware Upgrade Protocol status indication
 
-/**
- * Base Management FUP Kill Indication
- * - puc_eui48:          MAC address of the node
- */
-typedef void (*bmng_fup_kill_ind_cb_t)(uint8_t *puc_eui48);
+  Summary:
+    Callback function pointer for the Firmware Upgrade Protocol status 
+    indication.
 
-/**
- * Base Management Network Event Indication
- * - px_net_event:          Network event information
- */
-typedef void (*bmng_network_event_ind_cb_t)(bmng_net_event_t *px_net_event);
+  Description:
+    This callback is used for the Firmware Upgrade Protocol status indication.
+    nodeState   - Node upgrade state
+    pages       - Pages received by the SN according to the BN
+    eui48       - Pointer to the MAC address of the node
 
-/**
- * Base Management PRIME Profile Acknowledgement
- * - uc_cmd:             Command being acknowledged
- * - x_ack_code:         ACK returned code
- */
-typedef void (*bmng_pprof_ack_cb_t)(uint8_t uc_cmd, pprof_ack_code_t x_ack_code);
+  Remarks:
+    None.
+*/
+typedef void (*BMNG_FUP_STATUS_INDICATION_CB)(BMNG_FUP_NODE_STATE nodeState, 
+    uint16_t pages, uint8_t *eui48);
 
-/**
- * Base Management PRIME Profile Get Response
- * - puc_eui48:            MAC address of the node
- * - us_data_length:       Data length
- * - puc_data:             Data
- */
-typedef void (*bmng_pprof_get_response_cb_t)(uint8_t *puc_eui48, uint16_t us_data_len, uint8_t *puc_data);
+// *****************************************************************************
+/* Firmware Upgrade Protocol error indication
 
-/**
- * Base Management PRIME Profile Get Enhanced Response
- * - puc_eui48:            MAC address of the node
- * - us_data_length:       Data length
- * - puc_data:             Data
- */
-typedef void (*bmng_pprof_get_enhanced_response_cb_t)(uint8_t *puc_eui48, uint16_t us_data_len, uint8_t *puc_data);
+  Summary:
+    Callback function pointer for the Firmware Upgrade Protocol error 
+    indication.
 
-/**
- * Base Management PRIME Profile Get Zero Crossing Response
- * - puc_eui48:            MAC address of the node
- * - uc_zc_status:         Zero cross status
- * - ul_zc_time:           Zero crossing time (in microsec)
- */
-typedef void (*bmng_pprof_get_zc_response_cb_t)(uint8_t *puc_eui48, uint8_t uc_zc_status, uint32_t ul_zc_time);
+  Description:
+    This callback is used for the Firmware Upgrade Protocol error indication.
+    errorCode   - Error code
+    eui48       - Pointer to the MAC address of the node
 
-/**
- * Base Management PRIME Profile Zero Crossing Difference between BN and SN Response
- * - puc_eui48:            MAC address of the node
- * - ul_time_freq:         Frequency
- * - ul_time_diff:         Zero crossing difference (in 10s of microsec)
- */
-typedef void (*bmng_pprof_zc_diff_response_cb_t)(uint8_t *puc_eui48, uint32_t ul_time_freq, uint32_t ul_time_diff);
+  Remarks:
+    None.
+*/
+typedef void (*BMNG_FUP_ERROR_INDICATION_CB)(BMNG_FUP_ERRORerrorCode, 
+    uint8_t *eui48);
 
-/**
- * Base Management Whitelist Acknowledgement
- * - uc_cmd:             Command being acknowledged
- * - x_ack_code:         ACK returned code
- */
-typedef void (*bmng_whitelist_ack_cb_t)(uint8_t uc_cmd, whitelist_ack_code_t x_ack_code);
+// *****************************************************************************
+/* Firmware Upgrade Protocol version indication
 
-/** Base Management callbacks configuration */
+  Summary:
+    Callback function pointer for the Firmware Upgrade Protocol version 
+    indication.
+
+  Description:
+    This callback is used for the Firmware Upgrade Protocol version indication.
+    eui48       - Pointer to the MAC address of the node
+    vendorLen   - Vendor length
+    vendor      - Pointer to the vendor identification
+    modelLen    - Model length
+    model       - Pointer to the model identification
+    versionLen  - Version length
+    version     - Pointer to the version identification
+
+  Remarks:
+    None.
+*/
+typedef void (*BMNG_FUP_VERSION_INDICATION_CB)(uint8_t *eui48, uint8_t vendorLen, 
+    char *vendor, uint8_t modelLen, char *model, uint8_t versionLen, char *version);
+
+// *****************************************************************************
+/* Firmware Upgrade Protocol kill indication
+
+  Summary:
+    Callback function pointer for the Firmware Upgrade Protocol kill indication.
+
+  Description:
+    This callback is used for the Firmware Upgrade Protocol kill indication.
+    eui48       - Pointer to the MAC address of the node
+
+  Remarks:
+    None.
+*/
+typedef void (*BMNG_FUP_KILL_INDICATION_CB)(uint8_t *eui48);
+
+// *****************************************************************************
+/* Network Event indication
+
+  Summary:
+    Callback function pointer for the Network Event indication.
+
+  Description:
+    This callback is used for the Network Event indication.
+    netEvent    - Network event information
+
+  Remarks:
+    None.
+*/
+typedef void (*BMNG_NET_EVENT_INDICATION_CB)(BMNG_NET_EVENT_INFO *netEvent);
+
+// *****************************************************************************
+/* PRIME Profile acknowledgement
+
+  Summary:
+    Callback function pointer for the PRIME Profile acknowledgement.
+
+  Description:
+    This callback is used for the PRIME Profile acknowledgement.
+    cmd         - Command being acknowledged
+    ackCode     - ACK returned code
+
+  Remarks:
+    None.
+*/
+typedef void (*BMNG_PPROF_ACK_CB)(uint8_t cmd, BMNG_PPROF_ACK ackCode);
+
+// *****************************************************************************
+/* PRIME Profile get response
+
+  Summary:
+    Callback function pointer for the PRIME Profile get response.
+
+  Description:
+    This callback is used for the PRIME Profile get response.
+    eui48       - Pointer to the MAC address of the node
+    dataLen     - Data length
+    data        - Pointer to the data
+
+  Remarks:
+    None.
+*/
+typedef void (*BMNG_PPROF_GET_RESPONSE_CB)(uint8_t *eui48, uint16_t dataLen, 
+    uint8_t *data);
+
+// *****************************************************************************
+/* PRIME Profile get enhanced response
+
+  Summary:
+    Callback function pointer for the PRIME Profile get enhanced response.
+
+  Description:
+    This callback is used for the PRIME Profile get enhanced response.
+    eui48       - Pointer to the MAC address of the node
+    dataLen     - Data length
+    data        - Pointer to the data
+
+  Remarks:
+    None.
+*/
+typedef void (*(*BMNG_PPROF_GET_ENHANCED_RESPONSE_CB)(uint8_t *eui48, 
+    uint16_t dataLen, uint8_t *data);
+
+// *****************************************************************************
+/* PRIME Profile get zero crossing response
+
+  Summary:
+    Callback function pointer for the PRIME Profile get zero crossing response.
+
+  Description:
+    This callback is used for the PRIME Profile get zero crossing response.
+    eui48       - Pointer to the MAC address of the node
+    zcStatus    - Zero cross status
+    zcTime      - Zero crossing time (in microseconds)
+
+  Remarks:
+    None.
+*/
+typedef void (*BMNG_PPROF_GET_ZC_RESPONSE_CB)(uint8_t *eui48, uint8_t zcStatus, 
+    uint32_t zcTime);
+
+// *****************************************************************************
+/* PRIME Profile get zero crossing difference response
+
+  Summary:
+    Callback function pointer for the PRIME Profile get zero crossing difference 
+    response.
+
+  Description:
+    This callback is used for the PRIME Profile get the response to the zero
+    crossing difference between BN and SN.
+    eui48       - Pointer to the MAC address of the node
+    timeFreq    - Frequency
+    timeDiff    - Zero crossing difference (in 10s of microseconds)
+
+  Remarks:
+    None.
+*/
+typedef void (*BMNG_PPROF_GET_ZC_DIFF_RESPONSE_CB)(uint8_t *eui48, 
+    uint32_t timeFreq, uint32_t timeDiff);
+
+// *****************************************************************************
+/* Whitelist acknowledgement
+
+  Summary:
+    Callback function pointer for the Whitelist acknowledgement.
+
+  Description:
+    This callback is used for the Whitelist acknowledgement.
+    cmd         - Command being acknowledged
+    ackCode     - ACK returned code
+
+  Remarks:
+    None.
+*/
+typedef void (*BMNG_WHITELIST_ACK_CB)(uint8_t cmd, BMNG_WHITELIST_ACK ackCode);
+
+// ****************************************************************************
+/* Base Management callback configuration
+
+  Summary:
+    Defines the callbacks to handle the Base Management.
+
+  Description:
+    This structure defines the callbacks to handle the Base Management.
+
+  Remarks:
+    None.
+*/
 typedef struct {
-	bmng_fup_ack_cb_t fup_ack_cb;
-	bmng_fup_status_ind_cb_t fup_status_ind_cb;
-	bmng_fup_error_ind_cb_t fup_error_ind_cb;
-	bmng_fup_version_ind_cb_t fup_version_ind_cb;
-	bmng_fup_kill_ind_cb_t fup_kill_ind_cb;
-	bmng_network_event_ind_cb_t network_event_ind_cb;
-	bmng_pprof_ack_cb_t pprof_ack_cb;
-	bmng_pprof_get_response_cb_t pprof_get_response_cb;
-	bmng_pprof_get_enhanced_response_cb_t pprof_get_enhanced_response_cb;
-	bmng_pprof_get_zc_response_cb_t pprof_get_zc_response_cb;
-	bmng_pprof_zc_diff_response_cb_t pprof_zc_diff_response_cb;
-	bmng_whitelist_ack_cb_t whitelist_ack_cb;
-} bmng_callbacks_t;
+	BMNG_FUP_ACK_CB fup_ack;
+	BMNG_FUP_STATUS_INDICATION_CB fup_status_ind;
+	BMNG_FUP_ERROR_INDICATION_CB fup_error_ind;
+	BMNG_FUP_VERSION_INDICATION_CB fup_version_ind;
+	BMNG_FUP_KILL_INDICATION_CB fup_kill_ind;
+	BMNG_NET_EVENT_INDICATION_CB network_event_ind;
+	BMNG_PPROF_ACK_CB pprof_ack;
+	BMNG_PPROF_GET_RESPONSE_CB pprof_get_response;
+	BMNG_PPROF_GET_ENHANCED_RESPONSE_CB pprof_get_enhanced_response;
+	BMNG_PPROF_GET_ZC_RESPONSE_CB pprof_get_zc_response;
+	BMNG_PPROF_GET_ZC_DIFF_RESPONSE_CB pprof_zc_diff_response;
+	BMNG_WHITELIST_ACK_CB whitelist_ack;
+} BMNG_CALLBACKS;
 
-/* @} */
-
-/* @cond 0 */
-/**INDENT-OFF**/
+//DOM-IGNORE-BEGIN
 #ifdef __cplusplus
 }
 #endif
-/**INDENT-ON**/
-/* @endcond */
+//DOM-IGNORE-END
+
 #endif /* BMNG_DEFS_H_ */
+
+/*******************************************************************************
+ End of File
+*/

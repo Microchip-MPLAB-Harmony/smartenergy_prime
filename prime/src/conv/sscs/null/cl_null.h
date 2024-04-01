@@ -1,5 +1,5 @@
 /*******************************************************************************
-  PRIME NULL Convergence Sublayer Header
+  PRIME NULL Convergence Sublayer Control Interface Header
 
   Company:
     Microchip Technology Inc.
@@ -8,11 +8,11 @@
     cl_null.h
 
   Summary:
-    PRIME NULL Convergence Sublayer General Header File
+    PRIME NULL Convergence Sublayer Control Interface Header File
 
   Description:
-    This file contains definitions of the functions to be used by the PRIME 
-    stack when managing the PRIME Null Convergence Sublayer.
+    This file contains definitions of the control functions to be used by the 
+    PRIME stack when managing the PRIME Null Convergence Sublayer.
 *******************************************************************************/
 
 //DOM-IGNORE-BEGIN
@@ -54,7 +54,7 @@
 
 // *****************************************************************************
 // *****************************************************************************
-// Section: PRIME NULL Convergence Sublayer Interface Routines
+// Section: PRIME NULL Convergence Sublayer Control Interface Routines
 // *****************************************************************************
 // *****************************************************************************
 

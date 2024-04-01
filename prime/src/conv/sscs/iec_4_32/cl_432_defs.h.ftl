@@ -1,87 +1,137 @@
-/**
- * \file
- *
- * \brief CL_432_DEFS: CONV 432 layer
- *
- * Copyright (c) 2015 Atmel Corporation. All rights reserved.
- *
- * \asf_license_start
- *
- * \page License
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- * 1. Redistributions of source code must retain the above copyright notice,
- *    this list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright notice,
- *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution.
- *
- * 3. The name of Atmel may not be used to endorse or promote products derived
- *    from this software without specific prior written permission.
- *
- * 4. This software may only be redistributed and used in connection with an
- *    Atmel microcontroller product.
- *
- * THIS SOFTWARE IS PROVIDED BY ATMEL "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT ARE
- * EXPRESSLY AND SPECIFICALLY DISCLAIMED. IN NO EVENT SHALL ATMEL BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
- * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
- * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- * \asf_license_stop
- *
- */
+/*******************************************************************************
+  PRIME 4-32 Convergence Sublayer Definitions Header
+
+  Company:
+    Microchip Technology Inc.
+
+  File Name:
+    cl_null_api.h
+
+  Summary:
+    PRIME 4-32 Convergence Sublayer Definitions Header File
+
+  Description:
+    This file contains definitions of the PRIME 4-32 Convergence Sublayer to be 
+    used by the PRIME application.
+*******************************************************************************/
+
+//DOM-IGNORE-BEGIN
+/*******************************************************************************
+* Copyright (C) 2024 Microchip Technology Inc. and its subsidiaries.
+*
+* Subject to your compliance with these terms, you may use Microchip software
+* and any derivatives exclusively with Microchip products. It is your
+* responsibility to comply with third party license terms applicable to your
+* use of third party software (including open source software) that may
+* accompany Microchip software.
+*
+* THIS SOFTWARE IS SUPPLIED BY MICROCHIP "AS IS". NO WARRANTIES, WHETHER
+* EXPRESS, IMPLIED OR STATUTORY, APPLY TO THIS SOFTWARE, INCLUDING ANY IMPLIED
+* WARRANTIES OF NON-INFRINGEMENT, MERCHANTABILITY, AND FITNESS FOR A
+* PARTICULAR PURPOSE.
+*
+* IN NO EVENT WILL MICROCHIP BE LIABLE FOR ANY INDIRECT, SPECIAL, PUNITIVE,
+* INCIDENTAL OR CONSEQUENTIAL LOSS, DAMAGE, COST OR EXPENSE OF ANY KIND
+* WHATSOEVER RELATED TO THE SOFTWARE, HOWEVER CAUSED, EVEN IF MICROCHIP HAS
+* BEEN ADVISED OF THE POSSIBILITY OR THE DAMAGES ARE FORESEEABLE. TO THE
+* FULLEST EXTENT ALLOWED BY LAW, MICROCHIP'S TOTAL LIABILITY ON ALL CLAIMS IN
+* ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF ANY,
+* THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
+*******************************************************************************/
+//DOM-IGNORE-END
+
 #ifndef CL_432_DEFS_H_INCLUDE
 #define CL_432_DEFS_H_INCLUDE
 
+// *****************************************************************************
+// *****************************************************************************
+// Section: File includes
+// *****************************************************************************
+// *****************************************************************************
+
 #include <stdint.h>
 
-/* @cond 0 */
-/**INDENT-OFF**/
-#ifdef __cplusplus
-extern "C" {
+// DOM-IGNORE-BEGIN
+#ifdef __cplusplus  // Provide C++ Compatibility
+
+    extern "C" {
+
 #endif
-/**INDENT-ON**/
-/* @endcond */
+// DOM-IGNORE-END
 
-/**
- * \ingroup prime_ng_group
- * \defgroup prime_sscs_432_group PRIME SSCS 4-32
- *
- * This module provides configuration and utils for the
- * SSCS 4-32 in PRIME.
- *
- * @{
- */
+// *****************************************************************************
+// *****************************************************************************
+// Section: Macro Definitions
+// *****************************************************************************
+// *****************************************************************************
 
-/** Length of the LPDU */
-#define LPDU_HEADER                    3
+/* Length of the LPDU (Link Protocol Data Unit) */
+#define CL_432_LPDU_HEADER                3
 
-/** \brief LSDU Data length */
-/** \note It must be smaller than PRIME_MACSAP_DATA_SIZE */
-/* @{ */
-#define MAX_LENGTH_432_DATA            (1024 - LPDU_HEADER)
-/* @} */
+/* Maxixum length of the LSDU (Link Service Data Unit) */
+/* (It must be smaller than PRIME_MACSAP_DATA_SIZE) */
+#define CL_432_MAX_LENGTH_DATA            (1024 - CL_432_LPDU_HEADER)
 
-/** RESULTS values for convergence layer primitives */
+/* Addresses defined in 4-32 layer */
+#define CL_432_INVALID_ADDRESS            (0xFFFF)
+#define CL_432_BROADCAST_ADDRESS          (0x0FFF)
+
+// *****************************************************************************
+/* Connection status macros
+
+ Summary:
+    4-32 connection status macros.
+
+ Description:
+    Macrod for the 4-32 connection status.
+
+ Remarks:
+    None.
+*/
+#define CL_432_CON_CLOSE              (0)
+#define CL_432_CON_CONNECTING         (1)
+#define CL_432_CON_DISCONNECTING      (2)
+#define CL_432_CON_OPEN               (3)
+
+// *****************************************************************************
+// *****************************************************************************
+// Section: Data Types
+// *****************************************************************************
+// *****************************************************************************
+
+// *****************************************************************************
+/* Result values enumeration
+
+ Summary:
+    Enumeration of the result values for the 4-32 Convergence Layer primitives.
+
+ Description:
+    This enumeration contains the result values for the 4-32 Convergence Layer 
+    primitives.
+
+ Remarks:
+    None.
+*/
 typedef enum {
 	DL_432_RESULT_SUCCESS = 0,
 	DL_432_RESULT_REJECT = 1,
 	DL_432_RESULT_TIMEOUT = 2,
 	DL_432_RESULT_NOT_REGISTERED = 6
-} dl_432_result_t;
+} DL_432_RESULT;
 
-/** \brief Transmission errors defined in 432 layer */
-/* @{ */
+// *****************************************************************************
+/* Transmission errors enumeration
+
+ Summary:
+    Enumeration of the transmission errors defined in the 4-32 Convergence Layer.
+
+ Description:
+    This enumeration contains the transmission errors defined in the 4-32 
+    Convergence Layer.
+
+ Remarks:
+    None.
+*/
 typedef enum {
 	/* Standard errors */
 	CL_432_TX_STATUS_SUCCESS                           = 0,
@@ -97,161 +147,261 @@ typedef enum {
 	CL_432_TX_STATUS_ERROR_BAD_HANLDER                 = 0xC1,
 	CL_432_TX_STATUS_ERROR_BUSY                        = 0xC2,
 	CL_432_TX_STATUS_ERROR_BAD_DST_ADDRESS             = 0xC3
-} dl_432_tx_status_t;
-/* @} */
+} DL_432_TX_STATUS;
 
-/** LSDU part of DL message */
-#define lsdu                           dl.buff
+// *****************************************************************************
+/* Buffer for transmission / reception
 
-/** Buffer defined for reception/transmission */
+ Summary:
+    Data structure of the buffer for transmission and reception.
+
+ Description:
+    This structure contains the definition of the buffer used for tranmission and 
+    reception of messages in the 4-32 Convergence layer.
+
+ Remarks:
+    None.
+*/
 typedef union {
-	uint8_t lpdu[MAX_LENGTH_432_DATA + LPDU_HEADER];
+	uint8_t lpdu[CL_432_MAX_LENGTH_DATA + CL_432_LPDU_HEADER];
 
 	struct {
 		uint8_t control;
 		uint8_t dsap;
 		uint8_t lsap;
-		uint8_t buff[MAX_LENGTH_432_DATA];
+		uint8_t buff[CL_432_MAX_LENGTH_DATA];
 	} dl;
-} dl_432_buffer_t;
+} DL_432_BUFFER;
 
-/** \brief Addresses defined in 432 layer */
-/* @{ */
-#define CL_432_INVALID_ADDRESS                 (0xFFFF)
-#define CL_432_BROADCAST_ADDRESS               (0x0FFF)
-/* @} */
+// *****************************************************************************
+/* CL 4-32 Establish Request function pointer
 
-/** \brief Connection status */
-/* @{ */
-#define CL_432_CON_CLOSE              (0)
-#define CL_432_CON_CONNECTING         (1)
-#define CL_432_CON_DISCONNECTING      (2)
-#define CL_432_CON_OPEN               (3)
-/* @} */
+ Summary:
+    Function pointer for the CL 4-32 Establish Request primitive.
 
-/** PRIME CL 432 declarations */
+ Description:
+    This data type contains the definition of the function pointer for the 
+    CL 4-32 Establish Request primitive.
+    - deviceId: Pointer to the device identifier data
+    - deviceIdLen: Length of the device identifier
+    - ae (v1.4): Flag to indicate that authentication and encryption is requested
 
-/**
- * CL 432 Establish request
- *
- * - puc_device_id:         Pointer to the device identifier data
- * - uc_device_id_len:      Length of the device identfier
- * - uc_ae (v1.4):          Flag to indicate that authentication and encryption is requested
- */
-typedef void (*cl_432_establish_request_t)(uint8_t *puc_device_id, uint8_t uc_device_id_len, uint8_t uc_ae);
+ Remarks:
+    None.
+*/
+typedef void (*CL_432_ESTABLISH_REQUEST)(uint8_t *deviceId, uint8_t deviceIdLen, 
+    uint8_t ae);
 
-/**
- * CL 432 Establish confirm
- *
- * - puc_device_id:          Pointer to the device identifier data
- * - uc_device_id_len:       Length of the device identfier
- * - us_dst_address:         Destination 432 Address
- * - us_base_address:        Base 432 Address
- * - uc_ae (v1.4):           Flag to indicate that authentication and encryption is requested
- */
-typedef void (*cl_432_establish_cfm_cb_t)(uint8_t *puc_device_id, uint8_t uc_device_id_len, uint16_t us_dst_address, uint16_t us_base_address, uint8_t uc_ae);
+// *****************************************************************************
+/* CL 4-32 Establish Confirm callback function pointer
 
-/**
- * CL 432 Release request
- *
- * - us_dst_address:   Address to disconnect
- */
-typedef void (*cl_432_release_request_t)(uint16_t us_dst_address);
+ Summary:
+    Callback function pointer for the CL 4-32 Establish Confirm primitive.
 
-/**
- * CL 432 Data request
- *
- * - uc_dst_lsap:      Destination LSAP
- * - uc_src_lsap:      Source LSAP
- * - us_dst_address:   Destination 432 Address
- * - px_buff:          Pointer to the data buffer
- * - us_lsdu_len:      Length of the data
- * - uc_link_class:    Link class (non used)
- */
-typedef void (*cl_432_dl_data_request_t)(uint8_t uc_dst_lsap, uint8_t uc_src_lsap, uint16_t us_dst_address, dl_432_buffer_t *px_buff, uint16_t us_lsdu_len,
-		uint8_t uc_link_class);
+ Description:
+    This data type contains the definition of the callback function for the 
+    CL 4-32 Establish Confirm primitive.
+    - deviceId: Pointer to the device identifier data
+    - deviceIdLen: Length of the device identifier
+    - dstAddress: Destination 4.32 address
+    - baseAddress: Base 4-32 address
+    - ae (v1.4): Flag to indicate that authentication and encryption is requested
 
-/**
- * CL 432 Data indication
- *
- * - uc_dst_lsap:      Destination LSAP
- * - uc_src_lsap:      Source LSAP
- * - us_dst_address:   Destination 432 Address
- * - src_address:      Source Address
- * - puc_data:         Pointer to received data
- * - us_lsdu_len:      Length of the data
- * - uc_link_class:    Link class (non used)
- */
-typedef void (*cl_432_dl_data_ind_cb_t)(uint8_t uc_dst_lsap, uint8_t uc_src_lsap, uint16_t us_dst_address, uint16_t us_src_address,
-		uint8_t *puc_data, uint16_t us_lsdu_len, uint8_t uc_link_class);
+ Remarks:
+    None.
+*/
+typedef void (*CL_432_ESTABLISH_CONFIRM_CB)(uint8_t *deviceId, uint8_t deviceIdLen, 
+    uint16_t dstAddress, uint16_t baseAddress, uint8_t ae);
 
-/**
- * CL 432 Data confirm
- *
- * - uc_dst_lsap:      Destination LSAP
- * - uc_src_lsap:      Source LSAP
- * - us_dst_address:   Destination 432 Address
- * - uc_tx_status:     Tx status (see mac_defs.h)
- */
-typedef void (*cl_432_dl_data_cfm_cb_t)(uint8_t uc_dst_lsap, uint8_t uc_src_lsap, uint16_t us_dst_address, dl_432_tx_status_t uc_tx_status);
+// *****************************************************************************
+/* CL 4-32 Release Request function pointer
+
+ Summary:
+    Function pointer for the CL 4-32 Release Request primitive.
+
+ Description:
+    This data type contains the definition of the function pointer for the 
+    CL 4-32 Release Request primitive.
+    - dstAddress: Address to disconnect
+
+ Remarks:
+    None.
+*/
+typedef void (*CL_432_RELEASE_REQUEST)(uint16_t dstAddress);
+
+// *****************************************************************************
+/* CL 4-32 Data Request function pointer
+
+ Summary:
+    Function pointer for the CL 4-32 Data Request primitive.
+
+ Description:
+    This data type contains the definition of the function pointer for the 
+    CL 4-32 Data Request primitive.
+    - dstLsap: Destination LSAP
+    - srcLsap: Source LSAP
+    - dstAddress: Destination 4-32 address
+    - buff: Pointer to the data buffer
+    - lsduLen: Length of the data
+    - linkClass: Link class (not used)
+
+ Remarks:
+    None.
+*/
+typedef void (*CL_432_DL_DATA_REQUEST)(uint8_t dstLsap, uint8_t srcLsap, 
+    uint16_t dstAddress, DL_432_BUFFER *buff, uint16_t lsduLen, uint8_t linkClass);
+
+// *****************************************************************************
+/* CL 4-32 Data Indication callback function pointer
+
+ Summary:
+    Callback function pointer for the CL 4-32 Data Indication primitive.
+
+ Description:
+    This data type contains the definition of the callback function for the 
+    CL 4-32 Data Indication primitive.
+    - dstLsap: Destination LSAP
+    - srcLsap: Source LSAP
+    - dstAddress: Destination 4-32 address
+    - srcAddress: Source 4-32 address
+    - data: Pointer to received data
+    - lsduLen: Length of the data
+    - linkClass: Link class (not used)
+
+ Remarks:
+    None.
+*/
+typedef void (*CL_432_DL_DATA_INDICATION_CB)(uint8_t dstLsap, uint8_t srcLsap, 
+    uint16_t dstAddress, uint16_t srcAddress, uint8_t *data, uint16_t lsduLen, 
+    uint8_t link_Class);
+
+// *****************************************************************************
+/* CL 4-32 Data Confirm callback function pointer
+
+ Summary:
+    Callback function pointer for the CL 4-32 Data Confirm primitive.
+
+ Description:
+    This data type contains the definition of the callback function for the 
+    CL 4-32 Data Confirm primitive.
+    - dstLsap: Destination LSAP
+    - srcLsap: Source LSAP
+    - dstAddress: Destination 4-32 address
+    - txStatus: Transmission status
+
+ Remarks:
+    None.
+*/
+typedef void (*CL_432_DL_DATA_CONFIRM_CB)(uint8_t dstLsap, uint8_t srcLsap, 
+    uint16_t dstAddress, DL_432_TX_STATUS txStatus);
 
 <#if PRIME_MODE == "BN" && BN_SLAVE_EN == false>  
-/**
- * CL 432 Join Indication
- *
- * - puc_device_id:          Pointer to the device identifier data
- * - uc_device_id_len:       Length of the device identfier
- * - us_dst_address:         Destination 432 Address
- * - puc_mac:                Pointer to mac address
- * - uc_ae (v1.4):           Flag to indicate that authentication and encryption is requested
- */
-typedef void (*cl_432_join_ind_cb_t)(uint8_t *puc_device_id, uint8_t uc_device_id_len, uint16_t us_dst_address, uint8_t *puc_mac, uint8_t uc_ae);
+// *****************************************************************************
+/* CL 4-32 Join Indication callback function pointer
 
-/**
- * CL 432 Leave Indication
- *
- * - us_dst_address:   Destination 432 Address
- */
-typedef void (*cl_432_leave_ind_cb_t)(uint16_t us_dst_address);
+ Summary:
+    Callback function pointer for the CL 4-32 Join Indication primitive.
+
+ Description:
+    This data type contains the definition of the callback function for the 
+    CL 4-32 Join Indication primitive.
+    - deviceId: Pointer to the device identifier data
+    - deviceIdLen: Length of the device identifier
+    - dstAddress: Destination 4.32 address
+    - mac: Pointer to the MAC address
+    - ae (v1.4): Flag to indicate that authentication and encryption is requested
+
+ Remarks:
+    None.
+*/
+typedef void (*CL_432_JOIN_INDICATION_CB)(uint8_t *deviceId, uint8_t deviceIdLen, 
+    uint16_t dstAddress, uint8_t *mac, uint8_t ae);
+
+// *****************************************************************************
+/* CL 4-32 Leave Indication callback function pointer
+
+ Summary:
+    Callback function pointer for the CL 4-32 Leave Indication primitive.
+
+ Description:
+    This data type contains the definition of the callback function for the 
+    CL 4-32 Leave Indication primitive.
+    - dstAddress: Destination 4.32 address
+
+ Remarks:
+    None.
+*/
+typedef void (*CL_432_LEAVE_INDICATION_CB)(uint16_t dstAddress);
 </#if>
 
 <#if (PRIME_MODE == "SN") || (PRIME_MODE == "BN" && BN_SLAVE_EN == true)>
-/**
- * CL 432 Release confirm
- *
- * - us_dst_address:   Destination 432 Address
- * - uc_result:        Confirmation result
- */
-typedef void (*cl_432_release_cfm_cb_t)(uint16_t us_dst_address, dl_432_result_t uc_result);
+// *****************************************************************************
+/* CL 4-32 Release Confirm callback function pointer
+
+ Summary:
+    Callback function pointer for the CL 4-32 Release Confirm primitive.
+
+ Description:
+    This data type contains the definition of the callback function for the 
+    CL 4-32 Release Confirm primitive.
+    - dstAddress: Destination 4.32 address
+    - result: Confirmation result
+
+ Remarks:
+    None.
+*/
+typedef void (*CL_432_RELEASE_CONFIRM_CB)(uint16_t dstAddress, DL_432_RESULT result);
 </#if>
 
-/** CL432 callbacks configuration */
+// ****************************************************************************
+/* CL-432 callback configuration
+
+  Summary:
+    Defines the callbacks to handle the CL-432 Convergence layer.
+
+  Description:
+    This structure defines the callbacks to handle the CL-432 Convergence layer.
+
+  Remarks:
+    None.
+*/
 typedef struct {
-	cl_432_dl_data_ind_cb_t cl_432_dl_data_ind_cb;
-	cl_432_dl_data_cfm_cb_t cl_432_dl_data_cfm_cb;
+	CL_432_DL_DATA_INDICATION_CB cl_432_dl_data_ind;
+	CL_432_DL_DATA_CONFIRM_CB cl_432_dl_data_cfm;
 <#if PRIME_MODE == "BN" && BN_SLAVE_EN == false>  
-	cl_432_join_ind_cb_t cl_432_join_ind_cb;
-	cl_432_leave_ind_cb_t cl_432_leave_ind_cb;
+	CL_432_JOIN_INDICATION_CB cl_432_join_ind;
+	CL_432_LEAVE_INDICATION_CB cl_432_leave_ind;
 </#if>
 <#if (PRIME_MODE == "SN") || (PRIME_MODE == "BN" && BN_SLAVE_EN == true)>
-    cl_432_establish_cfm_cb_t cl_432_establish_cfm_cb;
-	cl_432_release_cfm_cb_t cl_432_release_cfm_cb;
+    CL_432_ESTABLISH_CONFIRM_CB cl_432_establish_cfm;
+	CL_432_RELEASE_CONFIRM_CB cl_432_release_cfm;
 </#if>
-} cl_432_callbacks_t;
+} CL_432_CALLBACKS;
 
-/**
- * CL432 Set callback functions
- * - px_prime_cbs:  Pointer to 432 callbacks structure
- */
-typedef void (*cl_432_set_callbacks_t)(cl_432_callbacks_t *px_cl_432_cbs);
+// ****************************************************************************
+/* CL-432 callback function pointer
 
-/* @} */
+  Summary:
+    Defines the funtion pointer to set the callbacks to handle the CL-432 
+    Convergence layer.
 
-/* / @cond 0 */
-/**INDENT-OFF**/
+  Description:
+    This data type defines the function pointer to set the callbacks to 
+    handle the CL-432 Convergence layer.
+
+  Remarks:
+    None.
+*/
+typedef void (*CL_432_SET_CALLBACKS)(CL_432_CALLBACKS *cl432cbs);
+
+//DOM-IGNORE-BEGIN
 #ifdef __cplusplus
 }
 #endif
-/**INDENT-ON**/
-/* / @endcond */
-#endif
+//DOM-IGNORE-END
+
+#endif /* CL_432_DEFS_H_INCLUDE */
+
+/*******************************************************************************
+ End of File
+*/

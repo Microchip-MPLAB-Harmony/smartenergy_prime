@@ -1,87 +1,153 @@
-/**
- * \file
- *
- * \brief MNGP : PRIME Management Plane interface
- *
- * Copyright (c) 2015 Atmel Corporation. All rights reserved.
- *
- * \asf_license_start
- *
- * \page License
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- * 1. Redistributions of source code must retain the above copyright notice,
- *    this list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright notice,
- *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution.
- *
- * 3. The name of Atmel may not be used to endorse or promote products derived
- *    from this software without specific prior written permission.
- *
- * 4. This software may only be redistributed and used in connection with an
- *    Atmel microcontroller product.
- *
- * THIS SOFTWARE IS PROVIDED BY ATMEL "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT ARE
- * EXPRESSLY AND SPECIFICALLY DISCLAIMED. IN NO EVENT SHALL ATMEL BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
- * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
- * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- * \asf_license_stop
- *
- */
+/*******************************************************************************
+  PRIME Management Plane Control Interface Header
+
+  Company:
+    Microchip Technology Inc.
+
+  File Name:
+    mngp.h
+
+  Summary:
+    PRIME Management Plane Control Interface Header File
+
+  Description:
+    This file contains definitions of the PRIME Management Plane control functions 
+    to be used by the PRIME stack when managing the PRIME Management Plane.
+*******************************************************************************/
+
+//DOM-IGNORE-BEGIN
+/*******************************************************************************
+* Copyright (C) 2024 Microchip Technology Inc. and its subsidiaries.
+*
+* Subject to your compliance with these terms, you may use Microchip software
+* and any derivatives exclusively with Microchip products. It is your
+* responsibility to comply with third party license terms applicable to your
+* use of third party software (including open source software) that may
+* accompany Microchip software.
+*
+* THIS SOFTWARE IS SUPPLIED BY MICROCHIP "AS IS". NO WARRANTIES, WHETHER
+* EXPRESS, IMPLIED OR STATUTORY, APPLY TO THIS SOFTWARE, INCLUDING ANY IMPLIED
+* WARRANTIES OF NON-INFRINGEMENT, MERCHANTABILITY, AND FITNESS FOR A
+* PARTICULAR PURPOSE.
+*
+* IN NO EVENT WILL MICROCHIP BE LIABLE FOR ANY INDIRECT, SPECIAL, PUNITIVE,
+* INCIDENTAL OR CONSEQUENTIAL LOSS, DAMAGE, COST OR EXPENSE OF ANY KIND
+* WHATSOEVER RELATED TO THE SOFTWARE, HOWEVER CAUSED, EVEN IF MICROCHIP HAS
+* BEEN ADVISED OF THE POSSIBILITY OR THE DAMAGES ARE FORESEEABLE. TO THE
+* FULLEST EXTENT ALLOWED BY LAW, MICROCHIP'S TOTAL LIABILITY ON ALL CLAIMS IN
+* ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF ANY,
+* THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
+*******************************************************************************/
+//DOM-IGNORE-END
 
 #ifndef MNGP_H_INCLUDED
 #define MNGP_H_INCLUDED
 
-/* MAC includes */
+// *****************************************************************************
+// *****************************************************************************
+// Section: File includes
+// *****************************************************************************
+// *****************************************************************************
+
 #include "stack/prime/mac/mac_defs.h"
 
-/* @cond 0 */
-/**INDENT-OFF**/
-#ifdef __cplusplus
-extern "C" {
+// DOM-IGNORE-BEGIN
+#ifdef __cplusplus  // Provide C++ Compatibility
+
+    extern "C" {
+
 #endif
-/**INDENT-ON**/
-/* @endcond */
+// DOM-IGNORE-END
 
-/**
- * \ingroup prime_ng_group
- * \defgroup prime_mngp_group PRIME Management Plane
- *
- * This module provides configuration and utils for the Management
- * Plane in PRIME.
- *
- * @{
- */
+// *****************************************************************************
+// *****************************************************************************
+// Section: PRIME Management Plane Control Interface Routines
+// *****************************************************************************
+// *****************************************************************************
 
-/** \brief Management Plane interface */
-/* @{ */
-void mngp_init(mac_version_info_t *px_mac_info, uint8_t uc_usi_port);
+// *****************************************************************************
+/* Function:
+    void MNGP_Initialize(MAC_VERSION_INFO *macInfo, uint8_t usiPort)
+
+  Summary:
+    Initializes the PRIME Management Plane.
+
+  Description:
+    This routine initializes the PRIME Management Plane.
+
+  Precondition:
+    None.
+
+  Parameters:
+    macInfo     - Pointer to the MAC version information
+    usiPort     - USI port
+
+  Returns:
+    None.
+
+  Example:
+    <code>
+    MAC_VERSION_INFO macInfo;
+    
+    macInfo.fwVersion = "HS14.01.01\0\0\0\0\0\0";
+    macInfo.fwModel = "PIC32CXXPL460";
+    macInfo.fwVendor = "MCHP";
+    macInfo.pibVendor = 0;
+    macInfo.pibModel = 0x3941;
+    
+    MNGP_Initialize(&macInfo, 0);
+    </code>
+
+  Remarks:
+    This routine is normally not called directly by an application. It is 
+    called by the PRIME stack initalization routine.
+*/
+void MNGP_Initialize(MAC_VERSION_INFO *macInfo, uint8_t usiPort);
 
 <#if (PRIME_MODE == "SN") || (PRIME_MODE == "BN" && BN_SLAVE_EN == true)>
-void mngp_process(void);
+// ****************************************************************************
+/* Function:
+    void MNGP_Tasks(void)
+
+  Summary:
+    Maintains the Management Plane state machine. 
+
+  Description:
+    This function is used to maintain the Management Plane internal state 
+    machine and generate callbacks.
+
+  Precondition:
+    The MNGP_Initialize function should have been called before calling this 
+    function.
+
+  Parameters:
+    None
+
+  Returns:
+    None
+
+  Example:
+    <code>
+    while (true)
+    {
+        MNGP_Tasks();
+    }
+    </code>
+
+  Remarks:
+    This function must be periodically called by the user application.
+*/
+void MNGP_Tasks(void);
 </#if>
 
-/* @} */
-
-/* @} */
-
-/* @cond 0 */
-/**INDENT-OFF**/
+//DOM-IGNORE-BEGIN
 #ifdef __cplusplus
 }
 #endif
-/**INDENT-ON**/
-/* @endcond */
+//DOM-IGNORE-END
+
 #endif /* MNGP_H_INCLUDED */
+
+/*******************************************************************************
+ End of File
+*/
