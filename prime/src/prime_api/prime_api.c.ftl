@@ -1,209 +1,201 @@
-/**
- * \file
- *
- * \brief PRIME_API : API joins a library's existing interface into a global interface
- *
- * Copyright (c) 2023 Atmel Corporation. All rights reserved.
- *
- * \asf_license_start
- *
- * \page License
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- * 1. Redistributions of source code must retain the above copyright notice,
- *    this list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright notice,
- *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution.
- *
- * 3. The name of Atmel may not be used to endorse or promote products derived
- *    from this software without specific prior written permission.
- *
- * 4. This software may only be redistributed and used in connection with an
- *    Atmel microcontroller product.
- *
- * THIS SOFTWARE IS PROVIDED BY ATMEL "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT ARE
- * EXPRESSLY AND SPECIFICALLY DISCLAIMED. IN NO EVENT SHALL ATMEL BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
- * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
- * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- * \asf_license_stop
- *
- */
+/*******************************************************************************
+  PRIME API Source 
+   
+  Company:
+    Microchip Technology Inc.
+
+  File Name:
+    prime_api.c
+
+  Summary:
+    PRIME API Source File
+
+  Description:
+    This module manages the the PRIME stack from the PRIME application.
+*******************************************************************************/
+
+//DOM-IGNORE-BEGIN
+/*******************************************************************************
+* Copyright (C) 2024 Microchip Technology Inc. and its subsidiaries.
+*
+* Subject to your compliance with these terms, you may use Microchip software
+* and any derivatives exclusively with Microchip products. It is your
+* responsibility to comply with third party license terms applicable to your
+* use of third party software (including open source software) that may
+* accompany Microchip software.
+*
+* THIS SOFTWARE IS SUPPLIED BY MICROCHIP "AS IS". NO WARRANTIES, WHETHER
+* EXPRESS, IMPLIED OR STATUTORY, APPLY TO THIS SOFTWARE, INCLUDING ANY IMPLIED
+* WARRANTIES OF NON-INFRINGEMENT, MERCHANTABILITY, AND FITNESS FOR A
+* PARTICULAR PURPOSE.
+*
+* IN NO EVENT WILL MICROCHIP BE LIABLE FOR ANY INDIRECT, SPECIAL, PUNITIVE,
+* INCIDENTAL OR CONSEQUENTIAL LOSS, DAMAGE, COST OR EXPENSE OF ANY KIND
+* WHATSOEVER RELATED TO THE SOFTWARE, HOWEVER CAUSED, EVEN IF MICROCHIP HAS
+* BEEN ADVISED OF THE POSSIBILITY OR THE DAMAGES ARE FORESEEABLE. TO THE
+* FULLEST EXTENT ALLOWED BY LAW, MICROCHIP'S TOTAL LIABILITY ON ALL CLAIMS IN
+* ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF ANY,
+* THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
+*******************************************************************************/
+//DOM-IGNORE-END
+
+// *****************************************************************************
+// *****************************************************************************
+// Section: Include Files
+// *****************************************************************************
+// *****************************************************************************
 
 #include <stdio.h>
 #include "prime_hal_wrapper.h"
 #include "prime_api.h"
-#include "pal.h"
 #include "stack/prime/mac/mac.h"
 #include "stack/prime/mngp/mngp.h"
 #include "stack/prime/conv/sscs/null/cl_null.h"
 #include "stack/prime/conv/sscs/iec_4_32/cl_432.h"
 
+// *****************************************************************************
+// *****************************************************************************
+// Section: Macro Definitions
+// *****************************************************************************
+// *****************************************************************************
 
+<#if (PRIME_MODE == "BN" && BN_SLAVE_EN == false)>
 #define NUM_MAX_NODES            ${NUM_MAX_NODES}
+</#if>
 #define MAC_SECURITY_PROFILE     ${MAC_SECURITY_PROFILE}
 #define MNGP_SPROF_USI_PORT      ${MNGP_SPROF_USI_PORT}
 <#if MAC_SNIFFER_EN == true>
 #define MAC_SNIFFER_USI_PORT     ${MAC_SNIFFER_USI_PORT}
 </#if>
 
-/* @cond 0 */
-/**INDENT-OFF**/
-#ifdef __cplusplus
-extern "C" {
-#endif
-/**INDENT-ON**/
-/* @endcond */
 
-/**
- * \weakgroup prime_api_group
- * @{
- */
 <#if PRIME_MODE == "SN" && PRIME_PROJECT == "bin project">
-/* __GNUC__ */
-/** \brief Initialize segments */
-/* @{ */
+// *****************************************************************************
+// *****************************************************************************
+// Section: Global Data
+// *****************************************************************************
+// *****************************************************************************
+
+/* Initialize segments */
 extern uint32_t _szero;
 extern uint32_t _ezero;
-/* @} */
+</#if>
 
-/**
- * \brief PRIME data startup
- */
-static void _prime_data_startup(void)
+// *****************************************************************************
+// *****************************************************************************
+// Section: File scope functions
+// *****************************************************************************
+// *****************************************************************************
+
+<#if PRIME_MODE == "SN" && PRIME_PROJECT == "bin project">
+static void lPRIME_API_PrimeDataStartup(void)
 {
 	uint32_t *pDest;
 
 	/* Clear the zero segment */
-	for (pDest = &_szero; pDest < &_ezero;) {
+	for (pDest = &_szero; pDest < &_ezero;) 
+    {
 		*pDest++ = 0;
 	}
 }
 </#if>
 
-/**
- * \brief Set PRIME version
- *
- * \param mac_info    Pointer to MAC information
- */
-static void _set_prime_version(mac_version_info_t *mac_info)
+static void lPRIME_API_SetPrimeVersion(MAC_VERSION_INFO *macInfo)
 {
-	uint8_t uc_size_config, uc_size_info;
-	uint8_t uc_copy_len;
+	uint8_t sizeConfig, sizeInfo;
+	uint8_t copyLen;
 
-	memset(mac_info, 0, sizeof(mac_version_info_t));
+	memset(macInfo, 0, sizeof(MAC_VERSION_INFO));
 
 	/* Update MODEL */
-	uc_size_config = sizeof(PRIME_FW_MODEL);
-	uc_size_info = sizeof(mac_info->fw_model);
-	if (uc_size_config < uc_size_info) {
-		uc_copy_len = uc_size_config;
-	} else {
-		uc_copy_len = uc_size_info;
+	sizeConfig = sizeof(PRIME_FW_MODEL);
+	sizeInfo = sizeof(macInfo->fwModel);
+	if (sizeConfig < sizeInfo) 
+    {
+		copyLen = sizeConfig;
+	} 
+    else 
+    {
+		copyLen = sizeInfo;
 	}
 
-	memcpy(mac_info->fw_model, PRIME_FW_MODEL, uc_copy_len);
-	mac_info->pib_model = PRIME_PIB_MODEL;
+	memcpy(macInfo->fwModel, PRIME_FW_MODEL, copyLen);
+	macInfo->pibModel = PRIME_PIB_MODEL;
 
 	/* Update VENDOR */
-	uc_size_config = sizeof(PRIME_FW_VENDOR);
-	uc_size_info = sizeof(mac_info->fw_vendor);
-	if (uc_size_config < uc_size_info) {
-		uc_copy_len = uc_size_config;
+	sizeConfig = sizeof(PRIME_FW_VENDOR);
+	sizeInfo = sizeof(macInfo->fwVendor);
+	if (sizeConfig < sizeInfo) {
+		copyLen = sizeConfig;
 	} else {
-		uc_copy_len = uc_size_info;
+		copyLen = sizeInfo;
 	}
 
-	memcpy(mac_info->fw_vendor, PRIME_FW_VENDOR, uc_copy_len);
-	mac_info->pib_vendor = PRIME_PIB_VENDOR;
+	memcpy(macInfo->fwVendor, PRIME_FW_VENDOR, copyLen);
+	macInfo->pibVendor = PRIME_PIB_VENDOR;
 
 	/* Update VERSION */
-	uc_size_config = sizeof(PRIME_FW_VERSION);
-	uc_size_info = sizeof(mac_info->fw_version);
-	if (uc_size_config < uc_size_info) {
-		uc_copy_len = uc_size_config;
+	sizeConfig = sizeof(PRIME_FW_VERSION);
+	sizeInfo = sizeof(macInfo->fwVersion);
+	if (sizeConfig < sizeInfo) {
+		copyLen = sizeConfig;
 	} else {
-		uc_copy_len = uc_size_info;
+		copyLen = sizeInfo;
 	}
 
-	memcpy(mac_info->fw_version, PRIME_FW_VERSION, uc_copy_len);
+	memcpy(macInfo->fwVersion, PRIME_FW_VERSION, copyLen);
 }
 
-/**
- * \brief PRIME stack initialization
- */
-void prime_stack_init(void *px_hal_api)
-{
-	mac_version_info_t mac_info;
+// *****************************************************************************
+// *****************************************************************************
+// Section: CRC Service Interface Implementation
+// *****************************************************************************
+// *****************************************************************************
 
-	/* set critical region */
+void PRIME_API_Initialize(void *halApi)
+{
+	MAC_VERSION_INFO macInfo;
+
+	/* Set critical region */
 	__set_BASEPRI( 2 << (8 - __NVIC_PRIO_BITS));
 
 <#if PRIME_MODE == "SN" && PRIME_PROJECT == "bin project">
-	_prime_data_startup();
+	lPRIME_API_PrimeDataStartup();
 </#if>
+
 	/* Set PRIME HAL wrapper */
-	prime_hal_config(px_hal_api);
+	PRIME_HAL_WRP_SetConfig(halApi);
 
-	/* Set PRIME version from config file*/
-	_set_prime_version(&mac_info);
-
-	/* Initialize PAL layer */
-	pal_init();
+	/* Set PRIME version from configuration */
+	lPRIME_API_SetPrimeVersion(&macInfo);
 
 	/* Initialize MAC layer */
-	mac_init(&mac_info, (uint8_t)MAC_SECURITY_PROFILE);
+	MAC_Initialize(&macInfo, (uint8_t)MAC_SECURITY_PROFILE);
 
-	/* Initialize CONV layer */
-	cl_null_init();
-	cl_432_init();
+	/* Initialize Convergence layers */
+	CL_NULL_Initialize();
+	CL_432_Initialize();
 
 	/* Initialize Management Plane */
-	mngp_init(&mac_info, (uint8_t)MNGP_SPROF_USI_PORT);
+	MNGP_Initialize(&macInfo, (uint8_t)MNGP_SPROF_USI_PORT);
 
-	/* set critical region */
+	/* Set critical region */
 	__set_BASEPRI(0);
 }
 
-/**
- * \brief PRIME stack process
- */
-void prime_stack_process(void)
+void PRIME_API_Tasks(void)
 {
-	/* set critical region */
+	/* Set critical region */
 	__set_BASEPRI( 3 << (8 - __NVIC_PRIO_BITS));
 
-	/* Process PRIME layers */
-	pal_process();
-
-	mac_process();
+	/* Process MAC layer */
+	MAC_Tasks();
 
 <#if (PRIME_MODE == "SN") || (PRIME_MODE == "BN" && BN_SLAVE_EN == true)>
-	/* Process MNG layer */
-	mngp_process();
+	/* Process Management Plane */
+	MNGP_Tasks();
 </#if>
 
-	/* set critical region */
+	/* Set critical region */
 	__set_BASEPRI(0);
 }
-
-/* @} */
-
-/* @cond 0 */
-/**INDENT-OFF**/
-#ifdef __cplusplus
-}
-#endif
-/**INDENT-ON**/
-/* @endcond */

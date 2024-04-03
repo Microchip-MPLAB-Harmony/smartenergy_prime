@@ -1,73 +1,69 @@
-/**
- * \file
- *
- * \brief PRIME_API : PRIME WRAPPER API joins a library's existing interface into a global interface
- *
- * Copyright (c) 2023 Atmel Corporation. All rights reserved.
- *
- * \asf_license_start
- *
- * \page License
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- * 1. Redistributions of source code must retain the above copyright notice,
- *    this list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright notice,
- *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution.
- *
- * 3. The name of Atmel may not be used to endorse or promote products derived
- *    from this software without specific prior written permission.
- *
- * 4. This software may only be redistributed and used in connection with an
- *    Atmel microcontroller product.
- *
- * THIS SOFTWARE IS PROVIDED BY ATMEL "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT ARE
- * EXPRESSLY AND SPECIFICALLY DISCLAIMED. IN NO EVENT SHALL ATMEL BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
- * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
- * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- * \asf_license_stop
- *
- */
+/*******************************************************************************
+  PRIME API Header 
+   
+  Company:
+    Microchip Technology Inc.
+
+  File Name:
+    prime_api.h
+
+  Summary:
+    PRIME API Header File
+
+  Description:
+    This module converts the PRIME stack library interface into a global 
+    interface to be used by the PRIME application.
+*******************************************************************************/
+
+//DOM-IGNORE-BEGIN
+/*******************************************************************************
+* Copyright (C) 2024 Microchip Technology Inc. and its subsidiaries.
+*
+* Subject to your compliance with these terms, you may use Microchip software
+* and any derivatives exclusively with Microchip products. It is your
+* responsibility to comply with third party license terms applicable to your
+* use of third party software (including open source software) that may
+* accompany Microchip software.
+*
+* THIS SOFTWARE IS SUPPLIED BY MICROCHIP "AS IS". NO WARRANTIES, WHETHER
+* EXPRESS, IMPLIED OR STATUTORY, APPLY TO THIS SOFTWARE, INCLUDING ANY IMPLIED
+* WARRANTIES OF NON-INFRINGEMENT, MERCHANTABILITY, AND FITNESS FOR A
+* PARTICULAR PURPOSE.
+*
+* IN NO EVENT WILL MICROCHIP BE LIABLE FOR ANY INDIRECT, SPECIAL, PUNITIVE,
+* INCIDENTAL OR CONSEQUENTIAL LOSS, DAMAGE, COST OR EXPENSE OF ANY KIND
+* WHATSOEVER RELATED TO THE SOFTWARE, HOWEVER CAUSED, EVEN IF MICROCHIP HAS
+* BEEN ADVISED OF THE POSSIBILITY OR THE DAMAGES ARE FORESEEABLE. TO THE
+* FULLEST EXTENT ALLOWED BY LAW, MICROCHIP'S TOTAL LIABILITY ON ALL CLAIMS IN
+* ANY WAY RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF ANY,
+* THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
+*******************************************************************************/
+//DOM-IGNORE-END
 
 #ifndef PRIME_API_H_INCLUDE
 #define PRIME_API_H_INCLUDE
 
+// *****************************************************************************
+// *****************************************************************************
+// Section: Include Files
+// *****************************************************************************
+// *****************************************************************************
+
 #include "prime_api_defs.h"
 
-/* @cond 0 */
-/**INDENT-OFF**/
-#ifdef __cplusplus
-extern "C" {
+// DOM-IGNORE-BEGIN
+#ifdef __cplusplus  // Provide C++ Compatibility
+
+    extern "C" {
+
 #endif
-/**INDENT-ON**/
-/* @endcond */
+// DOM-IGNORE-END
 
-/**
- * \defgroup prime_ng_group PRIME NG
- *
- * This module provides configuration and utils for PRIME.
- */
-
-/**
- * \ingroup prime_ng_group
- * \defgroup prime_api_group PRIME Application Interface
- *
- * This module provides configuration and utils for
- * the PRIME stack in a Service Node.
- * @{
- */
+// *****************************************************************************
+// *****************************************************************************
+// Section: Macro Definitions
+// *****************************************************************************
+// *****************************************************************************
 
 #define PRIME_FW_VENDOR          "${PRIME_FW_VENDOR?string}"
 #define PRIME_FW_MODEL           "${PRIME_FW_MODEL?string}"
@@ -75,144 +71,221 @@ extern "C" {
 #define PRIME_PIB_VENDOR         ${PRIME_PIB_VENDOR}
 #define PRIME_PIB_MODEL          0x${PRIME_PIB_MODEL}
 
-/** \brief PRIME control interface */
-/* @{ */
-void prime_stack_init(void *px_hal_api);
-void prime_stack_process(void);
+// *****************************************************************************
+// *****************************************************************************
+// Section: PRIME API Control Interface Routines
+// *****************************************************************************
+// *****************************************************************************
 
-/* @} */
+// *****************************************************************************
+/* Function:
+    void PRIME_API_Initialize(void *halApi)
+
+  Summary:
+    Initializes the PRIME stack.
+
+  Description:
+    This routine initializes the PRIME stack.
+
+  Precondition:
+    None.
+
+  Parameters:
+    halApi      - Pointer to the HAL API functions
+
+  Returns:
+    None.
+
+  Example:
+    <code>
+    PRIME_API_Initialize((HAL_API*)&halApi);
+    </code>
+
+  Remarks:
+    This routine is normally not called directly by an application. The 
+    PRIME application must use the function located in the header table.
+*/
+void PRIME_API_Initialize(void *halApi);
+
+// ****************************************************************************
+/* Function:
+    void PRIME_API_Tasks(void)
+
+  Summary:
+    Maintains the PRIME stack state machine. 
+
+  Description:
+    This function is used to maintain the PRIME stack internal state machine and 
+    generate callbacks.
+
+  Precondition:
+    The PRIME_API_Initialize function should have been called before calling this 
+    function.
+
+  Parameters:
+    None
+
+  Returns:
+    None
+
+  Example:
+    <code>
+    while (true)
+    {
+        PRIME_API_Tasks();
+    }
+    </code>
+
+  Remarks:
+    This routine is normally not called directly by an application. The 
+    PRIME application must use the function located in the header table 
+    and call it periodically.
+*/
+void PRIME_API_Tasks(void);
+
 
 <#if (PRIME_MODE == "SN") || (PRIME_MODE == "BN" && BN_SLAVE_EN == true)>
-/** Pointer to the PRIME stack */
-extern uint32_t prime_api;
-#define PRIME_API_FUNCS_OFFSET                    0x18
-/** \brief PRIME constants located in header table (offset, type) duplets */
-/* @{ */
+// *****************************************************************************
+// *****************************************************************************
+// Section: PRIME API Interface Routines in separated application binaries
+// *****************************************************************************
+// *****************************************************************************
 
-#define PRIME_VENDOR                              (*((uint16_t *)((prime_api) + (0x00))))
-#define PRIME_MODEL                               (*((uint16_t *)((prime_api) + (0x02))))
-#define PRIME_VERSION                             (*((char *)((prime_api) + (0x04))))
-/* @} */
-/** \brief PRIME control functions interface (index, type) duplets */
-/* @{ */
-#define prime_init                                        ((prime_init_t)(prime_api + ((uint32_t *)(prime_api + PRIME_API_FUNCS_OFFSET))[0]))
-#define prime_process                                     ((prime_process_t)(prime_api + ((uint32_t *)(prime_api + PRIME_API_FUNCS_OFFSET))[1]))
-#define prime_cl_null_set_callbacks                       ((mac_set_callbacks_t)(prime_api + ((uint32_t *)(prime_api + PRIME_API_FUNCS_OFFSET))[2]))
-#define prime_cl_null_establish_request                   ((mac_establish_request_t)(prime_api + ((uint32_t *)(prime_api + PRIME_API_FUNCS_OFFSET))[3]))
-#define prime_cl_null_establish_response                  ((mac_establish_response_t)(prime_api + ((uint32_t *)(prime_api + PRIME_API_FUNCS_OFFSET))[4]))
-#define prime_cl_null_release_request                     ((mac_release_request_t)(prime_api + ((uint32_t *)(prime_api + PRIME_API_FUNCS_OFFSET))[5]))
-#define prime_cl_null_release_response                    ((mac_release_response_t)(prime_api + ((uint32_t *)(prime_api + PRIME_API_FUNCS_OFFSET))[6]))
-#define prime_cl_null_join_request                        ((mac_join_request_t)(prime_api + ((uint32_t *)(prime_api + PRIME_API_FUNCS_OFFSET))[7]))
-#define prime_cl_null_join_response                       ((mac_join_response_t)(prime_api + ((uint32_t *)(prime_api + PRIME_API_FUNCS_OFFSET))[8]))
-#define prime_cl_null_leave_request                       ((mac_leave_request_t)(prime_api + ((uint32_t *)(prime_api + PRIME_API_FUNCS_OFFSET))[9]))
-#define prime_cl_null_data_request                        ((mac_data_request_t)(prime_api + ((uint32_t *)(prime_api + PRIME_API_FUNCS_OFFSET))[10]))
-#define prime_cl_null_plme_reset_request                  ((plme_reset_request_t)(prime_api + ((uint32_t *)(prime_api + PRIME_API_FUNCS_OFFSET))[11]))
-#define prime_cl_null_plme_sleep_request                  ((plme_sleep_request_t)(prime_api + ((uint32_t *)(prime_api + PRIME_API_FUNCS_OFFSET))[12]))
-#define prime_cl_null_plme_resume_request                 ((plme_resume_request_t)(prime_api + ((uint32_t *)(prime_api + PRIME_API_FUNCS_OFFSET))[13]))
-#define prime_cl_null_plme_testmode_request               ((plme_testmode_request_t)(prime_api + ((uint32_t *)(prime_api + PRIME_API_FUNCS_OFFSET))[14]))
-#define prime_cl_null_plme_get_request                    ((plme_get_request_t)(prime_api + ((uint32_t *)(prime_api + PRIME_API_FUNCS_OFFSET))[15]))
-#define prime_cl_null_plme_set_request                    ((plme_set_request_t)(prime_api + ((uint32_t *)(prime_api + PRIME_API_FUNCS_OFFSET))[16]))
-#define prime_cl_null_mlme_register_request               ((mlme_register_request_t)(prime_api + ((uint32_t *)(prime_api + PRIME_API_FUNCS_OFFSET))[17]))
-#define prime_cl_null_mlme_unregister_request             ((mlme_unregister_request_t)(prime_api + ((uint32_t *)(prime_api + PRIME_API_FUNCS_OFFSET))[18]))
-#define prime_cl_null_mlme_promote_request                ((mlme_promote_request_t)(prime_api + ((uint32_t *)(prime_api + PRIME_API_FUNCS_OFFSET))[19]))
-#define prime_cl_null_mlme_demote_request                 ((mlme_demote_request_t)(prime_api + ((uint32_t *)(prime_api + PRIME_API_FUNCS_OFFSET))[20]))
-#define prime_cl_null_mlme_reset_request                  ((mlme_reset_request_t)(prime_api + ((uint32_t *)(prime_api + PRIME_API_FUNCS_OFFSET))[21]))
-#define prime_cl_null_mlme_get_request                    ((mlme_get_request_t)(prime_api + ((uint32_t *)(prime_api + PRIME_API_FUNCS_OFFSET))[22]))
-#define prime_cl_null_mlme_list_get_request               ((mlme_list_get_request_t)(prime_api + ((uint32_t *)(prime_api + PRIME_API_FUNCS_OFFSET))[23]))
-#define prime_cl_null_mlme_set_request                    ((mlme_set_request_t)(prime_api + ((uint32_t *)(prime_api + PRIME_API_FUNCS_OFFSET))[24]))
-#define prime_cl_432_set_callbacks                        ((cl_432_set_callbacks_t)(prime_api + ((uint32_t *)(prime_api + PRIME_API_FUNCS_OFFSET))[25]))
-#define prime_cl_432_establish_request                    ((cl_432_establish_request_t)(prime_api + ((uint32_t *)(prime_api + PRIME_API_FUNCS_OFFSET))[26]))
-#define prime_cl_432_release_request                      ((cl_432_release_request_t)(prime_api + ((uint32_t *)(prime_api + PRIME_API_FUNCS_OFFSET))[27]))
-#define prime_cl_432_dl_data_request                      ((cl_432_dl_data_request_t)(prime_api + ((uint32_t *)(prime_api + PRIME_API_FUNCS_OFFSET))[28]))
-#define prime_cl_null_mlme_mp_promote_request             ((mlme_mp_promote_request_t)(prime_api + ((uint32_t *)(prime_api + PRIME_API_FUNCS_OFFSET))[29]))
-#define prime_cl_null_mlme_mp_demote_request              ((mlme_mp_demote_request_t)(prime_api + ((uint32_t *)(prime_api + PRIME_API_FUNCS_OFFSET))[30]))
-/* @} */
+/* Pointer to the PRIME stack */
+extern uint32_t primeApi;
+
+#define PRIME_API_FUNCS_OFFSET                    0x18
+
+/* PRIME constants located in header table (offset, type) duplets */
+
+#define PRIME_VENDOR                              (*((uint16_t *)((primeApi) + (0x00))))
+#define PRIME_MODEL                               (*((uint16_t *)((primeApi) + (0x02))))
+#define PRIME_VERSION                             (*((char *)((primeApi) + (0x04))))
+
+/* PRIME control functions interface - (index, type) duplets */
+#define PRIME_Initialize                                 ((PRIME_API_INITIALIZE)(primeApi + ((uint32_t *)(primeApi + PRIME_API_FUNCS_OFFSET))[0]))
+#define PRIME_Tasks                                      ((PRIME_API_TASKS)(primeApi + ((uint32_t *)(primeApi + PRIME_API_FUNCS_OFFSET))[1]))
+#define PRIME_CL_NULL_SetCallbacks                       ((MAC_SET_CALLBACKS)(primeApi + ((uint32_t *)(primeApi + PRIME_API_FUNCS_OFFSET))[2]))
+#define PRIME_CL_NULL_EstablishRequest                   ((MAC_ESTABLISH_REQUEST)(primeApi + ((uint32_t *)(primeApi + PRIME_API_FUNCS_OFFSET))[3]))
+#define PRIME_CL_NULL_EstablishResponse                  ((MAC_ESTABLISH_RESPONSE)(primeApi + ((uint32_t *)(primeApi + PRIME_API_FUNCS_OFFSET))[4]))
+#define PRIME_CL_NULL_ReleaseRequest                     ((MAC_RELEASE_REQUEST)(primeApi + ((uint32_t *)(primeApi + PRIME_API_FUNCS_OFFSET))[5]))
+#define PRIME_CL_NULL_ReleaseResponse                    ((MAC_RELEASE_RESPONSE)(primeApi + ((uint32_t *)(primeApi + PRIME_API_FUNCS_OFFSET))[6]))
+#define PRIME_CL_NULL_JoinRequest                        ((MAC_JOIN_REQUEST)(primeApi + ((uint32_t *)(primeApi + PRIME_API_FUNCS_OFFSET))[7]))
+#define PRIME_CL_NULL_JoinResponse                       ((MAC_JOIN_RESPONSE)(primeApi + ((uint32_t *)(primeApi + PRIME_API_FUNCS_OFFSET))[8]))
+#define PRIME_CL_NULL_LeaveRequest                       ((MAC_LEAVE_REQUEST)(primeApi + ((uint32_t *)(primeApi + PRIME_API_FUNCS_OFFSET))[9]))
+#define PRIME_CL_NULL_DataRequest                        ((MAC_DATA_REQUEST)(primeApi + ((uint32_t *)(primeApi + PRIME_API_FUNCS_OFFSET))[10]))
+#define PRIME_CL_NULL_PlmeResetRequest                   ((PLME_RESET_REQUEST)(primeApi + ((uint32_t *)(primeApi + PRIME_API_FUNCS_OFFSET))[11]))
+#define PRIME_CL_NULL_PlmeSleepRequest                   ((PLME_SLEEP_REQUEST)(primeApi + ((uint32_t *)(primeApi + PRIME_API_FUNCS_OFFSET))[12]))
+#define PRIME_CL_NULL_PlmeResumeRequest                  ((PLME_RESUME_REQUEST)(primeApi + ((uint32_t *)(primeApi + PRIME_API_FUNCS_OFFSET))[13]))
+#define PRIME_CL_NULL_PlmeTestModeRequest                ((PLME_TESTMODE_REQUEST)(primeApi + ((uint32_t *)(primeApi + PRIME_API_FUNCS_OFFSET))[14]))
+#define PRIME_CL_NULL_PlmeGetRequest                     ((PLME_GET_REQUEST)(primeApi + ((uint32_t *)(primeApi + PRIME_API_FUNCS_OFFSET))[15]))
+#define PRIME_CL_NULL_PlmeSetRequest                     ((PLME_SET_REQUEST)(primeApi + ((uint32_t *)(primeApi + PRIME_API_FUNCS_OFFSET))[16]))
+#define PRIME_CL_NULL_MlmeRegisterRequest                ((MLME_REGISTER_REQUEST)(primeApi + ((uint32_t *)(primeApi + PRIME_API_FUNCS_OFFSET))[17]))
+#define PRIME_CL_NULL_MlmeUnregisterRequest              ((MLME_UNREGISTER_REQUEST)(primeApi + ((uint32_t *)(primeApi + PRIME_API_FUNCS_OFFSET))[18]))
+#define PRIME_CL_NULL_MlmePromoteRequest                 ((MLME_PROMOTE_REQUEST)(primeApi + ((uint32_t *)(primeApi + PRIME_API_FUNCS_OFFSET))[19]))
+#define PRIME_CL_NULL_MlmeDemoteRequest                  ((MLME_DEMOTE_REQUEST)(primeApi + ((uint32_t *)(primeApi + PRIME_API_FUNCS_OFFSET))[20]))
+#define PRIME_CL_NULL_MlmeResetRequest                   ((MLME_RESET_REQUEST)(primeApi + ((uint32_t *)(primeApi + PRIME_API_FUNCS_OFFSET))[21]))
+#define PRIME_CL_NULL_MlmeGetRequest                     ((MLME_GET_REQUEST)(primeApi + ((uint32_t *)(primeApi + PRIME_API_FUNCS_OFFSET))[22]))
+#define PRIME_CL_NULL_MlmeListGetRequest                 ((MLME_LIST_GET_REQUEST)(primeApi + ((uint32_t *)(primeApi + PRIME_API_FUNCS_OFFSET))[23]))
+#define PRIME_CL_NULL_MlmeSetRequest                     ((MLME_SET_REQUEST)(primeApi + ((uint32_t *)(primeApi + PRIME_API_FUNCS_OFFSET))[24]))
+#define PRIME_CL_432_SetCallbacks                        ((CL_432_SET_CALLBACKS)(primeApi + ((uint32_t *)(primeApi + PRIME_API_FUNCS_OFFSET))[25]))
+#define PRIME_CL_432_EstablishRequest                    ((CL_432_ESTABLISH_REQUEST)(primeApi + ((uint32_t *)(primeApi + PRIME_API_FUNCS_OFFSET))[26]))
+#define PRIME_CL_432_ReleaseRequest                      ((CL_432_RELEASE_REQUEST)(primeApi + ((uint32_t *)(primeApi + PRIME_API_FUNCS_OFFSET))[27]))
+#define PRIME_CL_432_DlDataRequest                       ((CL_432_DL_DATA_REQUEST)(primeApi + ((uint32_t *)(primeApi + PRIME_API_FUNCS_OFFSET))[28]))
+#define PRIME_CL_NULL_MlmeMpPromoteRequest               ((MLME_MP_PROMOTE_REQUEST)(primeApi + ((uint32_t *)(primeApi + PRIME_API_FUNCS_OFFSET))[29]))
+#define PRIME_CL_NULL_MlmeMpDemoteRequest                ((MLME_MP_DEMOTE_REQUEST)(primeApi + ((uint32_t *)(primeApi + PRIME_API_FUNCS_OFFSET))[30]))
 
 <#else>
 
+// *****************************************************************************
+// *****************************************************************************
+// Section: PRIME API Interface Routines in monolithic application
+// *****************************************************************************
+// *****************************************************************************
+
 #include "stack/prime/conv/sscs/null/cl_null_api.h"
 #include "stack/prime/conv/sscs/iec_4_32/cl_432_api.h"
+
 <#if PRIME_MODE == "BN" && BN_SLAVE_EN == false>
 #include "stack/prime/mngp/bmng_api.h"
 </#if>
 
-/** \brief PRIME control functions interface. Direct Access to PRIME lib */
-/* @{ */
-#define prime_init                                        prime_stack_init
-#define prime_process                                     prime_stack_process
-#define prime_cl_null_set_callbacks                       cl_null_set_callbacks
-#define prime_cl_null_establish_request                   cl_null_establish_request
-#define prime_cl_null_establish_response                  cl_null_establish_response
-#define prime_cl_null_release_request                     cl_null_release_request
-#define prime_cl_null_release_response                    cl_null_release_response
+/* PRIME control functions interface - direct access to PRIME library */
+#define PRIME_Initialize                                 PRIME_API_Initialize
+#define PRIME_Tasks                                      PRIME_API_Tasks
+#define PRIME_CL_NULL_SetCallbacks                       CL_NULL_SetCallbacks
+#define PRIME_CL_NULL_EstablishRequest                   CL_NULL_EstablishRequest
+#define PRIME_CL_NULL_EstablishResponse                  CL_NULL_EstablishResponse
+#define PRIME_CL_NULL_ReleaseRequest                     CL_NULL_ReleaseRequest
+#define PRIME_CL_NULL_ReleaseResponse                    CL_NULL_ReleaseResponse
 <#if PRIME_MODE == "BN" && BN_SLAVE_EN == false>
-#define prime_cl_null_redirect_response                   cl_null_redirect_response
+#define PRIME_CL_NULL_RedirectResponse                   CL_NULL_RedirectResponse
 </#if>
-#define prime_cl_null_join_request                        cl_null_join_request
-#define prime_cl_null_join_response                       cl_null_join_response
-#define prime_cl_null_leave_request                       cl_null_leave_request
-#define prime_cl_null_data_request                        cl_null_data_request
-#define prime_cl_null_plme_reset_request                  cl_null_plme_reset_request
-#define prime_cl_null_plme_sleep_request                  cl_null_plme_sleep_request
-#define prime_cl_null_plme_resume_request                 cl_null_plme_resume_request
-#define prime_cl_null_plme_testmode_request               cl_null_plme_testmode_request
-#define prime_cl_null_plme_get_request                    cl_null_plme_get_request
-#define prime_cl_null_plme_set_request                    cl_null_plme_set_request
+#define PRIME_CL_NULL_JoinRequest                        CL_NULL_JoinRequest
+#define PRIME_CL_NULL_JoinResponse                       CL_NULL_JoinResponse
+#define PRIME_CL_NULL_LeaveRequest                       CL_NULL_LeaveRequest
+#define PRIME_CL_NULL_DataRequest                        CL_NULL_DataRequest
+#define PRIME_CL_NULL_PlmeResetRequest                   CL_NULL_PlmeResetRequest
+#define PRIME_CL_NULL_PlmeSleepRequest                   CL_NULL_PlmeSleepRequest
+#define PRIME_CL_NULL_PlmeResumeRequest                  CL_NULL_PlmeResumeRequest
+#define PRIME_CL_NULL_PlmeTestModeRequest                CL_NULL_PlmeTestModeRequest
+#define PRIME_CL_NULL_PlmeGetRequest                     CL_NULL_PlmeGetRequest
+#define PRIME_CL_NULL_PlmeSetRequest                     CL_NULL_PlmeSetRequest
 <#if (PRIME_MODE == "BN" && BN_SLAVE_EN == true)>
-#define prime_cl_null_mlme_register_request               cl_null_mlme_register_request
-#define prime_cl_null_mlme_unregister_request             cl_null_mlme_unregister_request
+#define PRIME_CL_NULL_MlmeRegisterRequest                CL_NULL_MlmeRegisterRequest
+#define PRIME_CL_NULL_MlmeUnregisterRequest              CL_NULL_MlmeUnregisterRequest
 </#if>
-#define prime_cl_null_mlme_promote_request                cl_null_mlme_promote_request
-#define prime_cl_null_mlme_mp_promote_request             cl_null_mlme_mp_promote_request
+#define PRIME_CL_NULL_MlmePromoteRequest                 CL_NULL_MlmePromoteRequest
+#define PRIME_CL_NULL_MlmeMpPromoteRequest               CL_NULL_MlmeMpPromoteRequest
 <#if (PRIME_MODE == "BN" && BN_SLAVE_EN == true)>
-#define prime_cl_null_mlme_demote_request                 cl_null_mlme_demote_request
-#define prime_cl_null_mlme_mp_demote_request              cl_null_mlme_mp_demote_request
+#define PRIME_CL_NULL_MlmeDemoteRequest                  CL_NULL_MlmeDemoteRequest
+#define PRIME_CL_NULL_MlmeMpDemoteRequest                CL_NULL_MlmeMpDemoteRequest
 </#if>
-#define prime_cl_null_mlme_reset_request                  cl_null_mlme_reset_request
-#define prime_cl_null_mlme_get_request                    cl_null_mlme_get_request
-#define prime_cl_null_mlme_list_get_request               cl_null_mlme_list_get_request
-#define prime_cl_null_mlme_set_request                    cl_null_mlme_set_request
-#define prime_cl_432_set_callbacks                        cl_432_set_callbacks
+#define PRIME_CL_NULL_MlmeResetRequest                   CL_NULL_MlmeResetRequest
+#define PRIME_CL_NULL_MlmeGetRequest                     CL_NULL_MlmeGetRequest
+#define PRIME_CL_NULL_MlmeListGetRequest                 CL_NULL_MlmeListGetRequest
+#define PRIME_CL_NULL_MlmeSetRequest                     CL_NULL_MlmeSetRequest
+#define PRIME_CL_432_SetCallbacks                        CL_432_SetCallbacks
 <#if (PRIME_MODE == "BN" && BN_SLAVE_EN == true)>
-#define prime_cl_432_establish_request                    cl_432_establish_request
+#define PRIME_CL_432_EstablishRequest                    CL_432_EstablishRequest
 </#if>
-#define prime_cl_432_release_request                      cl_432_release_request
-#define prime_cl_432_dl_data_request                      cl_432_dl_data_request
+#define PRIME_CL_432_ReleaseRequest                      CL_432_ReleaseRequest
+#define PRIME_CL_432_DlDataRequest                       CL_432_DlDataRequest
 <#if PRIME_MODE == "BN" && BN_SLAVE_EN == false>
-#define prime_bmng_set_callbacks                          bmng_set_callbacks
-#define prime_bmng_fup_clear_target_list_request          bmng_fup_clear_target_list_request
-#define prime_bmng_fup_add_target_request                 bmng_fup_add_target_request
-#define prime_bmng_fup_set_fw_data_request                bmng_fup_set_fw_data_request
-#define prime_bmng_fup_set_upg_options_request            bmng_fup_set_upg_options_request
-#define prime_bmng_fup_init_file_tx_request               bmng_fup_init_file_tx_request
-#define prime_bmng_fup_data_frame_request                 bmng_fup_data_frame_request
-#define prime_bmng_fup_check_crc_request                  bmng_fup_check_crc_request
-#define prime_bmng_fup_abort_fu_request                   bmng_fup_abort_fu_request
-#define prime_bmng_fup_start_fu_request                   bmng_fup_start_fu_request
-#define prime_bmng_fup_set_match_rule_request             bmng_fup_set_match_rule_request
-#define prime_bmng_fup_get_version_request                bmng_fup_get_version_request
-#define prime_bmng_fup_get_state_request                  bmng_fup_get_state_request
-#define prime_bmng_fup_set_signature_data_request         bmng_fup_set_signature_data_request
-#define prime_bmng_pprof_get_request                      bmng_pprof_get_request
-#define prime_bmng_pprof_set_request                      bmng_pprof_set_request
-#define prime_bmng_pprof_reset_request                    bmng_pprof_reset_request
-#define prime_bmng_pprof_reboot_request                   bmng_pprof_reboot_request
-#define prime_bmng_pprof_get_enhanced_request             bmng_pprof_get_enhanced_request
-#define prime_bmng_pprof_zc_diff_request                  bmng_pprof_zc_diff_request
-#define prime_bmng_whitelist_add_request                  bmng_whitelist_add_request
-#define prime_bmng_whitelist_remove_request               bmng_whitelist_remove_request
+#define PRIME_BMNG_SetCallbacks                          BMNG_SetCallbacks
+#define PRIME_BMNG_FUP_ClearTargetListRequest            BMNG_FUP_ClearTargetListRequest
+#define PRIME_BMNG_FUP_AddTargetRequest                  BMNG_FUP_AddTargetRequest
+#define PRIME_BMNG_FUP_SetFwDataRequest                  BMNG_FUP_SetFwDataRequest
+#define PRIME_BMNG_FUP_SetUpgradeOptionsRequest          BMNG_FUP_SetUpgradeOptionsRequest
+#define PRIME_BMNG_FUP_InitFileTxRequest                 BMNG_FUP_InitFileTxRequest
+#define PRIME_BMNG_FUP_DataFrameRequest                  BMNG_FUP_DataFrameRequest
+#define PRIME_BMNG_FUP_CheckCrcRequest                   BMNG_FUP_CheckCrcRequest
+#define PRIME_BMNG_FUP_AbortFuRequest                    BMNG_FUP_AbortFuRequest
+#define PRIME_BMNG_FUP_StartFuRequest                    BMNG_FUP_StartFuRequest
+#define PRIME_BMNG_FUP_SetMatchRuleRequest               BMNG_FUP_SetMatchRuleRequest
+#define PRIME_BMNG_FUP_GetVersionRequest                 BMNG_FUP_GetVersionRequest
+#define PRIME_BMNG_FUP_GetStateRequest                   BMNG_FUP_GetStateRequest
+#define PRIME_BMNG_FUP_SetSignatureDataRequest           BMNG_FUP_SetSignatureDataRequest
+#define PRIME_BMNG_PPROF_GetRequest                      BMNG_PPROF_GetRequest
+#define PRIME_BMNG_PPROF_SetRequest                      BMNG_PPROF_SetRequest
+#define PRIME_BMNG_PPROF_ResetRequest                    BMNG_PPROF_ResetRequest
+#define PRIME_BMNG_PPROF_RebootRequest                   BMNG_PPROF_RebootRequest
+#define PRIME_BMNG_PPROF_GetEnhancedRequest              BMNG_PPROF_GetEnhancedRequest
+#define PRIME_BMNG_PPROF_GetZcDiffRequest                BMNG_PPROF_GetZcDiffRequest
+#define PRIME_BMNG_WHITELIST_AddRequest                  BMNG_WHITELIST_AddRequest
+#define PRIME_BMNG_WHITELIST_RemoveRequest               BMNG_WHITELIST_RemoveRequest
 </#if>
 
-/* @} */
 </#if>
 
-/* @} */
-
-/* @cond 0 */
-/**INDENT-OFF**/
+//DOM-IGNORE-BEGIN
 #ifdef __cplusplus
 }
 #endif
-/**INDENT-ON**/
-/* @endcond */
+//DOM-IGNORE-END
+
 #endif /* PRIME_API_H_INCLUDE */
+
+/*******************************************************************************
+ End of File
+*/

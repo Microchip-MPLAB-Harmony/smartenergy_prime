@@ -11,41 +11,42 @@
   .global prime_functions
     
   /* PRIME WRAPPER control functions interface */
-  .extern prime_stack_init
-  .extern prime_stack_process
+  .extern PRIME_API_Initialize
+  .extern PRIME_API_Tasks
 
   /* PRIME CL_NULL functions interface */
-  .extern cl_null_set_callbacks
-  .extern cl_null_establish_request
-  .extern cl_null_establish_response
-  .extern cl_null_release_request
-  .extern cl_null_release_response
-  .extern cl_null_join_request
-  .extern cl_null_join_response
-  .extern cl_null_leave_request
-  .extern cl_null_data_request
-  .extern cl_null_plme_reset_request
-  .extern cl_null_plme_sleep_request
-  .extern cl_null_plme_resume_request
-  .extern cl_null_plme_testmode_request
-  .extern cl_null_plme_get_request
-  .extern cl_null_plme_set_request
-  .extern cl_null_mlme_register_request
-  .extern cl_null_mlme_unregister_request
-  .extern cl_null_mlme_promote_request
-  .extern cl_null_mlme_demote_request
-  .extern cl_null_mlme_reset_request
-  .extern cl_null_mlme_get_request
-  .extern cl_null_mlme_list_get_request
-  .extern cl_null_mlme_set_request
+  .extern CL_NULL_SetCallbacks
+  .extern CL_NULL_EstablishRequest
+  .extern CL_NULL_EstablishResponse
+  .extern CL_NULL_ReleaseRequest
+  .extern CL_NULL_ReleaseResponse
+  .extern CL_NULL_JoinRequest
+  .extern CL_NULL_JoinResponse
+  .extern CL_NULL_LeaveRequest
+  .extern CL_NULL_DataRequest
+  .extern CL_NULL_PlmeResetRequest
+  .extern CL_NULL_PlmeSleepRequest
+  .extern CL_NULL_PlmeResumeRequest
+  .extern CL_NULL_PlmeTestModeRequest
+  .extern CL_NULL_PlmeGetRequest
+  .extern CL_NULL_PlmeSetRequest
+  .extern CL_NULL_MlmeRegisterRequest
+  .extern CL_NULL_MlmeUnregisterRequest
+  .extern CL_NULL_MlmePromoteRequest
+  .extern CL_NULL_MlmeDemoteRequest
+  .extern CL_NULL_MlmeResetRequest
+  .extern CL_NULL_MlmeGetRequest
+  .extern CL_NULL_MlmeListGetRequest
+  .extern CL_NULL_MlmeSetRequest
 
   /* PRIME SSCS_432 functions interface */
-  .extern cl_432_set_callbacks
-  .extern cl_432_establish_request
-  .extern cl_432_release_request
-  .extern cl_432_dl_data_request
-  .extern cl_null_mlme_mp_promote_request
-  .extern cl_null_mlme_mp_demote_request
+  .extern CL_432_SetCallbacks
+  .extern CL_432_EstablishRequest
+  .extern CL_432_ReleaseRequest
+  .extern CL_432_DlDataRequest
+  
+  .extern CL_NULL_MlmeMpPromoteRequest
+  .extern CL_NULL_MlmeMpDemoteRequest
 
   .section .prmwrp
 prime_header:
@@ -60,38 +61,39 @@ prime_version:
   /* PRIME WRAPPER control functions interface */
   .word 0
 prime_functions:
-  .word prime_stack_init - prime_header
-  .word prime_stack_process - prime_header
+  .word PRIME_API_Initialize - prime_header
+  .word PRIME_API_Tasks - prime_header
 
   /* PRIME CL_NULL functions interface */
-  .word cl_null_set_callbacks - prime_header
-  .word cl_null_establish_request - prime_header
-  .word cl_null_establish_response - prime_header
-  .word cl_null_release_request - prime_header
-  .word cl_null_release_response - prime_header
-  .word cl_null_join_request - prime_header
-  .word cl_null_join_response - prime_header
-  .word cl_null_leave_request - prime_header
-  .word cl_null_data_request - prime_header
-  .word cl_null_plme_reset_request - prime_header
-  .word cl_null_plme_sleep_request - prime_header
-  .word cl_null_plme_resume_request - prime_header
-  .word cl_null_plme_testmode_request - prime_header
-  .word cl_null_plme_get_request - prime_header
-  .word cl_null_plme_set_request - prime_header
-  .word cl_null_mlme_register_request - prime_header
-  .word cl_null_mlme_unregister_request - prime_header
-  .word cl_null_mlme_promote_request - prime_header
-  .word cl_null_mlme_demote_request - prime_header
-  .word cl_null_mlme_reset_request - prime_header
-  .word cl_null_mlme_get_request - prime_header
-  .word cl_null_mlme_list_get_request - prime_header
-  .word cl_null_mlme_set_request - prime_header
+  .word CL_NULL_SetCallbacks - prime_header
+  .word CL_NULL_EstablishRequest - prime_header
+  .word CL_NULL_EstablishResponse - prime_header
+  .word CL_NULL_ReleaseRequest - prime_header
+  .word CL_NULL_ReleaseResponse - prime_header
+  .word CL_NULL_JoinRequest - prime_header
+  .word CL_NULL_JoinResponse - prime_header
+  .word CL_NULL_LeaveRequest - prime_header
+  .word CL_NULL_DataRequest - prime_header
+  .word CL_NULL_PlmeResetRequest - prime_header
+  .word CL_NULL_PlmeSleepRequest - prime_header
+  .word CL_NULL_PlmeResumeRequest - prime_header
+  .word CL_NULL_PlmeTestModeRequest - prime_header
+  .word CL_NULL_PlmeGetRequest - prime_header
+  .word CL_NULL_PlmeSetRequest - prime_header
+  .word CL_NULL_MlmeRegisterRequest - prime_header
+  .word CL_NULL_MlmeUnregisterRequest - prime_header
+  .word CL_NULL_MlmePromoteRequest - prime_header
+  .word CL_NULL_MlmeDemoteRequest - prime_header
+  .word CL_NULL_MlmeResetRequest - prime_header
+  .word CL_NULL_MlmeGetRequest - prime_header
+  .word CL_NULL_MlmeListGetRequest - prime_header
+  .word CL_NULL_MlmeSetRequest - prime_header
 
   /* PRIME SSCS_432 functions interface */
-  .word cl_432_set_callbacks - prime_header
-  .word cl_432_establish_request - prime_header
-  .word cl_432_release_request - prime_header
-  .word cl_432_dl_data_request - prime_header
-  .word cl_null_mlme_mp_promote_request - prime_header
-  .word cl_null_mlme_mp_demote_request - prime_header
+  .word CL_432_SetCallbacks - prime_header
+  .word CL_432_EstablishRequest - prime_header
+  .word CL_432_ReleaseRequest - prime_header
+  .word CL_432_DlDataRequest - prime_header
+  
+  .word CL_NULL_MlmeMpPromoteRequest - prime_header
+  .word CL_NULL_MlmeMpDemoteRequest - prime_header

@@ -710,7 +710,7 @@ void CL_NULL_PlmeSetRequest(uint16_t pibAttrib, void *pibValue, uint8_t pibSize,
 <#if (PRIME_MODE == "SN") || (PRIME_MODE == "BN" && BN_SLAVE_EN == true)>
 // *****************************************************************************
 /* Function:
-    CL_NULL_MlmeRegisterRequest
+    void CL_NULL_MlmeRegisterRequest
     (
         uint8_t *sna,
         uint8_t sid
@@ -746,7 +746,7 @@ void CL_NULL_MlmeRegisterRequest(uint8_t *sna, uint8_t sid);
 
 // *****************************************************************************
 /* Function:
-    CL_NULL_MlmeUnregisterRequest
+    void CL_NULL_MlmeUnregisterRequest
     (
         void
     )
@@ -778,7 +778,7 @@ void CL_NULL_MlmeUnregisterRequest(void);
 
 // *****************************************************************************
 /* Function:
-    CL_NULL_MlmeDemoteRequest
+    void CL_NULL_MlmeDemoteRequest
     (
         void
     )
@@ -812,7 +812,7 @@ void CL_NULL_MlmeDemoteRequest(void);
 
 // *****************************************************************************
 /* Function:
-    CL_NULL_MlmeMpDemoteRequest
+    void CL_NULL_MlmeMpDemoteRequest
     (
         uint8_t lsid
     )
@@ -848,7 +848,7 @@ void CL_NULL_MlmeMpDemoteRequest(uint8_t lsid);
 
 // *****************************************************************************
 /* Function:
-    CL_NULL_MlmePromoteRequest
+    void CL_NULL_MlmePromoteRequest
     (
         uint8_t *eui48,
         uint8_t bcnMode
@@ -888,7 +888,7 @@ void CL_NULL_MlmePromoteRequest(uint8_t *eui48, uint8_t bcnMode);
 
 // *****************************************************************************
 /* Function:
-    CL_NULL_MlmeMpPromoteRequest
+    void CL_NULL_MlmeMpPromoteRequest
     (
         uint8_t *eui48,
         uint8_t bcnMode,
@@ -933,7 +933,7 @@ void CL_NULL_MlmeMpPromoteRequest(uint8_t *eui48, uint8_t bcnMode, uint16_t pch)
 
 // *****************************************************************************
 /* Function:
-    CL_NULL_MlmeResetRequest
+    void CL_NULL_MlmeResetRequest
     (
         void
     )
