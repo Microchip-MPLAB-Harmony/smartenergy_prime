@@ -539,23 +539,21 @@ def instantiateComponent(primeStackConfigComponent):
     
     global pPrimeHalWrapperHeaderFile
     pPrimeHalWrapperHeaderFile = primeStackConfigComponent.createFileSymbol("PRIME_HAL_WRAPPER_HEADER", None)
-    pPrimeHalWrapperHeaderFile.setSourcePath("prime/src/prime_api/prime_hal_wrapper.h.ftl")
+    pPrimeHalWrapperHeaderFile.setSourcePath("prime/src/prime_api/prime_hal_wrapper.h")
     pPrimeHalWrapperHeaderFile.setOutputName("prime_hal_wrapper.h")
     pPrimeHalWrapperHeaderFile.setDestPath("stack/prime/prime_api")
     pPrimeHalWrapperHeaderFile.setProjectPath("config/" + configName + "/stack/prime/prime_api")
     pPrimeHalWrapperHeaderFile.setType("HEADER")
     pPrimeHalWrapperHeaderFile.setEnabled(False)
-    pPrimeHalWrapperHeaderFile.setMarkup(True)
     
     global pPrimeHalWrapperSourceFile
     pPrimeHalWrapperSourceFile = primeStackConfigComponent.createFileSymbol("PRIME_HAL_WRAPPER_SOURCE", None)
-    pPrimeHalWrapperSourceFile.setSourcePath("prime/src/prime_api/prime_hal_wrapper.c.ftl")
+    pPrimeHalWrapperSourceFile.setSourcePath("prime/src/prime_api/prime_hal_wrapper.c")
     pPrimeHalWrapperSourceFile.setOutputName("prime_hal_wrapper.c")
     pPrimeHalWrapperSourceFile.setDestPath("stack/prime/prime_api")
     pPrimeHalWrapperSourceFile.setProjectPath("config/" + configName + "/stack/prime/prime_api")
     pPrimeHalWrapperSourceFile.setType("SOURCE")
     pPrimeHalWrapperSourceFile.setEnabled(False)
-    pPrimeHalWrapperSourceFile.setMarkup(True)
     
     ##### MAC API
     global pMacHeaderFile
@@ -662,23 +660,21 @@ def instantiateComponent(primeStackConfigComponent):
     
     ##### HAL API
     pHalApiHeaderFile = primeStackConfigComponent.createFileSymbol("HAL_API_HEADER", None)
-    pHalApiHeaderFile.setSourcePath("prime/src/hal_api/hal_api.h.ftl")
+    pHalApiHeaderFile.setSourcePath("prime/src/hal_api/hal_api.h")
     pHalApiHeaderFile.setOutputName("hal_api.h")
     pHalApiHeaderFile.setDestPath("stack/prime/hal_api")
     pHalApiHeaderFile.setProjectPath("config/" + configName + "/stack/prime/hal_api")
     pHalApiHeaderFile.setType("HEADER")
     pHalApiHeaderFile.setEnabled(True)
-    pHalApiHeaderFile.setMarkup(True)
     
     global pHalApiSourceFile
     pHalApiSourceFile = primeStackConfigComponent.createFileSymbol("HAL_API_SOURCE", None)
-    pHalApiSourceFile.setSourcePath("prime/src/hal_api/hal_api.c.ftl")
+    pHalApiSourceFile.setSourcePath("prime/src/hal_api/hal_api.c")
     pHalApiSourceFile.setOutputName("hal_api.c")
     pHalApiSourceFile.setDestPath("stack/prime/hal_api")
     pHalApiSourceFile.setProjectPath("config/" + configName + "/stack/prime/hal_api")
     pHalApiSourceFile.setType("SOURCE")
     pHalApiSourceFile.setEnabled(True)
-    pHalApiSourceFile.setMarkup(True)
      
     ##### PRIME LIBRARIES
     global pPrime13BnLibFile
