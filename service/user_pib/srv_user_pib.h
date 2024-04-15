@@ -261,6 +261,7 @@ void SRV_USER_PIB_Initialize(void);
         SRV_USER_PIB_Initialize;
         
         SRV_USER_PIB_GetRequestCallbackRegister(APP_GetRequestHandler);
+    }
     </code>
 
   Remarks:
@@ -307,6 +308,7 @@ void SRV_USER_PIB_GetRequestCallbackRegister(SRV_USER_PIB_GET_REQUEST_CALLBACK c
         SRV_USER_PIB_GetRequestCallbackRegister(APP_GetRequestHandler);
 
         SRV_USER_PIB_GetRequest(PIB_USER_RESET_INFO);
+    }
     </code>
 
   Remarks:
@@ -351,6 +353,7 @@ void SRV_USER_PIB_GetRequest(uint16_t pibAttrib);
         SRV_USER_PIB_Initialize;
         
         SRV_USER_PIB_SetRequestCallbackRegister(APP_SetRequestHandler);
+    }
     </code>
 
   Remarks:
@@ -404,6 +407,7 @@ void SRV_USER_PIB_SetRequestCallbackRegister(SRV_USER_PIB_SET_REQUEST_CALLBACK c
         SRV_USER_PIB_SetRequestCallbackRegister(APP_SetRequestHandler);
 
         SRV_USER_PIB_SetRequest(PIB_USER_RESET_INFO, &resetValue, sizeof(resetValue));
+    }
     </code>
 
   Remarks:
