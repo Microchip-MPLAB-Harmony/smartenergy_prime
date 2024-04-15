@@ -1,65 +1,102 @@
-/**
- * \file
- *
- * \brief HAL: PRIME Hardware Abstraction Layer.
- *
- * Copyright (c) 2024 Atmel Corporation. All rights reserved.
- *
- * \asf_license_start
- *
- * \page License
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- * 1. Redistributions of source code must retain the above copyright notice,
- *    this list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright notice,
- *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution.
- *
- * 3. The name of Atmel may not be used to endorse or promote products derived
- *    from this software without specific prior written permission.
- *
- * 4. This software may only be redistributed and used in connection with an
- *    Atmel microcontroller product.
- *
- * THIS SOFTWARE IS PROVIDED BY ATMEL "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT ARE
- * EXPRESSLY AND SPECIFICALLY DISCLAIMED. IN NO EVENT SHALL ATMEL BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
- * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
- * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- * \asf_license_stop
- *
- */
-#include <stdio.h>
+/*******************************************************************************
+  PRIME Hardware Abstraction Layer API Source 
+   
+  Company:
+    Microchip Technology Inc.
 
+  File Name:
+    hal_api.c
+
+  Summary:
+    PRIME Hardware Abstraction Layer API Source File
+
+  Description:
+    This module contains configuration and utils for the interface between the
+    services connected to the hardware and the PRIME stack.
+*******************************************************************************/
+
+//DOM-IGNORE-BEGIN
+/*
+Copyright (C) 2024, Microchip Technology Inc., and its subsidiaries. All rights reserved.
+
+The software and documentation is provided by microchip and its contributors
+"as is" and any express, implied or statutory warranties, including, but not
+limited to, the implied warranties of merchantability, fitness for a particular
+purpose and non-infringement of third party intellectual property rights are
+disclaimed to the fullest extent permitted by law. In no event shall microchip
+or its contributors be liable for any direct, indirect, incidental, special,
+exemplary, or consequential damages (including, but not limited to, procurement
+of substitute goods or services; loss of use, data, or profits; or business
+interruption) however caused and on any theory of liability, whether in contract,
+strict liability, or tort (including negligence or otherwise) arising in any way
+out of the use of the software and documentation, even if advised of the
+possibility of such damage.
+
+Except as expressly permitted hereunder and subject to the applicable license terms
+for any third-party software incorporated in the software and any applicable open
+source software license terms, no license or other rights, whether express or
+implied, are granted under any patent or other intellectual property rights of
+Microchip or any third party.
+*/
+//DOM-IGNORE-END
+
+// *****************************************************************************
+// *****************************************************************************
+// Section: Included Files
+// *****************************************************************************
+// *****************************************************************************
+
+#include <stdio.h>
 #include "hal_api.h"
 
-/* @cond 0 */
-/**INDENT-OFF**/
-#ifdef __cplusplus
-extern "C" {
-#endif
-/**INDENT-ON**/
-/* @endcond */
+// *****************************************************************************
+// *****************************************************************************
+// Section: Data Types
+// *****************************************************************************
+// *****************************************************************************
 
-/**
- * \weakgroup prime_hal_group
- * @{
+/* HAL API functions 
+
+  Summary:
+    HAL API functions.
+
+  Description:
+    This structure contains the list of available functions in the HAL API.
+
+  Remarks:
+    The functions in this structure correspond to the required services by the 
+    PRIME stack.
  */
-const hal_api_t hal_api = {
+ 
+const HAL_API hal_api = {
 	SRV_RESET_HANDLER_RestartSystem,
+    
 	SRV_PCRC_GetValue,
 	SRV_PCRC_ConfigureSNA,
+    
+    SRV_STORAGE_GetConfigInfo,
+	SRV_STORAGE_SetConfigInfo,
+    
+    SRV_USI_Open,
+	SRV_USI_CallbackRegister,
+	SRV_USI_Send_Message,
+    
+    SRV_LOG_REPORT_Message_With_Code,
+    
+    SRV_USER_PIB_GetRequest,
+	SRV_USER_PIB_GetRequestCallbackRegister,
+	SRV_USER_PIB_SetRequest,
+	SRV_USER_PIB_SetRequestCallbackRegister,
+    
+    SRV_RANDOM_Get32bits,
+    
+    CIPHER_Wrapper_AesCmacDirect,
+    CIPHER_Wrapper_AesCcmSetkey,
+    CIPHER_Wrapper_AesCcmEncryptAndTag,
+    CIPHER_Wrapper_AesCcmAuthDecrypt,
+    AES_Wrapper_WrapKey,
+    AES_Wrapper_UnwrapKey
+    
 	hal_fu_data_read,
 	hal_fu_data_write,
 	hal_fu_data_cfg_read,
@@ -125,13 +162,3 @@ const hal_api_t hal_api = {
 	prf_if_led,
 </#if>
 };
-
-/* @} */
-
-/* @cond 0 */
-/**INDENT-OFF**/
-#ifdef __cplusplus
-}
-#endif
-/**INDENT-ON**/
-/* @endcond */

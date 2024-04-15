@@ -1,89 +1,94 @@
-/**
- * \file
- *
- * \brief PRIME_HAL_WRAPPER : API wrapper to manage HAL functions
- *
- * Copyright (c) 2024 Atmel Corporation. All rights reserved.
- *
- * \asf_license_start
- *
- * \page License
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- * 1. Redistributions of source code must retain the above copyright notice,
- *    this list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright notice,
- *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution.
- *
- * 3. The name of Atmel may not be used to endorse or promote products derived
- *    from this software without specific prior written permission.
- *
- * 4. This software may only be redistributed and used in connection with an
- *    Atmel microcontroller product.
- *
- * THIS SOFTWARE IS PROVIDED BY ATMEL "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT ARE
- * EXPRESSLY AND SPECIFICALLY DISCLAIMED. IN NO EVENT SHALL ATMEL BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
- * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
- * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- * \asf_license_stop
- *
- */
+/*******************************************************************************
+  PRIME Hardware Abstraction Layer Wrapper API Source
+   
+  Company:
+    Microchip Technology Inc.
+
+  File Name:
+    prime_hal_wrapper.c
+
+  Summary:
+    PRIME Hardware Abstraction Layer Wrapper API Source File
+
+  Description:
+    This module contains the implementation of the API wrapper to be used by the
+    PRIME stack when accessing the services connected to the hardware.
+*******************************************************************************/
+
+//DOM-IGNORE-BEGIN
+/*
+Copyright (C) 2024, Microchip Technology Inc., and its subsidiaries. All rights reserved.
+
+The software and documentation is provided by microchip and its contributors
+"as is" and any express, implied or statutory warranties, including, but not
+limited to, the implied warranties of merchantability, fitness for a particular
+purpose and non-infringement of third party intellectual property rights are
+disclaimed to the fullest extent permitted by law. In no event shall microchip
+or its contributors be liable for any direct, indirect, incidental, special,
+exemplary, or consequential damages (including, but not limited to, procurement
+of substitute goods or services; loss of use, data, or profits; or business
+interruption) however caused and on any theory of liability, whether in contract,
+strict liability, or tort (including negligence or otherwise) arising in any way
+out of the use of the software and documentation, even if advised of the
+possibility of such damage.
+
+Except as expressly permitted hereunder and subject to the applicable license terms
+for any third-party software incorporated in the software and any applicable open
+source software license terms, no license or other rights, whether express or
+implied, are granted under any patent or other intellectual property rights of
+Microchip or any third party.
+*/
+//DOM-IGNORE-END
+
+// *****************************************************************************
+// *****************************************************************************
+// Section: Included Files
+// *****************************************************************************
+// *****************************************************************************
 
 #include <stdio.h>
 #include "prime_hal_wrapper.h"
 
-/* @cond 0 */
-/**INDENT-OFF**/
-#ifdef __cplusplus
-extern "C" {
-#endif
-/**INDENT-ON**/
-/* @endcond */
+// *****************************************************************************
+// *****************************************************************************
+// Section: File Scope Variables
+// *****************************************************************************
+// *****************************************************************************
 
-/**
- * \weakgroup prime_hal_wrapper_group
- * @{
- */
+static HAL_API *halApi;
 
-/** Define HAL API interface */
-static hal_api_t *p_hal_api;
+// *****************************************************************************
+// *****************************************************************************
+// Section: PRIME HAL Wrapper Interface Routines
+// *****************************************************************************
+// *****************************************************************************
 
-/** HAL wrapper configuration */
-void prime_hal_config(hal_api_t *hal_api_ptr)
+void PRIME_HAL_WRP_Configure(HAL_API *halApi)
 {
-	p_hal_api = hal_api_ptr;
+	halApi = hal_api_ptr;
 }
 
-/** System Interface */
-void prime_hal_restart_system(void)
+void PRIME_HAL_WRP_RestartSystem(SRV_RESET_HANDLER_RESET_CAUSE resetType)
 {
-	p_hal_api->restart_system();
+	halApi->restart_system(resetType);
 }
 
-/* @} */
-
-/** \brief CRC interface */
-/* @{ */
-uint32_t prime_hal_pcrc_calc(uint8_t *puc_buf, size_t ul_len, PCRC_HEADER_TYPE uc_header_type, PCRC_CRC_TYPE uc_crc_type, uint32_t initValue, bool b_v14_mode);
+uint32_t PRIME_HAL_WRAPPER_PcrcCalculate((uint8_t *pData, size_t length,
+    PCRC_HEADER_TYPE hdrType, PCRC_CRC_TYPE crcType, uint32_t initValue, 
+    bool v14Mode)
 {
-	return p_hal_api->pcrc_calc(puc_buf, ul_len, uc_header_type, uc_crc_type, initValue, b_v14_mode);
+	return halApi->pcrc_calc(pData, length, hdrType, crcType, initValue, v14Mode);
+}
+    
+void PRIME_HAL_WRP_PcrcConfigureSNA(uint8_t *sna)
+{
+	halApi->pcrc_config_sna(sna);
 }
 
-void prime_hal_pcrc_config_sna(uint8_t *puc_sna)
+bool PRIME_HAL_WRP_GetConfigInfo(SRV_STORAGE_TYPE infoType, uint8_t size, 
+    void* pData)
 {
-	p_hal_api->pcrc_config_sna(puc_sna);
+	return halApi->get_config_info(infoType, size, pData);
 }
 
 /* @} */
@@ -93,282 +98,186 @@ void prime_hal_pcrc_config_sna(uint8_t *puc_sna)
 /* @{ */
 void prime_hal_plc_init(void)
 {
-	p_hal_api->plc_init();
+	return halApi->set_config_info(infoType, size, pData);
 }
 
-void prime_hal_plc_reset(void)
+SRV_USI_HANDLE PRIME_HAL_WRP_UsiOpen(const SYS_MODULE_INDEX index)
 {
-	p_hal_api->plc_reset();
+    return halApi->usi_open(index);
 }
 
-void prime_hal_plc_set_handler(void (*p_handler)(void))
+void PRIME_HAL_WRP_UsiSetCallback(SRV_USI_HANDLE handle, SRV_USI_PROTOCOL_ID protocol, 
+    SRV_USI_CALLBACK callback)
 {
-	p_hal_api->plc_set_handler(p_handler);
+    halApi->usi_set_callback(handle, protocol, callback);
 }
 
-void prime_hal_plc_tx_signal(void)
+void PRIME_HAL_WRP_UsiSend(SRV_USI_HANDLE handle, SRV_USI_PROTOCOL_ID protocol, 
+    uint8_t *data, size_t length)
 {
-	p_hal_api->plc_tx_signal();
+	halApi->usi_send(handle, protocol, data, length);
 }
 
-void prime_hal_plc_rx_signal(void)
+void PRIME_HAL_WRP_DebugReport(SRV_LOG_REPORT_LEVEL logLevel, 
+    SRV_LOG_REPORT_CODE code, const char *info, ...)
 {
-	p_hal_api->plc_rx_signal();
+	halApi->debug_report(logLevel, code, info);
 }
 
 bool prime_hal_plc_send_boot_cmd(uint16_t us_cmd, uint32_t ul_addr, uint32_t ul_data_len, uint8_t *puc_data_buf, uint8_t *puc_data_read)
 {
-	return p_hal_api->plc_send_boot_cmd(us_cmd, ul_addr, ul_data_len, puc_data_buf, puc_data_read);
+	halApi->pib_get_request(pibAttrib);
 }
 
-bool prime_hal_plc_send_wrrd_cmd(uint8_t uc_cmd, void *px_spi_data, void *px_spi_status_info)
+void PRIME_HAL_WRP_PIBGetRequestSetCallback(USER_PIB_GET_REQUEST_CALLBACK callback)
 {
-	return p_hal_api->plc_send_wrrd_cmd(uc_cmd, px_spi_data, px_spi_status_info);
+	halApi->pib_get_request_set_callback(callback);
 }
 
-void prime_hal_plc_enable_interrupt(bool enable)
+void PRIME_HAL_WRP_PibSetRequest(uint16_t pibAttrib, void *pibValue, 
+    uint8_t pibSize)
 {
-	p_hal_api->plc_enable_int(enable);
+	halApi->pib_set_request(pibAttrib, pibValue, pibSize);
 }
 
-void prime_hal_plc_delay(uint8_t uc_tref, uint32_t ul_delay)
+void PRIME_HAL_WRP_PIBSetRequestSetCallback(USER_PIB_SET_REQUEST_CALLBACK callback)
 {
-	p_hal_api->plc_delay(uc_tref, ul_delay);
+	halApi->pib_set_request_set_callback(callback);
 }
 
-bool prime_hal_plc_set_stby_mode(bool sleep)
+uint32_t PRIME_HAL_WRP_RngGet(void)
 {
-	return p_hal_api->plc_set_stby_mode(sleep);
+	return halApi->rng_get();
 }
 
-bool prime_hal_plc_get_thermal_warning(void)
+int32_t PRIME_HAL_WRP_AesCmacDirect(uint8_t *input, uint32_t inputLen, 
+    uint8_t *outputMac, uint8_t *key)
 {
-	return p_hal_api->plc_get_thermal_warning();
+    return halApi->aes_cmac_direct(input, inputLen, outputMac, key);
 }
-</#if>
 
-/* @} */
-
-/** \brief Interface for the permanent storage of configuration parameters */
-/* @{ */
-bool prime_hal_get_config_info(SRV_STORAGE_TYPE cfg_type, uint16_t us_size, void *pv_data)
+int32_t PRIME_HAL_WRP_AesCcmSetkey(uint8_t *key)
 {
-	return p_hal_api->get_config_info(cfg_type, us_size, pv_data);
+    return halApi->aes_ccm_set_key(key);
 }
 
-bool prime_hal_set_config_info(SRV_STORAGE_TYPE cfg_type, uint16_t us_size, void *pv_data)
+int32_t PRIME_HAL_WRP_AesCcmEncryptAndTag(uint8_t *data, uint32_t dataLen,
+    uint8_t *iv, uint32_t ivLen, uint8_t *aad, uint32_t aadLen, uint8_t *tag, 
+    uint32_t tagLen)
 {
-	return p_hal_api->set_config_info(cfg_type, us_size, pv_data);
+    return halApi->aes_ccm_encrypt_tag(data, dataLen, iv, ivLen, aad, 
+        aadLen, tag, tagLen);
 }
 
-uint32_t prime_hal_nwk_recovery_init(void)
+int32_t PRIME_HAL_WRP_AesCcmAuthDecrypt(uint8_t *data, uint32_t dataLen,
+    uint8_t *iv, uint32_t ivLen, uint8_t *aad, uint32_t aadLen, 
+    uint8_t *tag, uint32_t tagLen)
 {
-#ifdef HAL_NWK_RECOVERY_INTERFACE
-	return p_hal_api->nwk_recovery_init();
-#else
-	return 0;
-#endif
+    return halApi->aes_ccm_auth_decrypt(data, dataLen, iv, ivLen, aad, 
+        aadLen,  tag, tagLen);
 }
 
-void prime_hal_nwk_recovery_read(uint32_t addr, uint8_t *puc_buf, uint16_t us_size)
+void PRIME_HAL_WRP_AesWrapKey(const uint8_t *key, uint32_t keyLen, 
+    const uint8_t *in, uint32_t inLen, uint8_t *out)
 {
-#ifdef HAL_NWK_RECOVERY_INTERFACE
-	p_hal_api->nwk_recovery_read(addr, puc_buf, us_size);
-#else
-	(void)addr;
-	(void)puc_buf;
-	(void)us_size;
-#endif
+    halApi->aes_wrap_key(key, keyLen, in, inLen, out);
 }
 
-uint8_t prime_hal_nwk_recovery_write(uint32_t addr, uint8_t *puc_buf, uint16_t us_size)
+bool PRIME_HAL_WRP_AesUnwrapKey(const uint8_t *key, uint32_t keyLen, 
+    const uint8_t *in, uint32_t inLen, uint8_t *out)
 {
-#ifdef HAL_NWK_RECOVERY_INTERFACE
-	return p_hal_api->nwk_recovery_write(addr, puc_buf, us_size);
-#else
-	(void)addr;
-	(void)puc_buf;
-	(void)us_size;
-	return 0;
-#endif
+    return halApi->aes_unwrap_key(key, keyLen, in, inLen, out);
 }
 
-/* @} */
+
 
 /** \brief Firmware Upgrade Interface */
 /* @{ */
 void prime_hal_fu_data_read(uint32_t addr, uint8_t *puc_buf, uint16_t us_size)
 {
-	p_hal_api->fu_data_read(addr, puc_buf, us_size);
+	halApi->fu_data_read(addr, puc_buf, us_size);
 }
 
 uint8_t prime_hal_fu_data_write(uint32_t addr, uint8_t *puc_buf, uint16_t us_size)
 {
-	return p_hal_api->fu_data_write(addr, puc_buf, us_size);
+	return halApi->fu_data_write(addr, puc_buf, us_size);
 }
 
 void prime_hal_fu_data_cfg_read(void *pv_dst, uint16_t us_size)
 {
-	p_hal_api->fu_data_cfg_read(pv_dst, us_size);
+	halApi->fu_data_cfg_read(pv_dst, us_size);
 }
 
 uint8_t prime_hal_fu_data_cfg_write(void *pv_src, uint16_t us_size)
 {
-	return p_hal_api->fu_data_cfg_write(pv_src, us_size);
+	return halApi->fu_data_cfg_write(pv_src, us_size);
 }
 
 void prime_hal_fu_start(hal_fu_info_t *x_fu_info)
 {
-	p_hal_api->fu_start(x_fu_info);
+	halApi->fu_start(x_fu_info);
 }
 
 void prime_hal_fu_end(hal_fu_result_t uc_hal_res)
 {
-	p_hal_api->fu_end(uc_hal_res);
+	halApi->fu_end(uc_hal_res);
 }
 
 void prime_hal_fu_revert(void)
 {
-	p_hal_api->fu_revert();
+	halApi->fu_revert();
 }
 
 void prime_hal_fu_crc_calculate(void)
 {
-	p_hal_api->fu_crc_calculate();
+	halApi->fu_crc_calculate();
 }
 
 void prime_hal_fu_crc_set_callback(void (*p_handler)(uint32_t ul_crc))
 {
-	p_hal_api->fu_crc_set_callback(p_handler);
+	halApi->fu_crc_set_callback(p_handler);
 }
 
 uint16_t prime_hal_fu_get_bitmap(uint8_t *puc_bitmap, uint32_t *pus_num_rcv_pages)
 {
-	return p_hal_api->fu_get_bitmap(puc_bitmap, pus_num_rcv_pages);
+	return halApi->fu_get_bitmap(puc_bitmap, pus_num_rcv_pages);
 }
 
 void prime_hal_fu_signature_image_check(void)
 {
-	p_hal_api->fu_signature_image_check();
+	halApi->fu_signature_image_check();
 }
 
 void prime_hal_fu_signature_image_check_set_callback(void (*p_handler)(hal_fu_verif_result_t uc_result))
 {
-	p_hal_api->fu_signature_image_check_set_callback(p_handler);
+	halApi->fu_signature_image_check_set_callback(p_handler);
 }
-
-/* @} */
-
-/** \brief Universal Serial Interface */
-/* @{ */
-SRV_USI_HANDLE prime_hal_usi_open(const SYS_MODULE_INDEX index)
-{
-    return p_hal_api->usi_open;
-}
-
-void prime_hal_usi_set_callback(SRV_USI_HANDLE handle, SRV_USI_PROTOCOL_ID protocol, SRV_USI_CALLBACK callback);
-{
-    p_hal_api->usi_set_callback(handle, protocol, callback);
-}
-
-void prime_hal_usi_send_cmd(SRV_USI_HANDLE handle, SRV_USI_PROTOCOL_ID protocol, uint8_t *data, size_t length)
-{
-	p_hal_api->usi_send_cmd(handle, protocol, data, length);
-}
-
-/* @} */
-
-/** \brief True Random Number Generator Interface */
-/* @{ */
-
-uint32_t prime_hal_trng_read(void)
-{
-	return p_hal_api->trng_read();
-}
-
-/* @} */
-
-/** \brief Debug Interface */
-/* @{ */
-void prime_hal_debug_report(SRV_LOG_REPORT_LEVEL logLevel, SRV_LOG_REPORT_CODE code,const char *info, ...)
-{
-	p_hal_api->debug_report(logLevel, code, info);
-}
-
-/* @} */
-
-/** \brief AES Interface */
-/* @{ */
-void prime_hal_aes_init(void)
-{
-	p_hal_api->aes_init();
-}
-
-void prime_hal_aes_set_callback(void (*p_handler)(void))
-{
-	p_hal_api->aes_set_callback(p_handler);
-}
-
-void prime_hal_aes_key(uint8_t *puc_key, uint8_t uc_key_len)
-{
-	p_hal_api->aes_key(puc_key, uc_key_len);
-}
-
-void prime_hal_aes_crypt(bool b_crypt_mode, uint8_t *puc_in_text, uint8_t *puc_out_text)
-{
-	p_hal_api->aes_crypt(b_crypt_mode, puc_in_text, puc_out_text);
-}
-
-/* @} */
-
-/** \brief Parameter Information Base Interface */
-/* @{ */
-void prime_hal_pib_get_request(uint16_t us_pib_attrib)
-{
-	p_hal_api->pib_get_request(us_pib_attrib);
-}
-
-void prime_hal_pib_get_request_set_callback(void (*p_handler)(uint8_t uc_result, uint16_t us_pib_attrib, void *pv_pib_value, uint8_t uc_pib_size))
-{
-	p_hal_api->pib_get_request_set_callback(p_handler);
-}
-
-void prime_hal_pib_set_request(uint16_t us_pib_attrib, void *pv_pib_value, uint8_t uc_pib_size)
-{
-	p_hal_api->pib_set_request(us_pib_attrib, pv_pib_value, uc_pib_size);
-}
-
-void prime_hal_pib_set_request_set_callback(void (*p_handler)(uint8_t uc_result))
-{
-	p_hal_api->pib_set_request_set_callback(p_handler);
-}
-/* @} */
 
 void prime_hal_swap_stack(uint8_t uc_traffic)
 {
-	p_hal_api->swap_stack(uc_traffic);
+	halApi->swap_stack(uc_traffic);
 }
 
 /** \brief Timer 1us Interface */
 /* @{ */
 uint32_t prime_hal_timer_1us_get(void)
 {
-	return p_hal_api->timer_1us_get();
+	return halApi->timer_1us_get();
 }
 
 void prime_hal_timer_1us_enable_interrupt(bool b_enable)
 {
-	p_hal_api->timer_1us_enable_interrupt(b_enable);
+	halApi->timer_1us_enable_interrupt(b_enable);
 }
 
 bool prime_hal_timer_1us_set_int(uint32_t ul_time_us, bool b_relative, void (*p_handler)(uint32_t), uint32_t *pul_int_id)
 {
-	return p_hal_api->timer_1us_set_int(ul_time_us, b_relative, p_handler, pul_int_id);
+	return halApi->timer_1us_set_int(ul_time_us, b_relative, p_handler, pul_int_id);
 }
 
 bool prime_hal_timer_1us_cancel_int(uint32_t ul_int_id)
 {
-	return p_hal_api->timer_1us_cancel_int(ul_int_id);
+	return halApi->timer_1us_cancel_int(ul_int_id);
 }
 /* @} */
 
