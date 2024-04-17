@@ -164,7 +164,7 @@ uint32_t SRV_TIME_MANAGEMENT_GetTimeUS(void);
     </code>
 
   Remarks:
-    Time to convert should be as close as posible to the current time
+    Time to convert should be as close as possible to the current time
     to avoid an overflow.
 */
 uint64_t SRV_TIME_MANAGEMENT_USToCount(uint32_t timeUs);
@@ -201,7 +201,7 @@ uint64_t SRV_TIME_MANAGEMENT_USToCount(uint32_t timeUs);
     </code>
 
   Remarks:
-    Cycles to convert should be as close as posible to the current value
+    Cycles to convert should be as close as possible to the current value
     to avoid an overflow.
 */
 uint32_t SRV_TIME_MANAGEMENT_CountToUS(uint64_t counter);
