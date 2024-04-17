@@ -179,7 +179,7 @@ def primeUpdateFiles(primeStackComponent):
         # Add PRIME components
         Database.activateComponents(["primePal"], "PRIME STACK")
         primeStackComponent.setDependencyEnabled("primePal_dep", True)
-    else:
+        else:
         # Remove PRIME components
         Database.deactivateComponents(["primePal"])
         primeStackComponent.setDependencyEnabled("primePal_dep", False)
@@ -282,7 +282,7 @@ def primeShowBNConfiguration(primeVersion):
     if (primeVersion == "1.4"):
         # BN - v1.4
         primeConfigBnSlaveEn.setValue(False)
-        primeConfigBnSlaveEn.setVisible(False)
+    primeConfigBnSlaveEn.setVisible(False)
         primeConfigSecProfile.setReadOnly(False)
         primeConfigFWVersion.setValue("HB14.01.01") 
     else:
@@ -308,11 +308,11 @@ def primeUpdateConfiguration(symbol, event):
     else:
         # Base Node
         primeShowBNConfiguration(primeVersion)
-            
+    
     # Add files
     localComponent = symbol.getComponent()
     primeUpdateFiles(localComponent)
-            
+    
 def instantiateComponent(primeStackConfigComponent):
     Log.writeInfoMessage("Loading Stack Configurator for PRIME")
     
