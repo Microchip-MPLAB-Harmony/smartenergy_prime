@@ -95,7 +95,10 @@ const HAL_API hal_api = {
     CIPHER_Wrapper_AesCcmEncryptAndTag,
     CIPHER_Wrapper_AesCcmAuthDecrypt,
     AES_Wrapper_WrapKey,
-    AES_Wrapper_UnwrapKey
+    AES_Wrapper_UnwrapKey,
+    
+    SRV_TIME_MANAGEMENT_GetTimeUS64,
+    SRV_TIME_MANAGEMENT_GetTimeUS,
     
 	hal_fu_data_read,
 	hal_fu_data_write,

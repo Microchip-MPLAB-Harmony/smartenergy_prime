@@ -189,6 +189,16 @@ bool PRIME_HAL_WRP_AesUnwrapKey(const uint8_t *key, uint32_t keyLen,
     return halApi->aes_unwrap_key(key, keyLen, in, inLen, out);
 }
 
+uint64_t PRIME_HAL_WRP_GetTimeUS64(void)
+{
+    return halApi->timer_get_us64();
+}
+
+uint32_t PRIME_HAL_WRP_GetTimeUS32(void)
+{
+    return halApi->timer_get_us32();
+}
+
 
 
 /** \brief Firmware Upgrade Interface */
@@ -258,12 +268,7 @@ void prime_hal_swap_stack(uint8_t uc_traffic)
 	halApi->swap_stack(uc_traffic);
 }
 
-/** \brief Timer 1us Interface */
-/* @{ */
-uint32_t prime_hal_timer_1us_get(void)
-{
-	return halApi->timer_1us_get();
-}
+/** \brief PAL Interface */
 
 void prime_hal_timer_1us_enable_interrupt(bool b_enable)
 {

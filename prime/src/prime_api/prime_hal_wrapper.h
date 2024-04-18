@@ -963,7 +963,81 @@ void PRIME_HAL_WRP_AesWrapKey(const uint8_t *key, uint32_t keyLen,
 bool PRIME_HAL_WRP_AesUnwrapKey(const uint8_t *key, uint32_t keyLen, 
     const uint8_t *in, uint32_t inLen, uint8_t *out);
     
-    
+// *****************************************************************************
+/* Function:
+    uint64_t PRIME_HAL_WRP_GetTimeUS64(void)
+
+  Summary:
+    This primitive gets the value of a counter and converts it in a 64 bit 
+    variable in microseconds.
+
+  Description:
+    This primitive makes use of SYS_TIME service to get the value of the 
+    microseconds counter in order to be able to set timeouts and perform delays.
+
+  Precondition:
+    None.
+
+  Parameters:
+    None.
+
+  Returns:
+    Value of microseconds in 64 bits.
+
+  Example:
+    <code>
+    uint64_t previousTimeUS = PRIME_HAL_WRP_GetTimeUS64();
+ 
+    uint64_t newTimeUS = PRIME_HAL_WRP_GetTimeUS64();
+
+    if ((newTimeUS - previousTimeUS) > 1000000)
+    {
+    }
+    </code>
+
+  Remarks:
+    Related to Time Management service.
+*/
+uint64_t PRIME_HAL_WRP_GetTimeUS64(void); 
+
+// *****************************************************************************
+/* Function:
+    uint32_t PRIME_HAL_WRP_GetTimeUS(void)
+
+  Summary:
+    This primitive gets the value of a counter and converts it in a 32 bit 
+    variable in microseconds.
+
+  Description:
+    This primitive makes use of SYS_TIME service to get the value of the 
+    microseconds counter in order to be able to set timeouts and perform delays.
+
+  Precondition:
+    None.
+
+  Parameters:
+    None.
+
+  Returns:
+    Value of microseconds in 32 bits.
+
+  Example:
+    <code>
+    uint32_t previousTimeUS = PRIME_HAL_WRP_GetTimeUS();
+ 
+    uint32_t newTimeUS = PRIME_HAL_WRP_GetTimeUS();
+
+    if ((newTimeUS - previousTimeUS) > 1000000)
+    {
+    }
+    </code>
+
+  Remarks:
+    Related to Time Management service.
+*/
+uint32_t PRIME_HAL_WRP_GetTimeUS(void);    
+
+
 
 
 /** \brief Firmware Upgrade Interface */
@@ -983,13 +1057,9 @@ void prime_hal_fu_signature_image_check_set_callback(void (*p_handler)(hal_fu_ve
 void prime_hal_swap_stack(uint8_t uc_traffic);
 /* @} */
 
-/** \brief Timer 1us Interface */
-/* @{ */
-uint32_t prime_hal_timer_1us_get(void);
-void prime_hal_timer_1us_enable_interrupt(bool b_enable);
-bool prime_hal_timer_1us_set_int(uint32_t ul_time_us, bool b_relative, void (*p_handler)(uint32_t), uint32_t *pul_int_id);
-bool prime_hal_timer_1us_cancel_int(uint32_t ul_int_id);
-/* @} */
+
+/** \brief PAL Interface */
+
 
 /** \brief RF Interface */
 /* @{ */

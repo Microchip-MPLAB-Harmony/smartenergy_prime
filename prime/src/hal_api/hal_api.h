@@ -60,6 +60,7 @@ Microchip or any third party.
 #include "service/usi/srv_usi.h"
 #include "service/security/aes_wrapper.h"
 #include "service/security/cipher_wrapper.h"
+#include "service/time_management/srv_time_management.h"
 
 // DOM-IGNORE-BEGIN
 #ifdef __cplusplus  // Provide C++ Compatibility
@@ -384,6 +385,40 @@ typedef void (*HAL_AES_WRAP_KEY)(const uint8_t *key, uint32_t keyLen,
 typedef bool (*HAL_AES_UNWRAP_KEY)(const uint8_t *key, uint32_t keyLen, const uint8_t *in, 
     uint32_t inLen, uint8_t *out);
 
+// *****************************************************************************
+/*  Gets the time in a 64 bit variable in microseconds
+
+
+  Summary:
+    Function pointer to get the value of a counter and convert it in a 64 bit 
+    variable in microseconds.
+
+  Description:
+    This function pointer is used to get the value of a counter and convert it 
+    in a 64 bit variable in microseconds.
+
+  Remarks:
+    Related to Time Management service.
+*/
+typedef uint64_t (*HAL_TIMER_GetTimeUS64)(void);
+
+// *****************************************************************************
+/*  Gets the time in a 32 bit variable in microseconds
+
+
+  Summary:
+    Function pointer to get the value of a counter and convert it in a 32 bit 
+    variable in microseconds.
+
+  Description:
+    This function pointer is used to get the value of a counter and convert it 
+    in a 32 bit variable in microseconds.
+
+  Remarks:
+    Related to Time Management service.
+*/
+typedef uint32_t (*HAL_TIMER_GetTimeUS)(void);
+
 
 // Related to FU service - TBD
 typedef void (*hal_fu_data_read_t)(uint32_t addr, uint8_t *puc_buf, uint16_t us_size);
@@ -412,12 +447,6 @@ typedef bool (*hal_plc_get_thermal_warning_t)(void);
 </#if>
 
 
-// Related to Time Management - TBD
-/* Timer of 1us service interface */
-typedef uint32_t (*hal_timer_1us_get_t)(void);
-typedef bool (*hal_timer_1us_set_int_t)(uint32_t ul_time_us, bool b_relative, void (*p_handler)(uint32_t), uint32_t *pul_int_id);
-typedef bool (*hal_timer_1us_cancel_int_t)(uint32_t ul_int_id);
-typedef void (*hal_timer_1us_enable_interrupt_t)(bool b_enable);
 
 <#if primePal.PRIME_PAL_RF_EN == true>
 typedef uint8_t (*hal_prf_if_init_t)(void);
@@ -469,6 +498,9 @@ typedef struct {
     HAL_AES_CCM_AUTH_DECRYPT aes_ccm_auth_decrypt;
     HAL_AES_WRAP_KEY aes_wrap_key;
     HAL_AES_UNWRAP_KEY aes_unwrap_key;
+    
+    HAL_TIMER_GetTimeUS64 timer_get_us64;
+    HAL_TIMER_GetTimeUS timer_get_us;
    
 	hal_fu_data_read_t fu_data_read;
 	hal_fu_data_write_t fu_data_write;
