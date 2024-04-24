@@ -72,11 +72,46 @@ about the modulation scheme to be used */
 /* QT unknown value */
 #define PAL_QT_UNKNOW       0xFF
 
+/* Bits to be used in radio channel */
+#define RF_CHANNEL_BITS     0x3FF
+
 // *****************************************************************************
 // *****************************************************************************
 // Section: Data Types
 // *****************************************************************************
 // *****************************************************************************
+
+// *****************************************************************************
+/* PRIME Channel definitions
+
+  Summary:
+    List of PRIME PAL channels.
+
+*/
+typedef enum
+{
+    /* PLC Single Channels */
+    PAL_PLC_CHN1_MASK = 0x00000001,
+    PAL_PLC_CHN2_MASK = 0x00000002,
+    PAL_PLC_CHN3_MASK = 0x00000004,
+    PAL_PLC_CHN4_MASK = 0x00000008,
+    PAL_PLC_CHN5_MASK = 0x00000010,
+    PAL_PLC_CHN6_MASK = 0x00000020,
+    PAL_PLC_CHN7_MASK = 0x00000040,
+    PAL_PLC_CHN8_MASK = 0x00000080,
+    /* PLC Double Channels */
+    PAL_PLC_CHN1_CHN2MASK = 0x00000100,
+    PAL_PLC_CHN2_CHN3MASK = 0x00000200,
+    PAL_PLC_CHN3_CHN4MASK = 0x00000400,
+    PAL_PLC_CHN4_CHN5MASK = 0x00000800,
+    PAL_PLC_CHN5_CHN6MASK = 0x00001000,
+    PAL_PLC_CHN6_CHN7MASK = 0x00002000,
+    PAL_PLC_CHN7_CHN8MASK = 0x00004000,
+    /* Radio Channel */
+    PAL_RF_CHN = 0x00010000,
+    /* Serial Channel */
+    PAL_SERIAL_CHN = 0x00100000,
+} PAL_CHANNEL_MASK;
 
 // *****************************************************************************
 /* PAL Handle
@@ -130,6 +165,39 @@ typedef enum {
     PAL_STATUS_ERROR = SYS_STATUS_ERROR,
     PAL_STATUS_INVALID_OBJECT = SYS_STATUS_ERROR_EXTENDED - 1,
 } PAL_STATUS;
+
+typedef enum {
+    PAL_FRAME_TYPE_A  = 0,
+    PAL_FRAME_TYPE_B  = 2,
+    PAL_FRAME_TYPE_BC = 3,
+    PAL_FRAME_TYPE_RF = 5,
+    PAL_FRAME_NOISE   = 0xFE,  /* Not in PL360 */
+    PAL_FRAME_TEST    = 0xFF,  /* Not in PL360 */
+} PAL_FRAME;
+
+// *****************************************************************************
+/* PAL Modulation schemes
+
+  Summary:
+    The list of all modulation schemes supported by PRIME spec.
+
+  Remarks:
+    None.
+*/
+
+typedef enum {
+    PAL_SCHEME_DBPSK = 0x00,
+    PAL_SCHEME_DQPSK = 0x01,
+    PAL_SCHEME_D8PSK = 0x02,
+    PAL_SCHEME_DBPSK_C = 0x04,
+    PAL_SCHEME_DQPSK_C = 0x05,
+    PAL_SCHEME_D8PSK_C = 0x06,
+    PAL_SCHEME_R_DBPSK = 0x0C,
+    PAL_SCHEME_R_DQPSK = 0x0D,
+    PAL_SCHEME_RF = 0x20,
+    PAL_SCHEME_RF_FSK_FEC_OFF = 0x21,
+    PAL_SCHEME_RF_FSK_FEC_ON = 0x22,
+} PAL_SCHEME;
 
 // *****************************************************************************
 /* PAL configuration result macros
@@ -299,7 +367,7 @@ typedef enum
     /* Transmission result: invalid transmission mode error */
     PAL_TX_RESULT_INV_TX_MODE    = 10,
     /* Transmission result: transmission cancelled */
-    PAL_TX_RESULT_INV_CANCELLED  = 11,
+    PAL_TX_RESULT_CANCELLED      = 11,
     /* Transmission result: high temperature
     (>120 Degree Centigrade) error (only with PL460) */
     PAL_TX_RESULT_HIGH_TEMP_120  = 12,
@@ -333,19 +401,19 @@ typedef struct
     /* Length of the data buffer */
     uint16_t dataLength;
     /* Physical channel mask to transmit the message */
-    uint16_t channelMask;
+    PAL_CHANNEL_MASK channelMask;
     /* Buffer identifier */
     uint8_t buffId;
     /* Attenuation level with which the message must be transmitted */
     uint8_t attLevel;
     /* Modulation scheme of last transmitted message */
-    uint8_t scheme;
+    PAL_SCHEME scheme;
     /* TX Forced */
     uint8_t disableRx;
     /* Type A, Type B, Type BC, Type Radio */
-    uint8_t mode;
+    PAL_FRAME frameType;
     /* Time mode: 0: Absolute mode, 1: Differential mode, 2: Cancel TX */
-    uint8_t timeMode;
+    PAL_TX_TIME_MODE timeMode;
     /* Number of channel senses */
     uint8_t numSenses;
     /* Delay between channel senses in ms */
@@ -367,16 +435,16 @@ typedef struct
 {
     /* Transmission time in us */
     uint32_t txTime;
+    /* Channel Mask where the message has been transmitted */
+    PAL_CHANNEL_MASK channelMask;
     /* RMS value */
     uint16_t rmsCalc;
-    /* Channel Mask where the message has been transmitted */
-    uint16_t channelMask;
     /* Type mode: Type A, Type B, Type BC, Type Radio  */
-    uint8_t mode;
+    PAL_FRAME frameType;
     /* Buffer identifier */
     uint8_t bufId;
     /* Result */
-    uint8_t result;
+    PAL_TX_RESULT result;
 } PAL_MSG_CONFIRM_DATA;
 
 /* PAL indication data structure
@@ -400,7 +468,7 @@ typedef struct
     /* Length of the data buffer */
     uint16_t dataLength;
     /* Channel Mask where the message has been received */
-    uint16_t channelMask;
+    PAL_CHANNEL_MASK channelMask;
     /* Bitrate estimation in Kbs */
     uint16_t estimatedBitrate;
     /* RSSI (Received Signal Strength Indicator) coded as specified */
@@ -408,9 +476,9 @@ typedef struct
     /* Buffer identifier */
     uint8_t bufId;
     /* Modulation scheme of the last received message */
-    uint8_t scheme;
+    PAL_SCHEME scheme;
     /* Type A, Type B, Type BC, Type Radio */
-    uint8_t mode;
+    PAL_FRAME frameType;
     /* Header type of the last received message */
     uint8_t headerType;
     /* Less robust modulation */

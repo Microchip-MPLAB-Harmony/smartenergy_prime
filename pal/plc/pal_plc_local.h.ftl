@@ -49,9 +49,6 @@ Microchip or any third party.
 #include <stdbool.h>
 #include <stdint.h>
 #include "service/pcoup/srv_pcoup.h"
-<#if (HarmonyCore.SELECT_RTOS)?? && HarmonyCore.SELECT_RTOS != "BareMetal">
-#include "osal/osal.h"
-</#if>
 #include "pal_types.h"
 
 #define PAL_TX_NUM_BUFFERS          2
@@ -112,7 +109,7 @@ typedef struct
     /* Length of the data buffer in bytes */
     uint16_t dataLen;
     /* Modulation scheme of the received message */
-    uint8_t scheme;
+    PAL_SCHEME scheme;
     /* Type A, Type B or Type BC */
     uint8_t modType;
     /* Header Type of the received message */
@@ -195,11 +192,6 @@ typedef struct
 
     uint16_t channelList;
     
-<#if (HarmonyCore.SELECT_RTOS)?? && HarmonyCore.SELECT_RTOS != "BareMetal">
-    /* Semaphore identifier. Used to suspend and resume task */
-    OSAL_SEM_DECLARE(semaphoreID);
-
-</#if>
 
 
     uint8_t statsErrorUnexpectedKey;

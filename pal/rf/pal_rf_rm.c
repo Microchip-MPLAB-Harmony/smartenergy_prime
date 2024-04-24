@@ -1,258 +1,185 @@
 /**
- *
  * \file
  *
- * \brief PRIME RF Phy Abstraction Layer for RF215 Robust Management Module
+ * \brief PAL: Physical Abstraction Layer Robust Management Module
  *
- * Copyright (c) 2023 Microchip Technology Inc. and its subsidiaries.
+ * Copyright (c) 2022 Atmel Corporation. All rights reserved.
  *
  * \asf_license_start
  *
  * \page License
  *
- * Subject to your compliance with these terms, you may use Microchip
- * software and any derivatives exclusively with Microchip products.
- * It is your responsibility to comply with third party license terms applicable
- * to your use of third party software (including open source software) that
- * may accompany Microchip software.
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
  *
- * THIS SOFTWARE IS SUPPLIED BY MICROCHIP "AS IS". NO WARRANTIES,
- * WHETHER EXPRESS, IMPLIED OR STATUTORY, APPLY TO THIS SOFTWARE,
- * INCLUDING ANY IMPLIED WARRANTIES OF NON-INFRINGEMENT, MERCHANTABILITY,
- * AND FITNESS FOR A PARTICULAR PURPOSE. IN NO EVENT WILL MICROCHIP BE
- * LIABLE FOR ANY INDIRECT, SPECIAL, PUNITIVE, INCIDENTAL OR CONSEQUENTIAL
- * LOSS, DAMAGE, COST OR EXPENSE OF ANY KIND WHATSOEVER RELATED TO THE
- * SOFTWARE, HOWEVER CAUSED, EVEN IF MICROCHIP HAS BEEN ADVISED OF THE
- * POSSIBILITY OR THE DAMAGES ARE FORESEEABLE.  TO THE FULLEST EXTENT
- * ALLOWED BY LAW, MICROCHIP'S TOTAL LIABILITY ON ALL CLAIMS IN ANY WAY
- * RELATED TO THIS SOFTWARE WILL NOT EXCEED THE AMOUNT OF FEES, IF ANY,
- * THAT YOU HAVE PAID DIRECTLY TO MICROCHIP FOR THIS SOFTWARE.
+ * 1. Redistributions of source code must retain the above copyright notice,
+ *    this list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
+ *    and/or other materials provided with the distribution.
+ *
+ * 3. The name of Atmel may not be used to endorse or promote products derived
+ *    from this software without specific prior written permission.
+ *
+ * 4. This software may only be redistributed and used in connection with an
+ *    Atmel microcontroller product.
+ *
+ * THIS SOFTWARE IS PROVIDED BY ATMEL "AS IS" AND ANY EXPRESS OR IMPLIED
+ * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT ARE
+ * EXPRESSLY AND SPECIFICALLY DISCLAIMED. IN NO EVENT SHALL ATMEL BE LIABLE FOR
+ * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+ * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
  *
  * \asf_license_stop
  *
  */
 
-
+/* System includes */
+#include <stdio.h>
 #include <string.h>
+#include <stdint.h>
+#include <stdbool.h>
+#include "pal_types.h"
+#include "driver/rf215/drv_rf215.h"
 
-/* Prime includes */
-#include "pal.h"
-#include "pal_rf_rm.h"
-#ifdef PAL_MULTIPHY
-#include "mpal.h"
-#endif
+/* RF RM mode */
+#define PAL_RF_RM_FORCED_OFF   1
+#define PAL_RF_RM_FORCED_ON    2
 
-#ifndef PAL_MULTIPHY
-#define pal_rf_rm_minimum_quality pal_rm_minimum_quality
-#define pal_rf_rm_get_less_robust_mod pal_rm_get_less_robust_mod
-#endif
+/* RSSI Thresholds */
+#define PAL_RF_RM_THRESHOLD_FSK_FEC_OFF     (-89)
+#define PAL_RF_RM_THRESHOLD_FSK_FEC_ON      (-94)
 
-
-#ifdef PAL_RF
-
-/**
- * \weakgroup prime_pal_group
- * @{
- */
-
-/*
- * Formula to obtain the RSSI threshold
- *
- * RSSI = ( ln((1 - FER) / FER) - b * N^2 - c * N - d ) / a
- *
- * FER = 0,005 (frame error rate)
- * N = 255 (number of bytes of the PHY frame)
- * a = 3,93 * 10^-1 = 0,393
- * b = 2,13 * 10^-5 = 0,0000213
- * c = -1,24 * 10^-2 = -0,0124
- * d = 3,95 * 10^1 = 39,5
- *
- * The operation gives -82,51
- * But we configure -89 (FER = 2% in 20-byte messages, FER = 10% in 255-byte messages)
- */
+static uint8_t palRfRmMode = PAL_RF_RM_FORCED_OFF;
 
 /* Bandwidth of every modulation */
-static const uint8_t suc_bandwidth[16] = {
-		50,  /* PAL_RF_FSK_FEC_OFF */
-		25,  /* PAL_RF_FSK_FEC_ON */
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0    /* PAL_OUTDATED_INF */
+static const uint8_t palRfBandwidth[] = {
+        0,   /* PAL_SCHEME_RF */
+        50,  /* PAL_SCHEME_RF_FSK_FEC_OFF */
+        25   /* PAL_SCHEME_RF_FSK_FEC_ON */
 };
 
-
-static int16_t ssc_rssi_threshold[2];
-static uint8_t suc_rm_mode;
-
-/*
- * \brief function to get valid modulations
- *
- * \param sc_rssi                        Received RSSI
- * \param us_estimated_bitrate           Bitrate estimation in Kbs
- * \param uc_less_robust_mod             Less robust modulation
- *
- * \return Less robust modulation and estimated bitrate for a valid communication
- */
-void pal_rf_rm_max_modulation_rx_msg(int8_t sc_rssi, uint16_t *us_estimated_bitrate, uint8_t *uc_less_robust_mod)
+uint8_t PAL_RF_RM_GetLqi(int16_t rssi)
 {
-	uint8_t uc_best_mod = PAL_OUTDATED_INF;
-
-	switch(suc_rm_mode) {
-	case RF_RM_FORCED_OFF:
-		if (sc_rssi >= ssc_rssi_threshold[PAL_RF_FSK_FEC_OFF]) {
-			uc_best_mod = PAL_RF_FSK_FEC_OFF;
-		}
-
-		break;
-
-	case RF_RM_FORCED_ON:
-		if (sc_rssi >= ssc_rssi_threshold[PAL_RF_FSK_FEC_ON]) {
-			uc_best_mod = PAL_RF_FSK_FEC_ON;
-		}
-
-		break;
-
-	case RF_RM_AUTOMATIC:
-	default:
-		if (sc_rssi >= ssc_rssi_threshold[PAL_RF_FSK_FEC_OFF]) {
-			uc_best_mod = PAL_RF_FSK_FEC_OFF;
-		} else if (sc_rssi >= ssc_rssi_threshold[PAL_RF_FSK_FEC_ON]) {
-			uc_best_mod = PAL_RF_FSK_FEC_ON;
-		}
-	}
-
-	*uc_less_robust_mod = uc_best_mod;
-
-	if (uc_best_mod != PAL_OUTDATED_INF) {
-		*us_estimated_bitrate = suc_bandwidth[uc_best_mod];
-	} else {
-		*us_estimated_bitrate = 0;
-	}
+    if (rssi > 80) 
+    {
+        return 0xFE;
+    } 
+    else 
+    {
+        return (rssi + 174);
+    }
 }
 
-/*
- * \brief function to calculate the LQI
- *
- * \param sc_rssi     Received RSSI
- *
- * \return Link quality indication
- */
-uint8_t pal_rf_rm_get_lqi(int8_t sc_rssi)
+uint8_t PAL_RF_RM_GetLessRobustModulation(PAL_SCHEME mod1, PAL_SCHEME mod2)
 {
-	uint8_t uc_lqi;
+    uint8_t index1 = mod1 - PAL_SCHEME_RF;
+    uint8_t index2 = mod2 - PAL_SCHEME_RF;
 
-	if (sc_rssi > 80) {
-		uc_lqi = 0xFE;
-	} else {
-		uc_lqi = sc_rssi + 174;
-	}
-
-	return uc_lqi;
+    if (palRfBandwidth[index1] > palRfBandwidth[index2]) 
+    {
+        return mod1;
+    } 
+    else 
+    {
+        return mod2;
+    }
 }
 
-
-/**
- * \brief Check if the modulation is good enough for a low FER in the given scheme
- *
- * \param us_pch              Channel of reception of the message
- * \param uc_scheme           Modulation to compare
- * \param uc_less_robust_mod  Less robust modulation
- *
- * \return true or false
- */
-bool pal_rf_rm_minimum_quality(uint16_t us_pch, uint8_t uc_scheme, uint8_t uc_less_robust_mod)
+bool PAL_RF_RM_CheckMinimumQuality(PAL_SCHEME reference, PAL_SCHEME modulation)
 {
-	(void)us_pch;
-	(void)uc_scheme;
-
-	if ((uc_less_robust_mod == PAL_OUTDATED_INF) ||
-		((uc_scheme == PAL_RF_FSK_FEC_OFF) && (uc_less_robust_mod == PAL_RF_FSK_FEC_ON))) {
-		return false;
-	} else {
-		return true;
-	}
+    if (modulation == PAL_SCHEME_RF)
+    {
+        return false;
+    }
+    
+    if ((reference == PAL_SCHEME_RF_FSK_FEC_OFF) && (modulation == PAL_SCHEME_RF_FSK_FEC_ON))
+    {
+        return false;
+    } 
+    else 
+    {
+        return true;
+    }
 }
 
-
-/**
- * \brief return the less robust modulation for a channel from to given
- *
- * \param us_pch            Channel of the modulation
- * \param uc_mod1           Modulation 1 to compare
- * \param uc_mod2           Modulation 2 to compare
- *
- * \return uc_mod1 or uc_mod2 scheme for the given channel
- */
-uint8_t pal_rf_rm_get_less_robust_mod(uint16_t us_pch, uint8_t uc_mod1, uint8_t uc_mod2)
+PAL_SCHEME PAL_RF_RM_GetScheme(void)
 {
-	(void) us_pch;
+    switch(palRfRmMode) 
+    {
+        case PAL_RF_RM_FORCED_OFF:
+            return PAL_SCHEME_RF_FSK_FEC_OFF;
 
-	if (suc_bandwidth[uc_mod1] > suc_bandwidth[uc_mod2]) {
-		return uc_mod1;
-	} else {
-		return uc_mod2;
-	}
+        case PAL_RF_RM_FORCED_ON:
+            return PAL_SCHEME_RF_FSK_FEC_ON;
+
+        default:
+            return PAL_SCHEME_RF_FSK_FEC_OFF;
+    }
 }
 
-/**
- * \brief Get the configured scheme
- *
- * \return Configured scheme
- */
-uint8_t pal_rf_rm_get_scheme(void)
+void PAL_RF_RM_SetScheme(PAL_SCHEME scheme)
 {
-	switch(suc_rm_mode) {
-	case RF_RM_FORCED_OFF:
-		return PAL_RF_FSK_FEC_OFF;
-
-	case RF_RM_FORCED_ON:
-		return PAL_RF_FSK_FEC_ON;
-
-	case RF_RM_AUTOMATIC:
-	default:
-		return PAL_RF_FSK_FEC_OFF;
-	}
+    if (scheme == PAL_SCHEME_RF_FSK_FEC_OFF) 
+    {
+        palRfRmMode = PAL_RF_RM_FORCED_OFF;
+    } 
+    else 
+    {
+        palRfRmMode = PAL_RF_RM_FORCED_ON;
+    }
 }
 
-/**
- * \brief Set the new scheme
- *
- * \param uc_scheme           Modulation to compare
- */
-void pal_rf_rm_set_scheme(uint8_t uc_scheme)
+void PAL_RF_RM_GetRobustModulation(void *indObj, uint16_t *pBitRate, PAL_SCHEME *pModulation, PAL_CHANNEL_MASK channelMask)
 {
-	if (uc_scheme == PAL_RF_FSK_FEC_OFF) {
-		suc_rm_mode = RF_RM_FORCED_OFF;
-	} else {
-		suc_rm_mode = RF_RM_FORCED_ON;
-	}
+    DRV_RF215_RX_INDICATION_OBJ *pIndObj;
+    PAL_SCHEME bestScheme = PAL_SCHEME_RF;
+
+    (void)channelMask;
+
+    pIndObj = (DRV_RF215_RX_INDICATION_OBJ *)indObj;
+
+    switch(palRfRmMode) 
+    {
+        case PAL_RF_RM_FORCED_OFF:
+            if (pIndObj->rssiDBm >= PAL_RF_RM_THRESHOLD_FSK_FEC_OFF) 
+            {
+                bestScheme = PAL_SCHEME_RF_FSK_FEC_OFF;
+            }
+
+            break;
+
+        case PAL_RF_RM_FORCED_ON:
+            if (pIndObj->rssiDBm >= PAL_RF_RM_THRESHOLD_FSK_FEC_ON) 
+            {
+                bestScheme = PAL_SCHEME_RF_FSK_FEC_ON;
+            }
+
+            break;
+
+        default:
+            if (pIndObj->rssiDBm >= PAL_RF_RM_THRESHOLD_FSK_FEC_OFF)
+            {
+                bestScheme = PAL_SCHEME_RF_FSK_FEC_OFF;
+            } 
+            else if (pIndObj->rssiDBm >= PAL_RF_RM_THRESHOLD_FSK_FEC_ON) 
+            {
+                bestScheme = PAL_SCHEME_RF_FSK_FEC_ON;
+            }
+    }
+
+    *pModulation = bestScheme;
+
+    if (bestScheme != PAL_SCHEME_RF) {
+        *pBitRate = palRfBandwidth[bestScheme - PAL_SCHEME_RF];
+    } else {
+        *pBitRate = 0;
+    }
 }
-
-/**
- * \brief Initialization function of the PAL RM module in PLC
- *
- */
-void pal_rf_rm_init(void)
-{
-	suc_rm_mode = RF_RM_MODE;
-	ssc_rssi_threshold[PAL_RF_FSK_FEC_OFF] = RF_THRESHOLD_FSK_FEC_OFF;
-	ssc_rssi_threshold[PAL_RF_FSK_FEC_ON] = RF_THRESHOLD_FSK_FEC_ON;
-}
-
-#endif /* PAL_RF */
-
-/* @} */
-
-
-

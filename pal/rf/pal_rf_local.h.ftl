@@ -3,14 +3,13 @@
     Microchip Technology Inc.
 
   File Name:
-    pal_plc_rm.h
+    pal_rf_local.h
 
   Summary:
-    Platform Abstraction Layer (PAL) Robust Management source file.
+    Platform Abstraction Layer (PAL) RF Interface Local header file.
 
   Description:
-    This module provides the interface between the PRIME MAC layer and the
-    PLC physical layer.
+    Platform Abstraction Layer (PAL) RF Interface Local header file.
 *******************************************************************************/
 
 //DOM-IGNORE-BEGIN
@@ -38,43 +37,102 @@ Microchip or any third party.
 */
 //DOM-IGNORE-END
 
+#ifndef PAL_RF_LOCAL_H
+#define PAL_RF_LOCAL_H
+
 // *****************************************************************************
 // *****************************************************************************
 // Section: File includes
 // *****************************************************************************
 // *****************************************************************************
 
-#ifndef PAL_PLC_RM_H
-#define PAL_PLC_RM_H
-
+#include <stdbool.h>
 #include <stdint.h>
-
-// DOM-IGNORE-BEGIN
-#ifdef __cplusplus  // Provide C++ Compatibility
-
-    extern "C" {
-
-#endif
-// DOM-IGNORE-END
+#include "configuration.h"
+#include "driver/rf215/drv_rf215.h"
+#include "pal_types.h"
 
 // *****************************************************************************
 // *****************************************************************************
-// Section: PAL PLC Robust Management Interface Functions
+// Section: Data Types
 // *****************************************************************************
+
 // *****************************************************************************
+/* RF PAL Module Status
 
-uint8_t PAL_PLC_RM_GetLqi(int16_t rssi);
-uint8_t PAL_PLC_RM_GetLessRobustModulation(PAL_SCHEME mod1, PAL_SCHEME mod2);
-bool PAL_PLC_RM_CheckMinimumQuality(PAL_SCHEME reference, PAL_SCHEME modulation);
-void PAL_PLC_RM_GetRobustModulation(void *indObj, uint16_t *pBitRate, 
-                                    PAL_SCHEME *pModulation, DRV_PLC_PHY_CHANNEL channel);
+  Summary:
+    Identifies the current status/state of the RF PAL module.
 
-// DOM-IGNORE-BEGIN
-#ifdef __cplusplus  // Provide C++ Compatibility
+  Description:
+    This enumeration identifies the current status/state of the RF PAL module.
 
-    }
+  Remarks:
+    This enumeration is the return type for the PAL_RF_Status routine. The
+    upper layer must ensure that PAL_RF_Status returns PAL_RF_STATUS_READY
+    before performing RF PAL operations.
+*/
+typedef enum
+{
+    PAL_RF_STATUS_UNINITIALIZED = SYS_STATUS_UNINITIALIZED,
+    PAL_RF_STATUS_BUSY = SYS_STATUS_BUSY,
+    PAL_RF_STATUS_READY = SYS_STATUS_READY,
+    PAL_RF_STATUS_ERROR = SYS_STATUS_ERROR,
+    PAL_RF_STATUS_INVALID_OBJECT = SYS_STATUS_ERROR_EXTENDED - 1,
+} PAL_RF_STATUS;
 
-#endif
-// DOM-IGNORE-END
+typedef struct
+{
+    uint8_t *pData;
+    DRV_RF215_TX_HANDLE txHandle;
+} PAL_RF_TX_HANDLERS_DATA;
 
-#endif //PAL_PLC_RM_H
+// *****************************************************************************
+/* PAL RF Data
+
+  Summary:
+    Holds PAL RF internal data.
+
+  Description:
+    This data type defines the all data required to handle the PAL RF module.
+
+  Remarks:
+    None.
+*/
+typedef struct
+{
+    PAL_CALLBACKS rfCallbacks;
+
+    PAL_RF_STATUS status;
+
+    SYS_STATUS drvPhyStatus;
+
+    DRV_HANDLE drvRfPhyHandle;
+
+    uint32_t hiTimerRef;
+
+    uint32_t previousTimerRef;
+
+    DRV_RF215_PHY_CFG_OBJ rfPhyConfig;
+    
+    DRV_RF215_TX_REQUEST_OBJ txReqObj[DRV_RF215_TX_BUFFERS_NUMBER];
+
+    PAL_RF_TX_HANDLERS_DATA txHandleData[DRV_RF215_TX_BUFFERS_NUMBER];
+
+    PAL_CHANNEL_MASK channelMask;
+
+    uint16_t rfChannelsNumber;
+
+    uint8_t statsErrorUnexpectedKey;
+
+    uint8_t statsErrorReset;
+
+    uint8_t statsErrorDebug;
+
+    uint8_t statsErrorCritical;
+
+} PAL_RF_DATA;
+
+#endif // #ifndef PAL_RF_LOCAL_H
+/*******************************************************************************
+ End of File
+*/

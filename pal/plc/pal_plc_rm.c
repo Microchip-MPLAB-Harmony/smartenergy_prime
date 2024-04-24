@@ -242,7 +242,7 @@ uint8_t PAL_PLC_RM_GetLqi(uint8_t cinr)
 	return ((cinr + 12) / 4);
 }
 
-uint8_t PAL_PLC_RM_GetLessRobustModulation(uint8_t mod1, uint8_t mod2)
+uint8_t PAL_PLC_RM_GetLessRobustModulation(PAL_SCHEME mod1, PAL_SCHEME mod2)
 {
 	if (palPlcRmBandwidth[mod1] > palPlcRmBandwidth[mod2]) 
 	{
@@ -254,7 +254,7 @@ uint8_t PAL_PLC_RM_GetLessRobustModulation(uint8_t mod1, uint8_t mod2)
 	}
 }
 
-bool PAL_PLC_RM_CheckMinimumQuality(uint8_t reference, uint8_t modulation)
+bool PAL_PLC_RM_CheckMinimumQuality(PAL_SCHEME reference, PAL_SCHEME modulation)
 {
 	if ((palPlcRmBandwidth[modulation] >= palPlcRmBandwidth[reference]) && (palPlcRmBandwidth[modulation] > 0))
 	{
@@ -266,18 +266,21 @@ bool PAL_PLC_RM_CheckMinimumQuality(uint8_t reference, uint8_t modulation)
 	}
 }
 
-void PAL_PLC_RM_GetRobustModulation(DRV_PLC_PHY_RECEPTION_OBJ *indObj, uint16_t *pBitRate, uint8_t *pModulation, DRV_PLC_PHY_CHANNEL channel)
+void PAL_PLC_RM_GetRobustModulation(void *indObj, uint16_t *pBitRate, PAL_SCHEME *pModulation, DRV_PLC_PHY_CHANNEL channelMask)
 {
 	uint64_t evmAccumulated;
 	uint32_t evm;
 	const PAL_PLC_RM_CONDITIONS_DATA *pConditionData;
+	DRV_PLC_PHY_RECEPTION_OBJ *pIndObj;
 	uint8_t index;
 	uint8_t numConditions;
 	uint8_t bestModulation;
+	
+	pIndObj = (DRV_PLC_PHY_RECEPTION_OBJ *)indObj;
 
 	/* Get conditions for the given modulation */
-	numConditions = palPlcRmConditions[indObj->scheme].numConditions;
-	pConditionData = palPlcRmConditions[indObj->scheme].pData;
+	numConditions = palPlcRmConditions[pIndObj->scheme].numConditions;
+	pConditionData = palPlcRmConditions[pIndObj->scheme].pData;
 
 	bestModulation = PAL_OUTDATED_INF;
 	for (index = 0; index < numConditions; index++) 
@@ -285,18 +288,18 @@ void PAL_PLC_RM_GetRobustModulation(DRV_PLC_PHY_RECEPTION_OBJ *indObj, uint16_t 
 		evm = EVM_INV_CONV(pConditionData->evm);
 		evmAccumulated = EVM_INV_ACC_CONV(pConditionData->evmAcc);
 
-		if ((indObj->narBandPercent >= pConditionData->narBandPercentMin) &&
-			(indObj->narBandPercent <= pConditionData->narBandPercentMax) &&
-			(indObj->impNoisePercent >= pConditionData->impNoisePercentMin) &&
-			(indObj->impNoisePercent <= pConditionData->impNoisePercentMax) &&
-			(indObj->evmPayload <= evm) &&
-			(indObj->evmHeader <= evm) &&
-			(indObj->evmHeaderAcum <= (uint32_t)evmAccumulated) &&
-			(indObj->evmPayloadAcum <= (uint32_t)evmAccumulated) &&
-			(indObj->cinrAvg >= pConditionData->cinrAvg) &&
-			(indObj->cinrMin >= pConditionData->cinrMin) &&
-			(indObj->berSoftAvg <= pConditionData->berSoftAvg) &&
-			(indObj->berSoftMax <= pConditionData->berSoftMax)) 
+		if ((pIndObj->narBandPercent >= pConditionData->narBandPercentMin) &&
+			(pIndObj->narBandPercent <= pConditionData->narBandPercentMax) &&
+			(pIndObj->impNoisePercent >= pConditionData->impNoisePercentMin) &&
+			(pIndObj->impNoisePercent <= pConditionData->impNoisePercentMax) &&
+			(pIndObj->evmPayload <= evm) &&
+			(pIndObj->evmHeader <= evm) &&
+			(pIndObj->evmHeaderAcum <= (uint32_t)evmAccumulated) &&
+			(pIndObj->evmPayloadAcum <= (uint32_t)evmAccumulated) &&
+			(pIndObj->cinrAvg >= pConditionData->cinrAvg) &&
+			(pIndObj->cinrMin >= pConditionData->cinrMin) &&
+			(pIndObj->berSoftAvg <= pConditionData->berSoftAvg) &&
+			(pIndObj->berSoftMax <= pConditionData->berSoftMax)) 
 		{
 				bestModulation = pConditionData->modulation;
 				break;
@@ -306,7 +309,7 @@ void PAL_PLC_RM_GetRobustModulation(DRV_PLC_PHY_RECEPTION_OBJ *indObj, uint16_t 
 	}
 
 	*pModulation = bestModulation;
-	if (channel >= CHN1_CHN2) 
+	if (channelMask >= PAL_PLC_CHN1_CHN2MASK) 
 	{
 		*pBitRate = palPlcRmBandwidth[bestModulation] << 1;
 	}

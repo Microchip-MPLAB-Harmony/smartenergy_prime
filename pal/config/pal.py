@@ -118,6 +118,13 @@ def instantiateComponent(primePalComponent):
     primePalRf.setDefaultValue(False)
     primePalRf.setHelp(prime_pal_helpkeyword)
 
+    primePalRfFreqHopping = primePalComponent.createBooleanSymbol("PRIME_PAL_RF_FREQ_HOPPING", primePalRf)
+    primePalRfFreqHopping.setLabel("Enable Frequency Hopping")
+    primePalRfFreqHopping.setVisible(False)
+    primePalRfFreqHopping.setDefaultValue(False)
+    primePalRfFreqHopping.setHelp(prime_pal_helpkeyword)
+    primePalRfFreqHopping.setDependencies(showSymbol, ["PRIME_PAL_RF_EN"])
+
     primePalSerial = primePalComponent.createBooleanSymbol("PRIME_PAL_SERIAL_EN", primePalInterfaces)
     primePalSerial.setLabel("Enable Serial PHY interface")
     primePalSerial.setDefaultValue(False)
@@ -220,12 +227,13 @@ def instantiateComponent(primePalComponent):
     ##### PRIME PAL RF
     global primePalRfSrcFile
     primePalRfSrcFile = primePalComponent.createFileSymbol("PRIME_PAL_RF_SOURCE", None)
-    primePalRfSrcFile.setSourcePath("pal/rf/pal_rf.c")
+    primePalRfSrcFile.setSourcePath("pal/rf/pal_rf.c.ftl")
     primePalRfSrcFile.setOutputName("pal_rf.c")
     primePalRfSrcFile.setDestPath("stack/pal")
     primePalRfSrcFile.setProjectPath("config/" + configName + "/stack/pal")
     primePalRfSrcFile.setType("SOURCE")
     primePalRfSrcFile.setEnabled(False)
+    primePalRfSrcFile.setMarkup(True)
 
     global primePalRfHdrFile
     primePalRfHdrFile = primePalComponent.createFileSymbol("PRIME_PAL_RF_HEADER", None)
@@ -238,12 +246,13 @@ def instantiateComponent(primePalComponent):
 
     global primePalRfLocalHdrFile
     primePalRfLocalHdrFile = primePalComponent.createFileSymbol("PRIME_PAL_RF_LOCAL_HEADER", None)
-    primePalRfLocalHdrFile.setSourcePath("pal/rf/pal_rf_local.h")
+    primePalRfLocalHdrFile.setSourcePath("pal/rf/pal_rf_local.h.ftl")
     primePalRfLocalHdrFile.setOutputName("pal_rf_local.h")
     primePalRfLocalHdrFile.setDestPath("stack/pal")
     primePalRfLocalHdrFile.setProjectPath("config/" + configName + "/stack/pal")
     primePalRfLocalHdrFile.setType("SOURCE")
     primePalRfLocalHdrFile.setEnabled(False)
+    primePalRfLocalHdrFile.setMarkup(True)
     
     global primePalRfRmSrcFile
     primePalRfRmSrcFile = primePalComponent.createFileSymbol("PRIME_PAL_RF_SOURCE_RM", None)

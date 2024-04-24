@@ -125,27 +125,32 @@ const PAL_INTERFACE PAL_PLC_Interface =
 
 // *****************************************************************************
 // *****************************************************************************
-// Section: File Scope Variables
+// Section: File Scope Data
 // *****************************************************************************
 // *****************************************************************************
 extern DRV_PLC_PHY_INIT drvPlcPhyInitData;
 
 static PAL_PLC_DATA palPlcData = {0};
 
-static const uint8_t palSymbolSize[14] = {
+static const uint8_t palPlcSymbolSize[14] = {
     12, 24, 36, 0, 6, 12, 18, 0, 0, 0, 0, 0, 6, 12
 };
 
-static const uint32_t palTimeChirpHeader[4] = { 
+static const uint32_t palPlcTimeChirpHeader[4] = { 
     PHY_CHIRP_TIME + PHY_HEADER_TIME, 
     0, 
     PHY_CHIRP_MODE_B_TIME + PHY_HEADER_B_BC_TIME,
     PHY_CHIRP_MODE_BC_TIME + PHY_HEADER_B_BC_TIME
 };
 
-static uint16_t lPAL_GetChannelMask(uint8_t channel)
+// *****************************************************************************
+// *****************************************************************************
+// Section: File Scope Functions
+// *****************************************************************************
+// *****************************************************************************
+static uint16_t lPAL_PLC_GetChannelMask(uint8_t channel)
 {
-    uint16_t channelMask;
+    PAL_CHANNEL_MASK channelMask;
 
     if (channel <= 8) {
         channelMask = 1 << (channel - 1); /* Single channel */
@@ -156,7 +161,7 @@ static uint16_t lPAL_GetChannelMask(uint8_t channel)
     return channelMask;
 }
 
-static uint8_t lPAL_GetChannelNumber(uint16_t channelMask)
+static uint8_t lPAL_PLC_GetChannelNumber(PAL_CHANNEL_MASK channelMask)
 {
     uint8_t plcChannel;
 
@@ -179,7 +184,7 @@ static uint8_t lPAL_GetChannelNumber(uint16_t channelMask)
     return plcChannel;
 }
 
-static void lPAL_SetTxContinuousMode(uint8_t txMode)
+static void lPAL_PLC_SetTxContinuousMode(uint8_t txMode)
 {
     uint8_t dummyValue = 0;
     
@@ -210,14 +215,14 @@ static void lPAL_SetTxContinuousMode(uint8_t txMode)
     DRV_PLC_PHY_TxRequest(palPlcData.drvPhyHandle, &palPlcData.phyTxObj);
 }
 
-static void lPAL_TimerSyncHandler(uint32_t ul_id)
+static void lPAL_PLC_TimerSyncHandler(uint32_t ul_id)
 {
     if (palPlcData.syncIntId == ul_id) {
         palPlcData.syncUpdate = true;
     }
 }
 
-static uint32_t lPAL_TimerSyncRead(uint32_t *pTimePlc)
+static uint32_t lPAL_PLC_TimerSyncRead(uint32_t *pTimePlc)
 {
     uint32_t timeHost;
     uint32_t basePrioPrev = __get_BASEPRI();
@@ -227,7 +232,7 @@ static uint32_t lPAL_TimerSyncRead(uint32_t *pTimePlc)
     __set_BASEPRI(1 << (8 - __NVIC_PRIO_BITS));
 
     /* Read Host timer */
-    PAL_PLC_GetTimer(&timeHost, 0);
+    PAL_PLC_GetTimer(&timeHost);
 
     /* Read PLC timer */
     palPlcData.plcPIB.id = PLC_ID_TIME_REF_ID;
@@ -244,7 +249,7 @@ static uint32_t lPAL_TimerSyncRead(uint32_t *pTimePlc)
     return timeHost;
 }
 
-__STATIC_INLINE void lPAL_TimerSyncInitialize(void)
+__STATIC_INLINE void lPAL_PLC_TimerSyncInitialize(void)
 {
     if (!palPlcData.syncEnable) 
     {
@@ -253,13 +258,13 @@ __STATIC_INLINE void lPAL_TimerSyncInitialize(void)
     else 
     {
         /* Get initial timer references */
-        palPlcData.timeRefHost = lPAL_TimerSyncRead(&palPlcData.timeRefPlc);
+        palPlcData.timeRefHost = lPAL_PLC_TimerSyncRead(&palPlcData.timeRefPlc);
 
         /* Initialize relative frequency F_host/F_plc to 1 [uQ1.24] */
         palPlcData.syncTimerRelFreq = 1UL << 24;
 
         /* Program first interrupt after 50 ms (5 us deviation with 100 PPM) */
-        // if (prime_hal_timer_1us_set_int(palPlcData.syncDelay, true, lPAL_TimerSyncHandler, &palPlcData.syncIntId) == true)
+        // if (prime_hal_timer_1us_set_int(palPlcData.syncDelay, true, lPAL_PLC_TimerSyncHandler, &palPlcData.syncIntId) == true)
         // {
             palPlcData.syncDelay = 50000;
             palPlcData.syncUpdate = false;
@@ -272,7 +277,7 @@ __STATIC_INLINE void lPAL_TimerSyncInitialize(void)
     }
 }
 
-__STATIC_INLINE void lPAL_TimerSyncUpdate(void)
+__STATIC_INLINE void lPAL_PLC_TimerSyncUpdate(void)
 {
     uint32_t timeHost;
     uint32_t timePlc;
@@ -282,7 +287,7 @@ __STATIC_INLINE void lPAL_TimerSyncUpdate(void)
     bool intProgrammed = false;
 
     /* Get current Host and PLC timers */
-    timeHost = lPAL_TimerSyncRead(&timePlc);
+    timeHost = lPAL_PLC_TimerSyncRead(&timePlc);
 
     /* Compute delays from references (last read) */
     delayHost = timeHost - palPlcData.timeRefHost;
@@ -321,13 +326,13 @@ __STATIC_INLINE void lPAL_TimerSyncUpdate(void)
         }
 
         /* Program next interrupt */
-        // intProgrammed = prime_hal_timer_1us_set_int(palPlcData.syncDelay, true, lPAL_TimerSyncHandler, &palPlcData.syncIntId);
+        // intProgrammed = prime_hal_timer_1us_set_int(palPlcData.syncDelay, true, lPAL_PLC_TimerSyncHandler, &palPlcData.syncIntId);
     } 
     else 
     {
         // prime_hal_debug_report(PAL_PLC_TIMER_SYNC_ERROR);
 
-        lPAL_TimerSyncInitialize();
+        lPAL_PLC_TimerSyncInitialize();
     }
 
     if (intProgrammed) 
@@ -341,7 +346,7 @@ __STATIC_INLINE void lPAL_TimerSyncUpdate(void)
 
 }
 
-static uint32_t lPAL_GetHostTime(uint32_t timePlc)
+static uint32_t lPAL_PLC_GetHostTime(uint32_t timePlc)
 {
     int64_t delayAux;
     int32_t delayPlc;
@@ -361,7 +366,7 @@ static uint32_t lPAL_GetHostTime(uint32_t timePlc)
     return timeHost;
 }
 
-static uint32_t lPAL_GetPlcTime(uint32_t timeHost)
+static uint32_t lPAL_PLC_GetPlcTime(uint32_t timeHost)
 {
     int64_t delayAux;
     int32_t delayHost;
@@ -381,7 +386,7 @@ static uint32_t lPAL_GetPlcTime(uint32_t timeHost)
     return timePlc;
 }
 
-static void lPAL_SetTxRxChannel(DRV_PLC_PHY_CHANNEL channel)
+static void lPAL_PLC_SetTxRxChannel(DRV_PLC_PHY_CHANNEL channel)
 {
     /* Set channel configuration for impedance detection */
     palPlcData.plcPIB.id = PLC_ID_CHANNEL_CFG;
@@ -393,17 +398,22 @@ static void lPAL_SetTxRxChannel(DRV_PLC_PHY_CHANNEL channel)
     SRV_PCOUP_SetChannelConfig(palPlcData.drvPhyHandle, channel);
 
     /* Initialize synchronization of PL360-Host timers when channel updated */
-    lPAL_TimerSyncInitialize();
+    lPAL_PLC_TimerSyncInitialize();
 }
 
-static void lPAL_PLC_DataCfmCb(DRV_PLC_PHY_TRANSMISSION_CFM_OBJ *cfmObj, uintptr_t context)
+// *****************************************************************************
+// *****************************************************************************
+// Section: Callback Functions
+// *****************************************************************************
+// *****************************************************************************
+static void lPAL_PLC_PLC_DataCfmCb(DRV_PLC_PHY_TRANSMISSION_CFM_OBJ *cfmObj, uintptr_t context)
 {
     /* Avoid warning */
     (void)context;
 
     if (cfmObj->result == DRV_PLC_PHY_TX_RESULT_TIMEOUT)
     {
-        lPAL_TimerSyncInitialize();
+        lPAL_PLC_TimerSyncInitialize();
     }
 
     if (palPlcData.status == PAL_PLC_STATUS_DETECT_IMPEDANCE)
@@ -417,10 +427,10 @@ static void lPAL_PLC_DataCfmCb(DRV_PLC_PHY_TRANSMISSION_CFM_OBJ *cfmObj, uintptr
         PAL_MSG_CONFIRM_DATA dataCfm;
         uint8_t id;
 
-        dataCfm.txTime = lPAL_GetHostTime(cfmObj->timeIni);
+        dataCfm.txTime = lPAL_PLC_GetHostTime(cfmObj->timeIni);
         dataCfm.rmsCalc = (uint16_t)cfmObj->rmsCalc;
-        dataCfm.channelMask = lPAL_GetChannelMask(palPlcData.channel);
-        dataCfm.mode = (uint8_t)cfmObj->frameType;
+        dataCfm.channelMask = lPAL_PLC_GetChannelMask(palPlcData.channel);
+        dataCfm.frameType = (uint8_t)cfmObj->frameType;
 
         switch (cfmObj->result)
         {
@@ -463,7 +473,7 @@ static void lPAL_PLC_DataCfmCb(DRV_PLC_PHY_TRANSMISSION_CFM_OBJ *cfmObj, uintptr
     }
 }
 
-static void lPAL_PLC_DataIndCb(DRV_PLC_PHY_RECEPTION_OBJ *indObj, uintptr_t context)
+static void lPAL_PLC_PLC_DataIndCb(DRV_PLC_PHY_RECEPTION_OBJ *indObj, uintptr_t context)
 {
     PAL_MSG_INDICATION_DATA dataInd;
 
@@ -490,14 +500,14 @@ static void lPAL_PLC_DataIndCb(DRV_PLC_PHY_RECEPTION_OBJ *indObj, uintptr_t cont
 
     /* Fill dataInd */
     dataInd.pData = indObj->pReceivedData;
-    dataInd.rxTime = lPAL_GetHostTime(indObj->timeIni);
+    dataInd.rxTime = lPAL_PLC_GetHostTime(indObj->timeIni);
     dataInd.dataLength = indObj->dataLength;
-    dataInd.channelMask = lPAL_GetChannelMask(palPlcData.channel);
-    PAL_PLC_RM_GetRobustModulation(indObj, &dataInd.estimatedBitrate, &dataInd.lessRobustMod, palPlcData.channel);
+    dataInd.channelMask = lPAL_PLC_GetChannelMask(palPlcData.channel);
+    PAL_PLC_RM_GetRobustModulation(indObj, &dataInd.estimatedBitrate, &dataInd.lessRobustMod, dataInd.channelMask);
     dataInd.rssi = indObj->rssiAvg;
     dataInd.bufId = 0;
     dataInd.scheme = (uint8_t)indObj->scheme;
-    dataInd.mode = (uint8_t)indObj->frameType;
+    dataInd.frameType = (uint8_t)indObj->frameType;
     dataInd.headerType = (uint8_t)indObj->headerType;
     dataInd.lqi = PAL_PLC_RM_GetLqi(indObj->cinrAvg);
 
@@ -512,7 +522,7 @@ static void lPAL_PLC_DataIndCb(DRV_PLC_PHY_RECEPTION_OBJ *indObj, uintptr_t cont
 }
 
 <#if PRIME_PAL_PLC_PVDD_MONITOR == true>
-static void lPAL_PLC_PVDDMonitorCb(SRV_PVDDMON_CMP_MODE cmpMode, uintptr_t context)
+static void lPAL_PLC_PLC_PVDDMonitorCb(SRV_PVDDMON_CMP_MODE cmpMode, uintptr_t context)
 {
     /* Avoid warning */
     (void)context;
@@ -536,7 +546,7 @@ static void lPAL_PLC_PVDDMonitorCb(SRV_PVDDMON_CMP_MODE cmpMode, uintptr_t conte
 }
 
 </#if>
-static void lPAL_PLC_ExceptionCb(DRV_PLC_PHY_EXCEPTION exception, uintptr_t context)
+static void lPAL_PLC_PLC_ExceptionCb(DRV_PLC_PHY_EXCEPTION exception, uintptr_t context)
 {
     uint8_t numErrors;
 
@@ -578,6 +588,11 @@ static void lPAL_PLC_ExceptionCb(DRV_PLC_PHY_EXCEPTION exception, uintptr_t cont
     }
 }
 
+// *****************************************************************************
+// *****************************************************************************
+// Section: PAL PLC Interface Implementation
+// *****************************************************************************
+// *****************************************************************************
 SYS_MODULE_OBJ PAL_PLC_Initialize(void)
 {
     uint8_t bufferId;
@@ -655,8 +670,8 @@ void PAL_PLC_Tasks(void)
             if (palPlcData.drvPhyStatus == SYS_STATUS_READY)
             {
                 /* Perform initial configuration */
-                DRV_PLC_PHY_ExceptionCallbackRegister(palPlcData.drvPhyHandle, lPAL_PLC_ExceptionCb, DRV_PLC_PHY_INDEX);
-                DRV_PLC_PHY_TxCfmCallbackRegister(palPlcData.drvPhyHandle, lPAL_PLC_DataCfmCb, DRV_PLC_PHY_INDEX);
+                DRV_PLC_PHY_ExceptionCallbackRegister(palPlcData.drvPhyHandle, lPAL_PLC_PLC_ExceptionCb, DRV_PLC_PHY_INDEX);
+                DRV_PLC_PHY_TxCfmCallbackRegister(palPlcData.drvPhyHandle, lPAL_PLC_PLC_DataCfmCb, DRV_PLC_PHY_INDEX);
 
                 /* Update Channel list */
                 palPlcData.channelList = SRV_PCOUP_GetChannelList();
@@ -666,7 +681,7 @@ void PAL_PLC_Tasks(void)
                 DRV_PLC_PHY_EnableTX(palPlcData.drvPhyHandle, false);
                 palPlcData.pvddMonTxEnable = false;
                 /* Enable PLC PVDD Monitor Service */
-                SRV_PVDDMON_CallbackRegister(lPAL_PLC_PVDDMonitorCb, 0);
+                SRV_PVDDMON_CallbackRegister(lPAL_PLC_PLC_PVDDMonitorCb, 0);
                 SRV_PVDDMON_Start(SRV_PVDDMON_CMP_MODE_IN);
 <#else>
                 /* Enable TX */
@@ -676,7 +691,7 @@ void PAL_PLC_Tasks(void)
 
                 /* Set Channel for impedance detection */
                 palPlcData.channel = SRV_PCOUP_GetChannelImpedanceDetection();
-                lPAL_SetTxRxChannel(palPlcData.channel);
+                lPAL_PLC_SetTxRxChannel(palPlcData.channel);
                 palPlcData.detectImpedanceResult = DRV_PLC_PHY_TX_RESULT_NO_TX;
                 palPlcData.status = PAL_PLC_STATUS_DETECT_IMPEDANCE;
             }
@@ -722,11 +737,11 @@ void PAL_PLC_Tasks(void)
         case PAL_PLC_STATUS_SET_DEFAULT:
         {
             /* Set Data Indication Callback */
-            DRV_PLC_PHY_DataIndCallbackRegister(palPlcData.drvPhyHandle, lPAL_PLC_DataIndCb, DRV_PLC_PHY_INDEX);
+            DRV_PLC_PHY_DataIndCallbackRegister(palPlcData.drvPhyHandle, lPAL_PLC_PLC_DataIndCb, DRV_PLC_PHY_INDEX);
 
             /* Apply PLC coupling configuration for the default channel */
             palPlcData.channel = SRV_PCOUP_GetDefaultChannel();
-            lPAL_SetTxRxChannel(palPlcData.channel);
+            lPAL_PLC_SetTxRxChannel(palPlcData.channel);
 
             /* Set PAL status to ready */
             palPlcData.status = PAL_PLC_STATUS_READY;
@@ -737,7 +752,7 @@ void PAL_PLC_Tasks(void)
         {
             if (palPlcData.syncUpdate) {
                 /* Update synchronization between Host and PL360 timers */
-                lPAL_TimerSyncUpdate();
+                lPAL_PLC_TimerSyncUpdate();
             }
             break;
         }
@@ -753,7 +768,7 @@ void PAL_PLC_Tasks(void)
 
                 /* Set Channel for impedance detection */
                 palPlcData.channel = SRV_PCOUP_GetChannelImpedanceDetection();
-                lPAL_SetTxRxChannel(palPlcData.channel);
+                lPAL_PLC_SetTxRxChannel(palPlcData.channel);
                 palPlcData.detectImpedanceResult = DRV_PLC_PHY_TX_RESULT_NO_TX;
                 palPlcData.status = PAL_PLC_STATUS_DETECT_IMPEDANCE;
 
@@ -792,13 +807,13 @@ uint8_t PAL_PLC_DataRequest(PAL_MSG_REQUEST_DATA *pMessageData)
     palPlcData.phyTxObj.csma.senseDelayMs = pMessageData->senseDelayMs;
     palPlcData.phyTxObj.bufferId = pMessageData->timeDelay;
     palPlcData.phyTxObj.scheme = pMessageData->scheme;
-    palPlcData.phyTxObj.frameType = pMessageData->mode;
+    palPlcData.phyTxObj.frameType = pMessageData->frameType;
     palPlcData.phyTxObj.pTransmitData = pMessageData->pData;
 
     /* Adapt Timer mode */
     if (pMessageData->timeMode == TX_MODE_ABSOLUTE) 
     {
-        palPlcData.phyTxObj.timeIni = lPAL_GetPlcTime(pMessageData->timeDelay);
+        palPlcData.phyTxObj.timeIni = lPAL_PLC_GetPlcTime(pMessageData->timeDelay);
     }
     else
     {
@@ -810,9 +825,8 @@ uint8_t PAL_PLC_DataRequest(PAL_MSG_REQUEST_DATA *pMessageData)
     return PAL_CFG_SUCCESS;
 }
 
-uint8_t PAL_PLC_GetTimer(uint32_t *pTimer, uint16_t channelMask)
+uint8_t PAL_PLC_GetTimer(uint32_t *pTimer)
 {
-    (void)(channelMask);
     uint32_t time;
 
     // time = prime_hal_timer_1us_get();
@@ -833,16 +847,15 @@ uint8_t PAL_PLC_GetTimerExtended(uint64_t *pTimeExtended)
     uint32_t time;
     uint64_t timeExtended;
 
-    PAL_PLC_GetTimer(&time, 0);
+    PAL_PLC_GetTimer(&time);
     timeExtended = ((uint64_t)palPlcData.hiTimerRef << 32) | time;
 
     *pTimeExtended = timeExtended;
     return PAL_CFG_SUCCESS;
 }
 
-uint8_t PAL_PLC_GetCD(uint8_t *pCD, uint8_t *pRSSI, uint32_t *pTime, uint8_t *pHeader, uint16_t channelMask)
+uint8_t PAL_PLC_GetCD(uint8_t *pCD, uint8_t *pRSSI, uint32_t *pTime, uint8_t *pHeader)
 {
-    (void)channelMask;
     DRV_PLC_PHY_CD_INFO cdData;
     uint64_t tempValue;
     uint32_t hiTimerRef;
@@ -878,7 +891,7 @@ uint8_t PAL_PLC_GetCD(uint8_t *pCD, uint8_t *pRSSI, uint32_t *pTime, uint8_t *pH
         header = (cdData.cdRxState == CD_RX_PAYLOAD)? 0 : 1;
 
         /* Check if there is overflow since last time ref read (assumed that last read time ref is previous to Rx end time) */
-        rxTimeEnd = lPAL_GetHostTime(cdData.rxTimeEnd);
+        rxTimeEnd = lPAL_PLC_GetHostTime(cdData.rxTimeEnd);
         hiTimerRef = palPlcData.hiTimerRef;
         if (rxTimeEnd < palPlcData.previousTimerRef) {
             hiTimerRef++;
@@ -902,10 +915,8 @@ uint8_t PAL_PLC_GetCD(uint8_t *pCD, uint8_t *pRSSI, uint32_t *pTime, uint8_t *pH
     return(PAL_CFG_SUCCESS);
 }
 
-uint8_t PAL_PLC_GetZCT(uint32_t *pZcTime, uint16_t channelMask)
+uint8_t PAL_PLC_GetZCT(uint32_t *pZcTime)
 {
-    (void)channelMask;
-
     /* Read ZC data */
     uint64_t tempValue;
     uint32_t timeRef;
@@ -917,7 +928,7 @@ uint8_t PAL_PLC_GetZCT(uint32_t *pZcTime, uint16_t channelMask)
     palPlcData.plcPIB.pData = (uint8_t *)&zcTime1us;
     DRV_PLC_PHY_PIBGet(palPlcData.drvPhyHandle, &palPlcData.plcPIB);
 
-    zcTime1us = lPAL_GetHostTime(zcTime1us);
+    zcTime1us = lPAL_PLC_GetHostTime(zcTime1us);
 
     PAL_PLC_GetTimerExtended(&tempValue);
 
@@ -939,23 +950,20 @@ uint8_t PAL_PLC_GetZCT(uint32_t *pZcTime, uint16_t channelMask)
     return(PAL_CFG_SUCCESS);
 }
 
-uint8_t PAL_PLC_GetAGC(uint8_t *pMode, uint8_t *pGain, uint16_t channelMask)
+uint8_t PAL_PLC_GetAGC(uint8_t *pMode, uint8_t *pGain)
 {
-    (void)(channelMask);
-
-    *pMode = 0; /* manual mode is not supported */
+    *pMode = 0;
     *pGain = 0;
 
     return(PAL_CFG_INVALID_INPUT);
 }
 
-uint8_t PAL_PLC_SetAGC(uint8_t mode, uint8_t gain, uint16_t channelMask)
+uint8_t PAL_PLC_SetAGC(uint8_t mode, uint8_t gain)
 {
     (void)(mode);
     (void)(gain);
-    (void)(channelMask);
 
-    return(PAL_CFG_INVALID_INPUT); /* Not supported */
+    return(PAL_CFG_INVALID_INPUT);
 }
 
 uint8_t PAL_PLC_GetCCA(uint8_t *channelState)
@@ -963,28 +971,26 @@ uint8_t PAL_PLC_GetCCA(uint8_t *channelState)
     return PAL_CFG_INVALID_INPUT;
 }
 
-uint8_t PAL_PLC_GetNL(uint8_t *pNoise, uint16_t channelMask)
+uint8_t PAL_PLC_GetNL(uint8_t *pNoise)
 {
-    (void)channelMask;
-
     /* CINR is in 1/4 db. */
     *pNoise = (palPlcData.lastRSSIAvg - (palPlcData.lastCINRMin >> 2));
 
     return(PAL_CFG_SUCCESS);
 }
 
-uint8_t PAL_PLC_GetChannel(uint16_t *pChannelMask)
+uint8_t PAL_PLC_GetChannel(PAL_CHANNEL_MASK *pChannelMask)
 {
     if (palPlcData.status != PAL_PLC_STATUS_READY)
     {
         return PAL_CFG_INVALID_INPUT;
     }
 
-    *pChannelMask = lPAL_GetChannelMask(palPlcData.channel);
+    *pChannelMask = lPAL_PLC_GetChannelMask(palPlcData.channel);
     return(PAL_CFG_SUCCESS);
 }
 
-uint8_t PAL_PLC_SetChannel(uint16_t channelMask)
+uint8_t PAL_PLC_SetChannel(PAL_CHANNEL_MASK channelMask)
 {
     uint8_t channel;
 
@@ -993,18 +999,16 @@ uint8_t PAL_PLC_SetChannel(uint16_t channelMask)
         return PAL_CFG_INVALID_INPUT;
     }
 
-    channel = lPAL_GetChannelNumber(channelMask);
+    channel = lPAL_PLC_GetChannelNumber(channelMask);
 
-    lPAL_SetTxRxChannel(channel);
+    lPAL_PLC_SetTxRxChannel(channel);
     
     return(PAL_CFG_SUCCESS);
 }
 
-uint8_t PAL_PLC_GetConfiguration(uint16_t id, void *pValue, uint16_t length, uint16_t channelMask)
+uint8_t PAL_PLC_GetConfiguration(uint16_t id, void *pValue, uint16_t length)
 {
     uint16_t plcID;
-
-    (void)channelMask;
 
     /* Check identifier */
     switch (id) 
@@ -1110,7 +1114,7 @@ uint8_t PAL_PLC_GetConfiguration(uint16_t id, void *pValue, uint16_t length, uin
             }
     }
 
-    /* Set in phy layer */
+    /* Get in phy layer */
     palPlcData.plcPIB.id = plcID;
     palPlcData.plcPIB.length = length;
     palPlcData.plcPIB.pData = (uint8_t *)pValue;
@@ -1119,11 +1123,9 @@ uint8_t PAL_PLC_GetConfiguration(uint16_t id, void *pValue, uint16_t length, uin
     return(PAL_CFG_SUCCESS);
 }
 
-uint8_t PAL_PLC_SetConfiguration(uint16_t id, void *pValue, uint16_t length, uint16_t channelMask)
+uint8_t PAL_PLC_SetConfiguration(uint16_t id, void *pValue, uint16_t length)
 {
     uint16_t plcID;
-
-    (void)channelMask;
 
     /* Check identifier */
     switch (id) 
@@ -1133,7 +1135,7 @@ uint8_t PAL_PLC_SetConfiguration(uint16_t id, void *pValue, uint16_t length, uin
             uint8_t txMode;
             
             txMode = *(uint8_t *)pValue;
-            lPAL_SetTxContinuousMode(txMode);
+            lPAL_PLC_SetTxContinuousMode(txMode);
             return(PAL_CFG_SUCCESS);
         }
 
@@ -1184,7 +1186,7 @@ uint8_t PAL_PLC_SetConfiguration(uint16_t id, void *pValue, uint16_t length, uin
             }
 
             chn = (*(uint8_t *)pValue);
-            lPAL_SetTxRxChannel(chn);
+            lPAL_PLC_SetTxRxChannel(chn);
             return(PAL_CFG_SUCCESS);
         }
 
@@ -1226,67 +1228,8 @@ uint8_t PAL_PLC_SetConfiguration(uint16_t id, void *pValue, uint16_t length, uin
     return(PAL_CFG_SUCCESS);
 }
 
-uint8_t PAL_PLC_GetMsgDuration(uint16_t channelMask, uint16_t length, uint8_t scheme, uint8_t mode, uint32_t *pDuration)
+uint8_t PAL_PLC_GetSNR(uint8_t *pSnr, uint8_t qt)
 {
-    uint32_t frameDuration;
-    uint16_t frameLen;
-    uint8_t symbolSize = 0;
-
-    (void)channelMask;
-
-    if (length == 0)
-    {
-        *pDuration = 0;
-        return(PAL_CFG_INVALID_INPUT);
-    }
-
-    frameDuration = 0;
-    frameLen = length;
-
-    if (mode == FRAME_TYPE_A) 
-    {
-        /* There are 7 bytes inside the header */
-        if (frameLen < 7) 
-        {
-            frameLen = 0;
-        } 
-        else 
-        {
-            frameLen -= 7;
-        }
-    }
-
-    symbolSize = palSymbolSize[scheme];
-    if (scheme >= SCHEME_DBPSK_C)
-    {
-        /* Increase a byte for flushing */
-        frameLen++;
-    }
-
-    /* Update tx frame duration */
-    frameDuration =  frameLen / symbolSize;
-    if (frameLen % symbolSize) {
-        frameDuration++;
-    }
-
-    /* adjust ROB mode */
-    if (scheme & 0x08) {
-        frameDuration <<= 2;
-    }
-
-    frameDuration *= PHY_SYMBOL_TIME;
-    /* Adjust chirp and header for PHY frame */
-    frameDuration += palTimeChirpHeader[mode];
-
-    *pDuration = frameDuration;
-
-    return(PAL_CFG_SUCCESS);
-}
-
-uint8_t PAL_PLC_GetSNR(uint8_t *pSnr, uint8_t qt, uint16_t channelMask)
-{
-    (void)channelMask;
-
     if (qt == 0) 
     {
         *pSnr = 0;
@@ -1304,7 +1247,7 @@ uint8_t PAL_PLC_GetSNR(uint8_t *pSnr, uint8_t qt, uint16_t channelMask)
     }
 }
 
-uint16_t PAL_PLC_GetSignalCapture(uint8_t *pData, uint8_t mode, uint32_t timeStart, uint32_t duration)
+uint16_t PAL_PLC_GetSignalCapture(uint8_t *pData, uint8_t frameType, uint32_t timeStart, uint32_t duration)
 {
     uint8_t *pDataPointer;
     DRV_PLC_PHY_SIGNAL_CAPTURE signalCapture;
@@ -1325,7 +1268,7 @@ uint16_t PAL_PLC_GetSignalCapture(uint8_t *pData, uint8_t mode, uint32_t timeSta
 
     /* Start Capture */
     pDataPointer = captureParameters;
-    *pDataPointer++ = mode;
+    *pDataPointer++ = frameType;
     *pDataPointer++ = (uint8_t)(timeStart >> 24);
     *pDataPointer++ = (uint8_t)(timeStart >> 16);
     *pDataPointer++ = (uint8_t)(timeStart >> 8);
@@ -1370,4 +1313,59 @@ uint16_t PAL_PLC_GetSignalCapture(uint8_t *pData, uint8_t mode, uint32_t timeSta
     }
 
     return (uint16_t)(pDataPointer - pData);
+}
+
+uint8_t PAL_PLC_GetMsgDuration(uint16_t length, PAL_SCHEME scheme, uint8_t frameType, uint32_t *pDuration)
+{
+    uint32_t frameDuration;
+    uint16_t frameLen;
+    uint8_t symbolSize = 0;
+
+    if (length == 0)
+    {
+        *pDuration = 0;
+        return(PAL_CFG_INVALID_INPUT);
+    }
+
+    frameDuration = 0;
+    frameLen = length;
+
+    if (frameType == FRAME_TYPE_A) 
+    {
+        /* There are 7 bytes inside the header */
+        if (frameLen < 7) 
+        {
+            frameLen = 0;
+        } 
+        else 
+        {
+            frameLen -= 7;
+        }
+    }
+
+    symbolSize = palPlcSymbolSize[scheme];
+    if (scheme >= SCHEME_DBPSK_C)
+    {
+        /* Increase a byte for flushing */
+        frameLen++;
+    }
+
+    /* Update tx frame duration */
+    frameDuration =  frameLen / symbolSize;
+    if (frameLen % symbolSize) {
+        frameDuration++;
+    }
+
+    /* adjust ROB scheme */
+    if (scheme & 0x08) {
+        frameDuration <<= 2;
+    }
+
+    frameDuration *= PHY_SYMBOL_TIME;
+    /* Adjust chirp and header for PHY frame */
+    frameDuration += palPlcTimeChirpHeader[frameType];
+
+    *pDuration = frameDuration;
+
+    return(PAL_CFG_SUCCESS);
 }

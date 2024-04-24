@@ -1,80 +1,82 @@
-/**
- * \file
- *
- * \brief PRIME RF Phy Abstraction Layer for RF215 Robust Management Module
- *
- * Copyright (c) 2023 Atmel Corporation. All rights reserved.
- *
- * \asf_license_start
- *
- * \page License
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- * 1. Redistributions of source code must retain the above copyright notice,
- *    this list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright notice,
- *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution.
- *
- * 3. The name of Atmel may not be used to endorse or promote products derived
- *    from this software without specific prior written permission.
- *
- * 4. This software may only be redistributed and used in connection with an
- *    Atmel microcontroller product.
- *
- * THIS SOFTWARE IS PROVIDED BY ATMEL "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT ARE
- * EXPRESSLY AND SPECIFICALLY DISCLAIMED. IN NO EVENT SHALL ATMEL BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
- * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
- * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- * \asf_license_stop
- *
- */
+/*******************************************************************************
+  Company:
+    Microchip Technology Inc.
 
-#ifndef PAL_RF_RM_H_INCLUDED
-#define PAL_RF_RM_H_INCLUDED
+  File Name:
+    pal_plc_rm.h
 
-/** @cond 0 */
-/**INDENT-OFF**/
-#ifdef __cplusplus
-extern "C" {
-#endif
-/**INDENT-ON**/
-/** @endcond */
+  Summary:
+    Platform Abstraction Layer (PAL) Robust Management source file.
+
+  Description:
+    This module provides the interface between the PRIME MAC layer and the
+    RF physical layer.
+*******************************************************************************/
+
+//DOM-IGNORE-BEGIN
+/*
+Copyright (C) 2024, Microchip Technology Inc., and its subsidiaries. All rights reserved.
+
+The software and documentation is provided by microchip and its contributors
+"as is" and any express, implied or statutory warranties, including, but not
+limited to, the implied warranties of merchantability, fitness for a particular
+purpose and non-infringement of third party intellectual property rights are
+disclaimed to the fullest extent permitted by law. In no event shall microchip
+or its contributors be liable for any direct, indirect, incidental, special,
+exemplary, or consequential damages (including, but not limited to, procurement
+of substitute goods or services; loss of use, data, or profits; or business
+interruption) however caused and on any theory of liability, whether in contract,
+strict liability, or tort (including negligence or otherwise) arising in any way
+out of the use of the software and documentation, even if advised of the
+possibility of such damage.
+
+Except as expressly permitted hereunder and subject to the applicable license terms
+for any third-party software incorporated in the software and any applicable open
+source software license terms, no license or other rights, whether express or
+implied, are granted under any patent or other intellectual property rights of
+Microchip or any third party.
+*/
+//DOM-IGNORE-END
+
+// *****************************************************************************
+// *****************************************************************************
+// Section: File includes
+// *****************************************************************************
+// *****************************************************************************
+
+#ifndef PAL_RF_RM_H
+#define PAL_RF_RM_H
 
 #include <stdint.h>
-#include "conf_pal.h"
 
-#ifdef PAL_RF
+// DOM-IGNORE-BEGIN
+#ifdef __cplusplus  // Provide C++ Compatibility
 
-/** \name PAL RF RM Interface */
-/** @{ */
-void pal_rf_rm_init(void);
-void pal_rf_rm_max_modulation_rx_msg(int8_t sc_rssi, uint16_t *us_estimated_bitrate, uint8_t *uc_less_robust_mod);
-uint8_t pal_rf_rm_get_lqi(int8_t sc_rssi);
-bool pal_rf_rm_minimum_quality(uint16_t us_chn, uint8_t uc_scheme, uint8_t uc_less_robust_mod);
-uint8_t pal_rf_rm_get_scheme(void);
-void pal_rf_rm_set_scheme(uint8_t uc_scheme);
+    extern "C" {
 
-/** @} */
-
-#endif /* PAL_RF */
-
-/** @cond 0 */
-/**INDENT-OFF**/
-#ifdef __cplusplus
-}
 #endif
-/**INDENT-ON**/
-/** @endcond */
-#endif /* PAL_RF_RM_H_INCLUDED */
+// DOM-IGNORE-END
+
+// *****************************************************************************
+// *****************************************************************************
+// Section: PAL RF Robust Management Interface Functions
+// *****************************************************************************
+// *****************************************************************************
+
+uint8_t PAL_RF_RM_GetLqi(int16_t rssi);
+uint8_t PAL_RF_RM_GetLessRobustModulation(PAL_SCHEME mod1, PAL_SCHEME mod2);
+bool PAL_RF_RM_CheckMinimumQuality(PAL_SCHEME reference, PAL_SCHEME modulation);
+PAL_SCHEME PAL_RF_RM_GetScheme(void);
+void PAL_RF_RM_SetScheme(PAL_SCHEME scheme);
+void PAL_RF_RM_GetRobustModulation(void *indObj, uint16_t *pBitRate, 
+                                   PAL_SCHEME *pModulation, PAL_CHANNEL_MASK channelMask);
+
+// DOM-IGNORE-BEGIN
+#ifdef __cplusplus  // Provide C++ Compatibility
+
+    }
+
+#endif
+// DOM-IGNORE-END
+
+#endif //PAL_RF_RM_H
