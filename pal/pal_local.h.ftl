@@ -123,6 +123,8 @@ typedef struct
   PAL_DATA_CONFIRM_CB dataConfirmCallback;
     
   PAL_DATA_INDICATION_CB dataIndicationCallback;
+    
+  PAL_SWITCH_RF_CH_CB channelSwitchCallback;
   
 } PAL_DATA;
 

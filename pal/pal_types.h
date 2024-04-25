@@ -527,7 +527,7 @@ typedef void (*PAL_DATA_INDICATION_CB)(PAL_MSG_INDICATION_DATA *pData);
   Remarks:
     None.
 */
-typedef void (*PAL_SWITCH_RF_CH_CB)(void);
+typedef void (*PAL_SWITCH_RF_CH_CB)(PAL_CHANNEL_MASK channelMask);
 
 // ****************************************************************************
 /* PRIME PAL handlers data
@@ -545,6 +545,7 @@ typedef struct
 {
     PAL_DATA_CONFIRM_CB dataConfirm;
     PAL_DATA_INDICATION_CB dataIndication;
+    PAL_SWITCH_RF_CH_CB switchRfChannel;
 } PAL_CALLBACKS;
 
 // DOM-IGNORE-BEGIN

@@ -3,7 +3,7 @@
     Microchip Technology Inc.
 
   File Name:
-    pal.h
+    pal_plc.h
 
   Summary:
     Physical Abstraction Layer (PAL) header file.
@@ -38,8 +38,8 @@
 *******************************************************************************/
 //DOM-IGNORE-END
 
-#ifndef  PAL_PLC_H_INCLUDED
-#define  PAL_PLC_H_INCLUDED
+#ifndef  PAL_PLC_H
+#define  PAL_PLC_H
 
 // *****************************************************************************
 // *****************************************************************************
@@ -59,17 +59,13 @@
 #endif
 // DOM-IGNORE-END
 
-// // ****************************************************************************
-// ****************************************************************************
-// Section: Interface Routines
-// ****************************************************************************
-// ****************************************************************************
 SYS_MODULE_OBJ PAL_PLC_Initialize(void);
 SYS_STATUS PAL_PLC_Status(void);
 void PAL_PLC_Tasks(void);
 void PAL_PLC_DataConfirmCallbackRegister(PAL_DATA_CONFIRM_CB callback);
 void PAL_PLC_DataIndicationCallbackRegister(PAL_DATA_INDICATION_CB callback);
 uint8_t PAL_PLC_DataRequest(PAL_MSG_REQUEST_DATA *requestMsg);
+void PAL_PLC_ProgramChannelSwitch(uint32_t timeSync, PAL_CHANNEL_MASK channelMask, uint8_t timeMode);
 uint8_t PAL_PLC_GetSNR(uint8_t *snr, uint8_t qt);
 uint8_t PAL_PLC_GetZCT(uint32_t *zct);
 uint8_t PAL_PLC_GetTimer(uint32_t *timer);
@@ -91,4 +87,4 @@ uint8_t PAL_PLC_GetMsgDuration(uint16_t msgLen, PAL_SCHEME scheme, PAL_FRAME fra
 }
 #endif
 
-#endif /*  PAL_PLC_H_INCLUDED */
+#endif /*  PAL_PLC_H */

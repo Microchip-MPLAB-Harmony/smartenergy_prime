@@ -113,6 +113,15 @@ static void lPAL_RfDataIndicationCallback(PAL_MSG_INDICATION_DATA *pData)
     }
 }
 
+<#if PRIME_PAL_RF_FREQ_HOPPING == true>
+static void lPAL_RfCHannelSwitchCallback(PAL_CHANNEL_MASK channelMask)
+{
+    if (palData.channelSwitchCallback) {
+        palData.channelSwitchCallback(channelMask);
+    }
+}
+</#if>
+
 </#if>
 <#if PRIME_PAL_SERIAL_EN == true>
 static void lPAL_SerialDataConfirmCallback(PAL_MSG_CONFIRM_DATA *pData)
@@ -199,7 +208,10 @@ SYS_MODULE_OBJ PAL_Initialize(const SYS_MODULE_INDEX index)
     }
 
     PAL_RF_DataConfirmCallbackRegister(lPAL_RfDataConfirmCallback);
-    PAL_RF_DataIndicationCallbackRegister(lPAL_RfDataConfirmCallback);
+    PAL_RF_DataIndicationCallbackRegister(lPAL_RfDataIndicationCallback);
+<#if PRIME_PAL_RF_FREQ_HOPPING == true>
+    PAL_RF_ChannelSwitchCallbackRegister(lPAL_RfCHannelSwitchCallback);
+</#if>
 
 </#if>
 <#if PRIME_PAL_SERIAL_EN == true>
@@ -209,7 +221,7 @@ SYS_MODULE_OBJ PAL_Initialize(const SYS_MODULE_INDEX index)
     }
 
     PAL_SERIAL_DataConfirmCallbackRegister(lPAL_SerialDataConfirmCallback);
-    PAL_SERIAL_DataIndicationCallbackRegister(lPAL_SerialDataConfirmCallback);
+    PAL_SERIAL_DataIndicationCallbackRegister(lPAL_SerialDataIndicationCallback);
 
 </#if>
     return (SYS_MODULE_OBJ)PRIME_PAL_INDEX;
@@ -284,17 +296,17 @@ uint8_t PAL_GetNL(PAL_CHANNEL_MASK channelMask, uint8_t *noise)
     return palIface->PAL_GetNL(noise);
 }
 
-// uint8_t PAL_GetAGC(PAL_CHANNEL_MASK channelMask, uint8_t *frameType, uint8_t *gain)
-// {
-//     PAL_INTERFACE *palIface = lPAL_GetInterface(channelMask);
-//     return palIface->PAL_GetAGC(frameType, gain);
-// }
+uint8_t PAL_GetAGC(PAL_CHANNEL_MASK channelMask, uint8_t *frameType, uint8_t *gain)
+{
+    PAL_INTERFACE *palIface = lPAL_GetInterface(channelMask);
+    return palIface->PAL_GetAGC(frameType, gain);
+}
 
-// uint8_t PAL_SetAGC(PAL_CHANNEL_MASK channelMask, PAL_FRAME frameType, uint8_t gain)
-// {
-//     PAL_INTERFACE *palIface = lPAL_GetInterface(channelMask);
-//     return palIface->PAL_SetAGC(frameType, gain);
-// }
+uint8_t PAL_SetAGC(PAL_CHANNEL_MASK channelMask, PAL_FRAME frameType, uint8_t gain)
+{
+    PAL_INTERFACE *palIface = lPAL_GetInterface(channelMask);
+    return palIface->PAL_SetAGC(frameType, gain);
+}
 
 uint8_t PAL_GetCCA(PAL_CHANNEL_MASK channelMask, uint8_t *pState)
 {

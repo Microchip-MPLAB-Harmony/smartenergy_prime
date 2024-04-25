@@ -81,6 +81,37 @@ def updatePalDependencies(symbol, event):
     elif (idSymbol == "PRIME_PAL_SERIAL_EN"):
         enablePalSerial(localComponent, event["value"])
 
+def freqHopGetChannelList(rangeValues):
+    channels = []
+    rangeSplit = rangeValues.split(",")
+    print("CHRIS dbg -> rangeSplit: {}".format(rangeSplit))
+    for channel in rangeSplit:
+        subRangeSplit = channel.split("-")
+        print("CHRIS dbg -> subRangeSplit: {}".format(subRangeSplit))
+        if len(subRangeSplit) == 1:
+            channels.append(int(channel))
+        else:
+            rangeIni = int(subRangeSplit[0])
+            rangeEnd = int(subRangeSplit[1])
+            channelRange = range(rangeIni, rangeEnd + 1)
+            print("CHRIS dbg -> channelRange: {}".format(channelRange))
+            for chnInRange in channelRange:
+                channels.append(chnInRange)
+
+    channelList = ",".join(map(str,channels))
+    return channelList
+
+def freqHopUpdateRanges(symbol, event):
+    channelList = freqHopGetChannelList(event["value"])
+    Database.setSymbolValue("primePal", "PRIME_PAL_RF_FREQ_HOPPING_RANGE_VALUES", channelList)
+    print("CHRIS dbg -> freqHopUpdateRanges: {}".format(channelList))
+            
+
+def freqHopUpdateBcnRanges(symbol, event):
+    channelList = freqHopGetChannelList(event["value"])
+    Database.setSymbolValue("primePal", "PRIME_PAL_RF_FREQ_HOPPING_BCN_RANGE_VALUES", channelList)
+    print("CHRIS dbg -> freqHopUpdateBcnRanges: {}".format(channelList))
+
 def instantiateComponent(primePalComponent):
     Log.writeInfoMessage("Loading PAL for PRIME")
 
@@ -124,6 +155,28 @@ def instantiateComponent(primePalComponent):
     primePalRfFreqHopping.setDefaultValue(False)
     primePalRfFreqHopping.setHelp(prime_pal_helpkeyword)
     primePalRfFreqHopping.setDependencies(showSymbol, ["PRIME_PAL_RF_EN"])
+
+    primePalRfFreqHoppingChnRange = primePalComponent.createStringSymbol("PRIME_PAL_RF_FREQ_HOPPING_RANGE", primePalRfFreqHopping)
+    primePalRfFreqHoppingChnRange.setLabel("Channel Sequence")
+    primePalRfFreqHoppingChnRange.setVisible(False)
+    primePalRfFreqHoppingChnRange.setHelp(prime_pal_helpkeyword)
+    primePalRfFreqHoppingChnRange.setDependencies(showSymbol, ["PRIME_PAL_RF_FREQ_HOPPING"])
+
+    primePalRfFreqHoppingChnRangeValues = primePalComponent.createStringSymbol("PRIME_PAL_RF_FREQ_HOPPING_RANGE_VALUES", primePalRfFreqHopping)
+    primePalRfFreqHoppingChnRangeValues.setLabel("")
+    primePalRfFreqHoppingChnRangeValues.setVisible(False)
+    primePalRfFreqHoppingChnRangeValues.setDependencies(freqHopUpdateRanges, ["PRIME_PAL_RF_FREQ_HOPPING_RANGE"])
+
+    primePalRfFreqHoppingChnBcnRange = primePalComponent.createStringSymbol("PRIME_PAL_RF_FREQ_HOPPING_BCN_RANGE", primePalRfFreqHopping)
+    primePalRfFreqHoppingChnBcnRange.setLabel("BCN Channel Sequence")
+    primePalRfFreqHoppingChnBcnRange.setVisible(False)
+    primePalRfFreqHoppingChnBcnRange.setHelp(prime_pal_helpkeyword)
+    primePalRfFreqHoppingChnBcnRange.setDependencies(showSymbol, ["PRIME_PAL_RF_FREQ_HOPPING"])
+
+    primePalRfFreqHoppingChnBcnRangeValues = primePalComponent.createStringSymbol("PRIME_PAL_RF_FREQ_HOPPING_BCN_RANGE_VALUES", primePalRfFreqHopping)
+    primePalRfFreqHoppingChnBcnRangeValues.setLabel("")
+    primePalRfFreqHoppingChnBcnRangeValues.setVisible(False)
+    primePalRfFreqHoppingChnBcnRangeValues.setDependencies(freqHopUpdateBcnRanges, ["PRIME_PAL_RF_FREQ_HOPPING_BCN_RANGE"])
 
     primePalSerial = primePalComponent.createBooleanSymbol("PRIME_PAL_SERIAL_EN", primePalInterfaces)
     primePalSerial.setLabel("Enable Serial PHY interface")

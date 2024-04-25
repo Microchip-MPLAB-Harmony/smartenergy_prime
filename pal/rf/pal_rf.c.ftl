@@ -50,6 +50,7 @@ Microchip or any third party.
 #include <string.h>
 #include "configuration.h"
 #include "driver/driver.h"
+#include "service/time_management/srv_time_management.h"
 #include "pal_types.h"
 #include "pal_local.h"
 #include "pal_rf.h"
@@ -73,7 +74,7 @@ const PAL_INTERFACE PAL_RF_Interface =
     .PAL_GetChannel = PAL_RF_GetChannel,
     .PAL_SetChannel = PAL_RF_SetChannel,
     .PAL_DataRequest = PAL_RF_DataRequest,
-    .PAL_ProgramChannelSwitch = NULL,
+    .PAL_ProgramChannelSwitch = PAL_RF_ProgramChannelSwitch,
     .PAL_GetConfiguration = PAL_RF_GetConfiguration,
     .PAL_SetConfiguration = PAL_RF_SetConfiguration,
     .PAL_GetSignalCapture = PAL_RF_GetSignalCapture,
@@ -82,10 +83,6 @@ const PAL_INTERFACE PAL_RF_Interface =
     .PAL_GetLessRobustModulation = PAL_RF_RM_GetLessRobustModulation,
 };
 
-#define DIV_ROUND(a, b)                (((a) + (b >> 1)) / (b))
-#define MAX(a, b)                      (((a) > (b)) ?  (a) : (b))
-#define MIN(a, b)                      (((a) < (b)) ?  (a) : (b))
-
 // *****************************************************************************
 // *****************************************************************************
 // Section: File Scope Variables
@@ -93,6 +90,11 @@ const PAL_INTERFACE PAL_RF_Interface =
 // *****************************************************************************
 static PAL_RF_DATA palRfData = {0};
 
+<#if PRIME_PAL_RF_FREQ_HOPPING == true>
+static const uint8_t palRfFreqHopChannelsSeq[] = FREQ_HOP_RF_SEQUENCE;
+static const uint8_t palRfFreqHopChannelsBcnSeq[] = FREQ_HOP_RF_BCN_SEQUENCE;
+
+</#if>
 // *****************************************************************************
 // *****************************************************************************
 // Section: File Scope Functions
@@ -149,17 +151,44 @@ static uint8_t lPAL_RF_GetTxBuffId(DRV_RF215_TX_HANDLE txHandle)
     return 0xFF;
 }
 
+<#if PRIME_PAL_RF_FREQ_HOPPING == true>
+static void lPAL_RF_FreqHopGetChannelSequence(void)
+{
+    uint16_t index;
+
+	palRfData.freqHopLengthSequence = sizeof(palRfFreqHopChannelsSeq);
+	palRfData.freqHopLengthBcnSequence = sizeof(palRfFreqHopChannelsBcnSeq);
+
+    for (index = 0; index < palRfData.freqHopLengthSequence; index++)
+    {
+        uint16_t channel = palRfFreqHopChannelsSeq[index];
+        uint8_t channelByte = channel / 8;
+        uint8_t channelBit = channel % 8;
+
+        palRfData.freqHopBitsSequence[channelByte] |= (1 << channelBit);
+    }
+
+    for (index = 0; index < palRfData.freqHopLengthBcnSequence; index++)
+    {
+        uint16_t channel = palRfFreqHopChannelsBcnSeq[index];
+        uint8_t channelByte = channel / 8;
+        uint8_t channelBit = channel % 8;
+
+        palRfData.freqHopBitsBcnSequence[channelByte] |= (1 << channelBit);
+    }
+
+    palRfData.freqHopCurrentChannel = palRfFreqHopChannelsBcnSeq[0];
+
+}
+
+</#if>
 static void lPAL_RF_UpdatePhyConfiguration(void)
 {
 	/* Get PHY configuration */
     DRV_RF215_GetPib(palRfData.drvRfPhyHandle, RF215_PIB_PHY_CONFIG, &palRfData.rfPhyConfig);
 
 <#if PRIME_PAL_RF_FREQ_HOPPING == true>
-	_build_valid_channels_array(&x_phy_cfg_09);
-	sus_current_channel = RF_FREQ_HOPPING_CHANNEL;
-	sus_hopping_sequence_length = MAC_HOPPING_SEQUENCE_LENGTH;
-	suc_hopping_bcn_sequence_length = MAC_HOPPING_BCN_SEQUENCE_LENGTH;
-	_set_rx_fh_channel();
+	lPAL_RF_FreqHopGetChannelSequence();
 <#else>
 	/* Always initialize PAL RF to min channel */
 	palRfData.channelMask = (PAL_CHANNEL_MASK)(PAL_RF_CHN | palRfData.rfPhyConfig.chnNumMin);
@@ -187,7 +216,7 @@ static void lPAL_RF_DataCfmCb(DRV_RF215_TX_HANDLE txHandle,
         /* Avoid warning */
         (void)ctxt;
 
-        dataCfm.txTime = 0; // TBD : Get US Time (cfmObj->timeIniCount);
+        dataCfm.txTime = SRV_TIME_MANAGEMENT_CountToUS(cfmObj->timeIniCount);
         dataCfm.channelMask = palRfData.channelMask;
         dataCfm.rmsCalc = 255; // TBD
         dataCfm.frameType = PAL_FRAME_TYPE_RF;
@@ -254,7 +283,7 @@ static void lPAL_RF_DataIndCb(DRV_RF215_RX_INDICATION_OBJ* indObj, uintptr_t ctx
 
         /* Fill dataInd */
         dataInd.pData = indObj->psdu;
-        dataInd.rxTime = 0; // TBD: Get US Time(indObj->timeIniCount);
+        dataInd.rxTime = SRV_TIME_MANAGEMENT_CountToUS(indObj->timeIniCount);
         dataInd.dataLength = indObj->psduLen;
         dataInd.channelMask = palRfData.channelMask;
         PAL_RF_RM_GetRobustModulation(indObj, &dataInd.estimatedBitrate, &dataInd.lessRobustMod, dataInd.channelMask);
@@ -271,6 +300,16 @@ static void lPAL_RF_DataIndCb(DRV_RF215_RX_INDICATION_OBJ* indObj, uintptr_t ctx
     }
 }
 
+<#if PRIME_PAL_RF_FREQ_HOPPING == true>
+static void lPAL_RF_ChannelSwitchCb(DRV_RF215_TX_RESULT result, uintptr_t context)
+{
+    if (palRfData.rfCallbacks.switchRfChannel)
+    {
+        palRfData.rfCallbacks.switchRfChannel(palRfData.freqHopCurrentChannel);
+    }
+}
+
+</#if>
 static void lPAL_RF_InitCallback(uintptr_t context, SYS_STATUS status)
 {
     if (status == SYS_STATUS_ERROR)
@@ -291,9 +330,12 @@ static void lPAL_RF_InitCallback(uintptr_t context, SYS_STATUS status)
     DRV_RF215_RxIndCallbackRegister(palRfData.drvRfPhyHandle, lPAL_RF_DataIndCb, 0);
     DRV_RF215_TxCfmCallbackRegister(palRfData.drvRfPhyHandle, lPAL_RF_DataCfmCb, 0);
 
+<#if PRIME_PAL_RF_FREQ_HOPPING == true>
     /* Get RF PHY configuration */
     lPAL_RF_UpdatePhyConfiguration();
+    DRV_RF215_SetChannelCallbackRegister(palRfData.drvRfPhyHandle, lPAL_RF_ChannelSwitchCb, 0);
 
+</#if>
     palRfData.status = PAL_RF_STATUS_READY;
 }
 
@@ -304,12 +346,6 @@ SYS_MODULE_OBJ PAL_RF_Initialize(void)
     {
         return SYS_MODULE_OBJ_INVALID;
     }
-
-    /* Clear exceptions statistics */
-    palRfData.statsErrorUnexpectedKey = 0;
-    palRfData.statsErrorReset = 0;
-    palRfData.statsErrorDebug = 0;
-    palRfData.statsErrorCritical = 0;
 
     palRfData.status = PAL_RF_STATUS_BUSY;
     palRfData.drvRfPhyHandle = DRV_HANDLE_INVALID;
@@ -340,6 +376,13 @@ void PAL_RF_DataIndicationCallbackRegister(PAL_DATA_INDICATION_CB callback)
     palRfData.rfCallbacks.dataIndication = callback;
 }
 
+<#if PRIME_PAL_RF_FREQ_HOPPING == true>
+void PAL_RF_ChannelSwitchCallbackRegister(PAL_SWITCH_RF_CH_CB callback)
+{
+    palRfData.rfCallbacks.switchRfChannel = callback;
+}
+
+</#if>
 uint8_t PAL_RF_DataRequest(PAL_MSG_REQUEST_DATA *pMessageData)
 {
     DRV_RF215_TX_REQUEST_OBJ *txReqObj = &palRfData.txReqObj[pMessageData->buffId];
@@ -367,16 +410,7 @@ uint8_t PAL_RF_DataRequest(PAL_MSG_REQUEST_DATA *pMessageData)
     txReqObj->timeMode = (DRV_RF215_TX_TIME_MODE)pMessageData->timeMode;
     txReqObj->txPwrAtt = pMessageData->attLevel;
     txReqObj->modScheme = pMessageData->scheme;
-
-    /* Adapt Timer mode */
-    if (pMessageData->timeMode == PAL_TX_MODE_ABSOLUTE)
-    {
-        txReqObj->timeCount = 0 ; // TBD: lPAL_RF_GetRfTime(pMessageData->timeDelay);
-    }
-    else
-    {
-        txReqObj->timeCount = (uint64_t)pMessageData->timeDelay; // TBD
-    }
+    txReqObj->timeCount = SRV_TIME_MANAGEMENT_USToCount(pMessageData->timeDelay);
 
     if (pMessageData->disableRx == false)
     {
@@ -405,7 +439,7 @@ uint8_t PAL_RF_DataRequest(PAL_MSG_REQUEST_DATA *pMessageData)
         DRV_RF215_TX_CONFIRM_OBJ cfmObj;
 
         cfmObj.txResult = txResult;
-        cfmObj.timeIniCount = pMessageData->timeDelay;  // TBD
+        cfmObj.timeIniCount = pMessageData->timeDelay;
         cfmObj.ppduDurationCount = 0;
         lPAL_RF_DataCfmCb(DRV_RF215_TX_HANDLE_INVALID, &cfmObj, pMessageData->buffId);
     }
@@ -417,32 +451,31 @@ uint8_t PAL_RF_DataRequest(PAL_MSG_REQUEST_DATA *pMessageData)
     return (uint8_t)rfPhyTxReqHandle;
 }
 
+void PAL_RF_ProgramChannelSwitch(uint32_t timeSync, PAL_CHANNEL_MASK channelMask, uint8_t timeMode)
+{
+<#if PRIME_PAL_RF_FREQ_HOPPING == true>
+    uint16_t channelNum = channelMask & (PAL_RF_CHN - 1);
+
+    palRfData.freqHopCurrentChannel = channelMask;
+    DRV_RF215_SetChannelRequest(palRfData.drvRfPhyHandle, timeSync, channelNum, (DRV_RF215_TX_TIME_MODE)timeMode);
+<#else>
+    (void)timeSync;
+    (void)channelMask;
+    (void)timeMode;
+</#if>
+}
+
 uint8_t PAL_RF_GetTimer(uint32_t *pTimer)
 {
-    uint32_t time;
-
-    // time = prime_hal_timer_1us_get();  // TBD
-
-    if (time < palRfData.previousTimerRef) {
-        palRfData.hiTimerRef++;
-    }
-
-    palRfData.previousTimerRef = time;
-
-    *pTimer = time;
+    *pTimer = SRV_TIME_MANAGEMENT_GetTimeUS();
 
     return PAL_CFG_SUCCESS;
 }
 
 uint8_t PAL_RF_GetTimerExtended(uint64_t *pTimeExtended)
 {
-    uint32_t time;
-    uint64_t timeExtended;
+    *pTimeExtended = SRV_TIME_MANAGEMENT_GetTimeUS64();
 
-    PAL_RF_GetTimer(&time);
-    timeExtended = ((uint64_t)palRfData.hiTimerRef << 32) | time;
-
-    *pTimeExtended = timeExtended;
     return PAL_CFG_SUCCESS;
 }
 
@@ -588,19 +621,19 @@ uint8_t PAL_RF_GetConfiguration(uint16_t id, void *pValue, uint16_t length)
 
 <#if PRIME_PAL_RF_FREQ_HOPPING == true>
         case PAL_ID_RF_BITS_HOPPING_SEQUENCE:
-            memcpy(pValue, &suc_bits_sequence, us_len);
+            memcpy(pValue, &palRfData.freqHopBitsSequence, length);
             return PAL_CFG_SUCCESS;
 
         case PAL_ID_RF_BITS_BCN_HOPPING_SEQUENCE:
-            memcpy(pValue, &suc_bits_beacon_sequence, us_len);
+            memcpy(pValue, &palRfData.freqHopBitsBcnSequence, length);
             return PAL_CFG_SUCCESS;
 
         case PAL_ID_RF_MAC_HOPPING_SEQUENCE_LENGTH:
-            *(uint16_t *)pValue = sus_hopping_sequence_length;
+            *(uint16_t *)pValue = palRfData.freqHopLengthSequence;
             return PAL_CFG_SUCCESS;
 
         case PAL_ID_RF_MAC_HOPPING_BCN_SEQUENCE_LENGTH:
-            *(uint8_t *)pValue = suc_hopping_bcn_sequence_length;
+            *(uint8_t *)pValue = palRfData.freqHopLengthBcnSequence;
             return PAL_CFG_SUCCESS;
 
 </#if>
@@ -761,7 +794,7 @@ uint8_t PAL_RF_SetConfiguration(uint16_t id, void *pValue, uint16_t length)
 uint8_t PAL_RF_GetMsgDuration(uint16_t length, PAL_SCHEME scheme, PAL_FRAME frameType, uint32_t *pDuration)
 {
     // TBD: Depending on Phy Band (FSK, OFDM) and their configs. 
-    // TBD: Create new API in DRV_RF_215 to get the Duration of a Message. It depends on PHY params.
+    // Create new API in DRV_RF_215 to get the Duration of a Message. It depends on PHY params.
 
     // Only Implemented for FSK (FEC OFF): SUN_FSK_BAND_863_870_OPM1
     uint8_t shrSymbol;

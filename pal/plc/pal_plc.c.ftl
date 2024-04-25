@@ -52,11 +52,9 @@ Microchip or any third party.
 #include "driver/driver.h"
 #include "driver/plc/phy/drv_plc_phy_comm.h"
 #include "service/pcoup/srv_pcoup.h"
+#include "service/time_management/srv_time_management.h"
 <#if (PRIME_PAL_PLC_PVDD_MONITOR)?? && PRIME_PAL_PLC_PVDD_MONITOR == true>
 #include "service/pvddmon/srv_pvddmon.h"
-</#if>
-<#if PRIME_PAL_PHY_SNIFFER == true>
-#include "service/usi/srv_usi.h"
 </#if>
 #include "pal_types.h"
 #include "pal_local.h"
@@ -83,7 +81,7 @@ const PAL_INTERFACE PAL_PLC_Interface =
     .PAL_GetChannel = PAL_PLC_GetChannel,
     .PAL_SetChannel = PAL_PLC_SetChannel,
     .PAL_DataRequest = PAL_PLC_DataRequest,
-    .PAL_ProgramChannelSwitch = NULL,
+    .PAL_ProgramChannelSwitch = PAL_PLC_ProgramChannelSwitch,
     .PAL_GetConfiguration = PAL_PLC_GetConfiguration,
     .PAL_SetConfiguration = PAL_PLC_SetConfiguration,
     .PAL_GetSignalCapture = PAL_PLC_GetSignalCapture,
@@ -232,7 +230,7 @@ static uint32_t lPAL_PLC_TimerSyncRead(uint32_t *pTimePlc)
     __set_BASEPRI(1 << (8 - __NVIC_PRIO_BITS));
 
     /* Read Host timer */
-    PAL_PLC_GetTimer(&timeHost);
+    timeHost = SRV_TIME_MANAGEMENT_GetTimeUS();
 
     /* Read PLC timer */
     palPlcData.plcPIB.id = PLC_ID_TIME_REF_ID;
@@ -825,32 +823,24 @@ uint8_t PAL_PLC_DataRequest(PAL_MSG_REQUEST_DATA *pMessageData)
     return PAL_CFG_SUCCESS;
 }
 
+void PAL_PLC_ProgramChannelSwitch(uint32_t timeSync, PAL_CHANNEL_MASK channelMask, uint8_t timeMode)
+{
+    (void)timeSync;
+    (void)channelMask;
+    (void)timeMode;
+}
+
 uint8_t PAL_PLC_GetTimer(uint32_t *pTimer)
 {
-    uint32_t time;
-
-    // time = prime_hal_timer_1us_get();
-
-    if (time < palPlcData.previousTimerRef) {
-        palPlcData.hiTimerRef++;
-    }
-
-    palPlcData.previousTimerRef = time;
-
-    *pTimer = time;
+    *pTimer = SRV_TIME_MANAGEMENT_GetTimeUS();
 
     return PAL_CFG_SUCCESS;
 }
 
 uint8_t PAL_PLC_GetTimerExtended(uint64_t *pTimeExtended)
 {
-    uint32_t time;
-    uint64_t timeExtended;
+    *pTimeExtended = SRV_TIME_MANAGEMENT_GetTimeUS64();
 
-    PAL_PLC_GetTimer(&time);
-    timeExtended = ((uint64_t)palPlcData.hiTimerRef << 32) | time;
-
-    *pTimeExtended = timeExtended;
     return PAL_CFG_SUCCESS;
 }
 

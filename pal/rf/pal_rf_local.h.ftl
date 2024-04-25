@@ -56,6 +56,13 @@ Microchip or any third party.
 // *****************************************************************************
 // Section: Data Types
 // *****************************************************************************
+<#if PRIME_PAL_RF_FREQ_HOPPING == true>
+#define RF_MAX_NUM_CHANNELS                512
+#define RF_MAX_NUM_BYTES_CHANNELS          (RF_MAX_NUM_CHANNELS >> 3)
+#define MAX_CHANNELS_BCN_SEQUENCE          32
+#define FREQ_HOP_RF_SEQUENCE               {${PRIME_PAL_RF_FREQ_HOPPING_RANGE_VALUES?string}}
+#define FREQ_HOP_RF_BCN_SEQUENCE           {${PRIME_PAL_RF_FREQ_HOPPING_BCN_RANGE_VALUES?string}}
+</#if>
 
 // *****************************************************************************
 /* RF PAL Module Status
@@ -108,10 +115,6 @@ typedef struct
 
     DRV_HANDLE drvRfPhyHandle;
 
-    uint32_t hiTimerRef;
-
-    uint32_t previousTimerRef;
-
     DRV_RF215_PHY_CFG_OBJ rfPhyConfig;
     
     DRV_RF215_TX_REQUEST_OBJ txReqObj[DRV_RF215_TX_BUFFERS_NUMBER];
@@ -122,14 +125,18 @@ typedef struct
 
     uint16_t rfChannelsNumber;
 
-    uint8_t statsErrorUnexpectedKey;
+<#if PRIME_PAL_RF_FREQ_HOPPING == true>
+    uint16_t freqHopLengthSequence;
 
-    uint8_t statsErrorReset;
+    uint16_t freqHopLengthBcnSequence;
 
-    uint8_t statsErrorDebug;
+    uint8_t freqHopBitsSequence[RF_MAX_NUM_BYTES_CHANNELS];
 
-    uint8_t statsErrorCritical;
+    uint8_t freqHopBitsBcnSequence[RF_MAX_NUM_BYTES_CHANNELS];
 
+    uint8_t freqHopCurrentChannel;
+
+</#if>
 } PAL_RF_DATA;
 
 #endif // #ifndef PAL_RF_LOCAL_H
