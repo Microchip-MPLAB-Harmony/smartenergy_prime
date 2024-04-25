@@ -64,6 +64,13 @@ Microchip or any third party.
 
 #include "peripheral/trng/plib_trng.h"
 
+<#assign PAL_PLC_COUP11 = false>
+<#if (drvPlcPhy)??>
+    <#if ((drvPlcPhy.DRV_PLC_MODE == "PL360") && 
+    (drvPlcPhy.DRV_PLC_PRIME_CH1 == true) && (drvPlcPhy.DRV_PLC_PRIME_CHANNELS_SELECTED > 2))>
+        <#assign PAL_PLC_COUP11 = true>
+    </#if>
+</#if>
 /******************************************************************************
  * PRIME PAL PLC interface implementation
  ******************************************************************************/
@@ -386,7 +393,7 @@ static uint32_t lPAL_PLC_GetPlcTime(uint32_t timeHost)
 
 static void lPAL_PLC_SetTxRxChannel(DRV_PLC_PHY_CHANNEL channel)
 {
-    /* Set channel configuration for impedance detection */
+    /* Set channel configuration */
     palPlcData.plcPIB.id = PLC_ID_CHANNEL_CFG;
     palPlcData.plcPIB.length = 1;
     palPlcData.plcPIB.pData = &channel;
@@ -397,6 +404,19 @@ static void lPAL_PLC_SetTxRxChannel(DRV_PLC_PHY_CHANNEL channel)
 
     /* Initialize synchronization of PL360-Host timers when channel updated */
     lPAL_PLC_TimerSyncInitialize();
+
+<#if PAL_PLC_COUP11 = true>
+    if (palPlcData.networkDetected == true)
+    {
+        uint8_t impedance = 2;
+
+        /* Set impedance to VLO */
+        palPlcData.plcPIB.id = PLC_ID_CFG_IMPEDANCE;
+        palPlcData.plcPIB.length = 1;
+        palPlcData.plcPIB.pData = &impedance;
+        DRV_PLC_PHY_PIBSet(palPlcData.drvPhyHandle, &palPlcData.plcPIB);
+    }
+</#if>
 }
 
 // *****************************************************************************
@@ -1199,6 +1219,7 @@ uint8_t PAL_PLC_SetConfiguration(uint16_t id, void *pValue, uint16_t length)
             return(PAL_CFG_INVALID_INPUT);
 
         case PAL_ID_NETWORK_DETECTION:
+            palPlcData.networkDetected = (*(uint8_t *)pValue);
             return(PAL_CFG_SUCCESS);
 
         case PAL_ID_CFG_ATTENUATION:
