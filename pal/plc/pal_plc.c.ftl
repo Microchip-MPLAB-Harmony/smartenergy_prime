@@ -64,6 +64,9 @@ Microchip or any third party.
 <#if PRIME_PAL_PHY_SNIFFER == true>
 #include "service/psniffer/srv_psniffer.h"
 </#if>
+<#if srvLogReport.ENABLE_TRACES == true>  
+#include "service/log_report/srv_log_report.h"      
+</#if>
 #include "peripheral/trng/plib_trng.h"
 
 <#assign PAL_PLC_COUP11 = false>
@@ -345,7 +348,9 @@ __STATIC_INLINE void lPAL_PLC_TimerSyncUpdate(void)
     } 
     else 
     {
-        // prime_hal_debug_report(PAL_PLC_TIMER_SYNC_ERROR);
+<#if srvLogReport.ENABLE_TRACES == true>        
+        SRV_LOG_REPORT_Message(SRV_LOG_REPORT_ERROR, PAL_PLC_TIMER_SYNC_ERROR);
+</#if>
         lPAL_PLC_TimerSyncInitialize();
     }
 }
@@ -675,6 +680,9 @@ SYS_MODULE_OBJ PAL_PLC_Initialize(void)
     }
     else
     {
+<#if srvLogReport.ENABLE_TRACES == true>        
+        SRV_LOG_REPORT_Message(SRV_LOG_REPORT_ERROR, PHY_LAYER_PLC_NOT_AVAILABLE);
+</#if>        
         palPlcData.status = PAL_PLC_STATUS_ERROR;
         return SYS_MODULE_OBJ_INVALID;
     }

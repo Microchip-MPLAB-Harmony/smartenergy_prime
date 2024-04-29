@@ -59,6 +59,9 @@ Microchip or any third party.
 <#if PRIME_PAL_PHY_SNIFFER == true>
 #include "service/rsniffer/srv_rsniffer.h"
 </#if>
+<#if srvLogReport.ENABLE_TRACES == true>  
+#include "service/log_report/srv_log_report.h"      
+</#if>
 
 /******************************************************************************
  * PRIME PAL RF interface implementation
@@ -361,6 +364,9 @@ static void lPAL_RF_InitCallback(uintptr_t context, SYS_STATUS status)
 
     if (palRfData.drvRfPhyHandle == DRV_HANDLE_INVALID)
     {
+<#if srvLogReport.ENABLE_TRACES == true>        
+        SRV_LOG_REPORT_Message(SRV_LOG_REPORT_ERROR, PHY_LAYER_RF_NOT_AVAILABLE);
+</#if> 
         palRfData.status = PAL_RF_STATUS_ERROR;
         return;
     }
