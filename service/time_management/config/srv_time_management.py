@@ -44,4 +44,12 @@ def instantiateComponent(primeTimeManagementComponent):
     pTimeMgmtHeader.setDestPath("service/time_management")
     pTimeMgmtHeader.setProjectPath("config/" + configName + "/service/time_management/")
     pTimeMgmtHeader.setType("HEADER")
+
+    #### FreeMaker System Files ######################################################
+
+    pTimeMgmtSystemDefFile = primeTimeManagementComponent.createFileSymbol("SRV_TIME_MANAGEMENT_DEF", None)
+    pTimeMgmtSystemDefFile.setType("STRING")
+    pTimeMgmtSystemDefFile.setOutputName("core.LIST_SYSTEM_DEFINITIONS_H_INCLUDES")
+    pTimeMgmtSystemDefFile.setSourcePath("service/time_management/templates/system/definitions.h.ftl")
+    pTimeMgmtSystemDefFile.setMarkup(True)
   

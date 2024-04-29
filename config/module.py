@@ -73,4 +73,5 @@ def loadModule():
     
     ## PRIME Time Management
     primeTimeManagementComponent = Module.CreateComponent("primeTimeManagement", "PRIME Time Management", "/SmartEnergy/PRIME Stack/Services", "service/time_management/config/srv_time_management.py")
+    primeTimeManagementComponent.addDependency("primeTimeManagement_sysTime_dependency", "SYS_TIME", True, True)
     primeTimeManagementComponent.setDisplayType("PRIME Service")   

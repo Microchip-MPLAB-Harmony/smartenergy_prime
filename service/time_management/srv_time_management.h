@@ -47,6 +47,8 @@ Microchip or any third party.
 #endif
 //DOM-IGNORE-END
 
+#include "system/time/sys_time.h"
+
 // *****************************************************************************
 // *****************************************************************************
 // Section: Time Management Service Interface Definition
@@ -205,6 +207,146 @@ uint64_t SRV_TIME_MANAGEMENT_USToCount(uint32_t timeUs);
     to avoid an overflow.
 */
 uint32_t SRV_TIME_MANAGEMENT_CountToUS(uint64_t counter);
+
+// *****************************************************************************
+/* Function:
+    SYS_TIME_HANDLE SRV_TIME_MANAGEMENT_CallbackRegisterUS ( SYS_TIME_CALLBACK callback,
+                        uintptr_t context, uint32_t us, SYS_TIME_CALLBACK_TYPE type )
+
+   Summary:
+        Registers a function with the time system service to be called back when the
+        requested number of microseconds have expired (either once or repeatedly).
+
+   Description:
+        Creates a timer object and registers a function with it to be called back
+        when the requested delay (specified in microseconds) has completed.  The
+        caller must identify if the timer should call the function once or repeatedly
+        every time the given delay period expires.
+
+   Parameters:
+    callback    - Pointer to the function to be called.
+                  For single shot timers, the callback cannot be NULL.
+                  For periodic timers, if the callback pointer is given as NULL,
+                  no callback will occur, but SYS_TIME_TimerPeriodHasExpired can
+                  still be polled to determine if the period has expired for a
+                  periodic timer.
+
+    context     - A client-defined value that is passed to the callback function.
+
+    us          - Time period in microseconds.
+
+    type        - Type of callback requested. If type is SYS_TIME_SINGLE, the
+                  Callback function will be called once when the time period expires.
+                  After the time period expires, the timer object will be freed.
+                  If type is SYS_TIME_PERIODIC Callback function will be called
+                  repeatedly, every time the time period expires until the timer
+                  object is stopped or deleted.
+
+
+   Returns:
+        SYS_TIME_HANDLE - A valid timer object handle if the call succeeds.
+                      SYS_TIME_HANDLE_INVALID if it fails.
+
+   Example:
+      Given a callback function implementation matching the following prototype:
+      <code>
+      void MyCallback ( uintptr_t context);
+      </code>
+
+      The following example call will register it, requesting a 500 microsecond
+      periodic callback.
+      <code>
+     
+      SYS_TIME_HANDLE handle = SRV_TIME_MANAGEMENT_CallbackRegisterUS(MyCallback, (uintptr_t)0, 
+                500, SYS_TIME_PERIODIC);
+      if (handle != SYS_TIME_HANDLE_INVALID)
+      {
+           
+      }
+      </code>
+
+   Remarks:
+       Will give a callback after the requested number of microseconds or longer
+       have elapsed, depending on system performance. In tick-based mode, the requested
+       delay will be ceiled to the next timer tick. For example, if the 
+       timer tick is set to 1 msec and the requested delay is 1500 usec, a 
+       delay of 2 msec will be generated.
+
+       Delay values of 0 will return SYS_TIME_ERROR.
+*/
+
+SYS_TIME_HANDLE SRV_TIME_MANAGEMENT_CallbackRegisterUS ( SYS_TIME_CALLBACK callback, 
+                        uintptr_t context, uint32_t us, SYS_TIME_CALLBACK_TYPE type );
+
+// *****************************************************************************
+/* Function:
+    SYS_TIME_HANDLE SRV_TIME_MANAGEMENT_CallbackRegisterMS ( SYS_TIME_CALLBACK callback,
+                        uintptr_t context, uint32_t ms, SYS_TIME_CALLBACK_TYPE type )
+
+   Summary:
+        Registers a function with the time system service to be called back when the
+        requested number of microseconds have expired (either once or repeatedly).
+
+   Description:
+        Creates a timer object and registers a function with it to be called back
+        when the requested delay (specified in microseconds) has completed.  The
+        caller must identify if the timer should call the function once or repeatedly
+        every time the given delay period expires.
+
+   Parameters:
+    callback    - Pointer to the function to be called.
+                  For single shot timers, the callback cannot be NULL.
+                  For periodic timers, if the callback pointer is given as NULL,
+                  no callback will occur, but SYS_TIME_TimerPeriodHasExpired can
+                  still be polled to determine if the period has expired for a
+                  periodic timer.
+
+    context     - A client-defined value that is passed to the callback function.
+
+    ms          - Time period in miliseconds.
+
+    type        - Type of callback requested. If type is SYS_TIME_SINGLE, the
+                  Callback function will be called once when the time period expires.
+                  After the time period expires, the timer object will be freed.
+                  If type is SYS_TIME_PERIODIC Callback function will be called
+                  repeatedly, every time the time period expires until the timer
+                  object is stopped or deleted.
+
+
+   Returns:
+        SYS_TIME_HANDLE - A valid timer object handle if the call succeeds.
+                      SYS_TIME_HANDLE_INVALID if it fails.
+
+   Example:
+      Given a callback function implementation matching the following prototype:
+      <code>
+      void MyCallback ( uintptr_t context);
+      </code>
+
+      The following example call will register it, requesting a 1 second
+      periodic callback.
+      <code>
+     
+      SYS_TIME_HANDLE handle = SRV_TIME_MANAGEMENT_CallbackRegisterMS(MyCallback, (uintptr_t)0, 
+                1000, SYS_TIME_PERIODIC);
+      if (handle != SYS_TIME_HANDLE_INVALID)
+      {
+           
+      }
+      </code>
+
+   Remarks:
+       Will give a callback after the requested number of microseconds or longer
+       have elapsed, depending on system performance. In tick-based mode, the requested
+       delay will be ceiled to the next timer tick. For example, if the 
+       timer tick is set to 1 msec and the requested delay is 1500 usec, a 
+       delay of 2 msec will be generated.
+
+       Delay values of 0 will return SYS_TIME_ERROR.
+*/
+
+SYS_TIME_HANDLE SRV_TIME_MANAGEMENT_CallbackRegisterMS ( SYS_TIME_CALLBACK callback, 
+                        uintptr_t context, uint32_t ms, SYS_TIME_CALLBACK_TYPE type );
 
 //DOM-IGNORE-BEGIN
 #ifdef __cplusplus // Provide C++ Compatibility

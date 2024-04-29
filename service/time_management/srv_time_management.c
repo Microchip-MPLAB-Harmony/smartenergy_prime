@@ -49,6 +49,7 @@ Microchip or any third party.
 #include <stdbool.h>
 #include <stdint.h>
 #include "system/time/sys_time.h"
+#include "srv_time_management.h"
 
 // *****************************************************************************
 // *****************************************************************************
@@ -142,4 +143,16 @@ uint32_t SRV_TIME_MANAGEMENT_CountToUS(uint64_t counter)
     }
 
   return timeUs;
+}
+
+SYS_TIME_HANDLE SRV_TIME_MANAGEMENT_CallbackRegisterUS ( SYS_TIME_CALLBACK callback, 
+                        uintptr_t context, uint32_t us, SYS_TIME_CALLBACK_TYPE type )
+{
+    SYS_TIME_CallbackRegisterUS(callback, context, us, type);
+}
+
+SYS_TIME_HANDLE SRV_TIME_MANAGEMENT_CallbackRegisterMS ( SYS_TIME_CALLBACK callback, 
+                        uintptr_t context, uint32_t ms, SYS_TIME_CALLBACK_TYPE type )
+{
+    SYS_TIME_CallbackRegisterMS(callback, context, ms, type);
 }
