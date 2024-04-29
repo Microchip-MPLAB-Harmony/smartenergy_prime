@@ -184,6 +184,21 @@ def primeRemoveServices():
     if (primeServicesGroup != None):
         Database.sendMessage("prime_srv_config", "PRIME_SERVICES_DEACTIVATE", {})
 
+def primeAddDrivers():
+    primeDriversGroup = Database.findGroup("PRIME Driver")
+    if (primeDriversGroup == None):
+        primeDriversGroup = Database.createGroup("PRIME STACK", "PRIME Driver")
+        primeDriversGroup.addComponent("prime_drv_config")
+        Database.activateComponents(["prime_drv_config"], "PRIME Driver")
+        
+    Database.sendMessage("prime_drv_config", "PRIME_DRIVERS_ACTIVATE", {})
+
+def primeRemoveDrivers():
+    primeDriversGroup = Database.findGroup("PRIME Driver")
+    if (primeDriversGroup != None):
+        Database.sendMessage("prime_drv_config", "PRIME_DRIVERS_DEACTIVATE", {})
+
+
 def primeAddFiles():
     if (primeConfigMode.getValue() == "SN"):
         # Add files for SN 
@@ -193,11 +208,15 @@ def primeAddFiles():
             primeAddPal()
             # Add Services
             primeAddServices()
+            # Add Drivers
+            primeAddDrivers()
         else:
             # Remove PAL
             primeRemovePal()
             # Remove Services
             primeRemoveServices()
+            # Remove Drivers
+            primeRemoveDrivers()
     elif (primeConfigMode.getValue() == "BN"):
         # Add files for BN 
         primeAddBnFiles()
@@ -444,6 +463,12 @@ def instantiateComponent(primeStackConfigComponent):
         primeServicesGroup = Database.createGroup("PRIME STACK", "PRIME SERVICES")
     primeServicesGroup.addComponent("prime_srv_config")
     Database.activateComponents(["prime_srv_config"], "PRIME SERVICES")
+    
+    primeDriversGroup = Database.findGroup("PRIME Driver")
+    if (primeDriversGroup == None):
+        primeDriversGroup = Database.createGroup("PRIME STACK", "PRIME Driver")
+    primeDriversGroup.addComponent("prime_drv_config")
+    Database.activateComponents(["prime_drv_config"], "PRIME Driver")
     
     processor = Variables.get("__PROCESSOR")
     

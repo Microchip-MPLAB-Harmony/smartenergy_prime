@@ -49,6 +49,17 @@ def loadModule():
     #primePalSerialComponent.addDependency("primePalSerial_DrvSerialPhy_dependency", "DRV_SERIAL_PHY", False, True)
     primePalSerialComponent.setDisplayType("PRIME PAL SERIAL")
 
+
+    ## PRIME Driver
+    primeDrvComponent = Module.CreateComponent("prime_drv_config", "PRIME Driver", "/SmartEnergy/PRIME Stack/Drivers", "driver/config/drv_configurator.py")
+    primeDrvComponent.addDependency("primePhySerial", "PRIME_PHY_SERIAL", True) 
+    primeDrvComponent.setDisplayType("PRIME Driver Configuration")
+    
+    ## PRIME PHY SERIAL
+    primeDrvPhySerialComponent = Module.CreateComponent("primePhySerial", "PRIME PHY SERIAL", "/SmartEnergy/PRIME Stack/PRIME Driver", "driver/phy/serial/config/drv_phy_serial.py")
+    primeDrvPhySerialComponent.addCapability("primePhySerial", "PRIME_PHY_SERIAL", True) 
+    primeDrvPhySerialComponent.setDisplayType("PRIME PHY Serial")
+    
     ###########  PRIME Stack Configurations  ###########
     global primeStackConfigComponent
     primeStackConfigComponent = Module.CreateComponent("prime_stack_config", "PRIME Stack", "/SmartEnergy/PRIME Stack", "prime/config/prime_configurator.py")
