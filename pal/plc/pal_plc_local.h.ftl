@@ -183,8 +183,6 @@ typedef struct
 
     bool syncUpdate;
 
-    bool bufId[PAL_TX_NUM_BUFFERS];
-
     uint8_t lastRSSIAvg;
 
     uint8_t lastCINRMin;

@@ -155,6 +155,11 @@ static const uint32_t palPlcTimeChirpHeader[4] = {
 // Section: File Scope Functions
 // *****************************************************************************
 // *****************************************************************************
+static void lPAL_PLC_SysTimeCB( uintptr_t context )
+{
+    palPlcData.syncUpdate = true;
+}
+
 static PAL_PCH lPAL_PLC_GetPCH(uint8_t channel)
 {
     PAL_PCH pch;
@@ -222,13 +227,6 @@ static void lPAL_PLC_SetTxContinuousMode(uint8_t txMode)
     DRV_PLC_PHY_TxRequest(palPlcData.drvPhyHandle, &palPlcData.phyTxObj);
 }
 
-static void lPAL_PLC_TimerSyncHandler(uint32_t ul_id)
-{
-    if (palPlcData.syncIntId == ul_id) {
-        palPlcData.syncUpdate = true;
-    }
-}
-
 static uint32_t lPAL_PLC_TimerSyncRead(uint32_t *pTimePlc)
 {
     uint32_t timeHost;
@@ -271,16 +269,17 @@ __STATIC_INLINE void lPAL_PLC_TimerSyncInitialize(void)
         palPlcData.syncTimerRelFreq = 1UL << 24;
 
         /* Program first interrupt after 50 ms (5 us deviation with 100 PPM) */
-        // if (prime_hal_timer_1us_set_int(palPlcData.syncDelay, true, lPAL_PLC_TimerSyncHandler, &palPlcData.syncIntId) == true)
-        // {
+        if (SRV_TIME_MANAGEMENT_CallbackRegisterUS(lPAL_PLC_SysTimeCB, 0, 
+                palPlcData.syncDelay, SYS_TIME_SINGLE) != SYS_TIME_HANDLE_INVALID)
+        {
             palPlcData.syncDelay = 50000;
             palPlcData.syncUpdate = false;
-        // } 
-        // else 
-        // {
-        //     palPlcData.syncDelay = 0;
-        //     palPlcData.syncUpdate = true;
-        // }
+        }
+        else
+        {
+            palPlcData.syncDelay = 0;
+            palPlcData.syncUpdate = true;
+        }
     }
 }
 
@@ -291,7 +290,6 @@ __STATIC_INLINE void lPAL_PLC_TimerSyncUpdate(void)
     uint32_t delayHost;
     uint32_t delayPlc;
     uint32_t syncTimerRelFreq;
-    bool intProgrammed = false;
 
     /* Get current Host and PLC timers */
     timeHost = lPAL_PLC_TimerSyncRead(&timePlc);
@@ -335,24 +333,21 @@ __STATIC_INLINE void lPAL_PLC_TimerSyncUpdate(void)
         }
 
         /* Program next interrupt */
-        // intProgrammed = prime_hal_timer_1us_set_int(palPlcData.syncDelay, true, lPAL_PLC_TimerSyncHandler, &palPlcData.syncIntId);
+        if (SRV_TIME_MANAGEMENT_CallbackRegisterUS(lPAL_PLC_SysTimeCB, 0, 
+                palPlcData.syncDelay, SYS_TIME_SINGLE) != SYS_TIME_HANDLE_INVALID)
+        {
+            palPlcData.syncUpdate = false;
+        }
+        else
+        {
+            palPlcData.syncDelay = 0;
+        }
     } 
     else 
     {
         // prime_hal_debug_report(PAL_PLC_TIMER_SYNC_ERROR);
-
         lPAL_PLC_TimerSyncInitialize();
     }
-
-    if (intProgrammed) 
-    {
-        palPlcData.syncUpdate = false;
-    } 
-    else 
-    {
-        palPlcData.syncDelay = 0;
-    }
-
 }
 
 static uint32_t lPAL_PLC_GetHostTime(uint32_t timePlc)
@@ -452,12 +447,12 @@ static void lPAL_PLC_PLC_DataCfmCb(DRV_PLC_PHY_TRANSMISSION_CFM_OBJ *pCfmObj, ui
     if (palPlcData.plcCallbacks.dataConfirm != NULL)
     {
         PAL_MSG_CONFIRM_DATA dataCfm;
-        uint8_t id;
 
         dataCfm.txTime = lPAL_PLC_GetHostTime(pCfmObj->timeIni);
         dataCfm.rmsCalc = (uint16_t)pCfmObj->rmsCalc;
         dataCfm.pch = lPAL_PLC_GetPCH(palPlcData.channel);
         dataCfm.frameType = (uint8_t)pCfmObj->frameType;
+        dataCfm.bufId = pCfmObj->bufferId;
 
         switch (pCfmObj->result)
         {
@@ -470,42 +465,18 @@ static void lPAL_PLC_PLC_DataCfmCb(DRV_PLC_PHY_TRANSMISSION_CFM_OBJ *pCfmObj, ui
                 break;
         }
 
-        /* PLC Reset management */
-        if (pCfmObj->result == DRV_PLC_PHY_TX_RESULT_NO_TX)
-        {
-            /* Reset indication of buffers in use */
-            for (id = 0; id < PAL_PLC_TX_NUM_BUFFERS; id++)
-            {
-                if (palPlcData.bufId[id])
-                {
-                    dataCfm.bufId = id;
-                    palPlcData.plcCallbacks.dataConfirm(&dataCfm);
-                    palPlcData.bufId[id] = false;
-                }
-            }
-        }
-        else
-        {
-            for (id = 0; id < PAL_PLC_TX_NUM_BUFFERS; id++)
-            {
-                if (palPlcData.bufId[id] && (pCfmObj->bufferId == id))
-                {
-                    dataCfm.bufId = id;
-                    palPlcData.bufId[id] = false;
-                    palPlcData.plcCallbacks.dataConfirm(&dataCfm);
-                    break;
-                }
-            }
-        }
+        palPlcData.plcCallbacks.dataConfirm(&dataCfm);
     }
 
 <#if PRIME_PAL_PHY_SNIFFER == true>
     if (palPlcData.snifferCallback)
     {
         size_t dataLength;
+        uint16_t paySymbols;
 
         palPlcData.plcPIB.id = PLC_ID_TX_PAY_SYMBOLS;
         palPlcData.plcPIB.length = 2;
+        palPlcData.plcPIB.pData = (uint8_t *)&paySymbols;
         DRV_PLC_PHY_PIBGet(palPlcData.drvPhyHandle, &palPlcData.plcPIB);
         
         SRV_PSNIFFER_SetTxPayloadSymbols(*(uint16_t *)palPlcData.plcPIB.pData);
@@ -569,9 +540,11 @@ static void lPAL_PLC_PLC_DataIndCb(DRV_PLC_PHY_RECEPTION_OBJ *pIndObj, uintptr_t
     if (palPlcData.snifferCallback)
     {
         size_t length;
+        uint16_t paySymbols;
 
         palPlcData.plcPIB.id = PLC_ID_RX_PAY_SYMBOLS;
         palPlcData.plcPIB.length = 2;
+        palPlcData.plcPIB.pData = (uint8_t *)&paySymbols;
         DRV_PLC_PHY_PIBGet(palPlcData.drvPhyHandle, &palPlcData.plcPIB);
 
         SRV_PSNIFFER_SetRxPayloadSymbols(*(uint16_t *)palPlcData.plcPIB.pData);
@@ -594,7 +567,7 @@ static void lPAL_PLC_PLC_PVDDMonitorCb(SRV_PVDDMON_CMP_MODE cmpMode, uintptr_t c
     {
         /* PLC Transmission is not permitted */
         DRV_PLC_PHY_EnableTX(palPlcData.drvPhyHandle, false);
-        appPlc.pvddMonTxEnable = false;
+        palPlcData.pvddMonTxEnable = false;
         /* Restart PVDD Monitor to check when VDD is within the comparison window */
         SRV_PVDDMON_Restart(SRV_PVDDMON_CMP_MODE_IN);
     }
@@ -602,7 +575,7 @@ static void lPAL_PLC_PLC_PVDDMonitorCb(SRV_PVDDMON_CMP_MODE cmpMode, uintptr_t c
     {
         /* PLC Transmission is permitted again */
         DRV_PLC_PHY_EnableTX(palPlcData.drvPhyHandle, true);
-        appPlc.pvddMonTxEnable = true;
+        palPlcData.pvddMonTxEnable = true;
         /* Restart PVDD Monitor to check when VDD is out of the comparison window */
         SRV_PVDDMON_Restart(SRV_PVDDMON_CMP_MODE_OUT);
     }
@@ -680,9 +653,6 @@ SYS_MODULE_OBJ PAL_PLC_Initialize(void)
     palPlcData.errorInfo = 0;
     palPlcData.palAttenuation = 0;
     palPlcData.syncEnable = false;
-    for(bufferId = 0; bufferId < PAL_PLC_TX_NUM_BUFFERS; bufferId++) {
-        palPlcData.bufId[bufferId] = false;
-    }
 
     /* Read Default Channel */
     palPlcData.channel = SRV_PCOUP_GetDefaultChannel();
@@ -878,7 +848,7 @@ uint8_t PAL_PLC_DataRequest(PAL_MSG_REQUEST_DATA *pMessageData)
     palPlcData.phyTxObj.csma.disableRx = pMessageData->disableRx;
     palPlcData.phyTxObj.csma.senseCount = pMessageData->numSenses;
     palPlcData.phyTxObj.csma.senseDelayMs = pMessageData->senseDelayMs;
-    palPlcData.phyTxObj.bufferId = pMessageData->timeDelay;
+    palPlcData.phyTxObj.bufferId = pMessageData->buffId;
     palPlcData.phyTxObj.scheme = pMessageData->scheme;
     palPlcData.phyTxObj.frameType = pMessageData->frameType;
     palPlcData.phyTxObj.pTransmitData = pMessageData->pData;

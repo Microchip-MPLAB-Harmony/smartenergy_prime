@@ -141,6 +141,48 @@ SYS_MODULE_OBJ PAL_Initialize(const SYS_MODULE_INDEX index);
 */
 void PAL_Tasks(SYS_MODULE_OBJ object);
 
+// *************************************************************************
+/* Function:
+    SYS_STATUS PAL_Status( SYS_MODULE_OBJ object )
+
+  Summary:
+    Gets the current status of the PAL module.
+
+  Description:
+    This routine provides the current status of the PAL module.
+
+  Preconditions:
+    Function PAL_Initialize should have been called before calling
+    this function.
+
+  Parameters:
+    object - Identifier for the object instance
+
+  Returns:
+    SYS_STATUS_READY: Indicates that the driver is ready and accept
+    requests for new operations.
+
+    SYS_STATUS_UNINITIALIZED: Indicates the driver is not initialized.
+
+    SYS_STATUS_ERROR: Indicates the driver is not initialized correctly.
+
+    SYS_STATUS_BUSY: Indicates the driver is initializing.
+
+  Example:
+    <code>
+    SYS_MODULE_OBJ sysObjPal;
+    sysObjPal = PAL_Initialize(PRIME_PAL_INDEX);
+    SYS_STATUS status;
+
+    status = PAL_Status(sysObjPal);
+    </code>
+
+  Remarks:
+    None.
+*/
+
+SYS_STATUS PAL_Status(SYS_MODULE_OBJ object);
+
 // ****************************************************************************
 /* Function:
     void PAL_CallbackRegister(PAL_CALLBACKS *pCallbacks)

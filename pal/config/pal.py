@@ -49,7 +49,8 @@ def enablePalPlc(palComponent, value):
     if value & palComponent.getDependencyEnabled("primePalUSI"):
         Database.activateComponents(["srv_psniffer"])
     else:
-        Database.deactivateComponents(["srv_psniffer"]) 
+        if (palComponent.getDependencyEnabled("primePalSerial") == False):
+            Database.deactivateComponents(["srv_psniffer"]) 
 
 def enablePalRf(palComponent, value):
     primePalRfSrcFile.setEnabled(value)
@@ -73,7 +74,8 @@ def enablePalSerial(palComponent, value):
     if value & palComponent.getDependencyEnabled("primePalUSI"):
         Database.activateComponents(["srv_psniffer"])
     else:
-        Database.deactivateComponents(["srv_psniffer"]) 
+        if (palComponent.getDependencyEnabled("primePalPlc") == False):
+            Database.deactivateComponents(["srv_psniffer"]) 
 
 def enablePhySniffer(palComponent, value):
     palComponent.setDependencyEnabled("primePalUSI", value)
@@ -81,7 +83,8 @@ def enablePhySniffer(palComponent, value):
     if value and palComponent.getDependencyEnabled("primePalPlc"):
         Database.activateComponents(["srv_psniffer"])
     else:
-        Database.deactivateComponents(["srv_psniffer"]) 
+        if (palComponent.getDependencyEnabled("primePalSerial") == False):
+            Database.deactivateComponents(["srv_psniffer"]) 
         
     if value & palComponent.getDependencyEnabled("primePalRf"):
         Database.activateComponents(["srv_rsniffer"])
@@ -91,7 +94,8 @@ def enablePhySniffer(palComponent, value):
     if value & palComponent.getDependencyEnabled("primePalSerial"):
         Database.activateComponents(["srv_psniffer"])
     else:
-        Database.deactivateComponents(["srv_psniffer"]) 
+        if (palComponent.getDependencyEnabled("primePalPlc") == False):
+            Database.deactivateComponents(["srv_psniffer"]) 
 
 def showUSISymbol(symbol, event):
     symbol.setVisible(event["value"])

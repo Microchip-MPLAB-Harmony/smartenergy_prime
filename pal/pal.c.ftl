@@ -280,6 +280,37 @@ void PAL_Tasks(SYS_MODULE_OBJ object)
 </#if>
 }
 
+SYS_STATUS PAL_Status(SYS_MODULE_OBJ object)
+{
+    if (object != PRIME_PAL_INDEX)
+    {
+        return SYS_STATUS_ERROR;
+    }
+
+<#if PRIME_PAL_PLC_EN == true>
+    if (PAL_PLC_Status() != SYS_STATUS_READY)
+    {
+        return SYS_STATUS_BUSY;
+    }
+
+</#if>
+<#if PRIME_PAL_RF_EN == true>
+    if (PAL_RF_Status() != SYS_STATUS_READY)
+    {
+        return SYS_STATUS_BUSY;
+    }
+
+</#if>
+<#if PRIME_PAL_SERIAL_EN == true>
+    if (PAL_SERIAL_Status() != SYS_STATUS_READY)
+    {
+        return SYS_STATUS_BUSY;
+    }
+
+</#if>
+    return SYS_STATUS_READY;
+}
+
 void PAL_CallbackRegister(PAL_CALLBACKS *pCallbacks)
 {
     palData.dataConfirmCallback = pCallbacks->dataConfirm;
