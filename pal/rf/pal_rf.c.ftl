@@ -56,6 +56,9 @@ Microchip or any third party.
 #include "pal_rf.h"
 #include "pal_rf_local.h"
 #include "pal_rf_rm.h"
+<#if PRIME_PAL_PHY_SNIFFER == true>
+#include "service/rsniffer/srv_rsniffer.h"
+</#if>
 
 /******************************************************************************
  * PRIME PAL RF interface implementation
@@ -191,7 +194,7 @@ static void lPAL_RF_UpdatePhyConfiguration(void)
 	lPAL_RF_FreqHopGetChannelSequence();
 <#else>
 	/* Always initialize PAL RF to min channel */
-	palRfData.channelMask = (PAL_CHANNEL_MASK)(PAL_RF_CHN | palRfData.rfPhyConfig.chnNumMin);
+	palRfData.pch = (PAL_PCH)(PAL_RF_CHN | palRfData.rfPhyConfig.chnNumMin);
 </#if>
 
 	palRfData.rfChannelsNumber = palRfData.rfPhyConfig.chnNumMax - palRfData.rfPhyConfig.chnNumMin + 1;
@@ -207,7 +210,7 @@ static void lPAL_RF_UpdatePhyConfiguration(void)
 // *****************************************************************************
 // *****************************************************************************
 static void lPAL_RF_DataCfmCb(DRV_RF215_TX_HANDLE txHandle, 
-						      DRV_RF215_TX_CONFIRM_OBJ *cfmObj, uintptr_t ctxt)
+						      DRV_RF215_TX_CONFIRM_OBJ *pCfmObj, uintptr_t ctxt)
 {
     if (palRfData.rfCallbacks.dataConfirm != NULL)
     {
@@ -216,13 +219,13 @@ static void lPAL_RF_DataCfmCb(DRV_RF215_TX_HANDLE txHandle,
         /* Avoid warning */
         (void)ctxt;
 
-        dataCfm.txTime = SRV_TIME_MANAGEMENT_CountToUS(cfmObj->timeIniCount);
-        dataCfm.channelMask = palRfData.channelMask;
+        dataCfm.txTime = SRV_TIME_MANAGEMENT_CountToUS(pCfmObj->timeIniCount);
+        dataCfm.pch = palRfData.pch;
         dataCfm.rmsCalc = 255; // TBD
         dataCfm.frameType = PAL_FRAME_TYPE_RF;
         dataCfm.bufId = lPAL_RF_GetTxBuffId(txHandle);
 
-        switch(cfmObj->txResult)
+        switch(pCfmObj->txResult)
         {
             case RF215_TX_SUCCESS:
                 dataCfm.result = PAL_TX_RESULT_SUCCESS;
@@ -269,9 +272,27 @@ static void lPAL_RF_DataCfmCb(DRV_RF215_TX_HANDLE txHandle,
 
         palRfData.rfCallbacks.dataConfirm(&dataCfm);
     }
+
+<#if PRIME_PAL_PHY_SNIFFER == true>
+    if (palRfData.snifferCallback)
+    {
+        uint8_t* pRfSnifferData;
+        uint16_t paySymbols;
+        size_t dataLength;
+
+        DRV_RF215_GetPib(palRfData.drvRfPhyHandle, RF215_PIB_PHY_TX_PAY_SYMBOLS,
+                    &paySymbols);
+        
+        pRfSnifferData = SRV_RSNIFFER_SerialCfmMessage(pCfmObj, txHandle,
+                    &palRfData.rfPhyConfig, paySymbols, palRfData.pch, &dataLength);
+
+        palRfData.snifferCallback(pRfSnifferData, dataLength);
+    }
+
+</#if>
 }
 
-static void lPAL_RF_DataIndCb(DRV_RF215_RX_INDICATION_OBJ* indObj, uintptr_t ctxt)
+static void lPAL_RF_DataIndCb(DRV_RF215_RX_INDICATION_OBJ* pIndObj, uintptr_t ctxt)
 {
     if (palRfData.rfCallbacks.dataIndication != NULL)
     {
@@ -282,13 +303,13 @@ static void lPAL_RF_DataIndCb(DRV_RF215_RX_INDICATION_OBJ* indObj, uintptr_t ctx
         (void)ctxt;
 
         /* Fill dataInd */
-        dataInd.pData = indObj->psdu;
-        dataInd.rxTime = SRV_TIME_MANAGEMENT_CountToUS(indObj->timeIniCount);
-        dataInd.dataLength = indObj->psduLen;
-        dataInd.channelMask = palRfData.channelMask;
-        PAL_RF_RM_GetRobustModulation(indObj, &dataInd.estimatedBitrate, &dataInd.lessRobustMod, dataInd.channelMask);
-        dataInd.rssi = indObj->rssiDBm;
-        dataInd.scheme = (uint8_t)indObj->modScheme;
+        dataInd.pData = pIndObj->psdu;
+        dataInd.rxTime = SRV_TIME_MANAGEMENT_CountToUS(pIndObj->timeIniCount);
+        dataInd.dataLength = pIndObj->psduLen;
+        dataInd.pch = palRfData.pch;
+        PAL_RF_RM_GetRobustModulation(pIndObj, &dataInd.estimatedBitrate, &dataInd.lessRobustMod, dataInd.pch);
+        dataInd.rssi = pIndObj->rssiDBm;
+        dataInd.scheme = (uint8_t)pIndObj->modScheme;
         dataInd.frameType = (uint8_t)PAL_FRAME_TYPE_RF;
         dataInd.headerType = (dataInd.pData[0] >> 4) & 0x03;
         dataInd.lqi = PAL_RF_RM_GetLqi(dataInd.rssi);
@@ -298,6 +319,24 @@ static void lPAL_RF_DataIndCb(DRV_RF215_RX_INDICATION_OBJ* indObj, uintptr_t ctx
 
         palRfData.rfCallbacks.dataIndication(&dataInd);
     }
+
+<#if PRIME_PAL_PHY_SNIFFER == true>
+    if (palRfData.snifferCallback)
+    {
+        uint8_t* pRfSnifferData;
+        uint16_t paySymbols;
+        size_t dataLength;
+
+        DRV_RF215_GetPib(palRfData.drvRfPhyHandle, RF215_PIB_PHY_RX_PAY_SYMBOLS,
+                    &paySymbols);
+        
+        pRfSnifferData = SRV_RSNIFFER_SerialRxMessage(pIndObj, &palRfData.rfPhyConfig, 
+                    paySymbols, palRfData.pch, &dataLength);
+                    
+        palRfData.snifferCallback(pRfSnifferData, dataLength);
+    }
+
+</#if>
 }
 
 <#if PRIME_PAL_RF_FREQ_HOPPING == true>
@@ -404,7 +443,7 @@ uint8_t PAL_RF_DataRequest(PAL_MSG_REQUEST_DATA *pMessageData)
         return (uint8_t)rfPhyTxReqHandle;
     }
 
-    txReqObj->channelNum = pMessageData->channelMask & (~PAL_RF_CHN);
+    txReqObj->channelNum = pMessageData->pch & (~PAL_RF_CHN);
     txReqObj->psdu = pMessageData->pData;
     txReqObj->psduLen = pMessageData->dataLength;
     txReqObj->timeMode = (DRV_RF215_TX_TIME_MODE)pMessageData->timeMode;
@@ -436,31 +475,39 @@ uint8_t PAL_RF_DataRequest(PAL_MSG_REQUEST_DATA *pMessageData)
 
     if (rfPhyTxReqHandle == DRV_RF215_TX_HANDLE_INVALID)
     {
-        DRV_RF215_TX_CONFIRM_OBJ cfmObj;
+        DRV_RF215_TX_CONFIRM_OBJ pCfmObj;
 
-        cfmObj.txResult = txResult;
-        cfmObj.timeIniCount = pMessageData->timeDelay;
-        cfmObj.ppduDurationCount = 0;
-        lPAL_RF_DataCfmCb(DRV_RF215_TX_HANDLE_INVALID, &cfmObj, pMessageData->buffId);
+        pCfmObj.txResult = txResult;
+        pCfmObj.timeIniCount = pMessageData->timeDelay;
+        pCfmObj.ppduDurationCount = 0;
+        lPAL_RF_DataCfmCb(DRV_RF215_TX_HANDLE_INVALID, &pCfmObj, pMessageData->buffId);
     }
     else
     {
         (void)lPAL_RF_SetTxHandler(rfPhyTxReqHandle, pMessageData->pData);
+
+<#if PRIME_PAL_PHY_SNIFFER == true>
+        if (palRfData.snifferCallback)
+        {
+            SRV_RSNIFFER_SetTxMessage(txReqObj, rfPhyTxReqHandle);
+        }
+
+</#if>
     }
-    
+
     return (uint8_t)rfPhyTxReqHandle;
 }
 
-void PAL_RF_ProgramChannelSwitch(uint32_t timeSync, PAL_CHANNEL_MASK channelMask, uint8_t timeMode)
+void PAL_RF_ProgramChannelSwitch(uint32_t timeSync, PAL_PCH pch, uint8_t timeMode)
 {
 <#if PRIME_PAL_RF_FREQ_HOPPING == true>
-    uint16_t channelNum = channelMask & (PAL_RF_CHN - 1);
+    uint16_t channelNum = pch & (PAL_RF_CHN - 1);
 
-    palRfData.freqHopCurrentChannel = channelMask;
+    palRfData.freqHopCurrentChannel = pch;
     DRV_RF215_SetChannelRequest(palRfData.drvRfPhyHandle, timeSync, channelNum, (DRV_RF215_TX_TIME_MODE)timeMode);
 <#else>
     (void)timeSync;
-    (void)channelMask;
+    (void)pch;
     (void)timeMode;
 </#if>
 }
@@ -526,22 +573,22 @@ uint8_t PAL_RF_SetAGC(uint8_t mode, uint8_t gain)
     return(PAL_CFG_INVALID_INPUT);
 }
 
-uint8_t PAL_RF_GetChannel(PAL_CHANNEL_MASK *pChannelMask)
+uint8_t PAL_RF_GetChannel(PAL_PCH *pPch)
 {
     if (palRfData.status != PAL_RF_STATUS_READY)
     {
         return PAL_CFG_INVALID_INPUT;
     }
 
-    *pChannelMask = palRfData.channelMask | PAL_RF_CHN;
+    *pPch = palRfData.pch | PAL_RF_CHN;
 
     return PAL_CFG_SUCCESS;
 }
 
-uint8_t PAL_RF_SetChannel(PAL_CHANNEL_MASK channelMask)
+uint8_t PAL_RF_SetChannel(PAL_PCH pch)
 {
     uint16_t channel;
-	channel = channelMask & (~PAL_RF_CHN);
+	channel = pch & (~PAL_RF_CHN);
 
     if (palRfData.status != PAL_RF_STATUS_READY)
     {
@@ -551,7 +598,7 @@ uint8_t PAL_RF_SetChannel(PAL_CHANNEL_MASK channelMask)
     if (channel == RF_CHANNEL_BITS)
     {
 <#if PRIME_PAL_RF_FREQ_HOPPING == true>
-        palRfData.channelMask = RF_CHANNEL_BITS;
+        palRfData.pch = RF_CHANNEL_BITS;
         return PAL_CFG_SUCCESS;
 <#else>
         return PAL_CFG_INVALID_INPUT;
@@ -563,7 +610,7 @@ uint8_t PAL_RF_SetChannel(PAL_CHANNEL_MASK channelMask)
         if (DRV_RF215_SetPib(palRfData.drvRfPhyHandle, 
             RF215_PIB_PHY_CHANNEL_NUM, &channel) == RF215_PIB_RESULT_SUCCESS)
         {
-            palRfData.channelMask = channel;
+            palRfData.pch = channel;
             return PAL_CFG_SUCCESS;
         }
     }
@@ -593,7 +640,7 @@ uint8_t PAL_RF_GetConfiguration(uint16_t id, void *pValue, uint16_t length)
             return PAL_CFG_SUCCESS;
 
         case PAL_ID_CFG_TXRX_CHANNEL:
-            return PAL_RF_GetChannel((PAL_CHANNEL_MASK *)pValue);
+            return PAL_RF_GetChannel((PAL_PCH *)pValue);
 
         case PAL_ID_RX_PAYLOAD_LEN_SYM:
             drvRfId = RF215_PIB_PHY_RX_PAY_SYMBOLS;
@@ -726,8 +773,8 @@ uint8_t PAL_RF_SetConfiguration(uint16_t id, void *pValue, uint16_t length)
 
 	case PAL_ID_CFG_TXRX_CHANNEL:
     {
-        PAL_CHANNEL_MASK channelMask = *(PAL_CHANNEL_MASK *)pValue;
-        return PAL_RF_SetChannel(channelMask);
+        PAL_PCH pch = *(PAL_PCH *)pValue;
+        return PAL_RF_SetChannel(pch);
     }
 
 	case PAL_ID_RX_PAYLOAD_LEN_SYM:
@@ -854,3 +901,12 @@ uint16_t PAL_RF_GetSignalCapture(uint8_t *pData, PAL_FRAME frameType, uint32_t t
 
     return PAL_CFG_INVALID_INPUT;
 }
+
+<#if PRIME_PAL_PHY_SNIFFER == true>
+void PAL_RF_USISnifferCallbackRegister(SRV_USI_HANDLE usiHandler, PAL_USI_SNIFFER_CB callback)
+{
+    palRfData.usiHandler = usiHandler;
+    palRfData.snifferCallback = callback;
+}
+
+</#if>

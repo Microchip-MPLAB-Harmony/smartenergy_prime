@@ -217,7 +217,7 @@ void PAL_CallbackRegister(PAL_CALLBACKS *pCallbacks);
     requestMsg.dataBuf = &msg;
     requestMsg.timeDelay = 10000;
     requestMsg.dataLength = sizeof(msg);
-    requestMsg.channelMask = 16;
+    requestMsg.pch = 16;
     requestMsg.buffIdentifier = 2;
     requestMsg.attLevel = 0;
     requestMsg.scheme = PAL_PLC_DBPSK_R;
@@ -237,7 +237,7 @@ uint8_t PAL_DataRequest(PAL_MSG_REQUEST_DATA *pData);
 
 // ****************************************************************************
 /* Function:
-    uint8_t PAL_GetSNR(PAL_CHANNEL_MASK channelMask, uint8_t *snr, uint8_t qt)
+    uint8_t PAL_GetSNR(PAL_PCH pch, uint8_t *snr, uint8_t qt)
 
   Summary:
     Convert QT value to Signal Noise Ratio (SNR).
@@ -254,7 +254,7 @@ uint8_t PAL_DataRequest(PAL_MSG_REQUEST_DATA *pData);
   Parameters:
     snr         Signal to noise ratio output parameter
     qt          QT input parameter to get SNR level
-    channelMask Physical channel mask
+    pch         Physical channel
 
   Returns:
     PAL_CFG_SUCCESS         - If successful
@@ -265,19 +265,19 @@ uint8_t PAL_DataRequest(PAL_MSG_REQUEST_DATA *pData);
     uint8_t result=PAL_CFG_SUCCESS;
     uint8_t snr=0;
     uint8_t qt=5;
-    PAL_CHANNEL_MASK channelMask=PAL_PLC_CHN1_MASK;
+    PAL_PCH pch=PAL_PLC_CHN1;
 
-    result = PAL_GetSNR(channelMask, &snr, qt);
+    result = PAL_GetSNR(pch, &snr, qt);
     </code>
 
   Remarks:
     Not available in PHY Serial medium
 */
-uint8_t PAL_GetSNR(PAL_CHANNEL_MASK channelMask, uint8_t *snr, uint8_t qt);
+uint8_t PAL_GetSNR(PAL_PCH pch, uint8_t *snr, uint8_t qt);
 
 // ****************************************************************************
 /* Function:
-    uint8_t PAL_GetZCT(PAL_CHANNEL_MASK channelMask, uint32_t *zct)
+    uint8_t PAL_GetZCT(PAL_PCH pch, uint32_t *zct)
 
   Summary:
     Get zero-cross time (ZCT).
@@ -293,7 +293,7 @@ uint8_t PAL_GetSNR(PAL_CHANNEL_MASK channelMask, uint8_t *snr, uint8_t qt);
 
   Parameters:
     zct         Zero time output parameter
-    channelMask Physical channel mask
+    pch         Physical channel
 
   Returns:
     PAL_CFG_SUCCESS         - If successful
@@ -303,19 +303,19 @@ uint8_t PAL_GetSNR(PAL_CHANNEL_MASK channelMask, uint8_t *snr, uint8_t qt);
     <code>
     uint8_t result=PAL_CFG_SUCCESS;
     uint8_t zct=0;
-    PAL_CHANNEL_MASK channelMask=PAL_PLC_CHN1_MASK;
+    PAL_PCH pch=PAL_PLC_CHN1;
 
-    result = PAL_GetZCT(channelMask, &zct);
+    result = PAL_GetZCT(pch, &zct);
     </code>
 
   Remarks:
     Not available for both PHY Serial and RF medium.
 */
-uint8_t PAL_GetZCT(PAL_CHANNEL_MASK channelMask, uint32_t *zct);
+uint8_t PAL_GetZCT(PAL_PCH pch, uint32_t *zct);
 
 // ****************************************************************************
 /* Function:
-    uint8_t PAL_GetTimer(PAL_CHANNEL_MASK channelMask, uint32_t *timer)
+    uint8_t PAL_GetTimer(PAL_PCH pch, uint32_t *timer)
 
   Summary:
     Get the current PHY time in us.
@@ -329,7 +329,7 @@ uint8_t PAL_GetZCT(PAL_CHANNEL_MASK channelMask, uint32_t *zct);
 
   Parameters:
     timer           Current output time of PHY
-    channelMask     Physical channel mask
+    pch             Physical channel
 
   Returns:
     PAL_CFG_SUCCESS         - If successful
@@ -339,19 +339,19 @@ uint8_t PAL_GetZCT(PAL_CHANNEL_MASK channelMask, uint32_t *zct);
     <code>
     uint8_t result=PAL_CFG_SUCCESS;
     uint32_t timer=0;
-    PAL_CHANNEL_MASK channelMask=PAL_PLC_CHN1_MASK;
+    PAL_PCH pch=PAL_PLC_CHN1;
 
-    result = PAL_GetTimer(channelMask, &timer);
+    result = PAL_GetTimer(pch, &timer);
     </code>
 
   Remarks:
     None
 */
-uint8_t PAL_GetTimer(PAL_CHANNEL_MASK channelMask, uint32_t *timer);
+uint8_t PAL_GetTimer(PAL_PCH pch, uint32_t *timer);
 
 // ****************************************************************************
 /* Function:
-    uint8_t PAL_GetTimerExtended(PAL_CHANNEL_MASK channelMask, uint64_t *timer)
+    uint8_t PAL_GetTimerExtended(PAL_PCH pch, uint64_t *timer)
 
   Summary:
     Get the extended PHY time in us.
@@ -365,7 +365,7 @@ uint8_t PAL_GetTimer(PAL_CHANNEL_MASK channelMask, uint32_t *timer);
 
   Parameters:
     timer           Extended output time  of PHY
-    channelMask     Physical channel mask
+    pch             Physical channel
 
   Returns:
     PAL_CFG_SUCCESS         - If successful
@@ -382,12 +382,12 @@ uint8_t PAL_GetTimer(PAL_CHANNEL_MASK channelMask, uint32_t *timer);
   Remarks:
     None
 */
-uint8_t PAL_GetTimerExtended(PAL_CHANNEL_MASK channelMask, uint64_t *timer);
+uint8_t PAL_GetTimerExtended(PAL_PCH pch, uint64_t *timer);
 
 // ****************************************************************************
 /* Function:
     uint8_t PAL_GetCD(
-        PAL_CHANNEL_MASK channelMask,
+        PAL_PCH pch,
         uint8_t *cd,
         uint8_t *rssi,
         uint32_t *time,
@@ -408,7 +408,7 @@ uint8_t PAL_GetTimerExtended(PAL_CHANNEL_MASK channelMask, uint64_t *timer);
     rssi            Received signal strength indicator
     time            Current time in us
     header          Header type
-    channelMask     Physical channel mask
+    pch             Physical channel
 
   Returns:
     PAL_CFG_SUCCESS         - If successful
@@ -421,19 +421,19 @@ uint8_t PAL_GetTimerExtended(PAL_CHANNEL_MASK channelMask, uint64_t *timer);
     uint8_t rssi=0;
     uint32_t time=0;
     uint8_t header=0;
-    PAL_CHANNEL_MASK channelMask=PAL_PLC_CHN1_MASK;
+    PAL_PCH pch=PAL_PLC_CHN1;
 
-    result = PAL_GetCD(channelMask, &cd, &rssi, &time, &header);
+    result = PAL_GetCD(pch, &cd, &rssi, &time, &header);
     </code>
 
   Remarks:
     Not available for both PHY Serial and PHY RF.
 */
-uint8_t PAL_GetCD(PAL_CHANNEL_MASK channelMask, uint8_t *cd, uint8_t *rssi, uint32_t *time, uint8_t *header);
+uint8_t PAL_GetCD(PAL_PCH pch, uint8_t *cd, uint8_t *rssi, uint32_t *time, uint8_t *header);
 
 // ****************************************************************************
 /* Function:
-    uint8_t PAL_GetNL(PAL_CHANNEL_MASK channelMask, uint8_t *noise)
+    uint8_t PAL_GetNL(PAL_PCH pch, uint8_t *noise)
 
   Summary:
     Get the noise floor level value.
@@ -447,7 +447,7 @@ uint8_t PAL_GetCD(PAL_CHANNEL_MASK channelMask, uint8_t *cd, uint8_t *rssi, uint
 
   Parameters:
     noise          Noise floor level output parameter
-    channelMask    Physical channel mask
+    pch            Physical channel
 
   Returns:
     PAL_CFG_SUCCESS         - If successful
@@ -457,19 +457,19 @@ uint8_t PAL_GetCD(PAL_CHANNEL_MASK channelMask, uint8_t *cd, uint8_t *rssi, uint
     <code>
     uint8_t result=PAL_CFG_SUCCESS;
     uint8_t nl=0;
-    PAL_CHANNEL_MASK channelMask=PAL_PLC_CHN1_MASK;
+    PAL_PCH pch=PAL_PLC_CHN1;
 
-    result = PAL_GetNL(channelMask, &nl);
+    result = PAL_GetNL(pch, &nl);
     </code>
 
   Remarks:
     Not available for PHY Serial.
 */
-uint8_t PAL_GetNL(PAL_CHANNEL_MASK channelMask, uint8_t *noise);
+uint8_t PAL_GetNL(PAL_PCH pch, uint8_t *noise);
 
 // ****************************************************************************
 /* Function:
-    uint8_t PAL_GetAGC(PAL_CHANNEL_MASK channelMask, uint8_t *mode, uint8_t *gain)
+    uint8_t PAL_GetAGC(PAL_PCH pch, uint8_t *mode, uint8_t *gain)
 
   Summary:
     Get the automatic gain mode of the PHY PLC layer.
@@ -484,7 +484,7 @@ uint8_t PAL_GetNL(PAL_CHANNEL_MASK channelMask, uint8_t *noise);
   Parameters:
     mode           Auto/Manual mode
     gain           Initial receiving gain in auto mode
-    channelMask    Physical channel mask
+    pch            Physical channel
 
   Returns:
     PAL_CFG_SUCCESS         - If successful
@@ -495,7 +495,7 @@ uint8_t PAL_GetNL(PAL_CHANNEL_MASK channelMask, uint8_t *noise);
     uint8_t result=PAL_CFG_SUCCESS;
     uint8_t mode=0;
     uint8_t gain=0;
-    PAL_CHANNEL_MASK channelMask=PAL_PLC_CHN1_MASK;
+    PAL_PCH pch=PAL_PLC_CHN1;
 
     result = PAL_GetAGC(&mode, &gain);
     </code>
@@ -503,11 +503,11 @@ uint8_t PAL_GetNL(PAL_CHANNEL_MASK channelMask, uint8_t *noise);
   Remarks:
     Not available for PHY Serial and PHY RF.
 */
-uint8_t PAL_GetAGC(PAL_CHANNEL_MASK channelMask, uint8_t *mode, uint8_t *gain);
+uint8_t PAL_GetAGC(PAL_PCH pch, uint8_t *mode, uint8_t *gain);
 
 // ****************************************************************************
 /* Function:
-    uint8_t PAL_SetAGC(PAL_CHANNEL_MASK channelMask, uint8_t mode, uint8_t gain)
+    uint8_t PAL_SetAGC(PAL_PCH pch, uint8_t mode, uint8_t gain)
 
   Summary:
     Set the automatic gain mode of the PHY PLC layer.
@@ -522,7 +522,7 @@ uint8_t PAL_GetAGC(PAL_CHANNEL_MASK channelMask, uint8_t *mode, uint8_t *gain);
   Parameters:
     mode            Auto/Manual mode (auto mode(0), manual mode(1))
     gain            Initial receiving gain in auto mode
-    channelMask     Physical channel mask
+    pch             Physical channel
 
   Returns:
     PAL_CFG_SUCCESS         - If successful
@@ -533,26 +533,26 @@ uint8_t PAL_GetAGC(PAL_CHANNEL_MASK channelMask, uint8_t *mode, uint8_t *gain);
     uint8_t result=PAL_CFG_SUCCESS;
     uint8_t mode=0;
     uint8_t gain=0;
-    PAL_CHANNEL_MASK channelMask=PAL_PLC_CHN1_MASK;
+    PAL_PCH pch=PAL_PLC_CHN1;
 
-    result = PAL_SetAGC(channelMask, mode, gain);
+    result = PAL_SetAGC(pch, mode, gain);
     </code>
 
   Remarks:
     Not available for PHY Serial and PHY RF.
 */
-uint8_t PAL_SetAGC(PAL_CHANNEL_MASK channelMask, uint8_t mode, uint8_t gain);
+uint8_t PAL_SetAGC(PAL_PCH pch, uint8_t mode, uint8_t gain);
 
 // ****************************************************************************
 /* Function:
-    uint8_t PAL_GetCCA(PAL_CHANNEL_MASK channelMask, uint8_t *pState)
+    uint8_t PAL_GetCCA(PAL_PCH pch, uint8_t *pState)
 
   Summary:
-    Get clear channelMask assessment mode value.
+    Get clear pch assessment mode value.
 
   Description:
-    This routine is used to get the clear channelMask assesment mode.
-    The channelMask state helps to know whether or not the RF physical medium is
+    This routine is used to get the clear pch assesment mode.
+    The pch state helps to know whether or not the RF physical medium is
     free.
 
   Precondition:
@@ -561,7 +561,7 @@ uint8_t PAL_SetAGC(PAL_CHANNEL_MASK channelMask, uint8_t mode, uint8_t gain);
 
   Parameters:
     pState                 Channel state (0: busy, 1: free) of RF module
-    channelMask            Physical channel mask
+    pch                    Physical channel
 
   Returns:
     PAL_CFG_SUCCESS         - If successful
@@ -571,32 +571,32 @@ uint8_t PAL_SetAGC(PAL_CHANNEL_MASK channelMask, uint8_t mode, uint8_t gain);
     <code>
     uint8_t result=PAL_CFG_SUCCESS;
     uint8_t pState=0;
-    uint16 channelMask = 512;
+    uint16 pch = 512;
 
-    result = PAL_GetCCA(channelMask, &pState);
+    result = PAL_GetCCA(pch, &pState);
     </code>
 
   Remarks:
     Only implemented in PHY RF interface.
 */
-uint8_t PAL_GetCCA(PAL_CHANNEL_MASK channelMask, uint8_t *pState);
+uint8_t PAL_GetCCA(PAL_PCH pch, uint8_t *pState);
 
 // ****************************************************************************
 /* Function:
-    uint8_t PAL_GetChannel(PAL_CHANNEL_MASK *pChannelMask, PAL_CHANNEL_MASK channelReference)
+    uint8_t PAL_GetChannel(PAL_PCH *pPch, PAL_PCH channelReference)
 
   Summary:
-    Get the band (PLC) or the channelMask (RF).
+    Get the band (PLC) or the pch (RF).
 
   Description:
-    This routine is used to get the channelMask or band used for the communication.
+    This routine is used to get the pch or band used for the communication.
 
   Precondition:
     The PAL_Initialize function should have been called before calling this
     function.
 
   Parameters:
-    pChannelMask      Pointer to store the Physical channel mask in use
+    pPch              Pointer to store the Physical channel in use
     channelReference  Physical channel in the same channels range
 
   Returns:
@@ -606,33 +606,33 @@ uint8_t PAL_GetCCA(PAL_CHANNEL_MASK channelMask, uint8_t *pState);
   Example:
     <code>
     uint8_t result=PAL_CFG_SUCCESS;
-    PAL_CHANNEL_MASK channelMask=0;
-    PAL_CHANNEL_MASK channelRef=PAL_PLC_CHN1_MASK; // Select a reference in PLC channels
+    PAL_PCH pch=0;
+    PAL_PCH channelRef=PAL_PLC_CHN1; // Select a reference in PLC channels
 
-    result = PAL_GetChannel(&channelMask, channelRef);
+    result = PAL_GetChannel(&pch, channelRef);
     </code>
 
   Remarks:
     Not available for PHY Serial.
 */
-uint8_t PAL_GetChannel(PAL_CHANNEL_MASK *pChannelMask, PAL_CHANNEL_MASK channelReference);
+uint8_t PAL_GetChannel(PAL_PCH *pPch, PAL_PCH channelReference);
 
 // ****************************************************************************
 /* Function:
-    uint8_t PAL_SetChannel(PAL_CHANNEL_MASK channelMask)
+    uint8_t PAL_SetChannel(PAL_PCH pch)
 
   Summary:
-    Set the band (PLC) or the channelMask (RF).
+    Set the band (PLC) or the pch (RF).
 
   Description:
-    This routine is used to set the channelMask or band used for the communication.
+    This routine is used to set the pch or band used for the communication.
 
   Precondition:
     The PAL_Initialize function should have been called before calling this
     function.
 
   Parameters:
-    channelMask       Physical channel mask
+    pch       Physical channel
 
   Returns:
     PAL_CFG_SUCCESS         - If successful
@@ -641,34 +641,34 @@ uint8_t PAL_GetChannel(PAL_CHANNEL_MASK *pChannelMask, PAL_CHANNEL_MASK channelR
   Example:
     <code>
     uint8_t result=PAL_CFG_SUCCESS;
-    PAL_CHANNEL_MASK channelMask=PAL_PLC_CHN1_MASK; // This mask belongs to PLC channels
+    PAL_PCH pch=PAL_PLC_CHN1; // This mask belongs to PLC channels
 
-    result = PAL_SetChannel(channelMask);
+    result = PAL_SetChannel(pch);
     </code>
 
   Remarks:
     Not available for PHY Serial.
 */
-uint8_t PAL_SetChannel(PAL_CHANNEL_MASK channelMask);
+uint8_t PAL_SetChannel(PAL_PCH pch);
 
 
 // ****************************************************************************
 /* Function:
-    void PAL_ProgramChannelSwitch(PAL_CHANNEL_MASK channelMask, uint32_t timeSync, uint8_t timeMode)
+    void PAL_ProgramChannelSwitch(PAL_PCH pch, uint32_t timeSync, uint8_t timeMode)
 
   Summary:
-    Program a channelMask switch in the given time.
+    Program a pch switch in the given time.
 
   Description:
-    This routine is used to program a channelMask switch in the given time.
+    This routine is used to program a pch switch in the given time.
 
   Precondition:
     The PAL_Initialize function should have been called before calling this
     function.
 
   Parameters:
-    timeSync          Initial channelMask switch time in us
-    channelMask       Frequency channelMask number to be updated
+    timeSync          Initial pch switch time in us
+    pch               Physical Channel to be updated
     timeMode          Channel switch time mode
 
   Returns:
@@ -677,21 +677,21 @@ uint8_t PAL_SetChannel(PAL_CHANNEL_MASK channelMask);
   Example:
     <code>
     uint32_t timeSync = 10000
-    PAL_CHANNEL_MASK channelMask = 600;
+    PAL_PCH pch = 600;
     uint8_t timeMode = PAL_TX_MODE_ABSOLUTE;
 
-    PAL_ProgramChannelSwitch(channelMask, timeSync, timeMode);
+    PAL_ProgramChannelSwitch(pch, timeSync, timeMode);
     </code>
 
   Remarks:
     Only available for PHY RF.
 */
-void PAL_ProgramChannelSwitch(PAL_CHANNEL_MASK channelMask, uint32_t timeSync, uint8_t timeMode);
+void PAL_ProgramChannelSwitch(PAL_PCH pch, uint32_t timeSync, uint8_t timeMode);
 
 // ****************************************************************************
 /* Function:
     uint8_t PAL_GetConfiguration(
-        PAL_CHANNEL_MASK channelMask,
+        PAL_PCH pch,
         uint16_t id,
         void *val,
         uint16_t len)
@@ -710,7 +710,7 @@ void PAL_ProgramChannelSwitch(PAL_CHANNEL_MASK channelMask, uint32_t timeSync, u
     id              Identifiers requested from the MAC layer
     val             Output parameter value
     length          Length of the parameter
-    channelMask     Physical channel mask
+    pch             Physical channel
 
   Returns:
     PAL_CFG_SUCCESS         - If successful
@@ -722,20 +722,20 @@ void PAL_ProgramChannelSwitch(PAL_CHANNEL_MASK channelMask, uint32_t timeSync, u
     uint16_t id=PAL_ID_CFG_ATTENUATION;
     void val=0;
     uint16_t len=1;
-    PAL_CHANNEL_MASK channelMask = 16;
+    PAL_PCH pch = 16;
 
-    result = PAL_GetConfiguration(channelMask, id, &val, len);
+    result = PAL_GetConfiguration(pch, id, &val, len);
     </code>
 
   Remarks:
     None
 */
-uint8_t PAL_GetConfiguration(PAL_CHANNEL_MASK channelMask, uint16_t id, void *val, uint16_t length);
+uint8_t PAL_GetConfiguration(PAL_PCH pch, uint16_t id, void *val, uint16_t length);
 
 // ****************************************************************************
 /* Function:
     uint8_t PAL_SetConfiguration(
-        PAL_CHANNEL_MASK channelMask,
+        PAL_PCH pch,
         uint16_t id,
         void *val,
         uint16_t len)
@@ -754,7 +754,7 @@ uint8_t PAL_GetConfiguration(PAL_CHANNEL_MASK channelMask, uint16_t id, void *va
     id              PHY attribute identifier
     val             Input parameter value
     len             Length of the parameter
-    channelMask     Physical channel mask
+    pch             Physical channel
 
   Returns:
     PAL_CFG_SUCCESS         - If successful
@@ -766,20 +766,20 @@ uint8_t PAL_GetConfiguration(PAL_CHANNEL_MASK channelMask, uint16_t id, void *va
     uint16_t id=PAL_ID_CFG_ATTENUATION;
     void val=2;
     uint16_t len=1;
-    PAL_CHANNEL_MASK channelMask = 16;
+    PAL_PCH pch = 16;
 
-    result = PAL_SetConfiguration(channelMask, id, &val, len);
+    result = PAL_SetConfiguration(pch, id, &val, len);
     </code>
 
   Remarks:
     Not available for PHY Serial.
 */
-uint8_t PAL_SetConfiguration(PAL_CHANNEL_MASK channelMask, uint16_t id, void *val, uint16_t length);
+uint8_t PAL_SetConfiguration(PAL_PCH pch, uint16_t id, void *val, uint16_t length);
 
 // ****************************************************************************
 /* Function:
     uint16_t PAL_GetSignalCapture(
-        PAL_CHANNEL_MASK channelMask,
+        PAL_PCH pch,
         uint8_t *noiseCapture,
         uint8_t mode,
         uint32_t timeStart,
@@ -811,20 +811,20 @@ uint8_t PAL_SetConfiguration(PAL_CHANNEL_MASK channelMask, uint16_t id, void *va
     uint8_t noiseCapture[300];
     uint16_t noiseSize;
     uint8_t mode = PAL_MODE_TYPE_B;
-    uint8_t channelMask = 1;
+    uint8_t pch = 1;
 
-    noiseSize = PAL_GetSignalCapture(channelMask, &noiseCapture, mode, timeStart, duration);
+    noiseSize = PAL_GetSignalCapture(pch, &noiseCapture, mode, timeStart, duration);
     </code>
 
   Remarks:
     Only available for PHY PLC.
 */
-uint16_t PAL_GetSignalCapture(PAL_CHANNEL_MASK channelMask, uint8_t *noiseCapture, uint8_t mode, 
+uint16_t PAL_GetSignalCapture(PAL_PCH pch, uint8_t *noiseCapture, uint8_t mode, 
                               uint32_t timeStart, uint32_t duration);
 // ****************************************************************************
 /* Function:
     uint8_t PAL_GetMsgDuration(
-        PAL_CHANNEL_MASK channelMask,
+        PAL_PCH pch,
         uint16_t msgLen,
         PAL_SCHEME scheme,
         uint8_t mode,
@@ -841,7 +841,7 @@ uint16_t PAL_GetSignalCapture(PAL_CHANNEL_MASK channelMask, uint8_t *noiseCaptur
     function.
 
   Parameters:
-    channelMask     Physical channel mask used
+    pch             Physical channel used
     msgLen          Message length
     scheme          Modulation scheme of message
     mode            Indicates if the message to transmit is type A, type B or type BC
@@ -854,24 +854,24 @@ uint16_t PAL_GetSignalCapture(PAL_CHANNEL_MASK channelMask, uint8_t *noiseCaptur
   Example:
     <code>
     uint32_t duration = 0;
-    PAL_CHANNEL_MASK channelMask = 16;
+    PAL_PCH pch = 16;
     uint16_t msgLen = 30;
     PAL_SCHEME scheme = PAL_PLC_DBPSK_R;
     uint8_t mode = PAL_MODE_TYPE_B;
     uint8_t result=PAL_CFG_SUCCESS;
 
-    result = PAL_GetMsgDuration(channelMask, msgLen, scheme, mode, &duration);
+    result = PAL_GetMsgDuration(pch, msgLen, scheme, mode, &duration);
     </code>
 
   Remarks:
     Not available for PHY serial.
 */
-uint8_t PAL_GetMsgDuration(PAL_CHANNEL_MASK channelMask, uint16_t length, PAL_SCHEME scheme, uint8_t mode, uint32_t *duration);
+uint8_t PAL_GetMsgDuration(PAL_PCH pch, uint16_t length, PAL_SCHEME scheme, uint8_t mode, uint32_t *duration);
 
 // ****************************************************************************
 /* Function:
    bool PAL_HasMinimumQuality(
-    PAL_CHANNEL_MASK channelMask,
+    PAL_PCH pch,
     PAL_SCHEME scheme,
     uint8_t lessRobustMode)
 
@@ -887,7 +887,7 @@ uint8_t PAL_GetMsgDuration(PAL_CHANNEL_MASK channelMask, uint16_t length, PAL_SC
     function.
 
   Parameters:
-    channelMask         Physical channel mask used
+    pch                 Physical channel used
     scheme              Modulation scheme of message
     lessRobustMode      Less robust modulation
 
@@ -897,36 +897,36 @@ uint8_t PAL_GetMsgDuration(PAL_CHANNEL_MASK channelMask, uint16_t length, PAL_SC
 
   Example:
     <code>
-    PAL_CHANNEL_MASK channelMask = 16;
+    PAL_PCH pch = 16;
     PAL_SCHEME scheme = PAL_PLC_DBPSK_R;
     uint8_t lessRobustMode = PAL_PLC_DQPSK;
     bool result=true;
 
-    result = PAL_HasMinimumQuality(channelMask, scheme, lessRobustMode);
+    result = PAL_HasMinimumQuality(pch, scheme, lessRobustMode);
     </code>
 
   Remarks:
     Not available for PHY Serial.
 */
-bool PAL_CheckMinimumQuality(PAL_CHANNEL_MASK channelMask, uint8_t reference, uint8_t modulation);
+bool PAL_CheckMinimumQuality(PAL_PCH pch, uint8_t reference, uint8_t modulation);
 
 // ****************************************************************************
 /* Function:
-    uint8_t PAL_GetLessRobustModulation(PAL_CHANNEL_MASK channelMask, uint8_t mod1, uint8_t mod2)
+    uint8_t PAL_GetLessRobustModulation(PAL_PCH pch, uint8_t mod1, uint8_t mod2)
 
   Summary:
     Get less robust modulation scheme.
 
   Description:
     This routine is used to get less robust modulation scheme for a selected
-    channelMask.
+    pch.
 
   Precondition:
     The PAL_Initialize function should have been called before calling this
     function.
 
   Parameters:
-    channelMask     Physical channel mask used
+    pch             Physical channel used
     mod1            Modulation 1 to compare
     mod2            Modulation 2 to compare
 
@@ -935,18 +935,18 @@ bool PAL_CheckMinimumQuality(PAL_CHANNEL_MASK channelMask, uint8_t reference, ui
 
   Example:
     <code>
-    PAL_CHANNEL_MASK channelMask=PAL_PLC_CHN1_MASK;
+    PAL_PCH pch=PAL_PLC_CHN1;
     uint8_t mod;
     uint8_t mod1=PAL_PLC_DBPSK_R;
     uint8_t mod2=PAL_PLC_DQPSK;
 
-    mod = PAL_GetLessRobustModulation(channelMask, mod1, mod2);
+    mod = PAL_GetLessRobustModulation(pch, mod1, mod2);
     </code>
 
   Remarks:
     Not available for PHY Serial.
 */
-uint8_t PAL_GetLessRobustModulation(PAL_CHANNEL_MASK channelMask, uint8_t mod1, uint8_t mod2);
+uint8_t PAL_GetLessRobustModulation(PAL_PCH pch, uint8_t mod1, uint8_t mod2);
 
 // DOM-IGNORE-BEGIN
 #ifdef __cplusplus  // Provide C++ Compatibility

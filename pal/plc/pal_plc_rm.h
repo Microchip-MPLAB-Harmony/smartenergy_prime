@@ -67,7 +67,7 @@ uint8_t PAL_PLC_RM_GetLqi(int16_t rssi);
 uint8_t PAL_PLC_RM_GetLessRobustModulation(PAL_SCHEME mod1, PAL_SCHEME mod2);
 bool PAL_PLC_RM_CheckMinimumQuality(PAL_SCHEME reference, PAL_SCHEME modulation);
 void PAL_PLC_RM_GetRobustModulation(void *indObj, uint16_t *pBitRate, 
-                                    PAL_SCHEME *pModulation, DRV_PLC_PHY_CHANNEL channel);
+                                    PAL_SCHEME *pModulation, PAL_PCH pch);
 
 // DOM-IGNORE-BEGIN
 #ifdef __cplusplus  // Provide C++ Compatibility

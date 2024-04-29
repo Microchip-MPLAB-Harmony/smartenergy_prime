@@ -61,7 +61,9 @@ Microchip or any third party.
 #include "pal_plc.h"
 #include "pal_plc_local.h"
 #include "pal_plc_rm.h"
-
+<#if PRIME_PAL_PHY_SNIFFER == true>
+#include "service/psniffer/srv_psniffer.h"
+</#if>
 #include "peripheral/trng/plib_trng.h"
 
 <#assign PAL_PLC_COUP11 = false>
@@ -153,40 +155,40 @@ static const uint32_t palPlcTimeChirpHeader[4] = {
 // Section: File Scope Functions
 // *****************************************************************************
 // *****************************************************************************
-static uint16_t lPAL_PLC_GetChannelMask(uint8_t channel)
+static PAL_PCH lPAL_PLC_GetPCH(uint8_t channel)
 {
-    PAL_CHANNEL_MASK channelMask;
+    PAL_PCH pch;
 
-    if (channel <= 8) {
-        channelMask = 1 << (channel - 1); /* Single channel */
-    } else  {
-        channelMask = 3 << (channel - 9); /* Double channel */
+    if (channel <= 8) 
+    {
+        pch = (PAL_PCH)(1 << (channel - 1)); /* Single channel */
+    } 
+    else  
+    {
+        pch = (PAL_PCH)(3 << (channel - 9)); /* Double channel */
     }
 
-    return channelMask;
+    return pch;
 }
 
-static uint8_t lPAL_PLC_GetChannelNumber(PAL_CHANNEL_MASK channelMask)
+static uint8_t lPAL_PLC_GetChannelNumber(PAL_PCH pch)
 {
-    uint8_t plcChannel;
+    uint8_t channel = 1;
 
-    if (channelMask == 0) {
-        return 0;
+    if ((pch % 3) == 0)
+    {
+        // double channel
+        pch /= 3;
+        channel += 8;
     }
 
-    plcChannel = 1;
-    while ((channelMask & 0x0001) == 0) {
-        channelMask >>= 1;
-        plcChannel++;
+    while ((pch & 0x0001) == 0) 
+    {
+        pch >>= 1;
+        channel++;
     }
 
-    channelMask &= 0x03;
-    /* Double channel, we must add 8 */
-    if (channelMask == 3) {
-        plcChannel += 8;
-    }
-
-    return plcChannel;
+    return channel;
 }
 
 static void lPAL_PLC_SetTxContinuousMode(uint8_t txMode)
@@ -302,32 +304,34 @@ __STATIC_INLINE void lPAL_PLC_TimerSyncUpdate(void)
     syncTimerRelFreq = (uint32_t)DIV_ROUND((uint64_t)delayHost << 24, delayPlc);
 
     /* Check if relative frequency is consistent, otherwise timer read is wrong */
-    if ((syncTimerRelFreq >= SYNC_TIMER_REL_FREQ_MIN) && (syncTimerRelFreq <= SYNC_TIMER_REL_FREQ_MAX)) {
+    if ((syncTimerRelFreq >= SYNC_TIMER_REL_FREQ_MIN) && (syncTimerRelFreq <= SYNC_TIMER_REL_FREQ_MAX)) 
+    {
         /* Update relative frequency and references */
         palPlcData.syncTimerRelFreq = syncTimerRelFreq;
         palPlcData.timeRefHost = timeHost;
         palPlcData.timeRefPlc = timePlc;
 
-        switch (palPlcData.syncDelay) {
-        case 0:
-            /* Next sync after 50 ms (5 us deviation with 100 PPM) */
-            palPlcData.syncDelay = 50000;
-            break;
+        switch (palPlcData.syncDelay) 
+        {
+            case 0:
+                /* Next sync after 50 ms (5 us deviation with 100 PPM) */
+                palPlcData.syncDelay = 50000;
+                break;
 
-        case 50000:
-            /* Next sync after 250 ms (5 us deviation with 20 PPM) */
-            palPlcData.syncDelay = 250000;
-            break;
+            case 50000:
+                /* Next sync after 250 ms (5 us deviation with 20 PPM) */
+                palPlcData.syncDelay = 250000;
+                break;
 
-        case 250000:
-            /* Next sync after 1 second (5 us deviation with 5 PPM) */
-            palPlcData.syncDelay = 1000000;
-            break;
+            case 250000:
+                /* Next sync after 1 second (5 us deviation with 5 PPM) */
+                palPlcData.syncDelay = 1000000;
+                break;
 
-        default:
-            /* Next sync after 5 seconds (5 us deviation with 1 PPM) */
-            palPlcData.syncDelay = 5000000;
-            break;
+            default:
+                /* Next sync after 5 seconds (5 us deviation with 1 PPM) */
+                palPlcData.syncDelay = 5000000;
+                break;
         }
 
         /* Program next interrupt */
@@ -416,6 +420,11 @@ static void lPAL_PLC_SetTxRxChannel(DRV_PLC_PHY_CHANNEL channel)
         palPlcData.plcPIB.pData = &impedance;
         DRV_PLC_PHY_PIBSet(palPlcData.drvPhyHandle, &palPlcData.plcPIB);
     }
+
+</#if>
+<#if PRIME_PAL_PHY_SNIFFER == true>
+    SRV_PSNIFFER_SetPLCChannel(channel);
+
 </#if>
 }
 
@@ -424,19 +433,19 @@ static void lPAL_PLC_SetTxRxChannel(DRV_PLC_PHY_CHANNEL channel)
 // Section: Callback Functions
 // *****************************************************************************
 // *****************************************************************************
-static void lPAL_PLC_PLC_DataCfmCb(DRV_PLC_PHY_TRANSMISSION_CFM_OBJ *cfmObj, uintptr_t context)
+static void lPAL_PLC_PLC_DataCfmCb(DRV_PLC_PHY_TRANSMISSION_CFM_OBJ *pCfmObj, uintptr_t context)
 {
     /* Avoid warning */
     (void)context;
 
-    if (cfmObj->result == DRV_PLC_PHY_TX_RESULT_TIMEOUT)
+    if (pCfmObj->result == DRV_PLC_PHY_TX_RESULT_TIMEOUT)
     {
         lPAL_PLC_TimerSyncInitialize();
     }
 
     if (palPlcData.status == PAL_PLC_STATUS_DETECT_IMPEDANCE)
     {
-        palPlcData.detectImpedanceResult = cfmObj->result;
+        palPlcData.detectImpedanceResult = pCfmObj->result;
         return;
     }
 
@@ -445,24 +454,24 @@ static void lPAL_PLC_PLC_DataCfmCb(DRV_PLC_PHY_TRANSMISSION_CFM_OBJ *cfmObj, uin
         PAL_MSG_CONFIRM_DATA dataCfm;
         uint8_t id;
 
-        dataCfm.txTime = lPAL_PLC_GetHostTime(cfmObj->timeIni);
-        dataCfm.rmsCalc = (uint16_t)cfmObj->rmsCalc;
-        dataCfm.channelMask = lPAL_PLC_GetChannelMask(palPlcData.channel);
-        dataCfm.frameType = (uint8_t)cfmObj->frameType;
+        dataCfm.txTime = lPAL_PLC_GetHostTime(pCfmObj->timeIni);
+        dataCfm.rmsCalc = (uint16_t)pCfmObj->rmsCalc;
+        dataCfm.pch = lPAL_PLC_GetPCH(palPlcData.channel);
+        dataCfm.frameType = (uint8_t)pCfmObj->frameType;
 
-        switch (cfmObj->result)
+        switch (pCfmObj->result)
         {
             case DRV_PLC_PHY_TX_RESULT_BUSY_CH:
             case DRV_PLC_PHY_TX_RESULT_BUSY_RX:
                 dataCfm.result = (uint8_t)PAL_TX_RESULT_BUSY_CH;
                 break;
             default:
-                dataCfm.result = (uint8_t)cfmObj->result;
+                dataCfm.result = (uint8_t)pCfmObj->result;
                 break;
         }
 
         /* PLC Reset management */
-        if (cfmObj->result == DRV_PLC_PHY_TX_RESULT_NO_TX)
+        if (pCfmObj->result == DRV_PLC_PHY_TX_RESULT_NO_TX)
         {
             /* Reset indication of buffers in use */
             for (id = 0; id < PAL_PLC_TX_NUM_BUFFERS; id++)
@@ -479,7 +488,7 @@ static void lPAL_PLC_PLC_DataCfmCb(DRV_PLC_PHY_TRANSMISSION_CFM_OBJ *cfmObj, uin
         {
             for (id = 0; id < PAL_PLC_TX_NUM_BUFFERS; id++)
             {
-                if (palPlcData.bufId[id] && (cfmObj->bufferId == id))
+                if (palPlcData.bufId[id] && (pCfmObj->bufferId == id))
                 {
                     dataCfm.bufId = id;
                     palPlcData.bufId[id] = false;
@@ -489,9 +498,27 @@ static void lPAL_PLC_PLC_DataCfmCb(DRV_PLC_PHY_TRANSMISSION_CFM_OBJ *cfmObj, uin
             }
         }
     }
+
+<#if PRIME_PAL_PHY_SNIFFER == true>
+    if (palPlcData.snifferCallback)
+    {
+        size_t dataLength;
+
+        palPlcData.plcPIB.id = PLC_ID_TX_PAY_SYMBOLS;
+        palPlcData.plcPIB.length = 2;
+        DRV_PLC_PHY_PIBGet(palPlcData.drvPhyHandle, &palPlcData.plcPIB);
+        
+        SRV_PSNIFFER_SetTxPayloadSymbols(*(uint16_t *)palPlcData.plcPIB.pData);
+
+        dataLength = SRV_PSNIFFER_SerialCfmMessage(palPlcData.snifferData, pCfmObj);
+
+        palPlcData.snifferCallback(palPlcData.snifferData, dataLength);
+    }
+
+</#if>
 }
 
-static void lPAL_PLC_PLC_DataIndCb(DRV_PLC_PHY_RECEPTION_OBJ *indObj, uintptr_t context)
+static void lPAL_PLC_PLC_DataIndCb(DRV_PLC_PHY_RECEPTION_OBJ *pIndObj, uintptr_t context)
 {
     PAL_MSG_INDICATION_DATA dataInd;
 
@@ -499,44 +526,62 @@ static void lPAL_PLC_PLC_DataIndCb(DRV_PLC_PHY_RECEPTION_OBJ *indObj, uintptr_t 
     (void)context;
 
     /* Store Rx parameters */
-    palPlcData.rxParameters.evmHeaderAcum = indObj->evmHeaderAcum;
-    palPlcData.rxParameters.evmPayloadAcum = indObj->evmPayloadAcum;
-    palPlcData.rxParameters.rxTime = indObj->timeIni;
-    palPlcData.rxParameters.evmHeader = indObj->evmHeader;
-    palPlcData.rxParameters.evmPayload = indObj->evmPayload;
-    palPlcData.rxParameters.dataLen = indObj->dataLength;
-    palPlcData.rxParameters.scheme = (uint8_t)indObj->scheme;
-    palPlcData.rxParameters.modType = (uint8_t)indObj->frameType;
-    palPlcData.rxParameters.headerType = (uint8_t)indObj->headerType;
-    palPlcData.rxParameters.rssiAvg = indObj->rssiAvg;
-    palPlcData.rxParameters.cinrAvg = indObj->cinrAvg;
-    palPlcData.rxParameters.cinrMin = indObj->cinrMin;
-    palPlcData.rxParameters.berSoft = indObj->berSoftAvg;
-    palPlcData.rxParameters.berSoftMax = indObj->berSoftMax;
-    palPlcData.rxParameters.narBandPercent = indObj->narBandPercent;
-    palPlcData.rxParameters.impPercent = indObj->impNoisePercent;
+    palPlcData.rxParameters.evmHeaderAcum = pIndObj->evmHeaderAcum;
+    palPlcData.rxParameters.evmPayloadAcum = pIndObj->evmPayloadAcum;
+    palPlcData.rxParameters.rxTime = pIndObj->timeIni;
+    palPlcData.rxParameters.evmHeader = pIndObj->evmHeader;
+    palPlcData.rxParameters.evmPayload = pIndObj->evmPayload;
+    palPlcData.rxParameters.dataLen = pIndObj->dataLength;
+    palPlcData.rxParameters.scheme = (uint8_t)pIndObj->scheme;
+    palPlcData.rxParameters.modType = (uint8_t)pIndObj->frameType;
+    palPlcData.rxParameters.headerType = (uint8_t)pIndObj->headerType;
+    palPlcData.rxParameters.rssiAvg = pIndObj->rssiAvg;
+    palPlcData.rxParameters.cinrAvg = pIndObj->cinrAvg;
+    palPlcData.rxParameters.cinrMin = pIndObj->cinrMin;
+    palPlcData.rxParameters.berSoft = pIndObj->berSoftAvg;
+    palPlcData.rxParameters.berSoftMax = pIndObj->berSoftMax;
+    palPlcData.rxParameters.narBandPercent = pIndObj->narBandPercent;
+    palPlcData.rxParameters.impPercent = pIndObj->impNoisePercent;
 
     /* Fill dataInd */
-    dataInd.pData = indObj->pReceivedData;
-    dataInd.rxTime = lPAL_PLC_GetHostTime(indObj->timeIni);
-    dataInd.dataLength = indObj->dataLength;
-    dataInd.channelMask = lPAL_PLC_GetChannelMask(palPlcData.channel);
-    PAL_PLC_RM_GetRobustModulation(indObj, &dataInd.estimatedBitrate, &dataInd.lessRobustMod, dataInd.channelMask);
-    dataInd.rssi = indObj->rssiAvg;
+    dataInd.pData = pIndObj->pReceivedData;
+    dataInd.rxTime = lPAL_PLC_GetHostTime(pIndObj->timeIni);
+    dataInd.dataLength = pIndObj->dataLength;
+    dataInd.pch = lPAL_PLC_GetPCH(palPlcData.channel);
+    PAL_PLC_RM_GetRobustModulation(pIndObj, &dataInd.estimatedBitrate, &dataInd.lessRobustMod, dataInd.pch);
+    dataInd.rssi = pIndObj->rssiAvg;
     dataInd.bufId = 0;
-    dataInd.scheme = (uint8_t)indObj->scheme;
-    dataInd.frameType = (uint8_t)indObj->frameType;
-    dataInd.headerType = (uint8_t)indObj->headerType;
-    dataInd.lqi = PAL_PLC_RM_GetLqi(indObj->cinrAvg);
+    dataInd.scheme = (uint8_t)pIndObj->scheme;
+    dataInd.frameType = (uint8_t)pIndObj->frameType;
+    dataInd.headerType = (uint8_t)pIndObj->headerType;
+    dataInd.lqi = PAL_PLC_RM_GetLqi(pIndObj->cinrAvg);
 
     /* Store last values of some fields */
-    palPlcData.lastRSSIAvg = indObj->rssiAvg;
-    palPlcData.lastCINRMin = indObj->cinrMin;
+    palPlcData.lastRSSIAvg = pIndObj->rssiAvg;
+    palPlcData.lastCINRMin = pIndObj->cinrMin;
 
     if (palPlcData.plcCallbacks.dataIndication != NULL)
     {
         palPlcData.plcCallbacks.dataIndication(&dataInd);
     }
+
+<#if PRIME_PAL_PHY_SNIFFER == true>
+    if (palPlcData.snifferCallback)
+    {
+        size_t length;
+
+        palPlcData.plcPIB.id = PLC_ID_RX_PAY_SYMBOLS;
+        palPlcData.plcPIB.length = 2;
+        DRV_PLC_PHY_PIBGet(palPlcData.drvPhyHandle, &palPlcData.plcPIB);
+
+        SRV_PSNIFFER_SetRxPayloadSymbols(*(uint16_t *)palPlcData.plcPIB.pData);
+
+        length = SRV_PSNIFFER_SerialRxMessage(palPlcData.snifferData, pIndObj);
+
+        palPlcData.snifferCallback(palPlcData.snifferData, length);
+    }
+
+</#if>
 }
 
 <#if PRIME_PAL_PLC_PVDD_MONITOR == true>
@@ -817,6 +862,16 @@ uint8_t PAL_PLC_DataRequest(PAL_MSG_REQUEST_DATA *pMessageData)
         return PAL_CFG_INVALID_INPUT;
     }
 
+    /* Adapt Timer mode */
+    if (pMessageData->timeMode == TX_MODE_ABSOLUTE) 
+    {
+        palPlcData.phyTxObj.timeIni = lPAL_PLC_GetPlcTime(pMessageData->timeDelay);
+    }
+    else
+    {
+        palPlcData.phyTxObj.timeIni = pMessageData->timeDelay;
+    }
+
     palPlcData.phyTxObj.dataLength = pMessageData->dataLength;
     palPlcData.phyTxObj.mode = pMessageData->timeMode;
     palPlcData.phyTxObj.attenuation = palPlcData.palAttenuation + pMessageData->attLevel;
@@ -828,25 +883,19 @@ uint8_t PAL_PLC_DataRequest(PAL_MSG_REQUEST_DATA *pMessageData)
     palPlcData.phyTxObj.frameType = pMessageData->frameType;
     palPlcData.phyTxObj.pTransmitData = pMessageData->pData;
 
-    /* Adapt Timer mode */
-    if (pMessageData->timeMode == TX_MODE_ABSOLUTE) 
-    {
-        palPlcData.phyTxObj.timeIni = lPAL_PLC_GetPlcTime(pMessageData->timeDelay);
-    }
-    else
-    {
-        palPlcData.phyTxObj.timeIni = pMessageData->timeDelay;
-    }
+<#if PRIME_PAL_PHY_SNIFFER == true>
+    SRV_PSNIFFER_SetTxMessage(&palPlcData.phyTxObj);
 
+</#if>
     DRV_PLC_PHY_TxRequest(palPlcData.drvPhyHandle, &palPlcData.phyTxObj);
 
     return PAL_CFG_SUCCESS;
 }
 
-void PAL_PLC_ProgramChannelSwitch(uint32_t timeSync, PAL_CHANNEL_MASK channelMask, uint8_t timeMode)
+void PAL_PLC_ProgramChannelSwitch(uint32_t timeSync, PAL_PCH pch, uint8_t timeMode)
 {
     (void)timeSync;
-    (void)channelMask;
+    (void)pch;
     (void)timeMode;
 }
 
@@ -989,18 +1038,18 @@ uint8_t PAL_PLC_GetNL(uint8_t *pNoise)
     return(PAL_CFG_SUCCESS);
 }
 
-uint8_t PAL_PLC_GetChannel(PAL_CHANNEL_MASK *pChannelMask)
+uint8_t PAL_PLC_GetChannel(PAL_PCH *pPch)
 {
     if (palPlcData.status != PAL_PLC_STATUS_READY)
     {
         return PAL_CFG_INVALID_INPUT;
     }
 
-    *pChannelMask = lPAL_PLC_GetChannelMask(palPlcData.channel);
+    *pPch = lPAL_PLC_GetPCH(palPlcData.channel);
     return(PAL_CFG_SUCCESS);
 }
 
-uint8_t PAL_PLC_SetChannel(PAL_CHANNEL_MASK channelMask)
+uint8_t PAL_PLC_SetChannel(PAL_PCH pch)
 {
     uint8_t channel;
 
@@ -1009,7 +1058,7 @@ uint8_t PAL_PLC_SetChannel(PAL_CHANNEL_MASK channelMask)
         return PAL_CFG_INVALID_INPUT;
     }
 
-    channel = lPAL_PLC_GetChannelNumber(channelMask);
+    channel = lPAL_PLC_GetChannelNumber(pch);
 
     lPAL_PLC_SetTxRxChannel(channel);
     
@@ -1380,3 +1429,12 @@ uint8_t PAL_PLC_GetMsgDuration(uint16_t length, PAL_SCHEME scheme, uint8_t frame
 
     return(PAL_CFG_SUCCESS);
 }
+
+<#if PRIME_PAL_PHY_SNIFFER == true>
+void PAL_PLC_USISnifferCallbackRegister(SRV_USI_HANDLE usiHandler, PAL_USI_SNIFFER_CB callback)
+{
+    palPlcData.usiHandler = usiHandler;
+    palPlcData.snifferCallback = callback;
+}
+
+</#if>

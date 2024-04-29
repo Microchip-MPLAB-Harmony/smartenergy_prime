@@ -266,7 +266,7 @@ bool PAL_PLC_RM_CheckMinimumQuality(PAL_SCHEME reference, PAL_SCHEME modulation)
 	}
 }
 
-void PAL_PLC_RM_GetRobustModulation(void *indObj, uint16_t *pBitRate, PAL_SCHEME *pModulation, DRV_PLC_PHY_CHANNEL channelMask)
+void PAL_PLC_RM_GetRobustModulation(void *indObj, uint16_t *pBitRate, PAL_SCHEME *pModulation, PAL_PCH pch)
 {
 	uint64_t evmAccumulated;
 	uint32_t evm;
@@ -309,7 +309,7 @@ void PAL_PLC_RM_GetRobustModulation(void *indObj, uint16_t *pBitRate, PAL_SCHEME
 	}
 
 	*pModulation = bestModulation;
-	if (channelMask >= PAL_PLC_CHN1_CHN2MASK) 
+	if (pch >= PAL_PLC_CHN1_CHN2) 
 	{
 		*pBitRate = palPlcRmBandwidth[bestModulation] << 1;
 	}

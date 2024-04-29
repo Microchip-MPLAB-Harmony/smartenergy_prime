@@ -137,12 +137,12 @@ void PAL_RF_RM_SetScheme(PAL_SCHEME scheme)
     }
 }
 
-void PAL_RF_RM_GetRobustModulation(void *indObj, uint16_t *pBitRate, PAL_SCHEME *pModulation, PAL_CHANNEL_MASK channelMask)
+void PAL_RF_RM_GetRobustModulation(void *indObj, uint16_t *pBitRate, PAL_SCHEME *pModulation, PAL_PCH pch)
 {
     DRV_RF215_RX_INDICATION_OBJ *pIndObj;
     PAL_SCHEME bestScheme = PAL_SCHEME_RF;
 
-    (void)channelMask;
+    (void)pch;
 
     pIndObj = (DRV_RF215_RX_INDICATION_OBJ *)indObj;
 

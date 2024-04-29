@@ -51,8 +51,13 @@ Microchip or any third party.
 #include "service/pcoup/srv_pcoup.h"
 #include "pal_types.h"
 
-#define PAL_TX_NUM_BUFFERS          2
+#define PAL_TX_NUM_BUFFERS             2
 
+<#if PRIME_PAL_PHY_SNIFFER == true>
+#define PAL_SNIFFER_DATA_MAX_SIZE      512
+typedef void (*PAL_USI_SNIFFER_CB)(uint8_t *pData, uint16_t length);
+
+</#if>
 // *****************************************************************************
 // *****************************************************************************
 // Section: Data Types
@@ -191,8 +196,6 @@ typedef struct
     bool networkDetected;
 
     uint16_t channelList;
-    
-
 
     uint8_t statsErrorUnexpectedKey;
 
@@ -212,6 +215,14 @@ typedef struct
 
     bool exceptionPending;
 
+<#if PRIME_PAL_PHY_SNIFFER == true>
+    PAL_USI_SNIFFER_CB snifferCallback;
+
+    SRV_USI_HANDLE usiHandler;
+
+    uint8_t snifferData[PAL_SNIFFER_DATA_MAX_SIZE];
+
+</#if>
 } PAL_PLC_DATA;
 
 #endif // #ifndef PAL_PLC_LOCAL_H

@@ -46,6 +46,11 @@ def enablePalPlc(palComponent, value):
     primePalPlcRmHdrFile.setEnabled(value)
     palComponent.setDependencyEnabled("primePalPlc", value)
 
+    if value & palComponent.getDependencyEnabled("primePalUSI"):
+        Database.activateComponents(["srv_psniffer"])
+    else:
+        Database.deactivateComponents(["srv_psniffer"]) 
+
 def enablePalRf(palComponent, value):
     primePalRfSrcFile.setEnabled(value)
     primePalRfHdrFile.setEnabled(value)
@@ -54,11 +59,39 @@ def enablePalRf(palComponent, value):
     primePalRfRmHdrFile.setEnabled(value)
     palComponent.setDependencyEnabled("primePalRf", value)
 
+    if value & palComponent.getDependencyEnabled("primePalUSI"):
+        Database.activateComponents(["srv_rsniffer"])
+    else:
+        Database.deactivateComponents(["srv_rsniffer"]) 
+
 def enablePalSerial(palComponent, value):
     primePalSerialSrcFile.setEnabled(value)
     primePalSerialHdrFile.setEnabled(value)
     primePalSerialLocalHdrFile.setEnabled(value)
     palComponent.setDependencyEnabled("primePalSerial", value)
+
+    if value & palComponent.getDependencyEnabled("primePalUSI"):
+        Database.activateComponents(["srv_psniffer"])
+    else:
+        Database.deactivateComponents(["srv_psniffer"]) 
+
+def enablePhySniffer(palComponent, value):
+    palComponent.setDependencyEnabled("primePalUSI", value)
+    
+    if value and palComponent.getDependencyEnabled("primePalPlc"):
+        Database.activateComponents(["srv_psniffer"])
+    else:
+        Database.deactivateComponents(["srv_psniffer"]) 
+        
+    if value & palComponent.getDependencyEnabled("primePalRf"):
+        Database.activateComponents(["srv_rsniffer"])
+    else:
+        Database.deactivateComponents(["srv_rsniffer"]) 
+        
+    if value & palComponent.getDependencyEnabled("primePalSerial"):
+        Database.activateComponents(["srv_psniffer"])
+    else:
+        Database.deactivateComponents(["srv_psniffer"]) 
 
 def showUSISymbol(symbol, event):
     symbol.setVisible(event["value"])
@@ -80,21 +113,20 @@ def updatePalDependencies(symbol, event):
         enablePalRf(localComponent, event["value"])
     elif (idSymbol == "PRIME_PAL_SERIAL_EN"):
         enablePalSerial(localComponent, event["value"])
+    elif (idSymbol == "PRIME_PAL_PHY_SNIFFER"):
+        enablePhySniffer(localComponent, event["value"])
 
 def freqHopGetChannelList(rangeValues):
     channels = []
     rangeSplit = rangeValues.split(",")
-    print("CHRIS dbg -> rangeSplit: {}".format(rangeSplit))
     for channel in rangeSplit:
         subRangeSplit = channel.split("-")
-        print("CHRIS dbg -> subRangeSplit: {}".format(subRangeSplit))
         if len(subRangeSplit) == 1:
             channels.append(int(channel))
         else:
             rangeIni = int(subRangeSplit[0])
             rangeEnd = int(subRangeSplit[1])
             channelRange = range(rangeIni, rangeEnd + 1)
-            print("CHRIS dbg -> channelRange: {}".format(channelRange))
             for chnInRange in channelRange:
                 channels.append(chnInRange)
 
@@ -102,21 +134,25 @@ def freqHopGetChannelList(rangeValues):
     return channelList
 
 def freqHopUpdateRanges(symbol, event):
-    channelList = freqHopGetChannelList(event["value"])
-    Database.setSymbolValue("primePal", "PRIME_PAL_RF_FREQ_HOPPING_RANGE_VALUES", channelList)
-    print("CHRIS dbg -> freqHopUpdateRanges: {}".format(channelList))
+    rangeValues = event["value"]
+    if (rangeValues):
+        channelList = freqHopGetChannelList(rangeValues)
+        Database.setSymbolValue("primePal", "PRIME_PAL_RF_FREQ_HOPPING_RANGE_VALUES", channelList)
+        print("CHRIS dbg -> freqHopUpdateRanges: {}".format(channelList))
             
-
 def freqHopUpdateBcnRanges(symbol, event):
-    channelList = freqHopGetChannelList(event["value"])
-    Database.setSymbolValue("primePal", "PRIME_PAL_RF_FREQ_HOPPING_BCN_RANGE_VALUES", channelList)
-    print("CHRIS dbg -> freqHopUpdateBcnRanges: {}".format(channelList))
+    rangeValues = event["value"]
+    if (rangeValues):
+        channelList = freqHopGetChannelList(rangeValues)
+        Database.setSymbolValue("primePal", "PRIME_PAL_RF_FREQ_HOPPING_BCN_RANGE_VALUES", channelList)
+        print("CHRIS dbg -> freqHopUpdateBcnRanges: {}".format(channelList))
 
 def instantiateComponent(primePalComponent):
     Log.writeInfoMessage("Loading PAL for PRIME")
 
     primePalComponent.setDependencyEnabled("primePalRf", False)
     primePalComponent.setDependencyEnabled("primePalSerial", False)
+    primePalComponent.setDependencyEnabled("primePalUSI", False)
     
     # Configure PRIME PAL
     primePalInterfaces = primePalComponent.createMenuSymbol("PRIME_PAL_INTERFACES", None)
@@ -182,20 +218,13 @@ def instantiateComponent(primePalComponent):
     primePalSerial.setLabel("Enable Serial PHY interface")
     primePalSerial.setDefaultValue(False)
     primePalSerial.setHelp(prime_pal_helpkeyword)
-    
-    primePalDummy = primePalComponent.createMenuSymbol("PRIME_PAL_DUMMY", None)
-    primePalDummy.setLabel("")
-    primePalDummy.setDescription("")
-    primePalDummy.setVisible(False)
-    primePalDummy.setHelp(prime_pal_helpkeyword)
-    primePalDummy.setDependencies(updatePalDependencies, ["PRIME_PAL_PLC_EN", "PRIME_PAL_RF_EN", "PRIME_PAL_SERIAL_EN"])
 
     primePalPhySniffer = primePalComponent.createBooleanSymbol("PRIME_PAL_PHY_SNIFFER", None)
     primePalPhySniffer.setLabel("Enable PRIME PHY sniffer")
     primePalPhySniffer.setDefaultValue(False)
     primePalPhySniffer.setHelp(prime_pal_helpkeyword)
 
-    primePalPlcUSIInstance = primePalComponent.createIntegerSymbol("PRIME_PAL_PLC_USI_INSTANCE", primePalPhySniffer)
+    primePalPlcUSIInstance = primePalComponent.createIntegerSymbol("PRIME_PAL_PHY_SNIFFER_USI_INSTANCE", primePalPhySniffer)
     primePalPlcUSIInstance.setLabel("USI Instance")
     primePalPlcUSIInstance.setDefaultValue(0)
     primePalPlcUSIInstance.setMax(0)
@@ -203,6 +232,13 @@ def instantiateComponent(primePalComponent):
     primePalPlcUSIInstance.setVisible(False)
     primePalPlcUSIInstance.setHelp(prime_pal_helpkeyword)
     primePalPlcUSIInstance.setDependencies(showUSISymbol, ["PRIME_PAL_PHY_SNIFFER"])
+
+    primePalDummy = primePalComponent.createMenuSymbol("PRIME_PAL_DUMMY", None)
+    primePalDummy.setLabel("")
+    primePalDummy.setDescription("")
+    primePalDummy.setVisible(False)
+    primePalDummy.setHelp(prime_pal_helpkeyword)
+    primePalDummy.setDependencies(updatePalDependencies, ["PRIME_PAL_PLC_EN", "PRIME_PAL_RF_EN", "PRIME_PAL_SERIAL_EN", "PRIME_PAL_PHY_SNIFFER"])
     
     ############################################################################
     #### Code Generation ####
@@ -246,11 +282,12 @@ def instantiateComponent(primePalComponent):
 
     global primePalPlcHdrFile
     primePalPlcHdrFile = primePalComponent.createFileSymbol("PRIME_PAL_PLC_HEADER", None)
-    primePalPlcHdrFile.setSourcePath("pal/plc/pal_plc.h")
+    primePalPlcHdrFile.setSourcePath("pal/plc/pal_plc.h.ftl")
     primePalPlcHdrFile.setOutputName("pal_plc.h")
     primePalPlcHdrFile.setDestPath("stack/pal")
     primePalPlcHdrFile.setProjectPath("config/" + configName + "/stack/pal")
     primePalPlcHdrFile.setType("SOURCE")
+    primePalPlcHdrFile.setMarkup(True)
 
     global primePalPlcLocalHdrFile
     primePalPlcLocalHdrFile = primePalComponent.createFileSymbol("PRIME_PAL_PLC_LOCAL_HEADER", None)
@@ -290,12 +327,13 @@ def instantiateComponent(primePalComponent):
 
     global primePalRfHdrFile
     primePalRfHdrFile = primePalComponent.createFileSymbol("PRIME_PAL_RF_HEADER", None)
-    primePalRfHdrFile.setSourcePath("pal/rf/pal_rf.h")
+    primePalRfHdrFile.setSourcePath("pal/rf/pal_rf.h.ftl")
     primePalRfHdrFile.setOutputName("pal_rf.h")
     primePalRfHdrFile.setDestPath("stack/pal")
     primePalRfHdrFile.setProjectPath("config/" + configName + "/stack/pal")
     primePalRfHdrFile.setType("SOURCE")
     primePalRfHdrFile.setEnabled(False)
+    primePalRfHdrFile.setMarkup(True)
 
     global primePalRfLocalHdrFile
     primePalRfLocalHdrFile = primePalComponent.createFileSymbol("PRIME_PAL_RF_LOCAL_HEADER", None)

@@ -66,7 +66,7 @@ void PAL_RF_DataConfirmCallbackRegister(PAL_DATA_CONFIRM_CB callback);
 void PAL_RF_DataIndicationCallbackRegister(PAL_DATA_INDICATION_CB callback);
 void PAL_RF_ChannelSwitchCallbackRegister(PAL_SWITCH_RF_CH_CB callback);
 uint8_t PAL_RF_DataRequest(PAL_MSG_REQUEST_DATA *requestMsg);
-void PAL_RF_ProgramChannelSwitch(uint32_t timeSync, PAL_CHANNEL_MASK channelMask, uint8_t timeMode);
+void PAL_RF_ProgramChannelSwitch(uint32_t timeSync, PAL_PCH pch, uint8_t timeMode);
 uint8_t PAL_RF_GetSNR(uint8_t *snr, uint8_t qt);
 uint8_t PAL_RF_GetZCT(uint32_t *zct);
 uint8_t PAL_RF_GetTimer(uint32_t *timer);
@@ -76,12 +76,15 @@ uint8_t PAL_RF_GetNL(uint8_t *noise);
 uint8_t PAL_RF_GetAGC(uint8_t *pMode, uint8_t *pGain);
 uint8_t PAL_RF_SetAGC(uint8_t mode, uint8_t gain);
 uint8_t PAL_RF_GetCCA(uint8_t *channelState);
-uint8_t PAL_RF_GetChannel(PAL_CHANNEL_MASK *pChannelMask);
-uint8_t PAL_RF_SetChannel(PAL_CHANNEL_MASK channelMask);
+uint8_t PAL_RF_GetChannel(PAL_PCH *pPch);
+uint8_t PAL_RF_SetChannel(PAL_PCH pch);
 uint8_t PAL_RF_GetConfiguration(uint16_t id, void *val, uint16_t len);
 uint8_t PAL_RF_SetConfiguration(uint16_t id, void *val, uint16_t len);
 uint16_t PAL_RF_GetSignalCapture(uint8_t *noiseCapture, PAL_FRAME frameType, uint32_t timeStart, uint32_t duration);
 uint8_t PAL_RF_GetMsgDuration(uint16_t msgLen, PAL_SCHEME scheme, PAL_FRAME frameType, uint32_t *duration);
+<#if PRIME_PAL_PHY_SNIFFER == true>
+void PAL_RF_USISnifferCallbackRegister(SRV_USI_HANDLE usiHandler, PAL_USI_SNIFFER_CB callback);
+</#if>
 
 #ifdef __cplusplus
 }

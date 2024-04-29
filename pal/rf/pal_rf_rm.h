@@ -69,7 +69,7 @@ bool PAL_RF_RM_CheckMinimumQuality(PAL_SCHEME reference, PAL_SCHEME modulation);
 PAL_SCHEME PAL_RF_RM_GetScheme(void);
 void PAL_RF_RM_SetScheme(PAL_SCHEME scheme);
 void PAL_RF_RM_GetRobustModulation(void *indObj, uint16_t *pBitRate, 
-                                   PAL_SCHEME *pModulation, PAL_CHANNEL_MASK channelMask);
+                                   PAL_SCHEME *pModulation, PAL_PCH pch);
 
 // DOM-IGNORE-BEGIN
 #ifdef __cplusplus  // Provide C++ Compatibility

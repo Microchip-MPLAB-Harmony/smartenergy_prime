@@ -114,14 +114,14 @@ static void lPAL_RfDataIndicationCallback(PAL_MSG_INDICATION_DATA *pData)
 }
 
 <#if PRIME_PAL_RF_FREQ_HOPPING == true>
-static void lPAL_RfCHannelSwitchCallback(PAL_CHANNEL_MASK channelMask)
+static void lPAL_RfCHannelSwitchCallback(PAL_PCH pch)
 {
     if (palData.channelSwitchCallback) {
-        palData.channelSwitchCallback(channelMask);
+        palData.channelSwitchCallback(pch);
     }
 }
-</#if>
 
+</#if>
 </#if>
 <#if PRIME_PAL_SERIAL_EN == true>
 static void lPAL_SerialDataConfirmCallback(PAL_MSG_CONFIRM_DATA *pData)
@@ -139,36 +139,44 @@ static void lPAL_SerialDataIndicationCallback(PAL_MSG_INDICATION_DATA *pData)
 }
 
 </#if>
-static PAL_INTERFACE * lPAL_GetInterface(PAL_CHANNEL_MASK channelMask)
+<#if PRIME_PAL_PHY_SNIFFER == true>
+static void lPAL_PhySnifferCallback(uint8_t *pData, uint16_t length)
+{
+    SRV_USI_Send_Message(palData.usiHandler, SRV_USI_PROT_ID_SNIF_PRIME, 
+            pData, length);
+}
+
+</#if>
+static PAL_INTERFACE * lPAL_GetInterface(PAL_PCH pch)
 {
 <#if PRIME_PAL_PLC_EN == true && PRIME_PAL_RF_EN == false && PRIME_PAL_SERIAL_EN == false>
-    (void)channelMask;
+    (void)pch;
     return (PAL_INTERFACE *)&PAL_PLC_Interface;
 <#elseif PRIME_PAL_PLC_EN == false && PRIME_PAL_RF_EN == true && PRIME_PAL_SERIAL_EN == false>
-    (void)channelMask;
+    (void)pch;
     return (PAL_INTERFACE *)&PAL_RF_Interface;
 <#elseif PRIME_PAL_PLC_EN == false && PRIME_PAL_RF_EN == false && PRIME_PAL_SERIAL_EN == true>
-    (void)channelMask;
+    (void)pch;
     return (PAL_INTERFACE *)&PAL_SERIAL_Interface;
 <#elseif PRIME_PAL_PLC_EN == false && PRIME_PAL_RF_EN == false && PRIME_PAL_SERIAL_EN == false>
     #warning PAL interface is not defined. Please, review PRIME PAL interface configuration in MCC.
 <#else>
   <#if PRIME_PAL_PLC_EN == true>
-    if (channelMask < PAL_RF_CHN)
+    if (pch < PAL_RF_CHN)
     {
         return (PAL_INTERFACE *)&PAL_PLC_Interface;
     }
 
   </#if>
   <#if PRIME_PAL_RF_EN == true>
-    if (channelMask < PAL_SERIAL_CHN)
+    if (pch < PAL_SERIAL_CHN)
     {
         return (PAL_INTERFACE *)&PAL_RF_Interface;
     }
 
   </#if>
   <#if PRIME_PAL_SERIAL_EN == true>
-    if (channelMask == PAL_SERIAL_CHN)
+    if (pch == PAL_SERIAL_CHN)
     {
         return (PAL_INTERFACE *)&PAL_SERIAL_Interface;
     }
@@ -191,6 +199,20 @@ SYS_MODULE_OBJ PAL_Initialize(const SYS_MODULE_INDEX index)
         return SYS_MODULE_OBJ_INVALID;
     }
 
+<#if PRIME_PAL_PHY_SNIFFER == true>
+    /* Open USI */
+    palData.usiHandler = SRV_USI_Open(PRIME_PAL_USI_INSTANCE);
+    if (palData.usiHandler == DRV_HANDLE_INVALID)
+    {
+        return SYS_MODULE_OBJ_INVALID;
+    }
+
+    /* Register USI callback : TBD - Tiene que recibir los comandos de Prime Sniffer?? */
+    // SRV_USI_CallbackRegister(palData.usiHandler,
+    //         SRV_USI_PROT_ID_SNIF_PRIME, _APP_UsiSnifferEventCb);
+
+
+</#if>
 <#if PRIME_PAL_PLC_EN == true>
     if (PAL_PLC_Initialize() == SYS_MODULE_OBJ_INVALID)
     {
@@ -199,6 +221,11 @@ SYS_MODULE_OBJ PAL_Initialize(const SYS_MODULE_INDEX index)
 
     PAL_PLC_DataConfirmCallbackRegister(lPAL_PlcDataConfirmCallback);
     PAL_PLC_DataIndicationCallbackRegister(lPAL_PlcDataIndicationCallback);
+
+  <#if PRIME_PAL_PHY_SNIFFER == true>
+    /* Register PLC PHY Sniffer callback */
+    PAL_PLC_USISnifferCallbackRegister(palData.usiHandler, lPAL_PhySnifferCallback);
+  </#if>
 
 </#if>
 <#if PRIME_PAL_RF_EN == true>
@@ -209,9 +236,14 @@ SYS_MODULE_OBJ PAL_Initialize(const SYS_MODULE_INDEX index)
 
     PAL_RF_DataConfirmCallbackRegister(lPAL_RfDataConfirmCallback);
     PAL_RF_DataIndicationCallbackRegister(lPAL_RfDataIndicationCallback);
-<#if PRIME_PAL_RF_FREQ_HOPPING == true>
+  <#if PRIME_PAL_RF_FREQ_HOPPING == true>
     PAL_RF_ChannelSwitchCallbackRegister(lPAL_RfCHannelSwitchCallback);
-</#if>
+  </#if>
+
+  <#if PRIME_PAL_PHY_SNIFFER == true>
+    /* Register RF PHY Sniffer callback */
+    PAL_RF_USISnifferCallbackRegister(palData.usiHandler, lPAL_PhySnifferCallback);
+  </#if>
 
 </#if>
 <#if PRIME_PAL_SERIAL_EN == true>
@@ -256,115 +288,115 @@ void PAL_CallbackRegister(PAL_CALLBACKS *pCallbacks)
 
 uint8_t PAL_DataRequest(PAL_MSG_REQUEST_DATA *pData)
 {
-    PAL_INTERFACE *palIface = lPAL_GetInterface(pData->channelMask);
+    PAL_INTERFACE *palIface = lPAL_GetInterface(pData->pch);
     return palIface->PAL_DataRequest(pData);
 }
 
-uint8_t PAL_GetSNR(PAL_CHANNEL_MASK channelMask, uint8_t *snr, uint8_t qt)
+uint8_t PAL_GetSNR(PAL_PCH pch, uint8_t *snr, uint8_t qt)
 {
-    PAL_INTERFACE *palIface = lPAL_GetInterface(channelMask);
+    PAL_INTERFACE *palIface = lPAL_GetInterface(pch);
     return palIface->PAL_GetSNR(snr, qt);
 }
 
-uint8_t PAL_GetZCT(PAL_CHANNEL_MASK channelMask, uint32_t *zct)
+uint8_t PAL_GetZCT(PAL_PCH pch, uint32_t *zct)
 {
-    PAL_INTERFACE *palIface = lPAL_GetInterface(channelMask);
+    PAL_INTERFACE *palIface = lPAL_GetInterface(pch);
     return palIface->PAL_GetZCT(zct);
 }
 
-uint8_t PAL_GetTimer(PAL_CHANNEL_MASK channelMask, uint32_t *timer)
+uint8_t PAL_GetTimer(PAL_PCH pch, uint32_t *timer)
 {
-    PAL_INTERFACE *palIface = lPAL_GetInterface(channelMask);
+    PAL_INTERFACE *palIface = lPAL_GetInterface(pch);
     return palIface->PAL_GetTimer(timer);
 }
 
-uint8_t PAL_GetTimerExtended(PAL_CHANNEL_MASK channelMask, uint64_t *timer)
+uint8_t PAL_GetTimerExtended(PAL_PCH pch, uint64_t *timer)
 {
-    PAL_INTERFACE *palIface = lPAL_GetInterface(channelMask);
+    PAL_INTERFACE *palIface = lPAL_GetInterface(pch);
     return palIface->PAL_GetTimerExtended(timer);
 }
 
-uint8_t PAL_GetCD(PAL_CHANNEL_MASK channelMask, uint8_t *cd, uint8_t *rssi, uint32_t *time, uint8_t *header)
+uint8_t PAL_GetCD(PAL_PCH pch, uint8_t *cd, uint8_t *rssi, uint32_t *time, uint8_t *header)
 {
-    PAL_INTERFACE *palIface = lPAL_GetInterface(channelMask);
+    PAL_INTERFACE *palIface = lPAL_GetInterface(pch);
     return palIface->PAL_GetCD(cd, rssi, time, header);
 }
 
-uint8_t PAL_GetNL(PAL_CHANNEL_MASK channelMask, uint8_t *noise)
+uint8_t PAL_GetNL(PAL_PCH pch, uint8_t *noise)
 {
-    PAL_INTERFACE *palIface = lPAL_GetInterface(channelMask);
+    PAL_INTERFACE *palIface = lPAL_GetInterface(pch);
     return palIface->PAL_GetNL(noise);
 }
 
-uint8_t PAL_GetAGC(PAL_CHANNEL_MASK channelMask, uint8_t *frameType, uint8_t *gain)
+uint8_t PAL_GetAGC(PAL_PCH pch, uint8_t *frameType, uint8_t *gain)
 {
-    PAL_INTERFACE *palIface = lPAL_GetInterface(channelMask);
+    PAL_INTERFACE *palIface = lPAL_GetInterface(pch);
     return palIface->PAL_GetAGC(frameType, gain);
 }
 
-uint8_t PAL_SetAGC(PAL_CHANNEL_MASK channelMask, PAL_FRAME frameType, uint8_t gain)
+uint8_t PAL_SetAGC(PAL_PCH pch, PAL_FRAME frameType, uint8_t gain)
 {
-    PAL_INTERFACE *palIface = lPAL_GetInterface(channelMask);
+    PAL_INTERFACE *palIface = lPAL_GetInterface(pch);
     return palIface->PAL_SetAGC(frameType, gain);
 }
 
-uint8_t PAL_GetCCA(PAL_CHANNEL_MASK channelMask, uint8_t *pState)
+uint8_t PAL_GetCCA(PAL_PCH pch, uint8_t *pState)
 {
-    PAL_INTERFACE *palIface = lPAL_GetInterface(channelMask);
+    PAL_INTERFACE *palIface = lPAL_GetInterface(pch);
     return palIface->PAL_GetCCA(pState);
 }
 
-uint8_t PAL_GetChannel(PAL_CHANNEL_MASK *pChannelMask, PAL_CHANNEL_MASK channelReference)
+uint8_t PAL_GetChannel(PAL_PCH *pPch, PAL_PCH channelReference)
 {
     PAL_INTERFACE *palIface = lPAL_GetInterface(channelReference);
-    return palIface->PAL_GetChannel(pChannelMask);
+    return palIface->PAL_GetChannel(pPch);
 }
 
-uint8_t PAL_SetChannel(PAL_CHANNEL_MASK channelMask)
+uint8_t PAL_SetChannel(PAL_PCH pch)
 {
-    PAL_INTERFACE *palIface = lPAL_GetInterface(channelMask);
-    return palIface->PAL_SetChannel(channelMask);
+    PAL_INTERFACE *palIface = lPAL_GetInterface(pch);
+    return palIface->PAL_SetChannel(pch);
 }
 
-void PAL_ProgramChannelSwitch(PAL_CHANNEL_MASK channelMask, uint32_t timeSync, uint8_t timeMode)
+void PAL_ProgramChannelSwitch(PAL_PCH pch, uint32_t timeSync, uint8_t timeMode)
 {
-    PAL_INTERFACE *palIface = lPAL_GetInterface(channelMask);
-    palIface->PAL_ProgramChannelSwitch(timeSync, channelMask, timeMode);
+    PAL_INTERFACE *palIface = lPAL_GetInterface(pch);
+    palIface->PAL_ProgramChannelSwitch(timeSync, pch, timeMode);
 }
 
-uint8_t PAL_GetConfiguration(PAL_CHANNEL_MASK channelMask, uint16_t id, void *val, uint16_t length)
+uint8_t PAL_GetConfiguration(PAL_PCH pch, uint16_t id, void *val, uint16_t length)
 {
-    PAL_INTERFACE *palIface = lPAL_GetInterface(channelMask);
+    PAL_INTERFACE *palIface = lPAL_GetInterface(pch);
     return palIface->PAL_GetConfiguration(id, val, length);
 }
 
-uint8_t PAL_SetConfiguration(PAL_CHANNEL_MASK channelMask, uint16_t id, void *val, uint16_t length)
+uint8_t PAL_SetConfiguration(PAL_PCH pch, uint16_t id, void *val, uint16_t length)
 {
-    PAL_INTERFACE *palIface = lPAL_GetInterface(channelMask);
+    PAL_INTERFACE *palIface = lPAL_GetInterface(pch);
     return palIface->PAL_SetConfiguration(id, val, length);
 }
 
-uint16_t PAL_GetSignalCapture(PAL_CHANNEL_MASK channelMask, uint8_t *noiseCapture, PAL_FRAME frameType, 
+uint16_t PAL_GetSignalCapture(PAL_PCH pch, uint8_t *noiseCapture, PAL_FRAME frameType, 
                               uint32_t timeStart, uint32_t duration)
 {
-    PAL_INTERFACE *palIface = lPAL_GetInterface(channelMask);
+    PAL_INTERFACE *palIface = lPAL_GetInterface(pch);
     return palIface->PAL_GetSignalCapture(noiseCapture, frameType, timeStart, duration);
 }
 
-uint8_t PAL_GetMsgDuration(PAL_CHANNEL_MASK channelMask, uint16_t length, PAL_SCHEME scheme, PAL_FRAME frameType, uint32_t *duration)
+uint8_t PAL_GetMsgDuration(PAL_PCH pch, uint16_t length, PAL_SCHEME scheme, PAL_FRAME frameType, uint32_t *duration)
 {
-    PAL_INTERFACE *palIface = lPAL_GetInterface(channelMask);
+    PAL_INTERFACE *palIface = lPAL_GetInterface(pch);
     return palIface->PAL_GetMsgDuration(length, scheme, frameType, duration);
 }
 
-bool PAL_CheckMinimumQuality(PAL_CHANNEL_MASK channelMask, uint8_t reference, uint8_t modulation)
+bool PAL_CheckMinimumQuality(PAL_PCH pch, uint8_t reference, uint8_t modulation)
 {
-    PAL_INTERFACE *palIface = lPAL_GetInterface(channelMask);
+    PAL_INTERFACE *palIface = lPAL_GetInterface(pch);
     return palIface->PAL_CheckMinimumQuality(reference, modulation);
 }
 
-uint8_t PAL_GetLessRobustModulation(PAL_CHANNEL_MASK channelMask, uint8_t mod1, uint8_t mod2)
+uint8_t PAL_GetLessRobustModulation(PAL_PCH pch, uint8_t mod1, uint8_t mod2)
 {
-    PAL_INTERFACE *palIface = lPAL_GetInterface(channelMask);
+    PAL_INTERFACE *palIface = lPAL_GetInterface(pch);
     return palIface->PAL_GetLessRobustModulation(mod1, mod2);
 }

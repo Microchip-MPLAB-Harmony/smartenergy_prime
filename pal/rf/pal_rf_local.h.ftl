@@ -64,6 +64,11 @@ Microchip or any third party.
 #define FREQ_HOP_RF_BCN_SEQUENCE           {${PRIME_PAL_RF_FREQ_HOPPING_BCN_RANGE_VALUES?string}}
 </#if>
 
+<#if PRIME_PAL_PHY_SNIFFER == true>
+#define PAL_SNIFFER_DATA_MAX_SIZE           512
+typedef void (*PAL_USI_SNIFFER_CB)(uint8_t *pData, uint16_t length);
+
+</#if>
 // *****************************************************************************
 /* RF PAL Module Status
 
@@ -121,7 +126,7 @@ typedef struct
 
     PAL_RF_TX_HANDLERS_DATA txHandleData[DRV_RF215_TX_BUFFERS_NUMBER];
 
-    PAL_CHANNEL_MASK channelMask;
+    PAL_PCH pch;
 
     uint16_t rfChannelsNumber;
 
@@ -135,6 +140,12 @@ typedef struct
     uint8_t freqHopBitsBcnSequence[RF_MAX_NUM_BYTES_CHANNELS];
 
     uint8_t freqHopCurrentChannel;
+
+</#if>
+<#if PRIME_PAL_PHY_SNIFFER == true>
+    PAL_USI_SNIFFER_CB snifferCallback;
+
+    SRV_USI_HANDLE usiHandler;
 
 </#if>
 } PAL_RF_DATA;

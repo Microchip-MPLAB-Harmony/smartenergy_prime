@@ -32,6 +32,7 @@ def loadModule():
     primePalComponent.addDependency("primePalPlc", "DRV_PLC_PHY", True, True)
     primePalComponent.addDependency("primePalRf", "DRV_RF_PHY", True, True)
     primePalComponent.addDependency("primePalSerial", "PSER", True, True)
+    primePalComponent.addDependency("primePalUSI", "USI", True, True)
     primePalComponent.setDisplayType("PRIME PAL")
 
 
