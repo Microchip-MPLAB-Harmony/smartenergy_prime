@@ -288,7 +288,7 @@ typedef enum
     PAL_ID_RF_NUM_CHANNELS,
     /* The maximum PSDU (PHY Service Data Unit) in octets */
     PAL_ID_MAX_PHY_PACKET_SIZE,
-    /* Turn around time for the SUN (Smart Utility Network) FSK PHY layer */
+    /* Turn arround time for the SUN (Smart Utility Network) FSK PHY layer */
     PAL_ID_TURNAROUND_TIME,
     /* The transmit power of the device in dBm */
     PAL_ID_PHY_TX_POWER,
@@ -473,7 +473,7 @@ typedef struct
     Callback used for confirm data transmission.
     
   Description:
-    The confirm attribute is used  to tell the MAC layer if MAC Protocol Data
+    The confirm attribute is used  to tells the MAC layer if MAC Protocol Data
 	Unit (MPDU) request has been successfully transmitted.
 
   Remarks:
@@ -1402,10 +1402,8 @@ bool PAL_HasMinimumQuality(uint16_t pch, uint8_t scheme, uint8_t lessRobustMode)
 */
 uint8_t PAL_GetLessRobustModulation(uint16_t pch, uint8_t mod1, uint8_t mod2);
 
-//DOM-IGNORE-BEGIN
 #ifdef __cplusplus
 }
 #endif
-//DOM-IGNORE-END
 
 #endif /* PAL_H_INCLUDED */

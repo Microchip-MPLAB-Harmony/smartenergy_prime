@@ -105,7 +105,7 @@ static DRV_PHY_SERIAL_INIT phySerialInitData = {0};
 // Section: File Scope Functions
 // *****************************************************************************
 // *****************************************************************************
-bool lDRV_PHY_SERIAL_RxFrame(uint8_t *rxMsg, size_t len) 
+void lDRV_PHY_SERIAL_RxFrame(uint8_t *rxMsg, size_t len) 
 {
     if(!sPhySerialMsgRecv[sInputMsgRcvIndex].len) 
     {
@@ -116,14 +116,7 @@ bool lDRV_PHY_SERIAL_RxFrame(uint8_t *rxMsg, size_t len)
         {
             sInputMsgRcvIndex = 0;
         }
-    } 
-    else 
-    {
-        /* ERROR ,RX queue full */
-        return false;
-    }
-
-    return true;
+    }    
 }
 
 // *****************************************************************************
@@ -203,8 +196,7 @@ uint8_t DRV_PHY_SERIAL_TxFrame(DRV_PHY_SERIAL_MSG_REQUEST_DATA *txMsg)
         txDataCnt = SRV_USI_Send_Message(phySerialInitData.srvUsiHandler, SRV_USI_PROT_ID_PHY_SERIAL_PRIME, sPhyTxBuffer, txMsg->dataLen);       
     }
     else
-    {
-        /* return from here */
+    {/* return from here */
         return 0xFE;
     }
 
@@ -222,7 +214,7 @@ uint8_t DRV_PHY_SERIAL_TxFrame(DRV_PHY_SERIAL_MSG_REQUEST_DATA *txMsg)
         }
         else
         {
-             sPhySerialTXConfirmData.result = DRV_PHY_SERIAL_TX_RESULT_BUSY_TX;
+            sPhySerialTXConfirmData.result = DRV_PHY_SERIAL_TX_RESULT_BUSY_TX;
         }
 
         sPhySerialTXConfirmData.txTime = currentTime;
@@ -242,7 +234,7 @@ void DRV_PHY_SERIAL_Tasks(void)
 {
     while(sPhySerialMsgRecv[sOutputMsgRcvIndex].len) 
     {
-            /* Generate Phy Data Indication Callback */
+        /* Generate Phy Data Indication Callback */
         if( phySerialInitData.serialPhyHandlers.dataReception != NULL) 
         {
             uint32_t currentTime;
