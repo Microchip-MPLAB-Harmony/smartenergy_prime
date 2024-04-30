@@ -150,7 +150,7 @@ Microchip or any third party.
 #define PIB_MAC_BEACON_TX_SLOT                  0x0029  /* v1.3 */
 #define PIB_MAC_BEACON_RX_FREQUENCY             0x002A
 #define PIB_MAC_BEACON_TX_FREQUENCY             0x002B
-#define PIB_MAC_MAC_CAPABILITES                 0x002C
+#define PIB_MAC_MAC_CAPABILITIES                0x002C
 #define PIB_MAC_FRAME_LENGTH                    0x002D  /* v1.4 */
 #define PIB_MAC_CFP_LENGTH                      0x002E  /* v1.4 */
 #define PIB_MAC_GUARD_TIME                      0x002F  /* v1.4 */
