@@ -31,44 +31,40 @@ def loadModule():
     primePalComponent.addCapability("primePal", "PRIME_PAL", True) 
     primePalComponent.addDependency("primePalPlc", "DRV_PLC_PHY", True, True)
     primePalComponent.addDependency("primePalRf", "DRV_RF_PHY", True, True)
-    primePalComponent.addDependency("primePalSerial", "PSER", True, True)
+    primePalComponent.addDependency("primePalSerial", "PRIME_PHY_SERIAL", True, True)
     primePalComponent.addDependency("primePalUSI", "USI", True, True)
     primePalComponent.setDisplayType("PRIME PAL")
 
-
-    ## PRIME Driver
-    primeDrvComponent = Module.CreateComponent("prime_drv_config", "PRIME Driver", "/SmartEnergy/PRIME Stack/Drivers", "driver/config/drv_configurator.py")
-    primeDrvComponent.addDependency("primePhySerial", "PRIME_PHY_SERIAL", True) 
-    primeDrvComponent.setDisplayType("PRIME Driver Configuration")
-    
-    ## PRIME PHY SERIAL
-    primeDrvPhySerialComponent = Module.CreateComponent("primePhySerial", "PRIME PHY SERIAL", "/SmartEnergy/PRIME Stack/PRIME Driver", "driver/phy/serial/config/drv_phy_serial.py")
+    ## PRIME PHY SERIAL Driver
+    primeDrvPhySerialComponent = Module.CreateComponent("primePhySerialDrv", "PRIME PHY SERIAL", "/SmartEnergy/Drivers", "driver/phy/serial/config/drv_phy_serial.py")
     primeDrvPhySerialComponent.addCapability("primePhySerial", "PRIME_PHY_SERIAL", True) 
-    primeDrvPhySerialComponent.setDisplayType("PRIME PHY Serial")
+    primeDrvPhySerialComponent.setDisplayType("PRIME PHY Serial Driver")
     
     ###########  PRIME Stack Configurations  ###########
     global primeStackConfigComponent
-    primeStackConfigComponent = Module.CreateComponent("prime_stack_config", "PRIME Stack", "/SmartEnergy/PRIME Stack", "prime/config/prime_configurator.py")
-    primeStackConfigComponent.setDisplayType("PRIME Stack Configurator")
+    primeStackConfigComponent = Module.CreateComponent("prime_config", "PRIME Stack", "/SmartEnergy/PRIME Stack", "prime/config/prime_configurator.py")
+    primeStackConfigComponent.setDisplayType("PRIME Stack")
+    primeStackConfigComponent.addDependency("primePal_dep", "PRIME_PAL", True, True)
+    primeStackConfigComponent.addCapability("primeStackCapability", "PRIME Stack", True)
 
     ###########  PRIME Service Configurations  ###########
-    global primeSrvConfigComponent
-    primeSrvConfigComponent = Module.CreateComponent("prime_srv_config", "PRIME Services", "/SmartEnergy/PRIME Stack/Services", "service/config/srv_configurator.py")
-    primeSrvConfigComponent.setDisplayType("PRIME Services Configurator")
-    
     ## PRIME Storage Service
-    primeStorageComponent = Module.CreateComponent("primeStorage", "PRIME Storage", "/SmartEnergy/PRIME Stack/Services", "service/storage/config/srv_storage.py")
+    primeStorageComponent = Module.CreateComponent("primeStorage", "PRIME Storage", "/SmartEnergy/Services", "service/storage/config/srv_storage.py")
     primeStorageComponent.setDisplayType("PRIME Service")
+    primeStorageComponent.addCapability("Storage", "PRIME Storage", True) 
     
     ## PRIME User PIBs Service
-    primeUserPibComponent = Module.CreateComponent("primeUserPib", "PRIME User PIBs", "/SmartEnergy/PRIME Stack/Services", "service/user_pib/config/srv_user_pib.py")
+    primeUserPibComponent = Module.CreateComponent("primeUserPib", "User PIBs", "/SmartEnergy/Services", "service/user_pib/config/srv_user_pib.py")
     primeUserPibComponent.setDisplayType("PRIME Service")
+    primeUserPibComponent.addCapability("User PIBs", "User PIBs", True) 
     
     ## PRIME Reset Handler Service
-    primeResetHandlerComponent = Module.CreateComponent("primeResetHandler", "PRIME Reset Handler", "/SmartEnergy/PRIME Stack/Services", "service/reset_handler/config/srv_reset_handler.py")
+    primeResetHandlerComponent = Module.CreateComponent("primeResetHandler", "Reset Handler", "/SmartEnergy/Services", "service/reset_handler/config/srv_reset_handler.py")
     primeResetHandlerComponent.setDisplayType("PRIME Service")
+    primeResetHandlerComponent.addCapability("Reset Handler", "Reset Handler", True) 
     
     ## PRIME Time Management
-    primeTimeManagementComponent = Module.CreateComponent("primeTimeManagement", "PRIME Time Management", "/SmartEnergy/PRIME Stack/Services", "service/time_management/config/srv_time_management.py")
-    primeTimeManagementComponent.addDependency("primeTimeManagement_sysTime_dependency", "SYS_TIME", True, True)
-    primeTimeManagementComponent.setDisplayType("PRIME Service")   
+    primeTimeManagementComponent = Module.CreateComponent("primeTimeManagement", "Time Management", "/SmartEnergy/Services", "service/time_management/config/srv_time_management.py")
+    primeTimeManagementComponent.setDisplayType("PRIME Service")
+    primeTimeManagementComponent.addDependency("SysTime_dep", "SYS_TIME", True, True)
+    primeTimeManagementComponent.addCapability("Time Management", "Time Management", True) 

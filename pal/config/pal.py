@@ -38,6 +38,20 @@ global primePalSerialSrcFile
 global primePalSerialHdrFile
 global primePalSerialLocalHdrFile
 
+def activateComponents(componentList):
+    primeDrvGroup = Database.findGroup("PRIME STACK")
+    if (primeDrvGroup == None):
+        Database.activateComponents(componentList)
+    else:
+        Database.activateComponents(componentList, primeDrvGroup.getID())
+
+    if ("srv_psniffer" in componentList):
+        dict = {}
+        dict = Database.sendMessage("srv_psniffer", "SRV_PSNIFFER_PRIME", {})
+    elif ("srv_rsniffer" in componentList):
+        dict = {}
+        dict = Database.sendMessage("srv_rsniffer", "SRV_RSNIFFER_PRIME", {})
+
 def enablePalPlc(palComponent, value):
     primePalPlcSrcFile.setEnabled(value)
     primePalPlcHdrFile.setEnabled(value)
@@ -47,7 +61,7 @@ def enablePalPlc(palComponent, value):
     palComponent.setDependencyEnabled("primePalPlc", value)
 
     if value & palComponent.getDependencyEnabled("primePalUSI"):
-        Database.activateComponents(["srv_psniffer"])
+        activateComponents(["srv_psniffer"])
     else:
         if (palComponent.getDependencyEnabled("primePalSerial") == False):
             Database.deactivateComponents(["srv_psniffer"]) 
@@ -61,7 +75,7 @@ def enablePalRf(palComponent, value):
     palComponent.setDependencyEnabled("primePalRf", value)
 
     if value & palComponent.getDependencyEnabled("primePalUSI"):
-        Database.activateComponents(["srv_rsniffer"])
+        activateComponents(["srv_rsniffer"])
     else:
         Database.deactivateComponents(["srv_rsniffer"]) 
 
@@ -71,8 +85,13 @@ def enablePalSerial(palComponent, value):
     primePalSerialLocalHdrFile.setEnabled(value)
     palComponent.setDependencyEnabled("primePalSerial", value)
 
+    if value == True:
+        activateComponents(["primePhySerialDrv"])
+    else:
+        Database.deactivateComponents(["primePhySerialDrv"]) 
+
     if value & palComponent.getDependencyEnabled("primePalUSI"):
-        Database.activateComponents(["srv_psniffer"])
+        activateComponents(["srv_psniffer"])
     else:
         if (palComponent.getDependencyEnabled("primePalPlc") == False):
             Database.deactivateComponents(["srv_psniffer"]) 
@@ -81,18 +100,18 @@ def enablePhySniffer(palComponent, value):
     palComponent.setDependencyEnabled("primePalUSI", value)
     
     if value and palComponent.getDependencyEnabled("primePalPlc"):
-        Database.activateComponents(["srv_psniffer"])
+        activateComponents(["srv_psniffer"])
     else:
         if (palComponent.getDependencyEnabled("primePalSerial") == False):
             Database.deactivateComponents(["srv_psniffer"]) 
         
     if value & palComponent.getDependencyEnabled("primePalRf"):
-        Database.activateComponents(["srv_rsniffer"])
+        activateComponents(["srv_rsniffer"])
     else:
         Database.deactivateComponents(["srv_rsniffer"]) 
         
     if value & palComponent.getDependencyEnabled("primePalSerial"):
-        Database.activateComponents(["srv_psniffer"])
+        activateComponents(["srv_psniffer"])
     else:
         if (palComponent.getDependencyEnabled("primePalPlc") == False):
             Database.deactivateComponents(["srv_psniffer"]) 
