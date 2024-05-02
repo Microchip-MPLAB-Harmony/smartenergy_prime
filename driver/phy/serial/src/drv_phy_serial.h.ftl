@@ -62,9 +62,8 @@ extern "C" {
 /* PHY Serial Instance Configuration Options */
 #define DRV_PHY_SERIAL_INDEX            0U
 
-<#if DRV_PHY_SERIAL_USI_INSTANCE == 0>
 #define DRV_PHY_SERIAL_USI_INSTANCE       SRV_USI_INDEX_${DRV_PHY_SERIAL_USI_INSTANCE?string}
-</#if>
+
 /* Maximum physical pdu size */
 #define DRV_PHY_SERIAL_MAX_PPDU_SIZE    512U
 
@@ -141,27 +140,6 @@ typedef struct
     uint16_t pch;
     /* Buffer identifier */
     uint8_t buffId;
-    /* Attenuation level with which the message must be transmitted */
-    /* NOT USED: keep for backwards compatibility */
-    uint8_t attLevel; 
-    /* Modulation scheme of last transmitted message */
-    /* NOT USED: keep for backwards compatibility */
-    uint8_t scheme; 
-    /* TX Forced */
-    /* NOT USED: keep for backwards compatibility */
-    uint8_t disableRX;
-    /* Type A, Type B, Type BC, Type Radio */
-    /* NOT USED: keep for backwards compatibility */
-    uint8_t mode;
-    /* Time mode: 0: Absolute mode, 1: Differential mode, 2: Cancel TX */
-    /* NOT USED: keep for backwards compatibility */
-    uint8_t timeMode;
-    /* Number of channel senses */
-    /* NOT USED: keep for backwards compatibility */
-    uint8_t numSenses;
-    /* Delay between channel senses in ms */
-    /* NOT USED: keep for backwards compatibility */
-    uint8_t senseDelay;
 } DRV_PHY_SERIAL_MSG_REQUEST_DATA;
 
 // *****************************************************************************
@@ -308,7 +286,6 @@ typedef struct
 */
 typedef struct
 {
-    SRV_USI_HANDLE srvUsiHandler;
     DRV_PHY_SERIAL_CALLBACKS serialPhyHandlers;
 } DRV_PHY_SERIAL_INIT;
 

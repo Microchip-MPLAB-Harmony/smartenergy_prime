@@ -57,17 +57,26 @@ def instantiateComponent(primeDrvPhySerialComponent):
     drvPhySerialSrcFile = primeDrvPhySerialComponent.createFileSymbol("DRV_PHY_SERIAL_SOURCE", None)
     drvPhySerialSrcFile.setSourcePath("driver/phy/serial/src/drv_phy_serial.c.ftl")
     drvPhySerialSrcFile.setOutputName("drv_phy_serial.c")
-    drvPhySerialSrcFile.setDestPath("stack/prime/driver/phy/serial")
-    drvPhySerialSrcFile.setProjectPath("config/" + configName + "/stack/prime/driver/phy/serial/")
+    drvPhySerialSrcFile.setDestPath("driver/plc/phy_serial")
+    drvPhySerialSrcFile.setProjectPath("config/" + configName + "/driver/plc/phy_serial/")
     drvPhySerialSrcFile.setType("SOURCE")
     drvPhySerialSrcFile.setMarkup(True)
 
     drvPhySerialHdrFile = primeDrvPhySerialComponent.createFileSymbol("DRV_PHY_SERIAL_HEADER", None)
     drvPhySerialHdrFile.setSourcePath("driver/phy/serial/src/drv_phy_serial.h.ftl")
     drvPhySerialHdrFile.setOutputName("drv_phy_serial.h")
-    drvPhySerialHdrFile.setDestPath("stack/prime/driver/phy/serial")
-    drvPhySerialHdrFile.setProjectPath("config/" + configName + "/stack/prime/driver/phy/serial/")
+    drvPhySerialHdrFile.setDestPath("driver/plc/phy_serial")
+    drvPhySerialHdrFile.setProjectPath("config/" + configName + "/driver/plc/phy_serial/")
     drvPhySerialHdrFile.setType("HEADER")
     drvPhySerialHdrFile.setMarkup(True)
+
+    
+#### FreeMaker System Files ######################################################
+
+    drvPhySerialSystemDefFile = primeDrvPhySerialComponent.createFileSymbol("DRV_PHY_SERIAL_DEF", None)
+    drvPhySerialSystemDefFile.setType("STRING")
+    drvPhySerialSystemDefFile.setOutputName("core.LIST_SYSTEM_DEFINITIONS_H_INCLUDES")
+    drvPhySerialSystemDefFile.setSourcePath("driver/phy/serial/templates/system/definitions.h.ftl")
+    drvPhySerialSystemDefFile.setMarkup(True)
 
  

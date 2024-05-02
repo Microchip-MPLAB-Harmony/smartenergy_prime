@@ -100,18 +100,6 @@ typedef struct
 
     PAL_SERIAL_STATUS status;
 
-    SRV_USI_HANDLE usiHandler;
-
-    uint8_t serialData[PAL_SERIAL_MAX_DATA_SIZE];
-
-    DRV_SERIAL_PHY_PIB_OBJ plcPIB;
-
-    DRV_PLC_PHY_TRANSMISSION_OBJ phyTxObj;
-
-    DRV_PLC_PHY_RECEPTION_OBJ phyRxObj;
-
-    DRV_PLC_PHY_TRANSMISSION_CFM_OBJ phyCfmObj;
-
 } PAL_SERIAL_DATA;
 
 #endif // #ifndef PAL_SERIAL_LOCAL_H

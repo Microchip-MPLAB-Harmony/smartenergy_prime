@@ -50,13 +50,16 @@ Microchip or any third party.
 #include <string.h>
 #include "configuration.h"
 #include "driver/driver.h"
+#include "driver/plc/phy_serial/drv_phy_serial.h"
 #include "service/time_management/srv_time_management.h"
-#include "service/pserial/srv_pserial.h"
 #include "service/usi/srv_usi.h"
 #include "pal_types.h"
 #include "pal_local.h"
 #include "pal_serial.h"
 #include "pal_serial_local.h"
+
+static uint8_t lPAL_SERIAL_RM_GetLessRobustModulation(PAL_SCHEME mod1, PAL_SCHEME mod2);
+static bool lPAL_SERIAL_RM_CheckMinimumQuality(PAL_SCHEME reference, PAL_SCHEME modulation);
 
 /******************************************************************************
  * PRIME PAL SERIAL interface implementation
@@ -96,38 +99,6 @@ static PAL_SERIAL_DATA palSerialData = {0};
 // Section: File Scope Functions
 // *****************************************************************************
 // *****************************************************************************
-
-// *****************************************************************************
-// *****************************************************************************
-// Section: Callback Functions
-// *****************************************************************************
-// *****************************************************************************
-static void lPAL_SERIAL_SERIAL_DataCfmCb(DRV_SERIAL_PHY_TRANSMISSION_CFM_OBJ *cfmObj, uintptr_t context)
-{
-    PAL_MSG_CONFIRM_DATA dataCfm;
-
-    /* Avoid warning */
-    (void)context;
-
-    if (palSerialData.serialCallbacks.dataConfirm != NULL)
-    {
-        palSerialData.serialCallbacks.dataConfirm(&dataCfm);
-    }
-}
-
-static void lPAL_SERIAL_SERIAL_DataIndCb(DRV_SERIAL_PHY_RECEPTION_OBJ *indObj, uintptr_t context)
-{
-    PAL_MSG_INDICATION_DATA dataInd;
-
-    /* Avoid warning */
-    (void)context;
-
-    if (palSerialData.serialCallbacks.dataIndication != NULL)
-    {
-        palSerialData.serialCallbacks.dataIndication(&dataInd);
-    }
-}
-
 static uint8_t lPAL_SERIAL_RM_GetLessRobustModulation(PAL_SCHEME mod1, PAL_SCHEME mod2)
 {
     (void)mod1;
@@ -146,29 +117,78 @@ static bool lPAL_SERIAL_RM_CheckMinimumQuality(PAL_SCHEME reference, PAL_SCHEME 
 
 // *****************************************************************************
 // *****************************************************************************
+// Section: Callback Functions
+// *****************************************************************************
+// *****************************************************************************
+static void lPAL_SERIAL_SERIAL_DataCfmCb(DRV_PHY_SERIAL_MSG_CONFIRM_DATA *pCfmData)
+{
+    PAL_MSG_CONFIRM_DATA dataCfm;
+
+    dataCfm.bufId = pCfmData->buffId;
+    dataCfm.frameType = (PAL_FRAME)pCfmData->mode;
+    dataCfm.pch = (PAL_PCH)DRV_PHY_SERIAL_CHANNEL;
+    dataCfm.result = (PAL_TX_RESULT)pCfmData->result;
+    dataCfm.rmsCalc = pCfmData->rmsCalc;
+    dataCfm.txTime = pCfmData->txTime;
+
+    if (palSerialData.serialCallbacks.dataConfirm != NULL)
+    {
+        palSerialData.serialCallbacks.dataConfirm(&dataCfm);
+    }
+}
+
+static void lPAL_SERIAL_SERIAL_DataIndCb(DRV_PHY_SERIAL_MSG_RX_DATA *pRxData)
+{
+    PAL_MSG_INDICATION_DATA dataInd;
+
+    dataInd.bufId = pRxData->buffId;
+    dataInd.dataLength = pRxData->dataLen;
+    // dataInd.estimatedBitrate = ;   TBD!!!!!!!!!!!!!!!!!!!!!
+    dataInd.frameType = pRxData->mode;
+    dataInd.headerType = pRxData->headerType;
+    // dataInd.lessRobustMod = ;    TBD!!!!!!!!!!!!!!!!!!!!!!!!
+    dataInd.lqi = ((pRxData->cinrAvg + 12) / 4);
+    dataInd.pData = pRxData->dataBuf;
+    dataInd.pch = (PAL_PCH)DRV_PHY_SERIAL_CHANNEL;
+    dataInd.rssi = pRxData->rssiAvg;
+    dataInd.rxTime = pRxData->rxTime;
+    dataInd.scheme = pRxData->scheme;
+
+    if (palSerialData.serialCallbacks.dataIndication != NULL)
+    {
+        palSerialData.serialCallbacks.dataIndication(&dataInd);
+    }
+}
+
+// *****************************************************************************
+// *****************************************************************************
 // Section: PAL SERIAL Interface Implementation
 // *****************************************************************************
 // *****************************************************************************
 SYS_MODULE_OBJ PAL_SERIAL_Initialize(void)
 {
+    DRV_PHY_SERIAL_INIT drvPhySerialInitData;
+
     /* Check previously initialized */
     if (palSerialData.status != PAL_SERIAL_STATUS_UNINITIALIZED)
     {
         return SYS_MODULE_OBJ_INVALID;
     }
 
-    /* Open USI */
-    palSerialData.usiHandler = SRV_USI_Open(PAL_SERIAL_USI_INSTANCE);
+    /* Initialize PHY Serial */
+    drvPhySerialInitData.serialPhyHandlers.dataConfirm = lPAL_SERIAL_SERIAL_DataCfmCb;
+    drvPhySerialInitData.serialPhyHandlers.dataReception = lPAL_SERIAL_SERIAL_DataIndCb;
 
-    if (palSerialData.usiHandler != DRV_HANDLE_INVALID)
-    {
-        palSerialData.status = PAL_SERIAL_STATUS_READY;
-        return SYS_MODULE_OBJ_STATIC;
-    }
-    else
+    if (DRV_PHY_SERIAL_Initialize(DRV_PHY_SERIAL_INDEX, 
+            (const SYS_MODULE_INIT *)&drvPhySerialInitData) != SYS_MODULE_OBJ_INVALID)
     {
         palSerialData.status = PAL_SERIAL_STATUS_ERROR;
         return SYS_MODULE_OBJ_INVALID;
+    }
+    else
+    {
+        palSerialData.status = PAL_SERIAL_STATUS_READY;
+        return SYS_MODULE_OBJ_STATIC;
     }
 }
 
@@ -180,7 +200,7 @@ SYS_STATUS PAL_SERIAL_Status(void)
 
 void PAL_SERIAL_Tasks(void)
 {
-    /* TBD */
+    DRV_PHY_SERIAL_Tasks();
 }
 
 void PAL_SERIAL_DataConfirmCallbackRegister(PAL_DATA_CONFIRM_CB callback)
@@ -195,35 +215,23 @@ void PAL_SERIAL_DataIndicationCallbackRegister(PAL_DATA_INDICATION_CB callback)
 
 uint8_t PAL_SERIAL_DataRequest(PAL_MSG_REQUEST_DATA *pMessageData)
 {
-    uint16_t serialLength;
+    DRV_PHY_SERIAL_MSG_REQUEST_DATA phyTxData;
 
     if (palSerialData.status != PAL_SERIAL_STATUS_READY)
     {
         return PAL_CFG_INVALID_INPUT;
     }
 
-    if (SRV_USI_Status(palSerialData.usiHandler) != SRV_USI_STATUS_CONFIGURED)
+    phyTxData.dataBuf = pMessageData->pData;
+    phyTxData.timeDelay = pMessageData->timeDelay;
+    phyTxData.dataLen = pMessageData->dataLength;
+    phyTxData.pch = pMessageData->pch;
+    phyTxData.buffId = pMessageData->buffId;
+
+    if (DRV_PHY_SERIAL_DataRequestTransmission(&phyTxData) != DRV_PHY_SERIAL_TX_RESULT_PROCESS)
     {
         return PAL_CFG_INVALID_INPUT;
     }
-
-    palSerialData.phyTxObj.dataLength = pMessageData->dataLength;
-    palSerialData.phyTxObj.mode = pMessageData->timeMode;
-    palSerialData.phyTxObj.attenuation = palSerialData.palAttenuation + pMessageData->attLevel;
-    palSerialData.phyTxObj.csma.disableRx = pMessageData->disableRx;
-    palSerialData.phyTxObj.csma.senseCount = pMessageData->numSenses;
-    palSerialData.phyTxObj.csma.senseDelayMs = pMessageData->senseDelayMs;
-    palSerialData.phyTxObj.bufferId = pMessageData->timeDelay;
-    palSerialData.phyTxObj.scheme = pMessageData->scheme;
-    palSerialData.phyTxObj.frameType = pMessageData->frameType;
-    palSerialData.phyTxObj.pTransmitData = pMessageData->pData;
-    palSerialData.phyTxObj.timeIni = pMessageData->timeDelay;
-
-    // TBD
-    serialLength = SRV_PSERIAL_SerialTxMessage(&palSerialData.phyTxObj, palSerialData.serialData);
-
-    SRV_USI_Send_Message(palSerialData.usiHandler, SRV_USI_PROT_ID_PHY_SERIAL_PRIME,
-            palSerialData.serialData, serialLength);
 
     return PAL_CFG_SUCCESS;
 }
@@ -312,7 +320,7 @@ uint8_t PAL_SERIAL_SetChannel(PAL_PCH pch)
 
 uint8_t PAL_SERIAL_GetConfiguration(uint16_t id, void *pValue, uint16_t length)
 {
-    uint16_t serialID;
+    uint16_t serialID = 0;
 
     (void)length;
 
@@ -331,7 +339,7 @@ uint8_t PAL_SERIAL_GetConfiguration(uint16_t id, void *pValue, uint16_t length)
             return PAL_CFG_INVALID_INPUT;
     }
 
-    *pValue = serialID;
+    *(uint16_t *)pValue = serialID;
 
     return PAL_CFG_SUCCESS;
 }
@@ -339,7 +347,7 @@ uint8_t PAL_SERIAL_GetConfiguration(uint16_t id, void *pValue, uint16_t length)
 uint8_t PAL_SERIAL_SetConfiguration(uint16_t id, void *pValue, uint16_t length)
 {
     (void)id;
-    *pValue = 0;
+    (void)pValue;
     (void)length;
 
     return PAL_CFG_INVALID_INPUT;

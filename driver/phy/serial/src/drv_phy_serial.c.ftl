@@ -50,7 +50,7 @@
 #include <stdio.h>
 #include "configuration.h"
 #include "system/system.h"
-#include "stack/prime/driver/phy/serial/drv_phy_serial.h"
+#include "driver/plc/phy_serial/drv_phy_serial.h"
 #include "service/time_management/srv_time_management.h"
 
 
@@ -97,8 +97,10 @@ static uint8_t sOutputMsgRcvIndex;
 
 static uint8_t sInputMsgRcvIndex;
 
-/* PHY Serial Init data */
-static DRV_PHY_SERIAL_INIT phySerialInitData = {0};
+/* PHY Serial Callbacks data */
+static DRV_PHY_SERIAL_CALLBACKS sPhySerialCallbacks = {0};
+
+static SRV_USI_HANDLE sPhySerialUsiHandler;
 
 // *****************************************************************************
 // *****************************************************************************
@@ -139,15 +141,14 @@ SYS_MODULE_OBJ DRV_PHY_SERIAL_Initialize(const SYS_MODULE_INDEX index,
 
     if(phySerialInit != NULL)
     {
-        phySerialInitData.serialPhyHandlers.dataReception = phySerialInit->serialPhyHandlers.dataReception;
-        phySerialInitData.serialPhyHandlers.dataConfirm = phySerialInit->serialPhyHandlers.dataConfirm;
+        sPhySerialCallbacks.dataReception = phySerialInit->serialPhyHandlers.dataReception;
+        sPhySerialCallbacks.dataConfirm = phySerialInit->serialPhyHandlers.dataConfirm;
     }
     else
     {
-        phySerialInitData.serialPhyHandlers.dataReception = NULL;
-        phySerialInitData.serialPhyHandlers.dataConfirm = NULL;
+        sPhySerialCallbacks.dataReception = NULL;
+        sPhySerialCallbacks.dataConfirm = NULL;
     }
-
 
     sInputMsgRcvIndex = 0;
     sOutputMsgRcvIndex = 0;
@@ -157,12 +158,12 @@ SYS_MODULE_OBJ DRV_PHY_SERIAL_Initialize(const SYS_MODULE_INDEX index,
     }
 
     /* Get USI handler for PHY Serial protocol */
-    phySerialInitData.srvUsiHandler = SRV_USI_Open(DRV_PHY_SERIAL_USI_INSTANCE);
+    sPhySerialUsiHandler = SRV_USI_Open(DRV_PHY_SERIAL_USI_INSTANCE);
 
-    if(phySerialInitData.srvUsiHandler != SRV_USI_HANDLE_INVALID)
+    if(sPhySerialUsiHandler != SRV_USI_HANDLE_INVALID)
     {
         /* Register Handler */
-        SRV_USI_CallbackRegister(phySerialInitData.srvUsiHandler, SRV_USI_PROT_ID_PHY_SERIAL_PRIME, lDRV_PHY_SERIAL_RxFrame);
+        SRV_USI_CallbackRegister(sPhySerialUsiHandler, SRV_USI_PROT_ID_PHY_SERIAL_PRIME, lDRV_PHY_SERIAL_RxFrame);
     }
     
     return (SYS_MODULE_OBJ)DRV_PHY_SERIAL_INDEX;
@@ -175,34 +176,33 @@ void DRV_PHY_SERIAL_Deinitialize(SYS_MODULE_OBJ object)
         return;
     }
 
-    phySerialInitData.srvUsiHandler = SRV_USI_HANDLE_INVALID;
+    sPhySerialUsiHandler = SRV_USI_HANDLE_INVALID;
 }
 
 void DRV_PHY_SERIAL_SetCallbacks(DRV_PHY_SERIAL_CALLBACKS *phySerCBs) 
 {
-    phySerialInitData.serialPhyHandlers.dataReception = phySerCBs->dataReception;
-    phySerialInitData.serialPhyHandlers.dataConfirm = phySerCBs->dataConfirm;
+    sPhySerialCallbacks.dataReception = phySerCBs->dataReception;
+    sPhySerialCallbacks.dataConfirm = phySerCBs->dataConfirm;
 }
 
-uint8_t DRV_PHY_SERIAL_TxFrame(DRV_PHY_SERIAL_MSG_REQUEST_DATA *txMsg) 
+uint8_t DRV_PHY_SERIAL_DataRequestTransmission(DRV_PHY_SERIAL_MSG_REQUEST_DATA *txMsg) 
 {
     size_t txDataCnt=0;
 
     memcpy(sPhyTxBuffer, txMsg->dataBuf, txMsg->dataLen);
 
     /* Send through USI */
-    if(phySerialInitData.srvUsiHandler != SRV_USI_HANDLE_INVALID)
+    if(sPhySerialUsiHandler != SRV_USI_HANDLE_INVALID)
     {       
-        txDataCnt = SRV_USI_Send_Message(phySerialInitData.srvUsiHandler, SRV_USI_PROT_ID_PHY_SERIAL_PRIME, sPhyTxBuffer, txMsg->dataLen);       
+        txDataCnt = SRV_USI_Send_Message(sPhySerialUsiHandler, SRV_USI_PROT_ID_PHY_SERIAL_PRIME, sPhyTxBuffer, txMsg->dataLen);       
     }
     else
     {/* return from here */
         return 0xFE;
     }
 
-
     /* Generate Phy Data Confirm Callback */
-    if(phySerialInitData.serialPhyHandlers.dataConfirm != NULL) 
+    if(sPhySerialCallbacks.dataConfirm != NULL) 
     {
         uint32_t currentTime;
 
@@ -223,7 +223,7 @@ uint8_t DRV_PHY_SERIAL_TxFrame(DRV_PHY_SERIAL_MSG_REQUEST_DATA *txMsg)
         sPhySerialTXConfirmData.rmsCalc = 140;
 
 
-        phySerialInitData.serialPhyHandlers.dataConfirm(&sPhySerialTXConfirmData);
+        sPhySerialCallbacks.dataConfirm(&sPhySerialTXConfirmData);
     }
 
     return DRV_PHY_SERIAL_TX_RESULT_PROCESS;
@@ -235,7 +235,7 @@ void DRV_PHY_SERIAL_Tasks(void)
     while(sPhySerialMsgRecv[sOutputMsgRcvIndex].len) 
     {
         /* Generate Phy Data Indication Callback */
-        if( phySerialInitData.serialPhyHandlers.dataReception != NULL) 
+        if( sPhySerialCallbacks.dataReception != NULL) 
         {
             uint32_t currentTime;
             currentTime = SRV_TIME_MANAGEMENT_GetTimeUS();
@@ -264,7 +264,7 @@ void DRV_PHY_SERIAL_Tasks(void)
             sPhySerialRxMsg.snrEx = 0;
 
     
-            phySerialInitData.serialPhyHandlers.dataReception(&sPhySerialRxMsg);
+            sPhySerialCallbacks.dataReception(&sPhySerialRxMsg);
         }
 
         sPhySerialMsgRecv[sOutputMsgRcvIndex].len = 0;
