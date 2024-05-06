@@ -72,13 +72,11 @@ const hal_api_t hal_api = {
 	hal_fu_signature_image_check,
 	hal_fu_signature_image_check_set_callback,
 	hal_fu_get_bitmap,
-<#if primePal.PRIME_PAL_PLC_EN == true>
 	hal_plc_init,
 	hal_plc_reset,
 	hal_plc_set_handler,
 	hal_plc_tx_signal,
 	hal_plc_rx_signal,
-</#if>
 	SRV_STORAGE_GetConfigInfo,
 	SRV_STORAGE_SetConfigInfo,
     SRV_USI_Open,
@@ -87,7 +85,7 @@ const hal_api_t hal_api = {
 	SRV_RANDOM_Get32bits,
 	SRV_LOG_REPORT_Message_With_Code,
 	hal_net_get_freq,
-<#if primePal.PRIME_PAL_PLC_EN == true>
+<#if PRIME_OPERATION_MODE == "Hybrid" || PRIME_OPERATION_MODE == "PLC" || PRIME_OPERATION_MODE == "PLC+Serial">
 	hal_plc_send_boot_cmd,
 	hal_plc_send_wrrd_cmd,
 	hal_plc_enable_interrupt,
@@ -107,7 +105,7 @@ const hal_api_t hal_api = {
 	hal_aes_key,
 	hal_aes_crypt,
 	hal_swap_stack,
-<#if primePal.PRIME_PAL_PLC_EN == true>
+<#if PRIME_OPERATION_MODE == "Hybrid" || PRIME_OPERATION_MODE == "PLC" || PRIME_OPERATION_MODE == "PLC+Serial">
 	hal_plc_set_stby_mode,
 	hal_plc_get_thermal_warning,
 </#if>
@@ -115,7 +113,7 @@ const hal_api_t hal_api = {
 	timer_1us_set_int,
 	timer_1us_cancel_int,
 	timer_1us_enable_interrupt,
-<#if primePal.PRIME_PAL_RF_EN == true>
+<#if PRIME_OPERATION_MODE == "Hybrid" || PRIME_OPERATION_MODE == "RF">
 	prf_if_init,
 	prf_if_reset,
 	prf_if_enable_interrupt,

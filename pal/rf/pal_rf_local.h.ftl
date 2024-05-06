@@ -105,7 +105,7 @@ typedef struct
     Holds PAL RF internal data.
 
   Description:
-    This data type defines the all data required to handle the PAL RF module.
+    This data type defines the data required to handle the PAL RF module.
 
   Remarks:
     None.
@@ -126,7 +126,7 @@ typedef struct
 
     PAL_RF_TX_HANDLERS_DATA txHandleData[DRV_RF215_TX_BUFFERS_NUMBER];
 
-    PAL_PCH pch;
+    uint16_t pch;
 
     uint16_t rfChannelsNumber;
 

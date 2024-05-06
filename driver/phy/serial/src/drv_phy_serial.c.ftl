@@ -50,7 +50,7 @@
 #include <stdio.h>
 #include "configuration.h"
 #include "system/system.h"
-#include "driver/plc/phy_serial/drv_phy_serial.h"
+#include "driver/phy_serial/drv_phy_serial.h"
 #include "service/time_management/srv_time_management.h"
 
 

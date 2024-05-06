@@ -194,10 +194,11 @@ static void lPAL_RF_UpdatePhyConfiguration(void)
     DRV_RF215_GetPib(palRfData.drvRfPhyHandle, RF215_PIB_PHY_CONFIG, &palRfData.rfPhyConfig);
 
 <#if PRIME_PAL_RF_FREQ_HOPPING == true>
+    palRfData.pch = PRIME_PAL_RF_FREQ_HOPPING_CHANNEL;
 	lPAL_RF_FreqHopGetChannelSequence();
 <#else>
 	/* Always initialize PAL RF to min channel */
-	palRfData.pch = (PAL_PCH)(PAL_RF_CHN | palRfData.rfPhyConfig.chnNumMin);
+	palRfData.pch = (uint16_t)(PRIME_PAL_RF_CHN_MASK | palRfData.rfPhyConfig.chnNumMin);
 </#if>
 
 	palRfData.rfChannelsNumber = palRfData.rfPhyConfig.chnNumMax - palRfData.rfPhyConfig.chnNumMin + 1;
@@ -224,7 +225,7 @@ static void lPAL_RF_DataCfmCb(DRV_RF215_TX_HANDLE txHandle,
 
         dataCfm.txTime = SRV_TIME_MANAGEMENT_CountToUS(pCfmObj->timeIniCount);
         dataCfm.pch = palRfData.pch;
-        dataCfm.rmsCalc = 255; // TBD
+        dataCfm.rmsCalc = 255;
         dataCfm.frameType = PAL_FRAME_TYPE_RF;
         dataCfm.bufId = lPAL_RF_GetTxBuffId(txHandle);
 
@@ -449,7 +450,9 @@ uint8_t PAL_RF_DataRequest(PAL_MSG_REQUEST_DATA *pMessageData)
         return (uint8_t)rfPhyTxReqHandle;
     }
 
-    txReqObj->channelNum = pMessageData->pch & (~PAL_RF_CHN);
+<#if PRIME_PAL_RF_FREQ_HOPPING == true>
+    txReqObj->channelNum = pMessageData->pch;
+</#if>
     txReqObj->psdu = pMessageData->pData;
     txReqObj->psduLen = pMessageData->dataLength;
     txReqObj->timeMode = (DRV_RF215_TX_TIME_MODE)pMessageData->timeMode;
@@ -504,10 +507,10 @@ uint8_t PAL_RF_DataRequest(PAL_MSG_REQUEST_DATA *pMessageData)
     return (uint8_t)rfPhyTxReqHandle;
 }
 
-void PAL_RF_ProgramChannelSwitch(uint32_t timeSync, PAL_PCH pch, uint8_t timeMode)
+void PAL_RF_ProgramChannelSwitch(uint32_t timeSync, uint16_t pch, uint8_t timeMode)
 {
 <#if PRIME_PAL_RF_FREQ_HOPPING == true>
-    uint16_t channelNum = pch & (PAL_RF_CHN - 1);
+    uint16_t channelNum = pch & PRIME_PAL_RF_FREQ_HOPPING_CHANNEL;
 
     palRfData.freqHopCurrentChannel = pch;
     DRV_RF215_SetChannelRequest(palRfData.drvRfPhyHandle, timeSync, channelNum, (DRV_RF215_TX_TIME_MODE)timeMode);
@@ -579,32 +582,32 @@ uint8_t PAL_RF_SetAGC(uint8_t mode, uint8_t gain)
     return(PAL_CFG_INVALID_INPUT);
 }
 
-uint8_t PAL_RF_GetChannel(PAL_PCH *pPch)
+uint8_t PAL_RF_GetChannel(uint16_t *pPch)
 {
     if (palRfData.status != PAL_RF_STATUS_READY)
     {
         return PAL_CFG_INVALID_INPUT;
     }
 
-    *pPch = palRfData.pch | PAL_RF_CHN;
+    *pPch = palRfData.pch | PRIME_PAL_RF_CHN_MASK;
 
     return PAL_CFG_SUCCESS;
 }
 
-uint8_t PAL_RF_SetChannel(PAL_PCH pch)
+uint8_t PAL_RF_SetChannel(uint16_t pch)
 {
     uint16_t channel;
-	channel = pch & (~PAL_RF_CHN);
+	channel = pch & (~PRIME_PAL_RF_CHN_MASK);
 
     if (palRfData.status != PAL_RF_STATUS_READY)
     {
         return PAL_CFG_INVALID_INPUT;
     }
 
-    if (channel == RF_CHANNEL_BITS)
+    if (channel == PRIME_PAL_RF_FREQ_HOPPING_CHANNEL)
     {
 <#if PRIME_PAL_RF_FREQ_HOPPING == true>
-        palRfData.pch = RF_CHANNEL_BITS;
+        palRfData.pch = PRIME_PAL_RF_FREQ_HOPPING_CHANNEL;
         return PAL_CFG_SUCCESS;
 <#else>
         return PAL_CFG_INVALID_INPUT;
@@ -630,23 +633,12 @@ uint8_t PAL_RF_GetConfiguration(uint16_t id, void *pValue, uint16_t length)
 
     /* Check identifier */
     switch (id) {
-        case PAL_ID_CONTINUOUS_TX_EN:
-            /* Not needed */
-            return PAL_CFG_INVALID_INPUT;
-
-        case PAL_ID_ZC_PERIOD:
-            return PAL_CFG_INVALID_INPUT;
-
         case PAL_ID_INFO_VERSION:
             drvRfId = RF215_PIB_FW_VERSION;
             break;
 
-        case PAL_ID_PHY_SNIFFER_EN:
-            // *(uint8_t *)pValue = suc_rf_sniffer_enabled;
-            return PAL_CFG_SUCCESS;
-
         case PAL_ID_CFG_TXRX_CHANNEL:
-            return PAL_RF_GetChannel((PAL_PCH *)pValue);
+            return PAL_RF_GetChannel((uint16_t *)pValue);
 
         case PAL_ID_RX_PAYLOAD_LEN_SYM:
             drvRfId = RF215_PIB_PHY_RX_PAY_SYMBOLS;
@@ -773,13 +765,9 @@ uint8_t PAL_RF_SetConfiguration(uint16_t id, void *pValue, uint16_t length)
 		drvRfId = RF215_PIB_FW_VERSION;
 		break;
 
-	case PAL_ID_PHY_SNIFFER_EN:
-		// suc_rf_sniffer_enabled = *(uint8_t *)pValue; // TBD
-		return PAL_CFG_SUCCESS;
-
 	case PAL_ID_CFG_TXRX_CHANNEL:
     {
-        PAL_PCH pch = *(PAL_PCH *)pValue;
+        uint16_t pch = *(uint16_t *)pValue;
         return PAL_RF_SetChannel(pch);
     }
 
@@ -846,9 +834,6 @@ uint8_t PAL_RF_SetConfiguration(uint16_t id, void *pValue, uint16_t length)
 
 uint8_t PAL_RF_GetMsgDuration(uint16_t length, PAL_SCHEME scheme, PAL_FRAME frameType, uint32_t *pDuration)
 {
-    // TBD: Depending on Phy Band (FSK, OFDM) and their configs. 
-    // Create new API in DRV_RF_215 to get the Duration of a Message. It depends on PHY params.
-
     // Only Implemented for FSK (FEC OFF): SUN_FSK_BAND_863_870_OPM1
     uint8_t shrSymbol;
     uint8_t symbolsOctet;

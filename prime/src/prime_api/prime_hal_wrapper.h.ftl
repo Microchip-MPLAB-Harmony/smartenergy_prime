@@ -66,7 +66,7 @@ uint32_t prime_hal_pcrc_calc(uint8_t *puc_buf, size_t ul_len, PCRC_HEADER_TYPE u
 void prime_hal_pcrc_config_sna(uint8_t *puc_sna);
 
 /* @} */
-<#if primePal.PRIME_PAL_PLC_EN == true>
+
 /** \brief PLC interface */
 /* @{ */
 void prime_hal_plc_init(void);
@@ -74,6 +74,8 @@ void prime_hal_plc_reset(void);
 void prime_hal_plc_set_handler(void (*p_handler)(void));
 void prime_hal_plc_tx_signal(void);
 void prime_hal_plc_rx_signal(void);
+
+<#if PRIME_OPERATION_MODE == "Hybrid" || PRIME_OPERATION_MODE == "PLC" || PRIME_OPERATION_MODE == "PLC+Serial">
 bool prime_hal_plc_send_boot_cmd(uint16_t us_cmd, uint32_t ul_addr, uint32_t ul_data_len, uint8_t *puc_data_buf, uint8_t *puc_data_read);
 bool prime_hal_plc_send_wrrd_cmd(uint8_t uc_cmd, void *px_spi_data, void *px_spi_status_info);
 void prime_hal_plc_enable_interrupt(bool enable);
@@ -164,7 +166,7 @@ bool prime_hal_timer_1us_cancel_int(uint32_t ul_int_id);
 
 /** \brief RF Interface */
 /* @{ */
-<#if primePal.PRIME_PAL_RF_EN == true>
+<#if PRIME_OPERATION_MODE == "Hybrid" || PRIME_OPERATION_MODE == "RF">
 uint8_t prime_hal_prf_if_init(void);
 void prime_hal_prf_if_reset(void);
 void prime_hal_prf_if_enable_interrupt(bool b_enable);

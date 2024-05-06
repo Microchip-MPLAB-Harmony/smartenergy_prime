@@ -76,37 +76,11 @@ Microchip or any third party.
         <#assign PAL_PLC_COUP11 = true>
     </#if>
 </#if>
-/******************************************************************************
- * PRIME PAL PLC interface implementation
- ******************************************************************************/
-const PAL_INTERFACE PAL_PLC_Interface =
-{
-    .PAL_GetSNR = PAL_PLC_GetSNR,
-    .PAL_GetZCT = PAL_PLC_GetZCT,
-    .PAL_GetTimer = PAL_PLC_GetTimer,
-    .PAL_GetTimerExtended = PAL_PLC_GetTimerExtended,
-    .PAL_GetCD = PAL_PLC_GetCD,
-    .PAL_GetNL = PAL_PLC_GetNL,
-    .PAL_GetAGC = PAL_PLC_GetAGC,
-    .PAL_SetAGC = PAL_PLC_SetAGC,
-    .PAL_GetCCA = PAL_PLC_GetCCA,
-    .PAL_GetChannel = PAL_PLC_GetChannel,
-    .PAL_SetChannel = PAL_PLC_SetChannel,
-    .PAL_DataRequest = PAL_PLC_DataRequest,
-    .PAL_ProgramChannelSwitch = PAL_PLC_ProgramChannelSwitch,
-    .PAL_GetConfiguration = PAL_PLC_GetConfiguration,
-    .PAL_SetConfiguration = PAL_PLC_SetConfiguration,
-    .PAL_GetSignalCapture = PAL_PLC_GetSignalCapture,
-    .PAL_GetMsgDuration = PAL_PLC_GetMsgDuration,
-    .PAL_CheckMinimumQuality = PAL_PLC_RM_CheckMinimumQuality,
-    .PAL_GetLessRobustModulation = PAL_PLC_RM_GetLessRobustModulation,
-};
-
-/* PRIME Buffer ID */
-#define PAL_PLC_TX_NUM_BUFFERS    2U
-#define PAL_PLC_TX_BUFFER_0       TX_BUFFER_0
-#define PAL_PLC_TX_BUFFER_1       TX_BUFFER_1
-
+// *****************************************************************************
+// *****************************************************************************
+// Section: Macro Definitions
+// *****************************************************************************
+// *****************************************************************************
 /* Delay in us between read of Host timer and PL360 timer (CS falling edge) */
 /* The delay depends on CPU frequency, compiler and optimizations */
 /* It doesn't affect to relative time between RX and TX (compensated) */
@@ -132,6 +106,32 @@ const PAL_INTERFACE PAL_PLC_Interface =
 #define DIV_ROUND(a, b)                (((a) + (b >> 1)) / (b))
 #define MAX(a, b)                      (((a) > (b)) ?  (a) : (b))
 #define MIN(a, b)                      (((a) < (b)) ?  (a) : (b))
+
+/******************************************************************************
+ * PRIME PAL PLC interface implementation
+ ******************************************************************************/
+const PAL_INTERFACE PAL_PLC_Interface =
+{
+    .PAL_GetSNR = PAL_PLC_GetSNR,
+    .PAL_GetZCT = PAL_PLC_GetZCT,
+    .PAL_GetTimer = PAL_PLC_GetTimer,
+    .PAL_GetTimerExtended = PAL_PLC_GetTimerExtended,
+    .PAL_GetCD = PAL_PLC_GetCD,
+    .PAL_GetNL = PAL_PLC_GetNL,
+    .PAL_GetAGC = PAL_PLC_GetAGC,
+    .PAL_SetAGC = PAL_PLC_SetAGC,
+    .PAL_GetCCA = PAL_PLC_GetCCA,
+    .PAL_GetChannel = PAL_PLC_GetChannel,
+    .PAL_SetChannel = PAL_PLC_SetChannel,
+    .PAL_DataRequest = PAL_PLC_DataRequest,
+    .PAL_ProgramChannelSwitch = PAL_PLC_ProgramChannelSwitch,
+    .PAL_GetConfiguration = PAL_PLC_GetConfiguration,
+    .PAL_SetConfiguration = PAL_PLC_SetConfiguration,
+    .PAL_GetSignalCapture = PAL_PLC_GetSignalCapture,
+    .PAL_GetMsgDuration = PAL_PLC_GetMsgDuration,
+    .PAL_CheckMinimumQuality = PAL_PLC_RM_CheckMinimumQuality,
+    .PAL_GetLessRobustModulation = PAL_PLC_RM_GetLessRobustModulation,
+};
 
 // *****************************************************************************
 // *****************************************************************************
@@ -163,23 +163,23 @@ static void lPAL_PLC_SysTimeCB( uintptr_t context )
     palPlcData.syncUpdate = true;
 }
 
-static PAL_PCH lPAL_PLC_GetPCH(uint8_t channel)
+static uint16_t lPAL_PLC_GetPCH(uint8_t channel)
 {
-    PAL_PCH pch;
+    uint16_t pch;
 
     if (channel <= 8) 
     {
-        pch = (PAL_PCH)(1 << (channel - 1)); /* Single channel */
+        pch = (uint16_t)(1 << (channel - 1)); /* Single channel */
     } 
     else  
     {
-        pch = (PAL_PCH)(3 << (channel - 9)); /* Double channel */
+        pch = (uint16_t)(3 << (channel - 9)); /* Double channel */
     }
 
     return pch;
 }
 
-static uint8_t lPAL_PLC_GetChannelNumber(PAL_PCH pch)
+static uint8_t lPAL_PLC_GetChannelNumber(uint16_t pch)
 {
     uint8_t channel = 1;
 
@@ -760,7 +760,7 @@ void PAL_PLC_Tasks(void)
                     txObj.csma.disableRx = true;
                     txObj.csma.senseCount = 0;
                     txObj.csma.senseDelayMs = 0;
-                    txObj.frameType = FRAME_TYPE_A;
+                    txObj.frameType = PAL_FRAME_TYPE_A;
                     txObj.scheme = SCHEME_DBPSK;
                     txObj.mode = TX_MODE_RELATIVE;
                     txObj.timeIni = TRNG_ReadData() % 100000;
@@ -870,7 +870,7 @@ uint8_t PAL_PLC_DataRequest(PAL_MSG_REQUEST_DATA *pMessageData)
     return PAL_CFG_SUCCESS;
 }
 
-void PAL_PLC_ProgramChannelSwitch(uint32_t timeSync, PAL_PCH pch, uint8_t timeMode)
+void PAL_PLC_ProgramChannelSwitch(uint32_t timeSync, uint16_t pch, uint8_t timeMode)
 {
     (void)timeSync;
     (void)pch;
@@ -1016,7 +1016,7 @@ uint8_t PAL_PLC_GetNL(uint8_t *pNoise)
     return(PAL_CFG_SUCCESS);
 }
 
-uint8_t PAL_PLC_GetChannel(PAL_PCH *pPch)
+uint8_t PAL_PLC_GetChannel(uint16_t *pPch)
 {
     if (palPlcData.status != PAL_PLC_STATUS_READY)
     {
@@ -1027,7 +1027,7 @@ uint8_t PAL_PLC_GetChannel(PAL_PCH *pPch)
     return(PAL_CFG_SUCCESS);
 }
 
-uint8_t PAL_PLC_SetChannel(PAL_PCH pch)
+uint8_t PAL_PLC_SetChannel(uint16_t pch)
 {
     uint8_t channel;
 
@@ -1063,7 +1063,7 @@ uint8_t PAL_PLC_GetConfiguration(uint16_t id, void *pValue, uint16_t length)
             break;
 
         case PAL_ID_CFG_MAX_TXRX_NUM_CHANNELS:
-            *(uint8_t *)pValue = 8; //suc_max_num_channels;
+            *(uint8_t *)pValue = 2;
 
             return(PAL_CFG_SUCCESS);
 
@@ -1074,10 +1074,6 @@ uint8_t PAL_PLC_GetConfiguration(uint16_t id, void *pValue, uint16_t length)
         case PAL_ID_INFO_VERSION:
             plcID = PLC_ID_VERSION_NUM;
             break;
-
-        case PAL_ID_PHY_SNIFFER_EN:    // ????????????????????????????
-            *(uint8_t *)pValue = 1;
-            return(PAL_CFG_SUCCESS);
 
         case PAL_ID_CFG_AUTODETECT_BRANCH:
             plcID = PLC_ID_CFG_AUTODETECT_IMPEDANCE;
@@ -1124,9 +1120,12 @@ uint8_t PAL_PLC_GetConfiguration(uint16_t id, void *pValue, uint16_t length)
             palPlcData.plcPIB.pData = (uint8_t *)&cdData;
             DRV_PLC_PHY_PIBGet(palPlcData.drvPhyHandle, &palPlcData.plcPIB);
 
-            if (cdData.cdRxState == CD_RX_IDLE) {
+            if (cdData.cdRxState == CD_RX_IDLE) 
+            {
                 *(uint32_t *)pValue = 0;
-            } else {
+            } 
+            else 
+            {
                 *(uint32_t *)pValue = cdData.rxTimeEnd - cdData.currentTime;
             }
 
@@ -1138,14 +1137,20 @@ uint8_t PAL_PLC_GetConfiguration(uint16_t id, void *pValue, uint16_t length)
             return(PAL_CFG_SUCCESS);
 
         default:
-            if (id >= 0xFD00) {
-                if (id != 0xFEEE) {
+            if (id >= 0xFD00) 
+            {
+                if (id != 0xFEEE) 
+                {
                     plcID = (id & 0x00FF) | 0x4000;
-                } else {
+                } 
+                else 
+                {
                     *(uint8_t *)pValue = palPlcData.errorInfo;
                     return(PAL_CFG_SUCCESS);
                 }
-            } else {
+            } 
+            else 
+            {
                 *(uint8_t *)pValue = 0;
                 return(PAL_CFG_SUCCESS);
             }
@@ -1198,12 +1203,6 @@ uint8_t PAL_PLC_SetConfiguration(uint16_t id, void *pValue, uint16_t length)
         case PAL_ID_INFO_VERSION:
             plcID = PLC_ID_VERSION_NUM;
             break;
-
-        case PAL_ID_PHY_SNIFFER_EN:
-#ifdef ATPL360_ADDONS_ENABLE
-            suc_sniffer_enabled = *(uint8_t *)pValue;
-#endif
-            return(PAL_CFG_SUCCESS);
 
         case PAL_ID_CFG_AUTODETECT_BRANCH:
             plcID = PLC_ID_CFG_AUTODETECT_IMPEDANCE;
@@ -1291,6 +1290,7 @@ uint16_t PAL_PLC_GetSignalCapture(uint8_t *pData, uint8_t frameType, uint32_t ti
     DRV_PLC_PHY_SIGNAL_CAPTURE signalCapture;
     uint8_t captureParameters[9];
     uint8_t index;
+    SYS_TIME_HANDLE timer = SYS_TIME_HANDLE_INVALID;
 
     palPlcData.plcPIB.id = PLC_ID_SIGNAL_CAPTURE_STATUS;
     palPlcData.plcPIB.length = sizeof(signalCapture);
@@ -1301,7 +1301,13 @@ uint16_t PAL_PLC_GetSignalCapture(uint8_t *pData, uint8_t frameType, uint32_t ti
     while (signalCapture.status == SIGNAL_CAPTURE_RUNNING) 
     {
         DRV_PLC_PHY_PIBGet(palPlcData.drvPhyHandle, &palPlcData.plcPIB);
-        // prime_hal_plc_delay(DELAY_TREF_MS, 5);
+        if (SYS_TIME_DelayMS(5, &timer) == SYS_TIME_SUCCESS)
+        {
+            if(SYS_TIME_DelayIsComplete(timer) != true)
+            {
+                while (SYS_TIME_DelayIsComplete(timer) == false);
+            }
+        }
     }
 
     /* Start Capture */
@@ -1327,15 +1333,23 @@ uint16_t PAL_PLC_GetSignalCapture(uint8_t *pData, uint8_t frameType, uint32_t ti
     palPlcData.plcPIB.pData = (uint8_t *)&signalCapture;
     DRV_PLC_PHY_PIBGet(palPlcData.drvPhyHandle, &palPlcData.plcPIB);
 
-    while (signalCapture.status != SIGNAL_CAPTURE_READY) {
+    while (signalCapture.status != SIGNAL_CAPTURE_READY) 
+    {
         DRV_PLC_PHY_PIBGet(palPlcData.drvPhyHandle, &palPlcData.plcPIB);
-        // prime_hal_plc_delay(DELAY_TREF_MS, 5);
+        if (SYS_TIME_DelayMS(5, &timer) == SYS_TIME_SUCCESS)
+        {
+            if(SYS_TIME_DelayIsComplete(timer) != true)
+            {
+                while (SYS_TIME_DelayIsComplete(timer) == false);
+            }
+        }
     }
 
     /* Read Noise Data */
     pDataPointer = pData;
     index = 0;
-    while (index < signalCapture.numFrags) {
+    while (index < signalCapture.numFrags) 
+    {
         palPlcData.plcPIB.id = PLC_ID_SIGNAL_CAPTURE_FRAGMENT;
         palPlcData.plcPIB.length = 1;
         palPlcData.plcPIB.pData = (uint8_t *)&index;
@@ -1368,7 +1382,7 @@ uint8_t PAL_PLC_GetMsgDuration(uint16_t length, PAL_SCHEME scheme, uint8_t frame
     frameDuration = 0;
     frameLen = length;
 
-    if (frameType == FRAME_TYPE_A) 
+    if (frameType == PAL_FRAME_TYPE_A) 
     {
         /* There are 7 bytes inside the header */
         if (frameLen < 7) 
@@ -1382,7 +1396,7 @@ uint8_t PAL_PLC_GetMsgDuration(uint16_t length, PAL_SCHEME scheme, uint8_t frame
     }
 
     symbolSize = palPlcSymbolSize[scheme];
-    if (scheme >= SCHEME_DBPSK_C)
+    if (scheme >= PAL_SCHEME_DBPSK_C)
     {
         /* Increase a byte for flushing */
         frameLen++;

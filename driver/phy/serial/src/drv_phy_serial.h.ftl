@@ -136,10 +136,25 @@ typedef struct
     uint32_t timeDelay;
     /* Length of the data buffer */
     uint16_t dataLen;
-    /* Physical channel to transmit the message */
-    uint16_t pch;
+    /* Time mode: 0: Absolute mode, 1: Differential mode, 2: Cancel TX */
+    /* NOT USED: keep for backwards compatibility */
+    uint8_t timeMode;
+    /* Attenuation level with which the message must be transmitted */
+    /* NOT USED: keep for backwards compatibility */
+    uint8_t attLevel; 
+    /* CSMA algorithm parameters */
+    /* NOT USED: keep for backwards compatibility */
+    uint8_t csma;
     /* Buffer identifier */
     uint8_t buffId;
+    /* Modulation scheme of last transmitted message */
+    /* NOT USED: keep for backwards compatibility */
+    uint8_t scheme; 
+    /* Type A, Type B, Type BC, Type Radio */
+    /* NOT USED: keep for backwards compatibility */
+    uint8_t mode;
+    /* Physical channel to transmit the message */
+    uint16_t pch;
 } DRV_PHY_SERIAL_MSG_REQUEST_DATA;
 
 // *****************************************************************************
@@ -159,13 +174,13 @@ typedef struct
     /* Transmission time in 10us */
     uint32_t txTime;
     /* RMS value emitted (valid only when txQRMode is enable) */
-    uint16_t rmsCalc;
+    uint32_t rmsCalc;
     /* Type mode: Type A, Type B or Type BC  */
     uint8_t mode;
-    /* Number of the buffer used to tx */
-    uint8_t buffId;
     /* Result */
     uint8_t result;
+    /* Number of the buffer used to tx */
+    uint8_t buffId;
 } DRV_PHY_SERIAL_MSG_CONFIRM_DATA;
 
 // *****************************************************************************
@@ -185,28 +200,24 @@ typedef struct
 {
     /* Pointer to local data buffer */
     uint8_t *dataBuf;
+    /* Reception time in 10us */
+    uint32_t rxTime;
     /* Accumulated Error Vector Magnitude for header */
     uint32_t evmHeaderAcum;
     /* Accumulated Error Vector Magnitude for payload */
     uint32_t evmPayloadAcum;
-    /* Reception time in 10us */
-    uint32_t rxTime;
     /* Error Vector Magnitude for header */
     uint16_t evmHeader;
     /* Error Vector Magnitude for payload */
     uint16_t evmPayload;
     /* Length of the data buffer. */
     uint16_t dataLen;
-    /* Buffer identifier */
-    uint8_t buffId;
     /* Modulation scheme of the last received message */
     uint8_t scheme;
     /* Type A, Type B or Type BC  */
     uint8_t mode;
     /* Header Type of the last received message */
     uint8_t headerType;
-    /* Noise result in case of noise capture mode */
-    uint8_t noiseResult;
     /* Average RSSI (Received Signal Strength Indication) */
     uint8_t rssiAvg;
     /* Average CNIR (Carrier to Interference + Noise ratio) */
@@ -221,6 +232,10 @@ typedef struct
     uint8_t qt;
     /* Extended signal noise ratio value */
     uint8_t snrEx;
+    /* Noise result in case of noise capture mode */
+    uint8_t noiseResult;
+    /* Buffer identifier */
+    uint8_t buffId;
 } DRV_PHY_SERIAL_MSG_RX_DATA;
 
 // *****************************************************************************

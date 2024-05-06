@@ -51,8 +51,6 @@ Microchip or any third party.
 #include "service/pcoup/srv_pcoup.h"
 #include "pal_types.h"
 
-#define PAL_TX_NUM_BUFFERS             2
-
 <#if PRIME_PAL_PHY_SNIFFER == true>
 #define PAL_SNIFFER_DATA_MAX_SIZE      512
 typedef void (*PAL_USI_SNIFFER_CB)(uint8_t *pData, uint16_t length);
@@ -142,7 +140,7 @@ typedef struct
     Holds PAL PLC internal data.
 
   Description:
-    This data type defines the all data required to handle the PAL PLC module.
+    This data type defines all data required to handle the PAL PLC module.
 
   Remarks:
     None.
@@ -151,23 +149,7 @@ typedef struct
 {
     PAL_CALLBACKS plcCallbacks;
 
-    PAL_PLC_STATUS status;
-
-    SYS_STATUS drvPhyStatus;
-
     DRV_HANDLE drvPhyHandle;
-
-    DRV_PLC_PHY_PIB_OBJ plcPIB;
-
-    DRV_PLC_PHY_CHANNEL channel;
-    
-    DRV_PLC_PHY_TX_RESULT detectImpedanceResult;
-
-    DRV_PLC_PHY_TRANSMISSION_OBJ phyTxObj;
-
-    PAL_PLC_RX_PHY_PARAMS rxParameters;
-
-    uint8_t palAttenuation;
 
     uint32_t timeRefPlc;
 
@@ -179,21 +161,31 @@ typedef struct
 
     uint32_t syncDelay;
 
-    bool syncEnable;
-
-    bool syncUpdate;
-
-    uint8_t lastRSSIAvg;
-
-    uint8_t lastCINRMin;
-
     uint32_t hiTimerRef;
 
     uint32_t previousTimerRef;
 
-    bool networkDetected;
+    DRV_PLC_PHY_PIB_OBJ plcPIB;
+    
+    DRV_PLC_PHY_TX_RESULT detectImpedanceResult;
+
+    DRV_PLC_PHY_TRANSMISSION_OBJ phyTxObj;
+
+    PAL_PLC_RX_PHY_PARAMS rxParameters;
+
+    DRV_PLC_PHY_CHANNEL channel;
+
+    SYS_STATUS drvPhyStatus;
 
     uint16_t channelList;
+
+    PAL_PLC_STATUS status;
+
+    uint8_t palAttenuation;
+
+    uint8_t lastRSSIAvg;
+
+    uint8_t lastCINRMin;
 
     uint8_t statsErrorUnexpectedKey;
 
@@ -212,6 +204,12 @@ typedef struct
     bool pvddMonTxEnable;
 
     bool exceptionPending;
+
+    bool syncEnable;
+
+    bool syncUpdate;
+
+    bool networkDetected;
 
 <#if PRIME_PAL_PHY_SNIFFER == true>
     PAL_USI_SNIFFER_CB snifferCallback;

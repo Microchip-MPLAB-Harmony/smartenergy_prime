@@ -74,10 +74,10 @@ typedef struct PAL_INTERFACE_TYPE
     uint8_t   (*PAL_GetCCA)(uint8_t *pState);
     uint8_t   (*PAL_GetAGC)(uint8_t *mode, uint8_t *gain);
     uint8_t   (*PAL_SetAGC)(uint8_t mode, uint8_t gain);
-    uint8_t   (*PAL_GetChannel)(PAL_PCH *pPch);
-    uint8_t   (*PAL_SetChannel)(PAL_PCH pch);
+    uint8_t   (*PAL_GetChannel)(uint16_t *pPch);
+    uint8_t   (*PAL_SetChannel)(uint16_t pch);
     uint8_t   (*PAL_DataRequest)(PAL_MSG_REQUEST_DATA *pData);
-    void      (*PAL_ProgramChannelSwitch)(uint32_t timeSync, PAL_PCH pch, uint8_t timeMode);
+    void      (*PAL_ProgramChannelSwitch)(uint32_t timeSync, uint16_t pch, uint8_t timeMode);
     uint8_t   (*PAL_GetConfiguration)(uint16_t id, void *val, uint16_t len);
     uint8_t   (*PAL_SetConfiguration)(uint16_t id, void *val, uint16_t len);
     uint16_t  (*PAL_GetSignalCapture)(uint8_t *noiseCapture, PAL_FRAME frameType, uint32_t timeStart, uint32_t duration);
@@ -94,7 +94,7 @@ typedef struct PAL_INTERFACE_TYPE
     Holds PAL internal data.
 
   Description:
-    This data type defines the all data required to handle the PAL module.
+    This data type defines all data required to handle the PAL module.
 
   Remarks:
     None.
@@ -111,6 +111,7 @@ typedef struct
     SRV_USI_HANDLE usiHandler;
 
 </#if>
+    uint8_t snifferEnabled;
 } PAL_DATA;
 
 #endif // #ifndef PAL_LOCAL_H

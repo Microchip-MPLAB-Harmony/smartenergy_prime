@@ -6,11 +6,11 @@
     pal_plc.h
 
   Summary:
-    Physical Abstraction Layer (PAL) header file.
+    Physical Abstraction Layer (PAL) PLC header file.
 
   Description:
     This module provides the interface between the PRIME MAC layer and the 
-    different physical layers.
+    PLC physical layer.
 *******************************************************************************/
 
 //DOM-IGNORE-BEGIN
@@ -65,7 +65,7 @@ void PAL_PLC_Tasks(void);
 void PAL_PLC_DataConfirmCallbackRegister(PAL_DATA_CONFIRM_CB callback);
 void PAL_PLC_DataIndicationCallbackRegister(PAL_DATA_INDICATION_CB callback);
 uint8_t PAL_PLC_DataRequest(PAL_MSG_REQUEST_DATA *requestMsg);
-void PAL_PLC_ProgramChannelSwitch(uint32_t timeSync, PAL_PCH pch, uint8_t timeMode);
+void PAL_PLC_ProgramChannelSwitch(uint32_t timeSync, uint16_t pch, uint8_t timeMode);
 uint8_t PAL_PLC_GetSNR(uint8_t *snr, uint8_t qt);
 uint8_t PAL_PLC_GetZCT(uint32_t *zct);
 uint8_t PAL_PLC_GetTimer(uint32_t *timer);
@@ -75,9 +75,9 @@ uint8_t PAL_PLC_GetNL(uint8_t *noise);
 uint8_t PAL_PLC_GetAGC(uint8_t *mode, uint8_t *gain);
 uint8_t PAL_PLC_SetAGC(uint8_t mode, uint8_t gain);
 uint8_t PAL_PLC_GetCCA(uint8_t *channelState);
-uint8_t PAL_PLC_GetChannel(PAL_PCH *pPch);
-uint8_t PAL_PLC_SetChannel(PAL_PCH pch);
-void PAL_PLC_ProgramChannelSwitch(uint32_t timeSync, PAL_PCH pch, uint8_t timeMode);
+uint8_t PAL_PLC_GetChannel(uint16_t *pPch);
+uint8_t PAL_PLC_SetChannel(uint16_t pch);
+void PAL_PLC_ProgramChannelSwitch(uint32_t timeSync, uint16_t pch, uint8_t timeMode);
 uint8_t PAL_PLC_GetConfiguration(uint16_t id, void *val, uint16_t len);
 uint8_t PAL_PLC_SetConfiguration(uint16_t id, void *val, uint16_t len);
 uint16_t PAL_PLC_GetSignalCapture(uint8_t *noiseCapture, PAL_FRAME frameType, uint32_t timeStart, uint32_t duration);

@@ -327,7 +327,7 @@ def instantiateComponent(primeStackConfigComponent):
     # Create group for all PRIME SERVICES 
     createGroupServices()
     
-    # Enable PAL by default for SN
+    # Enable PAL by default for SN (SN application is the default configuration)
     Database.activateComponents(["primePal"], "PRIME STACK")
     primeStackConfigComponent.setDependencyEnabled("primePal_dep", True)
     

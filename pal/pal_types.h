@@ -69,49 +69,18 @@ Microchip or any third party.
 about the modulation scheme to be used */
 #define PAL_OUTDATED_INF    0x0F
 
-/* QT unknown value */
-#define PAL_QT_UNKNOW       0xFF
-
-/* Bits to be used in radio channel */
-#define RF_CHANNEL_BITS     0x3FF
+/* Radio Channel Mask */
+#define PRIME_PAL_RF_CHN_MASK                  0x0200
+/* Macro to configure frequency hopping channel */
+#define PRIME_PAL_RF_FREQ_HOPPING_CHANNEL      0x03FF
+/* Serial Channel Mask */
+#define PRIME_PAL_SERIAL_CHN_MASK              0x0400
 
 // *****************************************************************************
 // *****************************************************************************
 // Section: Data Types
 // *****************************************************************************
 // *****************************************************************************
-
-// *****************************************************************************
-/* PRIME Channel definitions
-
-  Summary:
-    List of PRIME PAL channels.
-
-*/
-typedef enum
-{
-    /* PLC Single Channels */
-    PAL_PLC_CHN1 = 0x00000001,
-    PAL_PLC_CHN2 = 0x00000002,
-    PAL_PLC_CHN3 = 0x00000004,
-    PAL_PLC_CHN4 = 0x00000008,
-    PAL_PLC_CHN5 = 0x00000010,
-    PAL_PLC_CHN6 = 0x00000020,
-    PAL_PLC_CHN7 = 0x00000040,
-    PAL_PLC_CHN8 = 0x00000080,
-    /* PLC Double Channels */
-    PAL_PLC_CHN1_CHN2 = 0x00000003,
-    PAL_PLC_CHN2_CHN3 = 0x00000006,
-    PAL_PLC_CHN3_CHN4 = 0x0000000C,
-    PAL_PLC_CHN4_CHN5 = 0x00000018,
-    PAL_PLC_CHN5_CHN6 = 0x00000030,
-    PAL_PLC_CHN6_CHN7 = 0x00000060,
-    PAL_PLC_CHN7_CHN8 = 0x000000C0,
-    /* Radio Channel */
-    PAL_RF_CHN = 0x0200,
-    /* Serial Channel */
-    PAL_SERIAL_CHN = 0x0400,
-} PAL_PCH;
 
 // *****************************************************************************
 /* PAL Handle
@@ -400,8 +369,8 @@ typedef struct
     uint32_t timeDelay;
     /* Length of the data buffer */
     uint16_t dataLength;
-    /* Physical channel mask to transmit the message */
-    PAL_PCH pch;
+    /* Physical Physical channel to transmit the message */
+    uint16_t pch;
     /* Buffer identifier */
     uint8_t buffId;
     /* Attenuation level with which the message must be transmitted */
@@ -435,8 +404,8 @@ typedef struct
 {
     /* Transmission time in us */
     uint32_t txTime;
-    /* Channel Mask where the message has been transmitted */
-    PAL_PCH pch;
+    /* Physical channel where the message has been transmitted */
+    uint16_t pch;
     /* RMS value */
     uint16_t rmsCalc;
     /* Type mode: Type A, Type B, Type BC, Type Radio  */
@@ -467,8 +436,8 @@ typedef struct
     uint32_t rxTime;
     /* Length of the data buffer */
     uint16_t dataLength;
-    /* Channel Mask where the message has been received */
-    PAL_PCH pch;
+    /* Physical channel where the message has been received */
+    uint16_t pch;
     /* Bitrate estimation in Kbs */
     uint16_t estimatedBitrate;
     /* RSSI (Received Signal Strength Indicator) coded as specified */
@@ -527,7 +496,7 @@ typedef void (*PAL_DATA_INDICATION_CB)(PAL_MSG_INDICATION_DATA *pData);
   Remarks:
     None.
 */
-typedef void (*PAL_SWITCH_RF_CH_CB)(PAL_PCH pch);
+typedef void (*PAL_SWITCH_RF_CH_CB)(uint16_t pch);
 
 // ****************************************************************************
 /* PRIME PAL handlers data

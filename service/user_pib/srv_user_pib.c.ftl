@@ -76,10 +76,13 @@ void SRV_USER_PIB_GetRequest(uint16_t pibAttrib)
     uint8_t getResult;
 
     /* Check PIB value */
-    if ((pibAttrib >= PIB_USER_RESET_INFO) && (pibAttrib <= PIB_USER_R12)) {
+    if ((pibAttrib >= PIB_USER_RESET_INFO) && (pibAttrib <= PIB_USER_R12)) 
+    {
         getResult = true;
         pibValue = srvUserPibValues[pibAttrib & 0x000F];
-    } else {
+    } 
+    else 
+    {
         getResult = false;
         pibValue = 0;
     }

@@ -225,27 +225,35 @@ void DumpStack(uint32_t stack[])
     SRV_RESET_HANDLER_RESET_CAUSE resetType;
 
     /* Check forced hard fault */
-    if ((saved_hfsr & (1 << 30)) != 0) {
+    if ((saved_hfsr & (1 << 30)) != 0) 
+    {
         resetType = RESET_HANDLER_HARD_FAULT_RESET;
 
         /* Check usage error */
-        if((saved_cfsr & 0xFFFF0000) != 0) {
+        if((saved_cfsr & 0xFFFF0000) != 0) 
+        {
             resetType = RESET_HANDLER_USAGE_FAULT_RESET;
         }
 
         /* Check bus fault error */
-        if((saved_cfsr & 0xFF00) != 0) {
+        if((saved_cfsr & 0xFF00) != 0) 
+        {
             resetType = RESET_HANDLER_BUS_FAULT_RESET;
         }
 
         /* Check memory management error */
-        if((saved_cfsr & 0xFF) != 0) {
+        if((saved_cfsr & 0xFF) != 0) 
+        {
             resetType = RESET_HANDLER_MEM_MANAGE_RESET;
         }
     /* Check bus fault on a vector table */
-    } else if ((saved_hfsr & (1 << 1)) != 0) {
+    } 
+    else if ((saved_hfsr & (1 << 1)) != 0) 
+    {
         resetType = RESET_HANDLER_VECTOR_FAULT_RESET;
-    } else {
+    } 
+    else 
+    {
         resetType = RESET_HANDLER_WATCHDOG_RESET;
     }
 
@@ -269,7 +277,8 @@ void SRV_RESET_HANDLER_Initialize(void)
     resetType = (SRV_RESET_HANDLER_RESET_CAUSE)(RSTC_ResetCauseGet() >> RSTC_SR_RSTTYP_Pos);
 
     /* If it is a software reset, it is from one of these handlers */
-    if ((resetType != RESET_HANDLER_SOFTWARE_RESET) && (resetType != RESET_HANDLER_GENERAL_RESET)) {
+    if ((resetType != RESET_HANDLER_SOFTWARE_RESET) && (resetType != RESET_HANDLER_GENERAL_RESET)) 
+    {
         /* Store reset information for other reset types */
         lSRV_RESET_HANDLER_StoreResetInfo(resetType);
     }

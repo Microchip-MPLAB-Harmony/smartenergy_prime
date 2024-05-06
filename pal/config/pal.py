@@ -242,6 +242,11 @@ def instantiateComponent(primePalComponent):
     primePalSerial.setDefaultValue(False)
     primePalSerial.setHelp(prime_pal_helpkeyword)
 
+    primePalSerialComment = primePalComponent.createCommentSymbol("PRIME_PAL_SERIAL_EN_COMMENT", primePalSerial)
+    primePalSerialComment.setVisible(False)
+    primePalSerialComment.setLabel("***Review PLC PHY driver configuration to set PL360 PLC Driver Mode***")
+    primePalSerialComment.setDependencies(showSymbol, ["PRIME_PAL_SERIAL_EN"])
+
     primePalPhySniffer = primePalComponent.createBooleanSymbol("PRIME_PAL_PHY_SNIFFER", None)
     primePalPhySniffer.setLabel("Enable PRIME PHY sniffer")
     primePalPhySniffer.setDefaultValue(False)
@@ -389,30 +394,33 @@ def instantiateComponent(primePalComponent):
     ##### PRIME PAL SERIAL
     global primePalSerialSrcFile
     primePalSerialSrcFile = primePalComponent.createFileSymbol("PRIME_PAL_SERIAL_SOURCE", None)
-    primePalSerialSrcFile.setSourcePath("pal/serial/pal_serial.c")
+    primePalSerialSrcFile.setSourcePath("pal/serial/pal_serial.c.ftl")
     primePalSerialSrcFile.setOutputName("pal_serial.c")
     primePalSerialSrcFile.setDestPath("stack/pal")
     primePalSerialSrcFile.setProjectPath("config/" + configName + "/stack/pal")
     primePalSerialSrcFile.setType("SOURCE")
     primePalSerialSrcFile.setEnabled(False)
+    primePalSerialSrcFile.setMarkup(True)
 
     global primePalSerialHdrFile
     primePalSerialHdrFile = primePalComponent.createFileSymbol("PRIME_PAL_SERIAL_HEADER", None)
-    primePalSerialHdrFile.setSourcePath("pal/serial/pal_serial.h")
+    primePalSerialHdrFile.setSourcePath("pal/serial/pal_serial.h.ftl")
     primePalSerialHdrFile.setOutputName("pal_serial.h")
     primePalSerialHdrFile.setDestPath("stack/pal")
     primePalSerialHdrFile.setProjectPath("config/" + configName + "/stack/pal")
     primePalSerialHdrFile.setType("SOURCE")
     primePalSerialHdrFile.setEnabled(False)
+    primePalSerialHdrFile.setMarkup(True)
 
     global primePalSerialLocalHdrFile
     primePalSerialLocalHdrFile = primePalComponent.createFileSymbol("PRIME_PAL_SERIAL_LOCAL_HEADER", None)
-    primePalSerialLocalHdrFile.setSourcePath("pal/serial/pal_serial_local.h")
+    primePalSerialLocalHdrFile.setSourcePath("pal/serial/pal_serial_local.h.ftl")
     primePalSerialLocalHdrFile.setOutputName("pal_serial_local.h")
     primePalSerialLocalHdrFile.setDestPath("stack/pal")
     primePalSerialLocalHdrFile.setProjectPath("config/" + configName + "/stack/pal")
     primePalSerialLocalHdrFile.setType("SOURCE")
     primePalSerialLocalHdrFile.setEnabled(False)
+    primePalSerialLocalHdrFile.setMarkup(True)
 
     primePalTypesFile = primePalComponent.createFileSymbol("PRIME_PAL_TYPES", None)
     primePalTypesFile.setSourcePath("pal/pal_types.h")

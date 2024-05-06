@@ -50,13 +50,16 @@ Microchip or any third party.
 #include <string.h>
 #include "configuration.h"
 #include "driver/driver.h"
-#include "driver/plc/phy_serial/drv_phy_serial.h"
+#include "driver/phy_serial/drv_phy_serial.h"
 #include "service/time_management/srv_time_management.h"
 #include "service/usi/srv_usi.h"
 #include "pal_types.h"
 #include "pal_local.h"
 #include "pal_serial.h"
 #include "pal_serial_local.h"
+<#if PRIME_PAL_PHY_SNIFFER == true>
+#include "service/psniffer/srv_psniffer.h"
+</#if>
 
 static uint8_t lPAL_SERIAL_RM_GetLessRobustModulation(PAL_SCHEME mod1, PAL_SCHEME mod2);
 static bool lPAL_SERIAL_RM_CheckMinimumQuality(PAL_SCHEME reference, PAL_SCHEME modulation);
@@ -126,7 +129,7 @@ static void lPAL_SERIAL_SERIAL_DataCfmCb(DRV_PHY_SERIAL_MSG_CONFIRM_DATA *pCfmDa
 
     dataCfm.bufId = pCfmData->buffId;
     dataCfm.frameType = (PAL_FRAME)pCfmData->mode;
-    dataCfm.pch = (PAL_PCH)DRV_PHY_SERIAL_CHANNEL;
+    dataCfm.pch = (uint16_t)DRV_PHY_SERIAL_CHANNEL;
     dataCfm.result = (PAL_TX_RESULT)pCfmData->result;
     dataCfm.rmsCalc = pCfmData->rmsCalc;
     dataCfm.txTime = pCfmData->txTime;
@@ -135,6 +138,20 @@ static void lPAL_SERIAL_SERIAL_DataCfmCb(DRV_PHY_SERIAL_MSG_CONFIRM_DATA *pCfmDa
     {
         palSerialData.serialCallbacks.dataConfirm(&dataCfm);
     }
+
+<#if PRIME_PAL_PHY_SNIFFER == true>
+    if (palSerialData.snifferCallback)
+    {
+        size_t dataLength;
+
+        SRV_PSNIFFER_SetTxPayloadSymbols(0);
+
+        dataLength = SRV_PSNIFFER_SerialCfmMessage(palSerialData.snifferData, (void *)pCfmData);
+
+        palSerialData.snifferCallback(palSerialData.snifferData, dataLength);
+    }
+
+</#if>
 }
 
 static void lPAL_SERIAL_SERIAL_DataIndCb(DRV_PHY_SERIAL_MSG_RX_DATA *pRxData)
@@ -143,13 +160,13 @@ static void lPAL_SERIAL_SERIAL_DataIndCb(DRV_PHY_SERIAL_MSG_RX_DATA *pRxData)
 
     dataInd.bufId = pRxData->buffId;
     dataInd.dataLength = pRxData->dataLen;
-    // dataInd.estimatedBitrate = ;   TBD!!!!!!!!!!!!!!!!!!!!!
+    dataInd.estimatedBitrate = 20;
     dataInd.frameType = pRxData->mode;
     dataInd.headerType = pRxData->headerType;
-    // dataInd.lessRobustMod = ;    TBD!!!!!!!!!!!!!!!!!!!!!!!!
+    dataInd.lessRobustMod = pRxData->scheme;
     dataInd.lqi = ((pRxData->cinrAvg + 12) / 4);
     dataInd.pData = pRxData->dataBuf;
-    dataInd.pch = (PAL_PCH)DRV_PHY_SERIAL_CHANNEL;
+    dataInd.pch = (uint16_t)DRV_PHY_SERIAL_CHANNEL;
     dataInd.rssi = pRxData->rssiAvg;
     dataInd.rxTime = pRxData->rxTime;
     dataInd.scheme = pRxData->scheme;
@@ -158,6 +175,20 @@ static void lPAL_SERIAL_SERIAL_DataIndCb(DRV_PHY_SERIAL_MSG_RX_DATA *pRxData)
     {
         palSerialData.serialCallbacks.dataIndication(&dataInd);
     }
+
+<#if PRIME_PAL_PHY_SNIFFER == true>
+    if (palSerialData.snifferCallback)
+    {
+        size_t length;
+
+        SRV_PSNIFFER_SetRxPayloadSymbols(0);
+
+        length = SRV_PSNIFFER_SerialRxMessage(palSerialData.snifferData, (void *)pRxData);
+
+        palSerialData.snifferCallback(palSerialData.snifferData, length);
+    }
+
+</#if>
 }
 
 // *****************************************************************************
@@ -233,10 +264,15 @@ uint8_t PAL_SERIAL_DataRequest(PAL_MSG_REQUEST_DATA *pMessageData)
         return PAL_CFG_INVALID_INPUT;
     }
 
+<#if PRIME_PAL_PHY_SNIFFER == true>
+    SRV_PSNIFFER_SetTxMessage((void *)&phyTxData);
+
+</#if>
+
     return PAL_CFG_SUCCESS;
 }
 
-void PAL_SERIAL_ProgramChannelSwitch(uint32_t timeSync, PAL_PCH pch, uint8_t timeMode)
+void PAL_SERIAL_ProgramChannelSwitch(uint32_t timeSync, uint16_t pch, uint8_t timeMode)
 {
     (void)timeSync;
     (void)pch;
@@ -304,14 +340,14 @@ uint8_t PAL_SERIAL_GetNL(uint8_t *pNoise)
     return PAL_CFG_INVALID_INPUT;
 }
 
-uint8_t PAL_SERIAL_GetChannel(PAL_PCH *pPch)
+uint8_t PAL_SERIAL_GetChannel(uint16_t *pPch)
 {
     *pPch = 0xFFFF;
 
     return PAL_CFG_INVALID_INPUT;
 }
 
-uint8_t PAL_SERIAL_SetChannel(PAL_PCH pch)
+uint8_t PAL_SERIAL_SetChannel(uint16_t pch)
 {
     (void)pch;
 
@@ -380,3 +416,12 @@ uint8_t PAL_SERIAL_GetMsgDuration(uint16_t length, PAL_SCHEME scheme, uint8_t fr
 
     return PAL_CFG_INVALID_INPUT;
 }
+
+<#if PRIME_PAL_PHY_SNIFFER == true>
+void PAL_Serial_USISnifferCallbackRegister(SRV_USI_HANDLE usiHandler, PAL_USI_SNIFFER_CB callback)
+{
+    palSerialData.usiHandler = usiHandler;
+    palSerialData.snifferCallback = callback;
+}
+
+</#if>

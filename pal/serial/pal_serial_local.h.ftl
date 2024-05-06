@@ -6,10 +6,10 @@
     pal_serial_local.h
 
   Summary:
-    Platform Abstraction Layer (PAL) PLC Interface Local header file.
+    Platform Abstraction Layer (PAL) Serial Interface Local header file.
 
   Description:
-    Platform Abstraction Layer (PAL) PLC Interface Local header file.
+    Platform Abstraction Layer (PAL) Serial Interface Local header file.
 *******************************************************************************/
 
 //DOM-IGNORE-BEGIN
@@ -56,9 +56,14 @@ Microchip or any third party.
 // *****************************************************************************
 // *****************************************************************************
 // *****************************************************************************
-#define PAL_SERIAL_ID_INFO_VERSION  0x0400  // TBD
-#define PAL_SERIAL_ID_INFO_DEVICE   0x0400  // TBD
+#define PAL_SERIAL_ID_INFO_VERSION  0x0400
+#define PAL_SERIAL_ID_INFO_DEVICE   0x0400
 
+<#if PRIME_PAL_PHY_SNIFFER == true>
+#define PAL_SNIFFER_DATA_MAX_SIZE           512
+typedef void (*PAL_USI_SNIFFER_CB)(uint8_t *pData, uint16_t length);
+
+</#if>
 // *****************************************************************************
 /* SERIAL PAL Module Status
 
@@ -89,7 +94,7 @@ typedef enum
     Holds PAL PLC internal data.
 
   Description:
-    This data type defines the all data required to handle the PAL PLC module.
+    This data type defines all data required to handle the PAL PLC module.
 
   Remarks:
     None.
@@ -99,6 +104,15 @@ typedef struct
     PAL_CALLBACKS serialCallbacks;
 
     PAL_SERIAL_STATUS status;
+
+<#if PRIME_PAL_PHY_SNIFFER == true>
+    PAL_USI_SNIFFER_CB snifferCallback;
+
+    SRV_USI_HANDLE usiHandler;
+
+    uint8_t snifferData[PAL_SNIFFER_DATA_MAX_SIZE];
+
+</#if>
 
 } PAL_SERIAL_DATA;
 

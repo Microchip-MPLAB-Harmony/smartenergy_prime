@@ -156,7 +156,7 @@ typedef uint16_t (*hal_null_dev_write_callback_t)(uint8_t chn, const void *buffe
 bool hal_null_dev_set_read_callback(hal_null_dev_read_callback_t ptr_func);
 bool hal_null_dev_set_write_callback(hal_null_dev_write_callback_t ptr_func);
 
-<#if primePal.PRIME_PAL_PLC_EN == true>
+<#if PRIME_OPERATION_MODE == "Hybrid" || PRIME_OPERATION_MODE == "PLC" || PRIME_OPERATION_MODE == "PLC+Serial">
 typedef bool (*hal_plc_send_boot_cmd_t)(uint16_t us_cmd, uint32_t ul_addr, uint32_t ul_data_len, uint8_t *puc_data_buf, uint8_t *puc_data_read);
 typedef bool (*hal_plc_send_wrrd_cmd_t)(uint8_t uc_cmd, void *px_spi_data, void *px_spi_status_info);
 typedef void (*hal_plc_enable_interrupt_t)(bool enable);
@@ -180,7 +180,7 @@ typedef bool (*hal_timer_1us_cancel_int_t)(uint32_t ul_int_id);
 typedef void (*hal_timer_1us_enable_interrupt_t)(bool b_enable);
 /* @} */
 
-<#if primePal.PRIME_PAL_RF_EN == true>
+<#if PRIME_OPERATION_MODE == "Hybrid" || PRIME_OPERATION_MODE == "RF">
 typedef uint8_t (*hal_prf_if_init_t)(void);
 typedef void (*hal_prf_if_reset_t)(void);
 typedef void (*hal_prf_if_enable_interrupt_t)(bool b_enable);
@@ -210,13 +210,11 @@ typedef struct {
 	hal_fu_signature_image_check_set_callback_t fu_signature_image_check_set_callback;
 	hal_fu_get_bitmap_t fu_get_bitmap;
 
-<#if primePal.PRIME_PAL_PLC_EN == true>
 	hal_plc_init_t plc_init;
 	hal_plc_reset_t plc_reset;
 	hal_plc_set_handler_t plc_set_handler;
 	hal_plc_tx_signal_t plc_tx_signal;
 	hal_plc_rx_signal_t plc_rx_signal;
-</#if>
 
 	hal_get_config_info_t get_config_info;
 	hal_set_config_info_t set_config_info;
@@ -231,7 +229,7 @@ typedef struct {
 
 	hal_net_get_freq_t net_get_freq;
 
-<#if primePal.PRIME_PAL_PLC_EN == true>
+<#if PRIME_OPERATION_MODE == "Hybrid" || PRIME_OPERATION_MODE == "PLC" || PRIME_OPERATION_MODE == "PLC+Serial">
 	hal_plc_send_boot_cmd_t plc_send_boot_cmd;
 	hal_plc_send_wrrd_cmd_t plc_send_wrrd_cmd;
 	hal_plc_enable_interrupt_t plc_enable_int;
@@ -255,7 +253,7 @@ typedef struct {
 	hal_aes_crypt_t aes_crypt;
 	hal_swap_stack_t swap_stack;
 
-<#if primePal.PRIME_PAL_PLC_EN == true>
+<#if PRIME_OPERATION_MODE == "Hybrid" || PRIME_OPERATION_MODE == "PLC" || PRIME_OPERATION_MODE == "PLC+Serial">
 	hal_plc_set_stby_mode_t plc_set_stby_mode;
 	hal_plc_get_thermal_warning_t plc_get_thermal_warning;
 </#if>
@@ -268,7 +266,7 @@ typedef struct {
 	hal_timer_1us_cancel_int_t timer_1us_cancel_int;
 	hal_timer_1us_enable_interrupt_t timer_1us_enable_interrupt;
 
-<#if primePal.PRIME_PAL_RF_EN == true>
+<#if PRIME_OPERATION_MODE == "Hybrid" || PRIME_OPERATION_MODE == "RF">
 	hal_prf_if_init_t prf_if_init;
 	hal_prf_if_reset_t prf_if_reset;
 	hal_prf_if_enable_interrupt_t prf_if_enable_interrupt;
