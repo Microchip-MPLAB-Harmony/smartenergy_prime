@@ -200,7 +200,7 @@ typedef struct
 {
     /* Pointer to local data buffer */
     uint8_t *dataBuf;
-    /* Reception time in 10us */
+    /* Reception time in us */
     uint32_t rxTime;
     /* Accumulated Error Vector Magnitude for header */
     uint32_t evmHeaderAcum;

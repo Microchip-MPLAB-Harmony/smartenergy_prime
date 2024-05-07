@@ -244,7 +244,7 @@ def instantiateComponent(primePalComponent):
 
     primePalSerialComment = primePalComponent.createCommentSymbol("PRIME_PAL_SERIAL_EN_COMMENT", primePalSerial)
     primePalSerialComment.setVisible(False)
-    primePalSerialComment.setLabel("***Review PLC PHY driver configuration to set PL360 PLC Driver Mode***")
+    primePalSerialComment.setLabel("***PAL Serial only supported in a PRIME 1.3.6 BN or BN Slave***")
     primePalSerialComment.setDependencies(showSymbol, ["PRIME_PAL_SERIAL_EN"])
 
     primePalPhySniffer = primePalComponent.createBooleanSymbol("PRIME_PAL_PHY_SNIFFER", None)

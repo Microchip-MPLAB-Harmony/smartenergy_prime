@@ -614,7 +614,7 @@ uint8_t PAL_SetAGC(uint16_t pch, uint8_t mode, uint8_t gain);
     <code>
     uint8_t result=PAL_CFG_SUCCESS;
     uint8_t pState=0;
-    uint16 pch = 1;
+    uint16 pch = 512;
 
     result = PAL_GetCCA(pch, &pState);
     </code>
