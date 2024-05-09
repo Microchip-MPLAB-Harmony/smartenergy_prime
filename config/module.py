@@ -47,6 +47,7 @@ def loadModule():
     primeStackConfigComponent.setDisplayType("PRIME Stack")
     primeStackConfigComponent.addDependency("primePal_dep", "PRIME_PAL", True, True)
     primeStackConfigComponent.addDependency("primeUSI_dep", "USI", True, True)
+    primeStackConfigComponent.addDependency("primeFu_dep", "Firmware Upgrade", True, True)
     primeStackConfigComponent.addCapability("primeStackCapability", "PRIME Stack", True)
 
     ###########  PRIME Service Configurations  ###########
@@ -70,3 +71,9 @@ def loadModule():
     primeTimeManagementComponent.setDisplayType("PRIME Service")
     primeTimeManagementComponent.addDependency("SysTime_dep", "SYS_TIME", True, True)
     primeTimeManagementComponent.addCapability("Time Management", "Time Management", True) 
+
+    ## PRIME Firmware Upgrade
+    primeFUCompoment = Module.CreateComponent("primeFirwmareUpgrade", "Firmware Upgrade", "/SmartEnergy/Services", "service/firmware_upgrade/config/srv_firmware_upgrade.py")
+    primeFUCompoment.setDisplayType("PRIME Service")
+    primeFUCompoment.addMultiDependency("Memory_dep", "DRV_MEDIA", "DRV_MEDIA", True)
+    primeFUCompoment.addCapability("Firmware Upgrade", "Firmware Upgrade", True) 

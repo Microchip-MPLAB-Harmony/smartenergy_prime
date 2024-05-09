@@ -250,27 +250,32 @@ def primeAddSnFiles():
         pass
 
 def primeUpdateFiles(primeStackComponent):
-    addPALComponent = False
+    addPALFUComponent = False
+    
     if (primeConfigMode.getValue() == "SN"):
         # Add files for SN
         primeAddSnFiles()
         if (primeConfigProject.getValue() == "application project"):
-            addPALComponent = True
+            addPALFUComponent = True
+
     elif (primeConfigMode.getValue() == "BN"):
         # Add files for BN
         primeAddBnFiles()
         # Add PRIME components
-        addPALComponent = True
+        addPALFUComponent = True
 
-    if (addPALComponent == True):
+    if (addPALFUComponent == True):
         # Add PRIME components
         Database.activateComponents(["primePal"], "PRIME STACK")
         primeStackComponent.setDependencyEnabled("primePal_dep", True)
+        primeStackComponent.setDependencyEnabled("primeFu_dep", True)
     else:
         # Remove PRIME components
         Database.deactivateComponents(["primePal"])
         primeStackComponent.setDependencyEnabled("primePal_dep", False)
-
+        primeStackComponent.setDependencyEnabled("primeFu_dep", False)
+    
+        
 def primeShowSprofUsiInstance(symbol, event):
     symbol.setVisible(event["value"])
 
@@ -476,7 +481,8 @@ def instantiateComponent(primeStackConfigComponent):
     # Enable PAL by default for SN (SN application is the default configuration)
     Database.activateComponents(["primePal"], "PRIME STACK")
     primeStackConfigComponent.setDependencyEnabled("primePal_dep", True)
-
+    primeStackConfigComponent.setDependencyEnabled("primeFu_dep", True)
+    
     # Configure PRIME Stack
     primeStackConfig = primeStackConfigComponent.createMenuSymbol("PRIME_Stack_Configuration", None)
     primeStackConfig.setLabel("PRIME Stack Configuration")
