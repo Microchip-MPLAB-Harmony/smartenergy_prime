@@ -46,60 +46,115 @@ Microchip or any third party.
 // *****************************************************************************
 
 #include <stdio.h>
-#include "prime_hal_wrapper.h"
+#include "cmsis_compiler.h" 
 #include "prime_api.h"
-#include "stack/prime/mac/mac.h"
-#include "stack/prime/mngp/mngp.h"
-#include "stack/prime/conv/sscs/null/cl_null.h"
-#include "stack/prime/conv/sscs/iec_4_32/cl_432.h"
+#include "prime_api_types.h"
+<#if PRIME_MODE == "SN" && PRIME_PROJECT == "application project">
+#include "configuration.h"
+
+void PRIME_API_GetPrime13API(PRIME_API **pPrimeApi)
+{
+    *pPrimeApi = (PRIME_API *)PRIME_SN_FWSTACK13_ADDRESS;
+}
+
+void PRIME_API_GetPrime14API(PRIME_API **pPrimeApi)
+{
+    *pPrimeApi = (PRIME_API *)PRIME_SN_FWSTACK14_ADDRESS;
+}
+
+<#else>
+  <#if PRIME_MODE == "SN" && PRIME_PROJECT == "bin project">
+#include <libpic32c.h>
+  </#if>
+#include "stack/prime/prime_api/prime_hal_wrapper.h"
+#include "stack/prime/mac/mac_defs.h"
+//#include "stack/prime/mac/mac.h"
+//#include "stack/prime/mngp/mngp.h"
+//#include "stack/prime/conv/sscs/null/cl_null.h"
+//#include "stack/prime/conv/sscs/iec_4_32/cl_432.h"
 
 // *****************************************************************************
 // *****************************************************************************
 // Section: Macro Definitions
 // *****************************************************************************
 // *****************************************************************************
-
-<#if (PRIME_MODE == "BN" && BN_SLAVE_EN == false)>
+/* Configuration of the CORTEX-M4 Processor and Core Peripherals */
+/* PIC32CXMT */
+#define __NVIC_PRIO_BITS         4
+  <#if (PRIME_MODE == "BN" && BN_SLAVE_EN == false)>
 #define NUM_MAX_NODES            ${NUM_MAX_NODES}
-</#if>
+  </#if>
 #define MAC_SECURITY_PROFILE     ${MAC_SECURITY_PROFILE}
 #define MNGP_SPROF_USI_PORT      ${MNGP_SPROF_USI_PORT}
-<#if MAC_SNIFFER_EN == true>
+  <#if (MAC_SNIFFER_EN?? && MAC_SNIFFER_EN == true)>
 #define MAC_SNIFFER_USI_PORT     ${MAC_SNIFFER_USI_PORT}
-</#if>
+  </#if>
 
-
-<#if PRIME_MODE == "SN" && PRIME_PROJECT == "bin project">
 // *****************************************************************************
 // *****************************************************************************
 // Section: Global Data
 // *****************************************************************************
 // *****************************************************************************
+  <#if PRIME_MODE == "SN" && PRIME_PROJECT == "bin project">
+void __attribute__((optimize("-O1"), section(".text.Reset_Handler"), long_call)) Reset_Handler(void)
+{
+    // Avoid warning in compilation. Reset Handler is not needed.
+}
 
-/* Initialize segments */
-extern uint32_t _szero;
-extern uint32_t _ezero;
-</#if>
+  </#if>
+  <#if PRIME_MODE == "SN" && PRIME_PROJECT == "bin project">
+__attribute__ ((section(".vectors"), used))
+  </#if>
+const PRIME_API  PRIME_API_Interface =
+{
+    .vendor = PRIME_PIB_VENDOR,
+    .model = PRIME_PIB_MODEL,
+    .version = PRIME_FW_VERSION,
+    .Initialize = PRIME_API_Initialize,
+    .Tasks = PRIME_API_Tasks,
+    // .MacSetCallbacks = ,     
+    // .MacEstablishRequest = , 
+    // .MacEstablishResponse = ,
+    // .MacReleaseRequest = ,
+    // .MacReleaseResponse = ,
+    // .MacJoinRequest = ,
+    // .MacJoinResponse = ,
+    // .MacLeaveRequest = ,
+    // .MacLeaveResponse = ,
+    // .PlmeResetRequest = ,
+    // .PlmeSleepRequest = ,
+    // .PlmeResumeRequest = ,
+    // .PlmeTestModeRequest = ,
+    // .PlmeGetRequest = ,
+    // .PlmeSetRequest = ,
+    // .MlmeRegisterRequest = ,
+    // .MlmeUnregisterRequest
+    // .MlmePromoteRequest = ,
+    // .MlmeDemoteRequest = ,
+    // .MlmeResetRequest = ,
+    // .MlmeGetRequest = ,
+    // .MlmeListGetRequest = ,
+    // .MlmeSetRequest = ,
+    // .Cl432SetCallbacks = ,
+    // .Cl432EstablishRequest
+    // .Cl432ReleaseRequest = ,
+    // .Cl432DlDataRequest = ,
+    // .MlmeMpPromoteRequest = ,
+    // .MlmeMpDemoteRequest = ,
+};
 
 // *****************************************************************************
 // *****************************************************************************
 // Section: File scope functions
 // *****************************************************************************
 // *****************************************************************************
-
-<#if PRIME_MODE == "SN" && PRIME_PROJECT == "bin project">
+  <#if PRIME_MODE == "SN" && PRIME_PROJECT == "bin project">
 static void lPRIME_API_PrimeDataStartup(void)
 {
-	uint32_t *pDest;
-
-	/* Clear the zero segment */
-	for (pDest = &_szero; pDest < &_ezero;) 
-    {
-		*pDest++ = 0;
-	}
+    __pic32c_data_initialization();
 }
-</#if>
 
+  </#if>
 static void lPRIME_API_SetPrimeVersion(MAC_VERSION_INFO *macInfo)
 {
 	uint8_t sizeConfig, sizeInfo;
@@ -151,7 +206,6 @@ static void lPRIME_API_SetPrimeVersion(MAC_VERSION_INFO *macInfo)
 // Section: CRC Service Interface Implementation
 // *****************************************************************************
 // *****************************************************************************
-
 void PRIME_API_Initialize(void *halApi)
 {
 	MAC_VERSION_INFO macInfo;
@@ -159,25 +213,25 @@ void PRIME_API_Initialize(void *halApi)
 	/* Set critical region */
 	__set_BASEPRI( 2 << (8 - __NVIC_PRIO_BITS));
 
-<#if PRIME_MODE == "SN" && PRIME_PROJECT == "bin project">
+  <#if PRIME_MODE == "SN" && PRIME_PROJECT == "bin project">
 	lPRIME_API_PrimeDataStartup();
-</#if>
+  </#if>
 
 	/* Set PRIME HAL wrapper */
-	PRIME_HAL_WRP_SetConfig(halApi);
+	PRIME_HAL_WRP_Configure(halApi);
 
 	/* Set PRIME version from configuration */
 	lPRIME_API_SetPrimeVersion(&macInfo);
 
-	/* Initialize MAC layer */
-	MAC_Initialize(&macInfo, (uint8_t)MAC_SECURITY_PROFILE);
-
-	/* Initialize Convergence layers */
-	CL_NULL_Initialize();
-	CL_432_Initialize();
-
-	/* Initialize Management Plane */
-	MNGP_Initialize(&macInfo, (uint8_t)MNGP_SPROF_USI_PORT);
+//	/* Initialize MAC layer */
+//	MAC_Initialize(&macInfo, (uint8_t)MAC_SECURITY_PROFILE);
+//
+//	/* Initialize Convergence layers */
+//	CL_NULL_Initialize();
+//	CL_432_Initialize();
+//
+//	/* Initialize Management Plane */
+//	MNGP_Initialize(&macInfo, (uint8_t)MNGP_SPROF_USI_PORT);
 
 	/* Set critical region */
 	__set_BASEPRI(0);
@@ -188,14 +242,23 @@ void PRIME_API_Tasks(void)
 	/* Set critical region */
 	__set_BASEPRI( 3 << (8 - __NVIC_PRIO_BITS));
 
-	/* Process MAC layer */
-	MAC_Tasks();
+//	/* Process MAC layer */
+//	MAC_Tasks();
 
-<#if (PRIME_MODE == "SN") || (PRIME_MODE == "BN" && BN_SLAVE_EN == true)>
-	/* Process Management Plane */
-	MNGP_Tasks();
-</#if>
+  <#if (PRIME_MODE == "SN") || (PRIME_MODE == "BN" && BN_SLAVE_EN == true)>
+//	/* Process Management Plane */
+//	MNGP_Tasks();
+  </#if>
 
 	/* Set critical region */
 	__set_BASEPRI(0);
 }
+
+  <#if PRIME_MODE == "BN">
+void PRIME_API_GetPrimeAPI(PRIME_API **pPrimeApi)
+{
+    *pPrimeApi = (PRIME_API *)&PRIME_API_Interface;
+}
+
+  </#if>
+</#if>

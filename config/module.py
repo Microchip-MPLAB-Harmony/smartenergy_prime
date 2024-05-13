@@ -46,6 +46,7 @@ def loadModule():
     primeStackConfigComponent = Module.CreateComponent("prime_config", "PRIME Stack", "/SmartEnergy/PRIME Stack", "prime/config/prime_configurator.py")
     primeStackConfigComponent.setDisplayType("PRIME Stack")
     primeStackConfigComponent.addDependency("primePal_dep", "PRIME_PAL", True, True)
+    primeStackConfigComponent.addDependency("primeUSI_dep", "USI", True, True)
     primeStackConfigComponent.addCapability("primeStackCapability", "PRIME Stack", True)
 
     ###########  PRIME Service Configurations  ###########

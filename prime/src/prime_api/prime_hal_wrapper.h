@@ -64,41 +64,35 @@ Microchip or any third party.
 // Section: API Functions
 // *****************************************************************************
 // *****************************************************************************
-<#if primePal.PRIME_PAL_PLC_EN == true>
-//******************************************************************************
+// *****************************************************************************
 /* Function:
-    void PRIME_HAL_WRP_Configure(HAL_API *halApi)
-    
+    void PRIME_HAL_WRP_Configure(HAL_API *pHalApi)
+
   Summary:
-    Configure the PRIME HAL Wrapper.
-bool prime_hal_plc_send_boot_cmd(uint16_t us_cmd, uint32_t ul_addr, uint32_t ul_data_len, uint8_t *puc_data_buf, uint8_t *puc_data_read);
-bool prime_hal_plc_send_wrrd_cmd(uint8_t uc_cmd, void *px_spi_data, void *px_spi_status_info);
-void prime_hal_plc_enable_interrupt(bool enable);
-void prime_hal_plc_delay(uint8_t uc_tref, uint32_t ul_delay);
+    Trigger a system restart.
+
+  Description:
+    This routine triggers a system restart. 
 
   Precondition:
     None.
-
+    
   Parameters:
-    halApi       - Pointr to the HAL API.
+    pHalApi      - Pointer to HAL API 
 
   Returns:
     None.
 
   Example:
     <code>
-    void prime_stack_init(void *p_hal_api)
-    {
-        PRIME_HAL_WRP_Configure(p_hal_api);
-    }
+    extern HAL_API primeHalAPI;
+
+    PRIME_HAL_WRP_Configure(&primeHalAPI);
     </code>
 
-  Remarks:
-    None.
 */
-void PRIME_HAL_WRP_Configure(HAL_API *halApi);
+void PRIME_HAL_WRP_Configure(HAL_API *pHalApi);
 
-// *****************************************************************************
 /* Function:
     void PRIME_HAL_WRP_RestartSystem(SRV_RESET_HANDLER_RESET_CAUSE resetType)
 
@@ -184,7 +178,7 @@ void PRIME_HAL_WRP_RestartSystem(SRV_RESET_HANDLER_RESET_CAUSE resetType);
   Remarks:
     Related to PCRC service.
 */        
-uint32_t PRIME_HAL_WRAPPER_PcrcCalculate((uint8_t *pData, size_t length,
+uint32_t PRIME_HAL_WRAPPER_PcrcCalculate(uint8_t *pData, size_t length,
     PCRC_HEADER_TYPE hdrType, PCRC_CRC_TYPE crcType, uint32_t initValue, 
     bool v14Mode);
     
@@ -508,7 +502,7 @@ void PRIME_HAL_WRP_PibGetRequest(uint16_t us_pib_attrib);
 /* Function:
     void PRIME_HAL_WRP_PIBGetRequestSetCallback
     ( 
-        USER_PIB_GET_REQUEST_CALLBACK callback
+        SRV_USER_PIB_GET_REQUEST_CALLBACK callback
     )
 
   Summary:
@@ -544,7 +538,7 @@ void PRIME_HAL_WRP_PibGetRequest(uint16_t us_pib_attrib);
   Remarks:
     Related to User PIB service.
 */
-void PRIME_HAL_WRP_PIBGetRequestSetCallback(USER_PIB_GET_REQUEST_CALLBACK callback);
+void PRIME_HAL_WRP_PIBGetRequestSetCallback(SRV_USER_PIB_GET_REQUEST_CALLBACK callback);
 
 // *****************************************************************************
 /* Function:
@@ -601,7 +595,7 @@ void PRIME_HAL_WRP_PibSetRequest(uint16_t pibAttrib, void *pibValue,
 /* Function:
     void PRIME_HAL_WRP_PIBSetRequestSetCallback
     (
-        USER_PIB_SET_REQUEST_CALLBACK callback
+        SRV_USER_PIB_GET_REQUEST_CALLBACK callback
     )
 
   Summary:
@@ -636,7 +630,7 @@ void PRIME_HAL_WRP_PibSetRequest(uint16_t pibAttrib, void *pibValue,
   Remarks:
     Related to User PIB service.
 */
-void PRIME_HAL_WRP_PIBSetRequestSetCallback(USER_PIB_SET_REQUEST_CALLBACK callback);
+void PRIME_HAL_WRP_PIBSetRequestSetCallback(SRV_USER_PIB_SET_REQUEST_CALLBACK callback);
 
 //******************************************************************************
 /* Function:
@@ -1037,42 +1031,120 @@ uint64_t PRIME_HAL_WRP_GetTimeUS64(void);
 */
 uint32_t PRIME_HAL_WRP_GetTimeUS(void);    
 
+// *****************************************************************************
+/* Function:
+    SYS_TIME_HANDLE PRIME_HAL_WRP_TIMER_CallbackRegisterUS ( SYS_TIME_CALLBACK callback,
+                        uintptr_t context, uint32_t us, SYS_TIME_CALLBACK_TYPE type )
+
+   Summary:
+        Registers a function with the time system service to be called back when the
+        requested number of microseconds have expired (either once or repeatedly).
+
+   Description:
+        Creates a timer object and registers a function with it to be called back
+        when the requested delay (specified in microseconds) has completed.  The
+        caller must identify if the timer should call the function once or repeatedly
+        every time the given delay period expires.
+
+   Parameters:
+    callback    - Pointer to the function to be called.
+                  For single shot timers, the callback cannot be NULL.
+                  For periodic timers, if the callback pointer is given as NULL,
+                  no callback will occur, but SYS_TIME_TimerPeriodHasExpired can
+                  still be polled to determine if the period has expired for a
+                  periodic timer.
+
+    context     - A client-defined value that is passed to the callback function.
+
+    us          - Time period in microseconds.
+
+    type        - Type of callback requested. If type is SYS_TIME_SINGLE, the
+                  Callback function will be called once when the time period expires.
+                  After the time period expires, the timer object will be freed.
+                  If type is SYS_TIME_PERIODIC Callback function will be called
+                  repeatedly, every time the time period expires until the timer
+                  object is stopped or deleted.
 
 
+   Returns:
+        SYS_TIME_HANDLE - A valid timer object handle if the call succeeds.
+                      SYS_TIME_HANDLE_INVALID if it fails.
 
-/** \brief Firmware Upgrade Interface */
-/* @{ */
-void prime_hal_fu_data_read(uint32_t addr, uint8_t *puc_buf, uint16_t us_size);
-uint8_t prime_hal_fu_data_write(uint32_t addr, uint8_t *puc_buf, uint16_t us_size);
-void prime_hal_fu_data_cfg_read(void *pv_dst, uint16_t us_size);
-uint8_t prime_hal_fu_data_cfg_write(void *pv_src, uint16_t us_size);
-void prime_hal_fu_start(hal_fu_info_t *x_fu_info);
-void prime_hal_fu_end(hal_fu_result_t uc_hal_res);
-void prime_hal_fu_revert(void);
-void prime_hal_fu_crc_calculate(void);
-void prime_hal_fu_crc_set_callback(void (*p_handler)(uint32_t ul_crc));
-uint16_t prime_hal_fu_get_bitmap(uint8_t *puc_bitmap, uint32_t *pus_num_rcv_pages);
-void prime_hal_fu_signature_image_check(void);
-void prime_hal_fu_signature_image_check_set_callback(void (*p_handler)(hal_fu_verif_result_t uc_result));
-void prime_hal_swap_stack(uint8_t uc_traffic);
-/* @} */
+   Example:
+      Given a callback function implementation matching the following prototype:
+      <code>
+      void MyCallback ( uintptr_t context);
+      </code>
+
+      The following example call will register it, requesting a 500 microsecond
+      periodic callback.
+      <code>
+     
+      SYS_TIME_HANDLE handle = PRIME_HAL_WRP_TIMER_CallbackRegisterUS(MyCallback, (uintptr_t)0, 
+                500, SYS_TIME_PERIODIC);
+      if (handle != SYS_TIME_HANDLE_INVALID)
+      {
+           
+      }
+      </code>
+
+   Remarks:
+       Will give a callback after the requested number of microseconds or longer
+       have elapsed, depending on system performance. In tick-based mode, the requested
+       delay will be ceiled to the next timer tick. For example, if the 
+       timer tick is set to 1 msec and the requested delay is 1500 usec, a 
+       delay of 2 msec will be generated.
+
+       Delay values of 0 will return SYS_TIME_ERROR.
+*/
+SYS_TIME_HANDLE PRIME_HAL_WRP_TIMER_CallbackRegisterUS(SYS_TIME_CALLBACK callback,
+    uintptr_t context, uint32_t us, SYS_TIME_CALLBACK_TYPE type);
+
+// /** \brief Firmware Upgrade Interface */
+// /* @{ */
+// void prime_hal_fu_data_read(uint32_t addr, uint8_t *puc_buf, uint16_t us_size);
+// uint8_t prime_hal_fu_data_write(uint32_t addr, uint8_t *puc_buf, uint16_t us_size);
+// void prime_hal_fu_data_cfg_read(void *pv_dst, uint16_t us_size);
+// uint8_t prime_hal_fu_data_cfg_write(void *pv_src, uint16_t us_size);
+// void prime_hal_fu_start(hal_fu_info_t *x_fu_info);
+// void prime_hal_fu_end(hal_fu_result_t uc_hal_res);
+// void prime_hal_fu_revert(void);
+// void prime_hal_fu_crc_calculate(void);
+// void prime_hal_fu_crc_set_callback(void (*p_handler)(uint32_t ul_crc));
+// uint16_t prime_hal_fu_get_bitmap(uint8_t *puc_bitmap, uint32_t *pus_num_rcv_pages);
+// void prime_hal_fu_signature_image_check(void);
+// void prime_hal_fu_signature_image_check_set_callback(void (*p_handler)(hal_fu_verif_result_t uc_result));
+// void prime_hal_swap_stack(uint8_t uc_traffic);
+// /* @} */
 
 
 /** \brief PAL Interface */
 
+SYS_MODULE_OBJ PRIME_HAL_WRP_PAL_Initialize(const SYS_MODULE_INDEX index);
+void PRIME_HAL_WRP_PAL_Tasks(SYS_MODULE_OBJ object);
+SYS_STATUS PRIME_HAL_WRP_PAL_Status(SYS_MODULE_OBJ object);
+void PRIME_HAL_WRP_PAL_CallbackRegister(PAL_CALLBACKS *pCallbacks);
+uint8_t PRIME_HAL_WRP_PAL_DataRequest(PAL_MSG_REQUEST_DATA *pData);
+uint8_t PRIME_HAL_WRP_PAL_GetSNR(uint16_t pch, uint8_t *snr, uint8_t qt);
+uint8_t PRIME_HAL_WRP_PAL_GetZCT(uint16_t pch, uint32_t *zct);
+uint8_t PRIME_HAL_WRP_PAL_GetTimer(uint16_t pch, uint32_t *timer);
+uint8_t PRIME_HAL_WRP_PAL_GetTimerExtended(uint16_t pch, uint64_t *timer);
+uint8_t PRIME_HAL_WRP_PAL_GetCD(uint16_t pch, uint8_t *cd, uint8_t *rssi, uint32_t *time, uint8_t *header);
+uint8_t PRIME_HAL_WRP_PAL_GetNL(uint16_t pch, uint8_t *noise);
+uint8_t PRIME_HAL_WRP_PAL_GetAGC(uint16_t pch, uint8_t *mode, uint8_t *gain);
+uint8_t PRIME_HAL_WRP_PAL_SetAGC(uint16_t pch, uint8_t mode, uint8_t gain);
+uint8_t PRIME_HAL_WRP_PAL_GetCCA(uint16_t pch, uint8_t *pState);
+uint8_t PRIME_HAL_WRP_PAL_GetChannel(uint16_t *pPch, uint16_t channelReference);
+uint8_t PRIME_HAL_WRP_PAL_SetChannel(uint16_t pch);
+void PRIME_HAL_WRP_PAL_ProgramChannelSwitch(uint16_t pch, uint32_t timeSync, uint8_t timeMode);
+uint8_t PRIME_HAL_WRP_PAL_GetConfiguration(uint16_t pch, uint16_t id, void *val, uint16_t length);
+uint8_t PRIME_HAL_WRP_PAL_SetConfiguration(uint16_t pch, uint16_t id, void *val, uint16_t length);
+uint16_t PRIME_HAL_WRP_PAL_GetSignalCapture(uint16_t pch, uint8_t *noiseCapture, uint8_t mode, 
+                              uint32_t timeStart, uint32_t duration);
+uint8_t PRIME_HAL_WRP_PAL_GetMsgDuration(uint16_t pch, uint16_t length, PAL_SCHEME scheme, uint8_t mode, uint32_t *duration);
+bool PRIME_HAL_WRP_PAL_CheckMinimumQuality(uint16_t pch, uint8_t reference, uint8_t modulation);
+uint8_t PRIME_HAL_WRP_PAL_GetLessRobustModulation(uint16_t pch, uint8_t mod1, uint8_t mod2);
 
-/** \brief RF Interface */
-/* @{ */
-<#if primePal.PRIME_PAL_RF_EN == true>
-uint8_t prime_hal_prf_if_init(void);
-void prime_hal_prf_if_reset(void);
-void prime_hal_prf_if_enable_interrupt(bool b_enable);
-void prime_hal_prf_if_set_handler(void (*p_handler)(void));
-bool prime_hal_prf_if_send_spi_cmd(uint8_t *puc_data_buf, uint16_t us_addr, uint16_t us_len, uint8_t uc_mode);
-bool prime_hal_prf_if_is_spi_busy(void);
-void prime_hal_prf_if_led(uint8_t uc_led_id, bool b_led_on);
-</#if>
-/* @} */
 
 /* @cond 0 */
 /**INDENT-OFF**/

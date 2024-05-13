@@ -41,10 +41,20 @@ global primeConfigMaxNumNodes
 global primeMngpConfig
 global primeConfigMngpSprof
 global primeConfigSprofUsiPort
-   
-# Files  
-global pPrimeApiSourceFile
-global pPrimeApiAsFile
+
+# Memory Regions (SN)
+global primeSNAppAddress
+global primeSNPFWStack14Address
+global primeSNPHYAddress
+global primeSNPFWStack13Address
+global primeSNAppSize
+global primeSNPFWStack14Size
+global primeSNPHYSize
+global primeSNPFWStack13Size
+global primeSNFUComment
+global primeBNFUComment
+
+# Files
 global pPrimeHalWrapperHeaderFile
 global pPrimeHalWrapperSourceFile
 global pMacHeaderFile
@@ -56,12 +66,68 @@ global pClNullApiHeaderFile
 global pCl432HeaderFile
 global pCl432ApiHeaderFile
 global pHalApiSourceFile
+global pHalApiPalTypesFile
+global pHalApiPalHeaderFile
 
 # Libraries
 global pPrime13BnLibFile
 global pPrime13SnLibFile
 global pPrime14BnLibFile
 global pPrime14SnLibFile
+
+# Linker Options
+global pPrimeXc32LdPrepMacroSym
+
+PRIME_USER_APP_OFFSET_HEX = "0x10000"
+PRIME_USER_APP_SIZE_HEX = "0x40000"
+PRIME_FW_STACK_14_OFFSET_HEX = "0x90000"
+PRIME_FW_STACK_14_SIZE_HEX = "0x28000"
+PRIME_PHY_OFFSET_HEX = "0xB8000"
+PRIME_PHY_SIZE_HEX = "0x18000"
+PRIME_FW_STACK_13_OFFSET_HEX = "0xD0000"
+PRIME_FW_STACK_13_SIZE_HEX = "0x30000"
+
+PRIME_FW_STACK_RAM_SIZE = "0x0000B000"  # TBD !!!!!
+
+def getFlashMemoryDescription():
+    nodeIFLASH = ATDF.getNode("/avr-tools-device-file/devices/device/address-spaces/address-space/memory-segment@[type=\"flash\"]")
+    if nodeIFLASH is not None:
+        return (nodeIFLASH.getAttribute("start"), nodeIFLASH.getAttribute("size"))
+
+    return (0, 0)
+
+def getRamMemoryDescription():
+    nodeIRAM = ATDF.getNode("/avr-tools-device-file/devices/device/address-spaces/address-space/memory-segment@[type=\"ram\"]")
+    if nodeIRAM is not None:
+        return (nodeIRAM.getAttribute("start"), nodeIRAM.getAttribute("size"))
+
+    return (0, 0)
+
+def setFwStackRamParams(primeMode, primeProject):
+    global pPrimeXc32LdPrepMacroSym
+
+    ramStartAddressHex, ramSizeHex = getRamMemoryDescription()
+
+    if (primeMode == "SN"):
+        # Service Node
+        if (primeProject == "application project"):
+            # Service Node App
+            ramOrigin = ramStartAddressHex
+            ramLength = hex(int(ramSizeHex, 0) - int(PRIME_FW_STACK_RAM_SIZE, 0))
+        else:
+            # FW Stack App
+            ramOrigin = hex(int(ramStartAddressHex, 0) + int(ramSizeHex, 0) - int(PRIME_FW_STACK_RAM_SIZE, 0))
+            ramLength = PRIME_FW_STACK_RAM_SIZE
+    else:
+        # Base Node App
+        ramOrigin = ramStartAddressHex
+        ramLength = ramSizeHex
+
+    ram_origin  = "RAM_ORIGIN=" + ramOrigin
+    ram_length  = "RAM_LENGTH=" + ramLength
+
+    ramParams = (ram_origin + ";" + ram_length)
+    pPrimeXc32LdPrepMacroSym.setValue(ramParams)
 
 def createGroupServices():
     global primeServicesGroup
@@ -74,11 +140,10 @@ def createGroupServices():
         Database.activateComponents(primeServices, "PRIME SERVICES")
 
 def primeAddBnFiles():
-    # SN only 
-    pPrimeApiAsFile.setEnabled(False)
-    
+    # SN only
+    # pPrimeApiAsFile.setEnabled(False)
+
     # BN API files
-    pPrimeApiSourceFile.setEnabled(True)
     pPrimeHalWrapperHeaderFile.setEnabled(True)
     pPrimeHalWrapperSourceFile.setEnabled(True)
     pMacHeaderFile.setEnabled(True)
@@ -90,22 +155,24 @@ def primeAddBnFiles():
     pCl432HeaderFile.setEnabled(True)
     pCl432ApiHeaderFile.setEnabled(True)
     pHalApiSourceFile.setEnabled(True)
-    
+    pHalApiPalTypesFile.setEnabled(False)
+    pHalApiPalHeaderFile.setEnabled(False)
+
     # No libraries by default
     pPrime13BnLibFile.setEnabled(False)
     pPrime13SnLibFile.setEnabled(False)
     pPrime14BnLibFile.setEnabled(False)
     pPrime14SnLibFile.setEnabled(False)
-    
+
     # BN library
-    if (primeConfigVersion.getValue() == "1.3.6"): 
+    if (primeConfigVersion.getValue() == "1.3.6"):
         if (primeConfigBnSlaveEn.getValue() == True):
             pPrime13SnLibFile.setEnabled(True)
             pBmngApiHeaderFile.setEnabled(False)
             pBmngDefsHeaderFile.setEnabled(False)
         else:
             pPrime13BnLibFile.setEnabled(True)
-    elif (primeConfigVersion.getValue() == "1.4"): 
+    elif (primeConfigVersion.getValue() == "1.4"):
         pPrime14BnLibFile.setEnabled(True)
     else:
         # Unknown option: no library by default
@@ -117,17 +184,15 @@ def primeAddSnFiles():
     pBmngDefsHeaderFile.setEnabled(False)
     pClNullApiHeaderFile.setEnabled(False)
     pCl432ApiHeaderFile.setEnabled(False)
-    
+
     # No libraries by default
     pPrime13BnLibFile.setEnabled(False)
     pPrime13SnLibFile.setEnabled(False)
     pPrime14BnLibFile.setEnabled(False)
     pPrime14SnLibFile.setEnabled(False)
-    
+
     if (primeConfigProject.getValue() == "bin project"):
         # SN API files in bin
-        pPrimeApiSourceFile.setEnabled(True)
-        pPrimeApiAsFile.setEnabled(True)
         pPrimeHalWrapperHeaderFile.setEnabled(True)
         pPrimeHalWrapperSourceFile.setEnabled(True)
         pMacHeaderFile.setEnabled(True)
@@ -135,19 +200,19 @@ def primeAddSnFiles():
         pClNullHeaderFile.setEnabled(True)
         pCl432HeaderFile.setEnabled(True)
         pHalApiSourceFile.setEnabled(False)
-        
+        pHalApiPalTypesFile.setEnabled(True)
+        pHalApiPalHeaderFile.setEnabled(True)
+
         # SN library
-        if (primeConfigVersion.getValue() == "1.3.6"): 
+        if (primeConfigVersion.getValue() == "1.3.6"):
             pPrime13SnLibFile.setEnabled(True)
-        elif (primeConfigVersion.getValue() == "1.4"): 
+        elif (primeConfigVersion.getValue() == "1.4"):
             pPrime14SnLibFile.setEnabled(True)
         else:
             # Unknown option: no library by default
             pass
     elif (primeConfigProject.getValue() == "application project"):
         # SN API files in application
-        pPrimeApiSourceFile.setEnabled(False)
-        pPrimeApiAsFile.setEnabled(False)
         pPrimeHalWrapperHeaderFile.setEnabled(False)
         pPrimeHalWrapperSourceFile.setEnabled(False)
         pMacHeaderFile.setEnabled(False)
@@ -155,7 +220,9 @@ def primeAddSnFiles():
         pClNullHeaderFile.setEnabled(False)
         pCl432HeaderFile.setEnabled(False)
         pHalApiSourceFile.setEnabled(True)
-        
+        pHalApiPalTypesFile.setEnabled(False)
+        pHalApiPalHeaderFile.setEnabled(False)
+
         # No library in SN application
         pass
     else:
@@ -165,12 +232,12 @@ def primeAddSnFiles():
 def primeUpdateFiles(primeStackComponent):
     addPALComponent = False
     if (primeConfigMode.getValue() == "SN"):
-        # Add files for SN 
+        # Add files for SN
         primeAddSnFiles()
         if (primeConfigProject.getValue() == "application project"):
             addPALComponent = True
     elif (primeConfigMode.getValue() == "BN"):
-        # Add files for BN 
+        # Add files for BN
         primeAddBnFiles()
         # Add PRIME components
         addPALComponent = True
@@ -179,14 +246,14 @@ def primeUpdateFiles(primeStackComponent):
         # Add PRIME components
         Database.activateComponents(["primePal"], "PRIME STACK")
         primeStackComponent.setDependencyEnabled("primePal_dep", True)
-        else:
+    else:
         # Remove PRIME components
         Database.deactivateComponents(["primePal"])
         primeStackComponent.setDependencyEnabled("primePal_dep", False)
-        
+
 def primeShowSprofUsiInstance(symbol, event):
     symbol.setVisible(event["value"])
-    
+
     if (primeConfigMode.getValue() == "BN"):
         if (event["value"] == True):
             usiInstances = filter(lambda k: "srv_usi_" in k, Database.getActiveComponentIDs())
@@ -205,30 +272,42 @@ def primeShowSNAppConfiguration(primeVersion):
     primeConfigMode.setVisible(True)
     primeConfigProject.setVisible(True)
     primeConfigComment.setVisible(True)
-    
+    primeConfigFWVersion.setVisible(True)
+
+    primeSNAppAddress.setVisible(True)
+    primeSNFUComment.setVisible(True)
+    primeSNPHYAddress.setVisible(True)
+    primeSNPFWStack14Address.setVisible(True)
+    primeSNPFWStack13Address.setVisible(True)
+
+    primeSNAppSize.setVisible(True)
+    primeSNPHYSize.setVisible(True)
+    primeSNPFWStack14Size.setVisible(True)
+    primeSNPFWStack13Size.setVisible(True)
+
     # Hide SN Application options
     primeConfigBnSlaveEn.setVisible(False)
     primeConfigBnSlaveEn.setValue(False)
     primeConfigVersion.setVisible(False)
     primeConfigFWVendor.setVisible(False)
     primeConfigFWModel.setVisible(False)
-    primeConfigFWVersion.setVisible(False)
     primeConfigPIBVendor.setVisible(False)
     primeConfigPIBModel.setVisible(False)
     primeMacConfig.setVisible(False)
     primeConfigMaxNumNodes.setVisible(False)
     primeMngpConfig.setVisible(False)
     primeConfigMngpSprof.setVisible(False)
-    primeConfigSprofUsiPort.setVisible(False)   
-    primeConfigSecProfile.setVisible(False) 
-    
+    primeConfigSprofUsiPort.setVisible(False)
+    primeConfigSecProfile.setVisible(False)
+
     if (primeVersion == "1.4"):
-        primeConfigFWVersion.setValue("HS14.01.01") 
+        primeConfigFWVersion.setValue("HS14.01.01")
     else:
         primeConfigFWVersion.setValue("S13.01.01")
 
 def primeShowSNBinConfiguration(primeVersion):
     # Valid options
+    primeConfigProject.setVisible(True)
     primeConfigMode.setVisible(True)
     primeConfigVersion.setVisible(True)
     primeConfigFWVendor.setVisible(True)
@@ -241,23 +320,38 @@ def primeShowSNBinConfiguration(primeVersion):
     primeConfigMngpSprof.setVisible(True)
     primeConfigSprofUsiPort.setVisible(True)
     primeConfigSecProfile.setVisible(True)
-    
+
     # Hide SN Binary options
     primeConfigMaxNumNodes.setVisible(False)
     primeConfigMaxNumNodes.setValue(0)
     primeConfigComment.setVisible(False)
     primeConfigBnSlaveEn.setVisible(False)
     primeConfigBnSlaveEn.setValue(False)
-    
+
+    primeSNAppAddress.setVisible(False)
+    primeSNFUComment.setVisible(False)
+    primeSNPHYAddress.setVisible(False)
+
+    primeSNAppSize.setVisible(False)
+    primeSNPHYSize.setVisible(False)
+
     if (primeVersion == "1.4"):
         # SN - v1.4
         primeConfigSecProfile.setReadOnly(False)
-        primeConfigFWVersion.setValue("HS14.01.01") 
+        primeConfigFWVersion.setValue("HS14.01.01")
+        primeSNPFWStack14Address.setVisible(True)
+        primeSNPFWStack14Size.setVisible(True)
+        primeSNPFWStack13Address.setVisible(False)
+        primeSNPFWStack13Size.setVisible(False)
     else:
         # SN - v1.3.6
         primeConfigSecProfile.setValue(0)
         primeConfigSecProfile.setReadOnly(True)
         primeConfigFWVersion.setValue("S13.01.01")
+        primeSNPFWStack14Address.setVisible(False)
+        primeSNPFWStack14Size.setVisible(False)
+        primeSNPFWStack13Address.setVisible(True)
+        primeSNPFWStack13Size.setVisible(True)
 
 def primeShowBNConfiguration(primeVersion):
     # Valid options
@@ -274,23 +368,34 @@ def primeShowBNConfiguration(primeVersion):
     primeConfigMngpSprof.setVisible(True)
     primeConfigSprofUsiPort.setVisible(True)
     primeConfigSecProfile.setVisible(True)
-    
+    primeSNFUComment.setVisible(True)
+
     # Hide BN options
     primeConfigProject.setVisible(False)
     primeConfigComment.setVisible(False)
-    
+
+    primeSNAppAddress.setVisible(False)
+    primeSNPHYAddress.setVisible(False)
+    primeSNPFWStack14Address.setVisible(False)
+    primeSNPFWStack13Address.setVisible(False)
+
+    primeSNAppSize.setVisible(False)
+    primeSNPHYSize.setVisible(False)
+    primeSNPFWStack14Size.setVisible(False)
+    primeSNPFWStack13Size.setVisible(False)
+
     if (primeVersion == "1.4"):
         # BN - v1.4
         primeConfigBnSlaveEn.setValue(False)
-    primeConfigBnSlaveEn.setVisible(False)
+        primeConfigBnSlaveEn.setVisible(False)
         primeConfigSecProfile.setReadOnly(False)
-        primeConfigFWVersion.setValue("HB14.01.01") 
+        primeConfigFWVersion.setValue("HB14.01.01")
     else:
         # BN - v1.3.6
         primeConfigBnSlaveEn.setVisible(True)
         primeConfigSecProfile.setValue(0)
         primeConfigSecProfile.setReadOnly(True)
-        primeConfigFWVersion.setValue("B13.01.01") 
+        primeConfigFWVersion.setValue("B13.01.01")
 
 def primeUpdateConfiguration(symbol, event):
     primeMode = primeConfigMode.getValue()
@@ -302,20 +407,41 @@ def primeUpdateConfiguration(symbol, event):
         if (primeProject == "application project"):
             # SN - Application project
             primeShowSNAppConfiguration(primeVersion)
+            # Start address
+            startAddress = primeSNAppAddress.getValue()
+            # Enable PLC Phy driver static addressing
+            phyStartAddress = int(primeSNPHYAddress.getValue(), 0)
+            phySize = int(primeSNPHYSize.getValue(), 0)
+            Database.sendMessage("drvPlcPhy", "SET_STATIC_ADDRESSING", {"enable":True, "address":phyStartAddress, "size":phySize})
         else:
             # SN - Bin project
             primeShowSNBinConfiguration(primeVersion)
+            # Start address
+            if (primeVersion == "1.4"):
+                startAddress = primeSNPFWStack14Address.getValue()
+            else:
+                startAddress = primeSNPFWStack13Address.getValue()
     else:
         # Base Node
         primeShowBNConfiguration(primeVersion)
-    
+        # Start address
+        memStartAddressHex, memSizeHex = getFlashMemoryDescription()
+        startAddress = memStartAddressHex
+        # Disable PLC Phy driver static addressing
+        Database.sendMessage("drvPlcPhy", "SET_STATIC_ADDRESSING", {"enable":False, "address":0, "size":0})
+
     # Add files
     localComponent = symbol.getComponent()
     primeUpdateFiles(localComponent)
-    
+
+    # Set RAM linker properties
+    setFwStackRamParams(primeMode, primeProject)
+    # Set Application Start Address
+    Database.sendMessage("core", "APP_START_ADDRESS", {"start_address":startAddress})
+
 def instantiateComponent(primeStackConfigComponent):
     Log.writeInfoMessage("Loading Stack Configurator for PRIME")
-    
+
     processor = Variables.get("__PROCESSOR")
 
     primeStackGroup = Database.findGroup("PRIME STACK")
@@ -324,19 +450,19 @@ def instantiateComponent(primeStackConfigComponent):
     Database.setActiveGroup("PRIME STACK")
     primeStackGroup.addComponent("prime_stack_config")
 
-    # Create group for all PRIME SERVICES 
+    # Create group for all PRIME SERVICES
     createGroupServices()
-    
+
     # Enable PAL by default for SN (SN application is the default configuration)
     Database.activateComponents(["primePal"], "PRIME STACK")
     primeStackConfigComponent.setDependencyEnabled("primePal_dep", True)
-    
+
     # Configure PRIME Stack
     primeStackConfig = primeStackConfigComponent.createMenuSymbol("PRIME_Stack_Configuration", None)
     primeStackConfig.setLabel("PRIME Stack Configuration")
     primeStackConfig.setDescription("Configure the PRIME Stack general options")
     primeStackConfig.setVisible(True)
-    
+
     # Select mode
     global primeConfigMode
     primeModes = ["BN", "SN"]
@@ -345,7 +471,82 @@ def instantiateComponent(primeStackConfigComponent):
     primeConfigMode.setDescription("Select the PRIME mode: base or service node")
     primeConfigMode.setVisible(True)
     primeConfigMode.setDefaultValue("SN")
-    
+
+    memStartAddressHex, memSizeHex = getFlashMemoryDescription()
+
+    global primeSNAppAddress
+    primeSNAppAddress = primeStackConfigComponent.createStringSymbol("PRIME_SN_APP_ADDRESS", primeConfigMode)
+    primeSNAppAddress.setLabel("User Application Address")
+    primeSNAppAddress.setDescription("PRIME SN User Application region start address")
+    primeSNAppAddress.setVisible(True)
+    address = hex(int(memStartAddressHex, 0) + int(PRIME_USER_APP_OFFSET_HEX, 0))
+    primeSNAppAddress.setDefaultValue(address)
+
+    global primeSNAppSize
+    primeSNAppSize = primeStackConfigComponent.createStringSymbol("PRIME_SN_APP_SIZE", primeConfigMode)
+    primeSNAppSize.setLabel("User Application Size")
+    primeSNAppSize.setDescription("PRIME SN User Application size in bytes")
+    primeSNAppSize.setVisible(True)
+    primeSNAppSize.setDefaultValue(PRIME_USER_APP_SIZE_HEX)
+
+    global primeSNPFWStack14Address
+    primeSNPFWStack14Address = primeStackConfigComponent.createStringSymbol("PRIME_SN_FWSTACK14_ADDRESS", primeConfigMode)
+    primeSNPFWStack14Address.setLabel("FW Stack v1.4 Address")
+    primeSNPFWStack14Address.setDescription("PRIME v1.4 FW Stack region start address")
+    primeSNPFWStack14Address.setVisible(True)
+    address = hex(int(memStartAddressHex, 0) + int(PRIME_FW_STACK_14_OFFSET_HEX, 0))
+    primeSNPFWStack14Address.setDefaultValue(address)
+
+    global primeSNPFWStack14Size
+    primeSNPFWStack14Size = primeStackConfigComponent.createStringSymbol("PRIME_SN_FWSTACK14_SIZE", primeConfigMode)
+    primeSNPFWStack14Size.setLabel("FW Stack v1.4 Size")
+    primeSNPFWStack14Size.setDescription("PRIME SN FW Stack v1.4 size in bytes")
+    primeSNPFWStack14Size.setVisible(True)
+    primeSNPFWStack14Size.setDefaultValue(PRIME_FW_STACK_14_SIZE_HEX)
+
+    global primeSNPHYAddress
+    primeSNPHYAddress = primeStackConfigComponent.createStringSymbol("PRIME_SN_PHY_ADDRESS", primeConfigMode)
+    primeSNPHYAddress.setLabel("PHY Layer Address")
+    primeSNPHYAddress.setDescription("PRIME PHY layer region start address")
+    primeSNPHYAddress.setVisible(True)
+    address = hex(int(memStartAddressHex, 0) + int(PRIME_PHY_OFFSET_HEX, 0))
+    primeSNPHYAddress.setDefaultValue(address)
+
+    global primeSNPHYSize
+    primeSNPHYSize = primeStackConfigComponent.createStringSymbol("PRIME_SN_PHY_SIZE", primeConfigMode)
+    primeSNPHYSize.setLabel("PHY Layer Size")
+    primeSNPHYSize.setDescription("PRIME SN PHY Layer size in bytes")
+    primeSNPHYSize.setVisible(True)
+    primeSNPHYSize.setDefaultValue(PRIME_PHY_SIZE_HEX)
+
+    global primeSNPFWStack13Address
+    primeSNPFWStack13Address = primeStackConfigComponent.createStringSymbol("PRIME_SN_FWSTACK13_ADDRESS", primeConfigMode)
+    primeSNPFWStack13Address.setLabel("FW Stack v1.3 Address")
+    primeSNPFWStack13Address.setDescription("PRIME v1.3 FW Stack region start address")
+    primeSNPFWStack13Address.setVisible(True)
+    address = hex(int(memStartAddressHex, 0) + int(PRIME_FW_STACK_13_OFFSET_HEX, 0))
+    primeSNPFWStack13Address.setDefaultValue(address)
+
+    global primeSNPFWStack13Size
+    primeSNPFWStack13Size = primeStackConfigComponent.createStringSymbol("PRIME_SN_FWSTACK13_SIZE", primeConfigMode)
+    primeSNPFWStack13Size.setLabel("FW Stack v1.3 Size")
+    primeSNPFWStack13Size.setDescription("PRIME SN FW Stack v1.3 size in bytes")
+    primeSNPFWStack13Size.setVisible(True)
+    primeSNPFWStack13Size.setDefaultValue(PRIME_FW_STACK_13_SIZE_HEX)
+
+    # The FW Image address is configured by PRIME FU Service
+    global primeSNFUComment
+    primeSNFUComment = primeStackConfigComponent.createCommentSymbol("PRIME_SN_FU_COMMENT", primeConfigMode)
+    primeSNFUComment.setLabel("*** PRIME FU address must be configured using the PRIME FU Service ***")
+    primeSNFUComment.setVisible(True)
+
+    # Dummy symbol to update files of the PRIME Stack
+    primeStackAddressDummy = primeStackConfigComponent.createMenuSymbol("PRIME_Stack_Address_Dummy", None)
+    primeStackAddressDummy.setLabel("")
+    primeStackAddressDummy.setDescription("")
+    primeStackAddressDummy.setVisible(False)
+    primeStackAddressDummy.setDependencies(primeUpdateConfiguration, ["PRIME_SN_APP_ADDRESS", "PRIME_SN_FWSTACK14_ADDRESS", "PRIME_SN_FWSTACK13_ADDRESS"])
+
     # Enable BN slave
     global primeConfigBnSlaveEn
     primeConfigBnSlaveEn = primeStackConfigComponent.createBooleanSymbol("BN_SLAVE_EN", primeStackConfig)
@@ -353,8 +554,8 @@ def instantiateComponent(primeStackConfigComponent):
     primeConfigBnSlaveEn.setDescription("Enable/disable the BN slave functionality")
     primeConfigBnSlaveEn.setVisible(False)
     primeConfigBnSlaveEn.setDefaultValue(False)
-    
-    # Select type of project 
+
+    # Select type of project
     global primeConfigProject
     primeProjectOptions = ["application project", "bin project"]
     primeConfigProject = primeStackConfigComponent.createComboSymbol("PRIME_PROJECT", primeStackConfig, primeProjectOptions)
@@ -362,8 +563,8 @@ def instantiateComponent(primeStackConfigComponent):
     primeConfigProject.setDescription("Select the type of PRIME project for separated applications")
     primeConfigProject.setVisible(True)
     primeConfigProject.setDefaultValue("application project")
-    
-    # Select version 
+
+    # Select version
     global primeConfigVersion
     primeVersions = ["1.3.6", "1.4"]
     primeConfigVersion = primeStackConfigComponent.createComboSymbol("PRIME_VERSION", primeStackConfig, primeVersions)
@@ -371,13 +572,13 @@ def instantiateComponent(primeStackConfigComponent):
     primeConfigVersion.setDescription("Select the PRIME version: 1.3.6 or 1.4")
     primeConfigVersion.setVisible(False)
     primeConfigVersion.setDefaultValue("1.4")
-    
+
     # The SN application project cannot configure more than the previous parameters
     global primeConfigComment
     primeConfigComment = primeStackConfigComponent.createCommentSymbol("PRIME_CONFIG_COMMENT", primeStackConfig)
     primeConfigComment.setLabel("*** Configure the PRIME Stack of the Service Node in the bin project ***")
-    primeConfigComment.setVisible(True)    
-    
+    primeConfigComment.setVisible(True)
+
     # Select PRIME FW vendor
     global primeConfigFWVendor
     primeConfigFWVendor = primeStackConfigComponent.createStringSymbol("PRIME_FW_VENDOR", primeStackConfig)
@@ -385,7 +586,7 @@ def instantiateComponent(primeStackConfigComponent):
     primeConfigFWVendor.setDescription("Select the PRIME FW vendor")
     primeConfigFWVendor.setVisible(False)
     primeConfigFWVendor.setDefaultValue("MCHP")
-    
+
     # Select PRIME FW model
     global primeConfigFWModel
     primeConfigFWModel = primeStackConfigComponent.createStringSymbol("PRIME_FW_MODEL", primeStackConfig)
@@ -398,7 +599,7 @@ def instantiateComponent(primeStackConfigComponent):
         primeConfigFWModel.setDefaultValue("PL360BN")
     else:
         primeConfigFWModel.setDefaultValue("OTHER")
-    
+
     # Select PRIME FW version
     global primeConfigFWVersion
     primeConfigFWVersion = primeStackConfigComponent.createStringSymbol("PRIME_FW_VERSION", primeStackConfig)
@@ -431,14 +632,14 @@ def instantiateComponent(primeStackConfigComponent):
         primeConfigPIBModel.setDefaultValue(0x3D3F)
     else:
         primeConfigPIBModel.setDefaultValue(0xFFFF)
-    
+
     # Configure PRIME MAC Layer
     global primeMacConfig
     primeMacConfig = primeStackConfigComponent.createMenuSymbol("PRIME_MAC_Layer", None)
     primeMacConfig.setLabel("PRIME MAC Layer Configuration")
     primeMacConfig.setDescription("Configure the PRIME MAC Layer options")
     primeMacConfig.setVisible(False)
-    
+
     # Select MAC security profile
     global primeConfigSecProfile
     primeConfigSecProfile = primeStackConfigComponent.createIntegerSymbol("MAC_SECURITY_PROFILE", primeMacConfig)
@@ -448,7 +649,7 @@ def instantiateComponent(primeStackConfigComponent):
     primeConfigSecProfile.setMin(0)
     primeConfigSecProfile.setMax(2)
     primeConfigSecProfile.setDefaultValue(0)
-    
+
     # Select maximum number of nodes
     global primeConfigMaxNumNodes
     primeConfigMaxNumNodes = primeStackConfigComponent.createIntegerSymbol("NUM_MAX_NODES", primeMacConfig)
@@ -458,14 +659,14 @@ def instantiateComponent(primeStackConfigComponent):
     primeConfigMaxNumNodes.setMin(0)
     primeConfigMaxNumNodes.setMax(2000)
     primeConfigMaxNumNodes.setDefaultValue(25)
-    
+
     # Configure PRIME Management Plane
     global primeMngpConfig
     primeMngpConfig = primeStackConfigComponent.createMenuSymbol("PRIME_MNGP", None)
     primeMngpConfig.setLabel("PRIME Management Plane Configuration")
     primeMngpConfig.setDescription("Configure the PRIME Management Plane options")
     primeMngpConfig.setVisible(False)
-    
+
     # Management Plane Serial Profile is always enabled
     global primeConfigMngpSprof
     primeConfigMngpSprof = primeStackConfigComponent.createCommentSymbol("MNGP_SPROFILE", primeMngpConfig)
@@ -477,7 +678,7 @@ def instantiateComponent(primeStackConfigComponent):
     primeConfigSprof.setVisible(False)
     primeConfigSprof.setDefaultValue(True)
     primeConfigSprof.setReadOnly(True)
-    
+
     # Select serial profile USI port
     global primeConfigSprofUsiPort
     primeConfigSprofUsiPort = primeStackConfigComponent.createIntegerSymbol("MNGP_SPROF_USI_PORT", primeConfigMngpSprof)
@@ -496,12 +697,29 @@ def instantiateComponent(primeStackConfigComponent):
     primeStackDummy.setVisible(False)
     primeStackDummy.setDependencies(primeUpdateConfiguration, ["PRIME_MODE", "PRIME_PROJECT", "PRIME_VERSION"])
 
+    #### Preprocessor-macros #####################################################
+
+    # Set XC32-LD option to Modify RAM Start address and length
+    global pPrimeXc32LdPrepMacroSym
+    pPrimeXc32LdPrepMacroSym = primeStackConfigComponent.createSettingSymbol("PRIME_XC32_LINKER_PREPROC_MACROS", None)
+    pPrimeXc32LdPrepMacroSym.setCategory("C32-LD")
+    pPrimeXc32LdPrepMacroSym.setKey("preprocessor-macros")
+    ramStartAddressHex, ramSizeHex = getRamMemoryDescription()
+    ram_origin  = "RAM_ORIGIN=" + ramStartAddressHex
+    ram_length  = "RAM_LENGTH=" + hex(int(ramSizeHex, 0) - int(PRIME_FW_STACK_RAM_SIZE, 0))
+    ramParams = (ram_origin + ";" + ram_length)
+    pPrimeXc32LdPrepMacroSym.setValue(ramParams)
+    pPrimeXc32LdPrepMacroSym.setAppend(True, ";=")
+
+    # Set Application Start Address
+    Database.sendMessage("core", "APP_START_ADDRESS", {"start_address":(hex(int(memStartAddressHex, 0) + int(PRIME_USER_APP_OFFSET_HEX, 0)))})
+
     ############################################################################
     #### Code Generation ####
     ############################################################################
-    
+
     configName = Variables.get("__CONFIGURATION_NAME")
-    
+
     ##### PRIME API
     pPrimeApiHeaderFile = primeStackConfigComponent.createFileSymbol("PRIME_API_HEADER", None)
     pPrimeApiHeaderFile.setSourcePath("prime/src/prime_api/prime_api.h.ftl")
@@ -511,24 +729,16 @@ def instantiateComponent(primeStackConfigComponent):
     pPrimeApiHeaderFile.setType("HEADER")
     pPrimeApiHeaderFile.setEnabled(True)
     pPrimeApiHeaderFile.setMarkup(True)
-    
-    global pPrimeApiSourceFile
+
     pPrimeApiSourceFile = primeStackConfigComponent.createFileSymbol("PRIME_API_SOURCE", None)
     pPrimeApiSourceFile.setSourcePath("prime/src/prime_api/prime_api.c.ftl")
     pPrimeApiSourceFile.setOutputName("prime_api.c")
     pPrimeApiSourceFile.setDestPath("stack/prime/prime_api")
     pPrimeApiSourceFile.setProjectPath("config/" + configName + "/stack/prime/prime_api")
     pPrimeApiSourceFile.setType("SOURCE")
-    pPrimeApiSourceFile.setEnabled(False)
+    pPrimeApiSourceFile.setEnabled(True)
     pPrimeApiSourceFile.setMarkup(True)
-    
-    global pPrimeApiAsFile
-    pPrimeApiAsFile = primeStackConfigComponent.createFileSymbol("PRIME_API_ASSEMBLER_FILE", None)
-    pPrimeApiAsFile.setSourcePath("prime/src/prime_api/prime_api_as.S")
-    pPrimeApiAsFile.setOutputName("prime_api_as.S")
-    pPrimeApiAsFile.setDestPath("stack/prime/prime_api")
-    pPrimeApiAsFile.setEnabled(False)
-    
+
     pPrimeApiDefsHeaderFile = primeStackConfigComponent.createFileSymbol("PRIME_API_DEFS_HEADER", None)
     pPrimeApiDefsHeaderFile.setSourcePath("prime/src/prime_api/prime_api_defs.h")
     pPrimeApiDefsHeaderFile.setOutputName("prime_api_defs.h")
@@ -536,7 +746,15 @@ def instantiateComponent(primeStackConfigComponent):
     pPrimeApiDefsHeaderFile.setProjectPath("config/" + configName + "/stack/prime/prime_api")
     pPrimeApiDefsHeaderFile.setType("HEADER")
     pPrimeApiDefsHeaderFile.setEnabled(True)
-    
+
+    pPrimeApiTypesHeaderFile = primeStackConfigComponent.createFileSymbol("PRIME_API_TYPES_HEADER", None)
+    pPrimeApiTypesHeaderFile.setSourcePath("prime/src/prime_api/prime_api_types.h")
+    pPrimeApiTypesHeaderFile.setOutputName("prime_api_types.h")
+    pPrimeApiTypesHeaderFile.setDestPath("stack/prime/prime_api")
+    pPrimeApiTypesHeaderFile.setProjectPath("config/" + configName + "/stack/prime/prime_api")
+    pPrimeApiTypesHeaderFile.setType("HEADER")
+    pPrimeApiTypesHeaderFile.setEnabled(True)
+
     global pPrimeHalWrapperHeaderFile
     pPrimeHalWrapperHeaderFile = primeStackConfigComponent.createFileSymbol("PRIME_HAL_WRAPPER_HEADER", None)
     pPrimeHalWrapperHeaderFile.setSourcePath("prime/src/prime_api/prime_hal_wrapper.h")
@@ -545,7 +763,7 @@ def instantiateComponent(primeStackConfigComponent):
     pPrimeHalWrapperHeaderFile.setProjectPath("config/" + configName + "/stack/prime/prime_api")
     pPrimeHalWrapperHeaderFile.setType("HEADER")
     pPrimeHalWrapperHeaderFile.setEnabled(False)
-    
+
     global pPrimeHalWrapperSourceFile
     pPrimeHalWrapperSourceFile = primeStackConfigComponent.createFileSymbol("PRIME_HAL_WRAPPER_SOURCE", None)
     pPrimeHalWrapperSourceFile.setSourcePath("prime/src/prime_api/prime_hal_wrapper.c")
@@ -554,7 +772,7 @@ def instantiateComponent(primeStackConfigComponent):
     pPrimeHalWrapperSourceFile.setProjectPath("config/" + configName + "/stack/prime/prime_api")
     pPrimeHalWrapperSourceFile.setType("SOURCE")
     pPrimeHalWrapperSourceFile.setEnabled(False)
-    
+
     ##### MAC API
     global pMacHeaderFile
     pMacHeaderFile = primeStackConfigComponent.createFileSymbol("MAC_HEADER", None)
@@ -564,7 +782,7 @@ def instantiateComponent(primeStackConfigComponent):
     pMacHeaderFile.setProjectPath("config/" + configName + "/stack/prime/mac")
     pMacHeaderFile.setType("HEADER")
     pMacHeaderFile.setEnabled(False)
-    
+
     pMacDefsHeaderFile = primeStackConfigComponent.createFileSymbol("MAC_DEFS_HEADER", None)
     pMacDefsHeaderFile.setSourcePath("prime/src/mac/mac_defs.h")
     pMacDefsHeaderFile.setOutputName("mac_defs.h")
@@ -572,7 +790,7 @@ def instantiateComponent(primeStackConfigComponent):
     pMacDefsHeaderFile.setProjectPath("config/" + configName + "/stack/prime/mac")
     pMacDefsHeaderFile.setType("HEADER")
     pMacDefsHeaderFile.setEnabled(True)
-    
+
     pMacPibHeaderFile = primeStackConfigComponent.createFileSymbol("MAC_PIB_HEADER", None)
     pMacPibHeaderFile.setSourcePath("prime/src/mac/mac_pib.h")
     pMacPibHeaderFile.setOutputName("mac_pib.h")
@@ -591,7 +809,7 @@ def instantiateComponent(primeStackConfigComponent):
     pMngpHeaderFile.setType("HEADER")
     pMngpHeaderFile.setEnabled(False)
     pMngpHeaderFile.setMarkup(True)
-    
+
     global pBmngDefsHeaderFile
     pBmngDefsHeaderFile = primeStackConfigComponent.createFileSymbol("BMNG_DEFS_HEADER", None)
     pBmngDefsHeaderFile.setSourcePath("prime/src/mngp/bmng_defs.h")
@@ -600,7 +818,7 @@ def instantiateComponent(primeStackConfigComponent):
     pBmngDefsHeaderFile.setProjectPath("config/" + configName + "/stack/prime/mngp")
     pBmngDefsHeaderFile.setType("HEADER")
     pBmngDefsHeaderFile.setEnabled(False)
-    
+
     global pBmngApiHeaderFile
     pBmngApiHeaderFile = primeStackConfigComponent.createFileSymbol("BMNG_API_HEADER", None)
     pBmngApiHeaderFile.setSourcePath("prime/src/mngp/bmng_api.h")
@@ -609,7 +827,7 @@ def instantiateComponent(primeStackConfigComponent):
     pBmngApiHeaderFile.setProjectPath("config/" + configName + "/stack/prime/mngp")
     pBmngApiHeaderFile.setType("HEADER")
     pBmngApiHeaderFile.setEnabled(False)
-    
+
     ##### Convergence Layer API
     global pClNullHeaderFile
     pClNullHeaderFile = primeStackConfigComponent.createFileSymbol("CL_NULL_HEADER", None)
@@ -619,7 +837,7 @@ def instantiateComponent(primeStackConfigComponent):
     pClNullHeaderFile.setProjectPath("config/" + configName + "/stack/prime/conv/sscs/null")
     pClNullHeaderFile.setType("HEADER")
     pClNullHeaderFile.setEnabled(False)
-    
+
     global pClNullApiHeaderFile
     pClNullApiHeaderFile = primeStackConfigComponent.createFileSymbol("CL_NULL_API_HEADER", None)
     pClNullApiHeaderFile.setSourcePath("prime/src/conv/sscs/null/cl_null_api.h.ftl")
@@ -629,7 +847,7 @@ def instantiateComponent(primeStackConfigComponent):
     pClNullApiHeaderFile.setType("HEADER")
     pClNullApiHeaderFile.setEnabled(False)
     pClNullApiHeaderFile.setMarkup(True)
-    
+
     global pCl432HeaderFile
     pCl432HeaderFile = primeStackConfigComponent.createFileSymbol("CL_432_HEADER", None)
     pCl432HeaderFile.setSourcePath("prime/src/conv/sscs/iec_4_32/cl_432.h")
@@ -638,7 +856,7 @@ def instantiateComponent(primeStackConfigComponent):
     pCl432HeaderFile.setProjectPath("config/" + configName + "/stack/prime/conv/sscs/iec_4_32")
     pCl432HeaderFile.setType("HEADER")
     pCl432HeaderFile.setEnabled(False)
-    
+
     global pCl432ApiHeaderFile
     pCl432ApiHeaderFile = primeStackConfigComponent.createFileSymbol("CL_432_API_HEADER", None)
     pCl432ApiHeaderFile.setSourcePath("prime/src/conv/sscs/iec_4_32/cl_432_api.h.ftl")
@@ -648,7 +866,7 @@ def instantiateComponent(primeStackConfigComponent):
     pCl432ApiHeaderFile.setType("HEADER")
     pCl432ApiHeaderFile.setEnabled(False)
     pCl432ApiHeaderFile.setMarkup(True)
-    
+
     pCl432DefsHeaderFile = primeStackConfigComponent.createFileSymbol("CL_432_DEFS_HEADER", None)
     pCl432DefsHeaderFile.setSourcePath("prime/src/conv/sscs/iec_4_32/cl_432_defs.h.ftl")
     pCl432DefsHeaderFile.setOutputName("cl_432_defs.h")
@@ -657,7 +875,7 @@ def instantiateComponent(primeStackConfigComponent):
     pCl432DefsHeaderFile.setType("HEADER")
     pCl432DefsHeaderFile.setEnabled(True)
     pCl432DefsHeaderFile.setMarkup(True)
-    
+
     ##### HAL API
     pHalApiHeaderFile = primeStackConfigComponent.createFileSymbol("HAL_API_HEADER", None)
     pHalApiHeaderFile.setSourcePath("prime/src/hal_api/hal_api.h")
@@ -666,7 +884,7 @@ def instantiateComponent(primeStackConfigComponent):
     pHalApiHeaderFile.setProjectPath("config/" + configName + "/stack/prime/hal_api")
     pHalApiHeaderFile.setType("HEADER")
     pHalApiHeaderFile.setEnabled(True)
-    
+
     global pHalApiSourceFile
     pHalApiSourceFile = primeStackConfigComponent.createFileSymbol("HAL_API_SOURCE", None)
     pHalApiSourceFile.setSourcePath("prime/src/hal_api/hal_api.c")
@@ -675,7 +893,25 @@ def instantiateComponent(primeStackConfigComponent):
     pHalApiSourceFile.setProjectPath("config/" + configName + "/stack/prime/hal_api")
     pHalApiSourceFile.setType("SOURCE")
     pHalApiSourceFile.setEnabled(True)
-     
+
+    global pHalApiPalTypesFile
+    pHalApiPalTypesFile = primeStackConfigComponent.createFileSymbol("HAL_API_PAL_TYPES", None)
+    pHalApiPalTypesFile.setSourcePath("pal/pal_types.h")
+    pHalApiPalTypesFile.setOutputName("pal_types.h")
+    pHalApiPalTypesFile.setDestPath("stack/pal")
+    pHalApiPalTypesFile.setProjectPath("config/" + configName + "/stack/pal")
+    pHalApiPalTypesFile.setType("HEADER")
+    pHalApiPalTypesFile.setEnabled(False)
+
+    global pHalApiPalHeaderFile
+    pHalApiPalHeaderFile = primeStackConfigComponent.createFileSymbol("HAL_API_PAL_HEADER", None)
+    pHalApiPalHeaderFile.setSourcePath("pal/pal.h")
+    pHalApiPalHeaderFile.setOutputName("pal.h")
+    pHalApiPalHeaderFile.setDestPath("stack/pal")
+    pHalApiPalHeaderFile.setProjectPath("config/" + configName + "/stack/pal")
+    pHalApiPalHeaderFile.setType("HEADER")
+    pHalApiPalHeaderFile.setEnabled(False)
+
     ##### PRIME LIBRARIES
     global pPrime13BnLibFile
     pPrime13BnLibFile = primeStackConfigComponent.createLibrarySymbol("PRIME_1_3_BN_LIBRARY", None)
@@ -683,35 +919,35 @@ def instantiateComponent(primeStackConfigComponent):
     pPrime13BnLibFile.setOutputName("prime13_lib_bn.a")
     pPrime13BnLibFile.setDestPath("stack/prime/libs")
     pPrime13BnLibFile.setEnabled(False)
-    
+
     global pPrime13SnLibFile
     pPrime13SnLibFile = primeStackConfigComponent.createLibrarySymbol("PRIME_1_3_SN_LIBRARY", None)
     pPrime13SnLibFile.setSourcePath("prime/libs/prime13_lib_sn.a")
     pPrime13SnLibFile.setOutputName("prime13_lib_sn.a")
     pPrime13SnLibFile.setDestPath("stack/prime/libs")
     pPrime13SnLibFile.setEnabled(False)
-    
+
     global pPrime14BnLibFile
     pPrime14BnLibFile = primeStackConfigComponent.createLibrarySymbol("PRIME_1_4_BN_LIBRARY", None)
     pPrime14BnLibFile.setSourcePath("prime/libs/prime14_lib_bn.a")
     pPrime14BnLibFile.setOutputName("prime14_lib_bn.a")
     pPrime14BnLibFile.setDestPath("stack/prime/libs")
     pPrime14BnLibFile.setEnabled(False)
-    
+
     global pPrime14SnLibFile
     pPrime14SnLibFile = primeStackConfigComponent.createLibrarySymbol("PRIME_1_4_SN_LIBRARY", None)
     pPrime14SnLibFile.setSourcePath("prime/libs/prime14_lib_sn.a")
     pPrime14SnLibFile.setOutputName("prime14_lib_sn.a")
     pPrime14SnLibFile.setDestPath("stack/prime/libs")
     pPrime14SnLibFile.setEnabled(False)
-    
+
 #### FreeMaker System Files ######################################################
 
-    #primeStackSystemConfigFile = primeStackConfigComponent.createFileSymbol("PRIME_STACK_CONFIGURATION", None)
-    #primeStackSystemConfigFile.setType("STRING")
-    #primeStackSystemConfigFile.setOutputName("core.LIST_SYSTEM_CONFIG_H_MIDDLEWARE_CONFIGURATION")
-    #primeStackSystemConfigFile.setSourcePath("prime/templates/system/configuration.h.ftl")
-    #primeStackSystemConfigFile.setMarkup(True)
+    primeStackSystemConfigFile = primeStackConfigComponent.createFileSymbol("PRIME_STACK_CONFIGURATION", None)
+    primeStackSystemConfigFile.setType("STRING")
+    primeStackSystemConfigFile.setOutputName("core.LIST_SYSTEM_CONFIG_H_MIDDLEWARE_CONFIGURATION")
+    primeStackSystemConfigFile.setSourcePath("prime/templates/system/configuration.h.ftl")
+    primeStackSystemConfigFile.setMarkup(True)
 
     primeStackSystemDefFile = primeStackConfigComponent.createFileSymbol("PRIME_STACK_DEF", None)
     primeStackSystemDefFile.setType("STRING")
@@ -732,7 +968,11 @@ def instantiateComponent(primeStackConfigComponent):
     #primeSystemTasksFile.setMarkup(True)
 
 def destroyComponent(primeStackConfigComponent):
-    Database.deactivateComponents(["prime_config"]) 
+    # Set Application Start Address
+    memStartAddressHex, memSizeHex = getFlashMemoryDescription()
+    Database.sendMessage("core", "APP_START_ADDRESS", {"start_address":memStartAddressHex})
+
+    Database.deactivateComponents(["prime_config"])
 
 ################################################################################
 #### Business Logic ####

@@ -305,7 +305,7 @@ void PAL_PLC_RM_GetRobustModulation(void *indObj, uint16_t *pBitRate, PAL_SCHEME
 	}
 
 	*pModulation = bestModulation;
-	if (pch >= PAL_PLC_CHN1_CHN2) 
+	if (pch >= CHN1_CHN2) 
 	{
 		*pBitRate = palPlcRmBandwidth[bestModulation] << 1;
 	}

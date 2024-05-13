@@ -55,7 +55,7 @@ Microchip or any third party.
 // *****************************************************************************
 // *****************************************************************************
 
-static HAL_API *halApi;
+static HAL_API *pPrimeHalApi;
 
 // *****************************************************************************
 // *****************************************************************************
@@ -63,109 +63,106 @@ static HAL_API *halApi;
 // *****************************************************************************
 // *****************************************************************************
 
-void PRIME_HAL_WRP_Configure(HAL_API *halApi)
+void PRIME_HAL_WRP_Configure(HAL_API *pHalApi)
 {
-	halApi = hal_api_ptr;
+	pPrimeHalApi = pHalApi;
 }
 
 void PRIME_HAL_WRP_RestartSystem(SRV_RESET_HANDLER_RESET_CAUSE resetType)
 {
-	halApi->restart_system(resetType);
+	pPrimeHalApi->restart_system(resetType);
 }
 
-uint32_t PRIME_HAL_WRAPPER_PcrcCalculate((uint8_t *pData, size_t length,
+uint32_t PRIME_HAL_WRAPPER_PcrcCalculate(uint8_t *pData, size_t length,
     PCRC_HEADER_TYPE hdrType, PCRC_CRC_TYPE crcType, uint32_t initValue, 
     bool v14Mode)
 {
-	return halApi->pcrc_calc(pData, length, hdrType, crcType, initValue, v14Mode);
+	return pPrimeHalApi->pcrc_calc(pData, length, hdrType, crcType, initValue, v14Mode);
 }
     
 void PRIME_HAL_WRP_PcrcConfigureSNA(uint8_t *sna)
 {
-	halApi->pcrc_config_sna(sna);
+	pPrimeHalApi->pcrc_config_sna(sna);
 }
 
 bool PRIME_HAL_WRP_GetConfigInfo(SRV_STORAGE_TYPE infoType, uint8_t size, 
     void* pData)
 {
-	return halApi->get_config_info(infoType, size, pData);
+	return pPrimeHalApi->get_config_info(infoType, size, pData);
 }
 
-/* @} */
-
-<#if primePal.PRIME_PAL_PLC_EN == true>
-/** \brief PLC interface */
-/* @{ */
-void prime_hal_plc_init(void)
+bool PRIME_HAL_WRP_SetConfigInfo(SRV_STORAGE_TYPE infoType, uint8_t size, 
+    void* pData)
 {
-	return halApi->set_config_info(infoType, size, pData);
+	return pPrimeHalApi->set_config_info(infoType, size, pData);
 }
+
 
 SRV_USI_HANDLE PRIME_HAL_WRP_UsiOpen(const SYS_MODULE_INDEX index)
 {
-    return halApi->usi_open(index);
+    return pPrimeHalApi->usi_open(index);
 }
 
 void PRIME_HAL_WRP_UsiSetCallback(SRV_USI_HANDLE handle, SRV_USI_PROTOCOL_ID protocol, 
     SRV_USI_CALLBACK callback)
 {
-    halApi->usi_set_callback(handle, protocol, callback);
+    pPrimeHalApi->usi_set_callback(handle, protocol, callback);
 }
 
 void PRIME_HAL_WRP_UsiSend(SRV_USI_HANDLE handle, SRV_USI_PROTOCOL_ID protocol, 
     uint8_t *data, size_t length)
 {
-	halApi->usi_send(handle, protocol, data, length);
+	pPrimeHalApi->usi_send(handle, protocol, data, length);
 }
 
 void PRIME_HAL_WRP_DebugReport(SRV_LOG_REPORT_LEVEL logLevel, 
     SRV_LOG_REPORT_CODE code, const char *info, ...)
 {
-	halApi->debug_report(logLevel, code, info);
+	pPrimeHalApi->debug_report(logLevel, code, info);
 }
 
-bool prime_hal_plc_send_boot_cmd(uint16_t us_cmd, uint32_t ul_addr, uint32_t ul_data_len, uint8_t *puc_data_buf, uint8_t *puc_data_read)
+void PRIME_HAL_WRP_PibGetRequest(uint16_t pibAttrib)
 {
-	halApi->pib_get_request(pibAttrib);
+	pPrimeHalApi->pib_get_request(pibAttrib);
 }
 
-void PRIME_HAL_WRP_PIBGetRequestSetCallback(USER_PIB_GET_REQUEST_CALLBACK callback)
+void PRIME_HAL_WRP_PIBGetRequestSetCallback(SRV_USER_PIB_GET_REQUEST_CALLBACK callback)
 {
-	halApi->pib_get_request_set_callback(callback);
+	pPrimeHalApi->pib_get_request_set_callback(callback);
 }
 
 void PRIME_HAL_WRP_PibSetRequest(uint16_t pibAttrib, void *pibValue, 
     uint8_t pibSize)
 {
-	halApi->pib_set_request(pibAttrib, pibValue, pibSize);
+	pPrimeHalApi->pib_set_request(pibAttrib, pibValue, pibSize);
 }
 
-void PRIME_HAL_WRP_PIBSetRequestSetCallback(USER_PIB_SET_REQUEST_CALLBACK callback)
+void PRIME_HAL_WRP_PIBSetRequestSetCallback(SRV_USER_PIB_SET_REQUEST_CALLBACK callback)
 {
-	halApi->pib_set_request_set_callback(callback);
+	pPrimeHalApi->pib_set_request_set_callback(callback);
 }
 
 uint32_t PRIME_HAL_WRP_RngGet(void)
 {
-	return halApi->rng_get();
+	return pPrimeHalApi->rng_get();
 }
 
 int32_t PRIME_HAL_WRP_AesCmacDirect(uint8_t *input, uint32_t inputLen, 
     uint8_t *outputMac, uint8_t *key)
 {
-    return halApi->aes_cmac_direct(input, inputLen, outputMac, key);
+    return pPrimeHalApi->aes_cmac_direct(input, inputLen, outputMac, key);
 }
 
 int32_t PRIME_HAL_WRP_AesCcmSetkey(uint8_t *key)
 {
-    return halApi->aes_ccm_set_key(key);
+    return pPrimeHalApi->aes_ccm_set_key(key);
 }
 
 int32_t PRIME_HAL_WRP_AesCcmEncryptAndTag(uint8_t *data, uint32_t dataLen,
     uint8_t *iv, uint32_t ivLen, uint8_t *aad, uint32_t aadLen, uint8_t *tag, 
     uint32_t tagLen)
 {
-    return halApi->aes_ccm_encrypt_tag(data, dataLen, iv, ivLen, aad, 
+    return pPrimeHalApi->aes_ccm_encrypt_tag(data, dataLen, iv, ivLen, aad, 
         aadLen, tag, tagLen);
 }
 
@@ -173,159 +170,154 @@ int32_t PRIME_HAL_WRP_AesCcmAuthDecrypt(uint8_t *data, uint32_t dataLen,
     uint8_t *iv, uint32_t ivLen, uint8_t *aad, uint32_t aadLen, 
     uint8_t *tag, uint32_t tagLen)
 {
-    return halApi->aes_ccm_auth_decrypt(data, dataLen, iv, ivLen, aad, 
+    return pPrimeHalApi->aes_ccm_auth_decrypt(data, dataLen, iv, ivLen, aad, 
         aadLen,  tag, tagLen);
 }
 
 void PRIME_HAL_WRP_AesWrapKey(const uint8_t *key, uint32_t keyLen, 
     const uint8_t *in, uint32_t inLen, uint8_t *out)
 {
-    halApi->aes_wrap_key(key, keyLen, in, inLen, out);
+    pPrimeHalApi->aes_wrap_key(key, keyLen, in, inLen, out);
 }
 
 bool PRIME_HAL_WRP_AesUnwrapKey(const uint8_t *key, uint32_t keyLen, 
     const uint8_t *in, uint32_t inLen, uint8_t *out)
 {
-    return halApi->aes_unwrap_key(key, keyLen, in, inLen, out);
+    return pPrimeHalApi->aes_unwrap_key(key, keyLen, in, inLen, out);
 }
 
 uint64_t PRIME_HAL_WRP_GetTimeUS64(void)
 {
-    return halApi->timer_get_us64();
+    return pPrimeHalApi->timer_get_us64();
 }
 
-uint32_t PRIME_HAL_WRP_GetTimeUS32(void)
+uint32_t PRIME_HAL_WRP_GetTimeUS(void)
 {
-    return halApi->timer_get_us32();
+    return pPrimeHalApi->timer_get_us();
 }
 
-
-
-/** \brief Firmware Upgrade Interface */
-/* @{ */
-void prime_hal_fu_data_read(uint32_t addr, uint8_t *puc_buf, uint16_t us_size)
+SYS_TIME_HANDLE PRIME_HAL_WRP_TIMER_CallbackRegisterUS(SYS_TIME_CALLBACK callback,
+    uintptr_t context, uint32_t us, SYS_TIME_CALLBACK_TYPE type)
 {
-	halApi->fu_data_read(addr, puc_buf, us_size);
+    return pPrimeHalApi->timer_callback_register_us(callback, context, us, type);
 }
 
-uint8_t prime_hal_fu_data_write(uint32_t addr, uint8_t *puc_buf, uint16_t us_size)
+SYS_MODULE_OBJ PRIME_HAL_WRP_PAL_Initialize(const SYS_MODULE_INDEX index)
 {
-	return halApi->fu_data_write(addr, puc_buf, us_size);
+    return pPrimeHalApi->hal_pal_initialize(index);
 }
 
-void prime_hal_fu_data_cfg_read(void *pv_dst, uint16_t us_size)
+void PRIME_HAL_WRP_PAL_Tasks(SYS_MODULE_OBJ object)
 {
-	halApi->fu_data_cfg_read(pv_dst, us_size);
+    return pPrimeHalApi->hal_pal_tasks(object);
 }
 
-uint8_t prime_hal_fu_data_cfg_write(void *pv_src, uint16_t us_size)
+SYS_STATUS PRIME_HAL_WRP_PAL_Status(SYS_MODULE_OBJ object)
 {
-	return halApi->fu_data_cfg_write(pv_src, us_size);
+    return pPrimeHalApi->hal_pal_status(object);
 }
 
-void prime_hal_fu_start(hal_fu_info_t *x_fu_info)
+void PRIME_HAL_WRP_PAL_CallbackRegister(PAL_CALLBACKS *pCallbacks)
 {
-	halApi->fu_start(x_fu_info);
+    return pPrimeHalApi->hal_pal_callback_register(pCallbacks);
 }
 
-void prime_hal_fu_end(hal_fu_result_t uc_hal_res)
+uint8_t PRIME_HAL_WRP_PAL_DataRequest(PAL_MSG_REQUEST_DATA *pData)
 {
-	halApi->fu_end(uc_hal_res);
+    return pPrimeHalApi->hal_pal_data_request(pData);
 }
 
-void prime_hal_fu_revert(void)
+uint8_t PRIME_HAL_WRP_PAL_GetSNR(uint16_t pch, uint8_t *snr, uint8_t qt)
 {
-	halApi->fu_revert();
+    return pPrimeHalApi->hal_pal_get_snr(pch, snr, qt);
 }
 
-void prime_hal_fu_crc_calculate(void)
+uint8_t PRIME_HAL_WRP_PAL_GetZCT(uint16_t pch, uint32_t *zct)
 {
-	halApi->fu_crc_calculate();
+    return pPrimeHalApi->hal_pal_get_zct(pch, zct);
 }
 
-void prime_hal_fu_crc_set_callback(void (*p_handler)(uint32_t ul_crc))
+uint8_t PRIME_HAL_WRP_PAL_GetTimer(uint16_t pch, uint32_t *timer)
 {
-	halApi->fu_crc_set_callback(p_handler);
+    return pPrimeHalApi->hal_pal_get_timer(pch, timer);
 }
 
-uint16_t prime_hal_fu_get_bitmap(uint8_t *puc_bitmap, uint32_t *pus_num_rcv_pages)
+uint8_t PRIME_HAL_WRP_PAL_GetTimerExtended(uint16_t pch, uint64_t *timer)
 {
-	return halApi->fu_get_bitmap(puc_bitmap, pus_num_rcv_pages);
+    return pPrimeHalApi->hal_pal_get_timer_extended(pch, timer);
 }
 
-void prime_hal_fu_signature_image_check(void)
+uint8_t PRIME_HAL_WRP_PAL_GetCD(uint16_t pch, uint8_t *cd, uint8_t *rssi, uint32_t *time, uint8_t *header)
 {
-	halApi->fu_signature_image_check();
+    return pPrimeHalApi->hal_pal_get_cd(pch, cd, rssi, time, header);
 }
 
-void prime_hal_fu_signature_image_check_set_callback(void (*p_handler)(hal_fu_verif_result_t uc_result))
+uint8_t PRIME_HAL_WRP_PAL_GetNL(uint16_t pch, uint8_t *noise)
 {
-	halApi->fu_signature_image_check_set_callback(p_handler);
+    return pPrimeHalApi->hal_pal_get_nl(pch, noise);
 }
 
-void prime_hal_swap_stack(uint8_t uc_traffic)
+uint8_t PRIME_HAL_WRP_PAL_GetAGC(uint16_t pch, uint8_t *mode, uint8_t *gain)
 {
-	halApi->swap_stack(uc_traffic);
+    return pPrimeHalApi->hal_pal_get_agc(pch, mode, gain);
 }
 
-/** \brief PAL Interface */
-
-void prime_hal_timer_1us_enable_interrupt(bool b_enable)
+uint8_t PRIME_HAL_WRP_PAL_SetAGC(uint16_t pch, uint8_t mode, uint8_t gain)
 {
-	halApi->timer_1us_enable_interrupt(b_enable);
+    return pPrimeHalApi->hal_pal_set_agc(pch, mode, gain);
 }
 
-bool prime_hal_timer_1us_set_int(uint32_t ul_time_us, bool b_relative, void (*p_handler)(uint32_t), uint32_t *pul_int_id)
+uint8_t PRIME_HAL_WRP_PAL_GetCCA(uint16_t pch, uint8_t *pState)
 {
-	return halApi->timer_1us_set_int(ul_time_us, b_relative, p_handler, pul_int_id);
+    return pPrimeHalApi->hal_pal_get_cca(pch, pState);
 }
 
-bool prime_hal_timer_1us_cancel_int(uint32_t ul_int_id)
+uint8_t PRIME_HAL_WRP_PAL_GetChannel(uint16_t *pPch, uint16_t channelReference)
 {
-	return halApi->timer_1us_cancel_int(ul_int_id);
+    return pPrimeHalApi->hal_pal_get_channel(pPch, channelReference);
 }
-/* @} */
 
-<#if primePal.PRIME_PAL_RF_EN == true>
-/** \brief RF Interface */
-/* @{ */
-uint8_t prime_hal_prf_if_init(void)
+uint8_t PRIME_HAL_WRP_PAL_SetChannel(uint16_t pch)
 {
-	return p_hal_api->prf_if_init();
+    return pPrimeHalApi->hal_pal_set_channel(pch);
 }
 
-void prime_hal_prf_if_reset(void)
+void PRIME_HAL_WRP_PAL_ProgramChannelSwitch(uint16_t pch, uint32_t timeSync, uint8_t timeMode)
 {
-	p_hal_api->prf_if_reset();
+    return pPrimeHalApi->hal_pal_program_channel_switch(pch, timeSync, timeMode);
 }
 
-void prime_hal_prf_if_enable_interrupt(bool b_enable)
+uint8_t PRIME_HAL_WRP_PAL_GetConfiguration(uint16_t pch, uint16_t id, void *val, uint16_t length)
 {
-	p_hal_api->prf_if_enable_interrupt(b_enable);
+    return pPrimeHalApi->hal_pal_get_configuration(pch, id, val, length);
 }
 
-void prime_hal_prf_if_set_handler(void (*p_handler)(void))
+uint8_t PRIME_HAL_WRP_PAL_SetConfiguration(uint16_t pch, uint16_t id, void *val, uint16_t length)
 {
-	p_hal_api->prf_if_set_handler(p_handler);
+    return pPrimeHalApi->hal_pal_set_configuration(pch, id, val, length);
 }
 
-bool prime_hal_prf_if_send_spi_cmd(uint8_t *puc_data_buf, uint16_t us_addr, uint16_t us_len, uint8_t uc_mode)
+uint16_t PRIME_HAL_WRP_PAL_GetSignalCapture(uint16_t pch, uint8_t *noiseCapture, uint8_t mode, 
+                              uint32_t timeStart, uint32_t duration)
 {
-	return p_hal_api->prf_if_send_spi_cmd(puc_data_buf, us_addr, us_len, uc_mode);
+    return pPrimeHalApi->hal_pal_get_signal_capture(pch, noiseCapture, mode, 
+                              timeStart, duration);
 }
 
-bool prime_hal_prf_if_is_spi_busy(void)
+uint8_t PRIME_HAL_WRP_PAL_GetMsgDuration(uint16_t pch, uint16_t length, PAL_SCHEME scheme, uint8_t mode, uint32_t *duration)
 {
-	return p_hal_api->prf_if_is_spi_busy();
+    return pPrimeHalApi->hal_pal_get_msg_duration(pch, length, scheme, mode, duration);
 }
 
-void prime_hal_prf_if_led(uint8_t uc_led_id, bool b_led_on)
+bool PRIME_HAL_WRP_PAL_CheckMinimumQuality(uint16_t pch, uint8_t reference, uint8_t modulation)
 {
-	p_hal_api->prf_if_led(uc_led_id, b_led_on);
+    return pPrimeHalApi->hal_pal_check_minimum_quality(pch, reference, modulation);
 }
-</#if>
 
-	/* @} */
+uint8_t PRIME_HAL_WRP_PAL_GetLessRobustModulation(uint16_t pch, uint8_t mod1, uint8_t mod2)
+{
+    return pPrimeHalApi->hal_pal_get_less_robust_modulation(pch, mod1, mod2);
+}
 
 
 /* @cond 0 */

@@ -1,6 +1,6 @@
 /*******************************************************************************
-  PRIME Hardware Abstraction Layer API Header 
-   
+  PRIME Hardware Abstraction Layer API Header
+
   Company:
     Microchip Technology Inc.
 
@@ -61,6 +61,7 @@ Microchip or any third party.
 #include "service/security/aes_wrapper.h"
 #include "service/security/cipher_wrapper.h"
 #include "service/time_management/srv_time_management.h"
+#include "stack/pal/pal_types.h"
 
 // DOM-IGNORE-BEGIN
 #ifdef __cplusplus  // Provide C++ Compatibility
@@ -103,7 +104,7 @@ typedef void (*HAL_RESTART_SYSTEM)(SRV_RESET_HANDLER_RESET_CAUSE resetType);
     Related to PCRC service.
 */
 typedef uint32_t (*HAL_PCRC_CALCULATE)(uint8_t *pData, size_t length,
-    PCRC_HEADER_TYPE hdrType, PCRC_CRC_TYPE crcType, uint32_t initValue, 
+    PCRC_HEADER_TYPE hdrType, PCRC_CRC_TYPE crcType, uint32_t initValue,
     bool v14Mode);
 
 // *****************************************************************************
@@ -113,7 +114,7 @@ typedef uint32_t (*HAL_PCRC_CALCULATE)(uint8_t *pData, size_t length,
     Function pointer to set the subnetwork address for the calculation of a CRC.
 
   Description:
-    This function pointer is used to set the subnetwork address for the 
+    This function pointer is used to set the subnetwork address for the
     calculation of a CRC.
 
   Remarks:
@@ -128,13 +129,13 @@ typedef void (*HAL_PCRC_CONFIGURE_SNA)(uint8_t *sna);
     Function pointer to get configuration information stored externally.
 
   Description:
-    This function pointer is used to get configuration information stored 
+    This function pointer is used to get configuration information stored
     externally.
 
   Remarks:
     Related to PRIME Storage service.
 */
-typedef bool (*HAL_GET_CONFIG_INFO)(SRV_STORAGE_TYPE infoType, uint8_t size, 
+typedef bool (*HAL_GET_CONFIG_INFO)(SRV_STORAGE_TYPE infoType, uint8_t size,
     void *pData);
 
 // *****************************************************************************
@@ -144,13 +145,13 @@ typedef bool (*HAL_GET_CONFIG_INFO)(SRV_STORAGE_TYPE infoType, uint8_t size,
     Function pointer to set configuration information stored externally.
 
   Description:
-    This function pointer is used to set configuration information stored 
+    This function pointer is used to set configuration information stored
     externally.
 
   Remarks:
     Related to PRIME Storage service.
 */
-typedef bool (*HAL_SET_CONFIG_INFO)(SRV_STORAGE_TYPE infoType, uint8_t size, 
+typedef bool (*HAL_SET_CONFIG_INFO)(SRV_STORAGE_TYPE infoType, uint8_t size,
     void *pData);
 
 // *****************************************************************************
@@ -174,13 +175,13 @@ typedef SRV_USI_HANDLE (*HAL_USI_OPEN)(const SYS_MODULE_INDEX index);
     Function pointer to request the registration of a USI callback function.
 
   Description:
-    This function pointer is used to request the registration of a USI callback 
+    This function pointer is used to request the registration of a USI callback
     function.
 
   Remarks:
     Related to USI service.
 */
-typedef void (*HAL_USI_SET_CALLBACK)(SRV_USI_HANDLE handle, 
+typedef void (*HAL_USI_SET_CALLBACK)(SRV_USI_HANDLE handle,
     SRV_USI_PROTOCOL_ID protocol, SRV_USI_CALLBACK callback);
 
 // *****************************************************************************
@@ -195,7 +196,7 @@ typedef void (*HAL_USI_SET_CALLBACK)(SRV_USI_HANDLE handle,
   Remarks:
     Related to USI service.
 */
-typedef void (*HAL_USI_SEND)(SRV_USI_HANDLE handle, SRV_USI_PROTOCOL_ID protocol, 
+typedef size_t (*HAL_USI_SEND)(SRV_USI_HANDLE handle, SRV_USI_PROTOCOL_ID protocol,
     uint8_t *data, size_t length);
 
 // *****************************************************************************
@@ -205,13 +206,13 @@ typedef void (*HAL_USI_SEND)(SRV_USI_HANDLE handle, SRV_USI_PROTOCOL_ID protocol
     Function pointer to request the reporting of an error for the debug log.
 
   Description:
-    This function pointer is used to request the reporting of an error for the 
+    This function pointer is used to request the reporting of an error for the
     debug log.
 
   Remarks:
     Related to Log Report service.
 */
-typedef void (*HAL_DEBUG_REPORT)(SRV_LOG_REPORT_LEVEL logLevel, 
+typedef void (*HAL_DEBUG_REPORT)(SRV_LOG_REPORT_LEVEL logLevel,
     SRV_LOG_REPORT_CODE code, const char *info, ...);
 
 // *****************************************************************************
@@ -232,11 +233,11 @@ typedef void (*HAL_PIB_GET_REQUEST)(uint16_t pibAttrib);
 /* Register a callback function to get a user PIB attribute
 
   Summary:
-    Function pointer to request the registration of the callback function to get 
+    Function pointer to request the registration of the callback function to get
     a user PIB attribute.
 
   Description:
-    This function pointer is used to request the registration of the callback 
+    This function pointer is used to request the registration of the callback
     function to get a user PIB attribute.
 
   Remarks:
@@ -262,11 +263,11 @@ typedef void (*HAL_PIB_SET_REQUEST)(uint16_t pibAttrib, void *pibValue, uint8_t 
 /* Register a callback function to set a user PIB attribute
 
   Summary:
-    Function pointer to request the registration of the callback function to set 
+    Function pointer to request the registration of the callback function to set
     a user PIB attribute.
 
   Description:
-    This function pointer is used to request the registration of the callback 
+    This function pointer is used to request the registration of the callback
     function to set a user PIB attribute.
 
   Remarks:
@@ -292,28 +293,28 @@ typedef uint32_t (*HAL_RNG_GET)(void);
 /*  Perform AES-CMAC
 
   Summary:
-    Function pointer to perform AES-CMAC to generate the MAC in single step 
+    Function pointer to perform AES-CMAC to generate the MAC in single step
     without initialization.
 
   Description:
-    This function pointer is used to perform AES-CMAC to generate the MAC in 
+    This function pointer is used to perform AES-CMAC to generate the MAC in
     single step without initialization.
 
   Remarks:
     Related to Security service.
 */
-typedef int32_t (*HAL_AES_CMAC_DIRECT)(uint8_t *input, uint32_t inputLen, 
+typedef int32_t (*HAL_AES_CMAC_DIRECT)(uint8_t *input, uint32_t inputLen,
     uint8_t *outputMac, uint8_t *key);
 
 // *****************************************************************************
 /*  Set the encryption key for AES-CCM
 
   Summary:
-    Function pointer to initialize the AES-CCM context and set the encryption 
+    Function pointer to initialize the AES-CCM context and set the encryption
     key.
 
   Description:
-    This function pointer is used to initialize the AES-CCM context and set the 
+    This function pointer is used to initialize the AES-CCM context and set the
     16-byte encryption key.
 
   Remarks:
@@ -328,14 +329,14 @@ typedef int32_t (*HAL_AES_CCM_SET_KEY)(uint8_t *key);
     Function pointer to perform AES-CCM authenticated encryption of a buffer.
 
   Description:
-    This function pointer is used to perform AES-CCM authenticated encryption 
+    This function pointer is used to perform AES-CCM authenticated encryption
     of a buffer.
 
   Remarks:
     Related to Security service.
 */
 typedef int32_t (*HAL_AES_CCM_ENCRYPT_TAG)(uint8_t *data, uint32_t dataLen,
-    uint8_t *iv, uint32_t ivLen, uint8_t *aad, uint32_t aadLen, uint8_t *tag, 
+    uint8_t *iv, uint32_t ivLen, uint8_t *aad, uint32_t aadLen, uint8_t *tag,
     uint32_t tagLen);
 
 // *****************************************************************************
@@ -345,14 +346,14 @@ typedef int32_t (*HAL_AES_CCM_ENCRYPT_TAG)(uint8_t *data, uint32_t dataLen,
     Function pointer to perform AES-CCM authenticated decryption of a buffer.
 
   Description:
-    This function pointer is used to perform AES-CCM authenticated decryption 
+    This function pointer is used to perform AES-CCM authenticated decryption
     of a buffer.
 
   Remarks:
     Related to Security service.
 */
 typedef int32_t (*HAL_AES_CCM_AUTH_DECRYPT)(uint8_t *data, uint32_t dataLen,
-    uint8_t *iv, uint32_t ivLen, uint8_t *aad, uint32_t aadLen, uint8_t *tag, 
+    uint8_t *iv, uint32_t ivLen, uint8_t *aad, uint32_t aadLen, uint8_t *tag,
     uint32_t tagLen);
 
 // *****************************************************************************
@@ -367,7 +368,7 @@ typedef int32_t (*HAL_AES_CCM_AUTH_DECRYPT)(uint8_t *data, uint32_t dataLen,
   Remarks:
     Related to Security service.
 */
-typedef void (*HAL_AES_WRAP_KEY)(const uint8_t *key, uint32_t keyLen, 
+typedef void (*HAL_AES_WRAP_KEY)(const uint8_t *key, uint32_t keyLen,
     const uint8_t *in, uint32_t inLen, uint8_t *out);
 
 // *****************************************************************************
@@ -382,7 +383,7 @@ typedef void (*HAL_AES_WRAP_KEY)(const uint8_t *key, uint32_t keyLen,
   Remarks:
     Related to Security service.
 */
-typedef bool (*HAL_AES_UNWRAP_KEY)(const uint8_t *key, uint32_t keyLen, const uint8_t *in, 
+typedef bool (*HAL_AES_UNWRAP_KEY)(const uint8_t *key, uint32_t keyLen, const uint8_t *in,
     uint32_t inLen, uint8_t *out);
 
 // *****************************************************************************
@@ -390,11 +391,11 @@ typedef bool (*HAL_AES_UNWRAP_KEY)(const uint8_t *key, uint32_t keyLen, const ui
 
 
   Summary:
-    Function pointer to get the value of a counter and convert it in a 64 bit 
+    Function pointer to get the value of a counter and convert it in a 64 bit
     variable in microseconds.
 
   Description:
-    This function pointer is used to get the value of a counter and convert it 
+    This function pointer is used to get the value of a counter and convert it
     in a 64 bit variable in microseconds.
 
   Remarks:
@@ -407,11 +408,11 @@ typedef uint64_t (*HAL_TIMER_GetTimeUS64)(void);
 
 
   Summary:
-    Function pointer to get the value of a counter and convert it in a 32 bit 
+    Function pointer to get the value of a counter and convert it in a 32 bit
     variable in microseconds.
 
   Description:
-    This function pointer is used to get the value of a counter and convert it 
+    This function pointer is used to get the value of a counter and convert it
     in a 32 bit variable in microseconds.
 
   Remarks:
@@ -419,45 +420,70 @@ typedef uint64_t (*HAL_TIMER_GetTimeUS64)(void);
 */
 typedef uint32_t (*HAL_TIMER_GetTimeUS)(void);
 
+// *****************************************************************************
+/* Register a callback function with the time system service
+
+   Summary:
+        Function pointer to register a function with the time system service
+        to be called back when the requested number of microseconds have expired
+        (either once or repeatedly).
+
+   Description:
+        Creates a timer object and registers a function with it to be called back
+        when the requested delay (specified in microseconds) has completed.  The
+        caller must identify if the timer should call the function once or repeatedly
+        every time the given delay period expires.
+
+   Returns:
+        SYS_TIME_HANDLE - A valid timer object handle if the call succeeds.
+                      SYS_TIME_HANDLE_INVALID if it fails.
+
+*/
+typedef SYS_TIME_HANDLE (*HAL_TIMER_CallbackRegisterUS)(SYS_TIME_CALLBACK callback,
+                        uintptr_t context, uint32_t us, SYS_TIME_CALLBACK_TYPE type);
+
 
 // Related to FU service - TBD
-typedef void (*hal_fu_data_read_t)(uint32_t addr, uint8_t *puc_buf, uint16_t us_size);
-typedef uint8_t (*hal_fu_data_write_t)(uint32_t addr, uint8_t *puc_buf, uint16_t us_size);
-typedef void (*hal_fu_data_cfg_read_t)(void *pv_dst, uint16_t us_size);
-typedef uint8_t (*hal_fu_data_cfg_write_t)(void *pv_src, uint16_t us_size);
-typedef void (*hal_fu_start_t)(hal_fu_info_t *x_fu_info);
-typedef void (*hal_fu_end_t)(hal_fu_result_t uc_hal_res);
-typedef void (*hal_fu_revert_t)(void);
-typedef void (*hal_fu_crc_calculate_t)(void);
-typedef void (*hal_fu_crc_set_callback_t)(void (*p_handler)(uint32_t ul_crc));
-typedef void (*hal_fu_signature_image_check_t)(void);
-typedef void (*hal_fu_signature_image_check_set_callback_t)(void (*p_handler)(hal_fu_verif_result_t uc_result));
-typedef uint16_t (*hal_fu_get_bitmap_t)(uint8_t *puc_bitmap, uint32_t *pus_num_rcv_pages);
-typedef void (*hal_swap_stack_t)(uint8_t uc_traffic);
+// typedef void (*hal_fu_data_read_t)(uint32_t addr, uint8_t *puc_buf, uint16_t us_size);
+// typedef uint8_t (*hal_fu_data_write_t)(uint32_t addr, uint8_t *puc_buf, uint16_t us_size);
+// typedef void (*hal_fu_data_cfg_read_t)(void *pv_dst, uint16_t us_size);
+// typedef uint8_t (*hal_fu_data_cfg_write_t)(void *pv_src, uint16_t us_size);
+// typedef void (*hal_fu_start_t)(hal_fu_info_t *x_fu_info);
+// typedef void (*hal_fu_end_t)(hal_fu_result_t uc_hal_res);
+// typedef void (*hal_fu_revert_t)(void);
+// typedef void (*hal_fu_crc_calculate_t)(void);
+// typedef void (*hal_fu_crc_set_callback_t)(void (*p_handler)(uint32_t ul_crc));
+// typedef void (*hal_fu_signature_image_check_t)(void);
+// typedef void (*hal_fu_signature_image_check_set_callback_t)(void (*p_handler)(hal_fu_verif_result_t uc_result));
+// typedef uint16_t (*hal_fu_get_bitmap_t)(uint8_t *puc_bitmap, uint32_t *pus_num_rcv_pages);
+// typedef void (*hal_swap_stack_t)(uint8_t uc_traffic);
 
 // Related to PAL - TBD
+typedef SYS_MODULE_OBJ (*HAL_PAL_INITIALIZE)(const SYS_MODULE_INDEX index);
+typedef void (*HAL_PAL_TASKS)(SYS_MODULE_OBJ object);
+typedef SYS_STATUS (*HAL_PAL_STATUS)(SYS_MODULE_OBJ object);
+typedef void (*HAL_PAL_CALLBACK_REGISTER)(PAL_CALLBACKS *pCallbacks);
+typedef uint8_t (*HAL_PAL_DATA_REQUEST)(PAL_MSG_REQUEST_DATA *pData);
+typedef uint8_t (*HAL_PAL_GET_SNR)(uint16_t pch, uint8_t *snr, uint8_t qt);
+typedef uint8_t (*HAL_PAL_GET_ZCT)(uint16_t pch, uint32_t *zct);
+typedef uint8_t (*HAL_PAL_GET_TIMER)(uint16_t pch, uint32_t *timer);
+typedef uint8_t (*HAL_PAL_GET_TIMER_EXTENDED)(uint16_t pch, uint64_t *timer);
+typedef uint8_t (*HAL_PAL_GET_CD)(uint16_t pch, uint8_t *cd, uint8_t *rssi, uint32_t *time, uint8_t *header);
+typedef uint8_t (*HAL_PAL_GET_NL)(uint16_t pch, uint8_t *noise);
+typedef uint8_t (*HAL_PAL_GET_AGC)(uint16_t pch, uint8_t *mode, uint8_t *gain);
+typedef uint8_t (*HAL_PAL_SET_AGC)(uint16_t pch, uint8_t mode, uint8_t gain);
+typedef uint8_t (*HAL_PAL_GET_CCA)(uint16_t pch, uint8_t *pState);
+typedef uint8_t (*HAL_PAL_GET_CHANNEL)(uint16_t *pPch, uint16_t channelReference);
+typedef uint8_t (*HAL_PAL_SET_CHANNEL)(uint16_t pch);
+typedef void (*HAL_PAL_PROGRAM_CHANNEL_SWITCH)(uint16_t pch, uint32_t timeSync, uint8_t timeMode);
+typedef uint8_t (*HAL_PAL_GET_CONFIGURATION)(uint16_t pch, uint16_t id, void *val, uint16_t length);
+typedef uint8_t (*HAL_PAL_SET_CONFIGURATION)(uint16_t pch, uint16_t id, void *val, uint16_t length);
+typedef uint16_t (*HAL_PAL_GET_SIGNAL_CAPTURE)(uint16_t pch, uint8_t *noiseCapture, uint8_t mode, uint32_t timeStart, uint32_t duration);
+typedef uint8_t (*HAL_PAL_GET_MSG_DURATION)(uint16_t pch, uint16_t length, PAL_SCHEME scheme, uint8_t mode, uint32_t *duration);
+typedef bool (*HAL_PAL_CHECK_MINIMUM_QUALITY)(uint16_t pch, uint8_t reference, uint8_t modulation);
+typedef uint8_t (*HAL_PAL_GET_LESS_ROBUST_MODULATION)(uint16_t pch, uint8_t mod1, uint8_t mod2);
 
-<#if primePal.PRIME_PAL_PLC_EN == true>
-typedef bool (*hal_plc_send_boot_cmd_t)(uint16_t us_cmd, uint32_t ul_addr, uint32_t ul_data_len, uint8_t *puc_data_buf, uint8_t *puc_data_read);
-typedef bool (*hal_plc_send_wrrd_cmd_t)(uint8_t uc_cmd, void *px_spi_data, void *px_spi_status_info);
-typedef void (*hal_plc_enable_interrupt_t)(bool enable);
-typedef void (*hal_plc_delay_t)(uint8_t uc_tref, uint32_t ul_delay);
-typedef bool (*hal_plc_set_stby_mode_t)(bool sleep);
-typedef bool (*hal_plc_get_thermal_warning_t)(void);
-</#if>
-
-
-
-<#if primePal.PRIME_PAL_RF_EN == true>
-typedef uint8_t (*hal_prf_if_init_t)(void);
-typedef void (*hal_prf_if_reset_t)(void);
-typedef void (*hal_prf_if_enable_interrupt_t)(bool b_enable);
-typedef void (*hal_prf_if_set_handler_t)(void (*p_handler)(void));
-typedef bool (*hal_prf_if_send_spi_cmd_t)(uint8_t *puc_data_buf, uint16_t us_addr, uint16_t us_len, uint8_t uc_mode);
-typedef bool (*hal_prf_if_is_spi_busy_t)(void);
-typedef void (*hal_prf_if_led_t)(uint8_t uc_led_id, bool b_led_on);
-</#if>
-
+typedef void (*TBD)(void);
 // *****************************************************************************
 /* HAL API functions structure
 
@@ -475,115 +501,80 @@ typedef struct {
 
 	HAL_PCRC_CALCULATE pcrc_calc;
 	HAL_PCRC_CONFIGURE_SNA pcrc_config_sna;
-    
+
     HAL_GET_CONFIG_INFO get_config_info;
 	HAL_SET_CONFIG_INFO set_config_info;
-    
+
     HAL_USI_OPEN usi_open;
 	HAL_USI_SET_CALLBACK usi_set_callback;
 	HAL_USI_SEND usi_send;
-    
+
     HAL_DEBUG_REPORT debug_report;
-    
+
     HAL_PIB_GET_REQUEST pib_get_request;
 	HAL_PIB_GET_REQUEST_SET_CALLBACK pib_get_request_set_callback;
 	HAL_PIB_SET_REQUEST pib_set_request;
 	HAL_PIB_SET_REQUEST_SET_CALLBACK pib_set_request_set_callback;
-    
+
     HAL_RNG_GET rng_get;
-    
+
     HAL_AES_CMAC_DIRECT aes_cmac_direct;
     HAL_AES_CCM_SET_KEY aes_ccm_set_key;
     HAL_AES_CCM_ENCRYPT_TAG aes_ccm_encrypt_tag;
     HAL_AES_CCM_AUTH_DECRYPT aes_ccm_auth_decrypt;
     HAL_AES_WRAP_KEY aes_wrap_key;
     HAL_AES_UNWRAP_KEY aes_unwrap_key;
-    
+
     HAL_TIMER_GetTimeUS64 timer_get_us64;
     HAL_TIMER_GetTimeUS timer_get_us;
-   
-	hal_fu_data_read_t fu_data_read;
-	hal_fu_data_write_t fu_data_write;
-	hal_fu_data_cfg_read_t fu_data_cfg_read;
-	hal_fu_data_cfg_write_t fu_data_cfg_write;
-	hal_fu_start_t fu_start;
-	hal_fu_end_t fu_end;
-	hal_fu_revert_t fu_revert;
-	hal_fu_crc_calculate_t fu_crc_calculate;
-	hal_fu_crc_set_callback_t fu_crc_set_callback;
-	hal_fu_signature_image_check_t fu_signature_image_check;
-	hal_fu_signature_image_check_set_callback_t fu_signature_image_check_set_callback;
-	hal_fu_get_bitmap_t fu_get_bitmap;
+    HAL_TIMER_CallbackRegisterUS timer_callback_register_us;
 
-<#if primePal.PRIME_PAL_PLC_EN == true>
-	hal_plc_init_t plc_init;
-	hal_plc_reset_t plc_reset;
-	hal_plc_set_handler_t plc_set_handler;
-	hal_plc_tx_signal_t plc_tx_signal;
-	hal_plc_rx_signal_t plc_rx_signal;
-</#if>
+	TBD tbd1; //hal_fu_data_read_t fu_data_read;
+	TBD tbd2; //hal_fu_data_write_t fu_data_write;
+	TBD tbd3; //hal_fu_data_cfg_read_t fu_data_cfg_read;
+	TBD tbd4; //hal_fu_data_cfg_write_t fu_data_cfg_write;
+	TBD tbd5; //hal_fu_start_t fu_start;
+	TBD tbd6; //hal_fu_end_t fu_end;
+	TBD tbd7; //hal_fu_revert_t fu_revert;
+	TBD tbd8; //hal_fu_crc_calculate_t fu_crc_calculate;
+	TBD tbd9; //hal_fu_crc_set_callback_t fu_crc_set_callback;
+	TBD tbd10; //hal_fu_signature_image_check_t fu_signature_image_check;
+	TBD tbd11; //hal_fu_signature_image_check_set_callback_t fu_signature_image_check_set_callback;
+	TBD tbd12; //hal_fu_get_bitmap_t fu_get_bitmap;
 
-	hal_get_config_info_t get_config_info;
-	hal_set_config_info_t set_config_info;
+	TBD tbd13; //hal_net_get_freq_t net_get_freq;
 
-    hal_usi_open_t usi_open;
-	hal_usi_set_callback_t usi_set_callback;
-	hal_usi_send_cmd_t usi_send_cmd;
+	TBD tbd14; //hal_nwk_recovery_init_t nwk_recovery_init;
+	TBD tbd15; //hal_nwk_recovery_read_t nwk_recovery_read;
+	TBD tbd16; //hal_nwk_recovery_write_t nwk_recovery_write;
 
-	hal_trng_read_t trng_read;
+    HAL_PAL_INITIALIZE hal_pal_initialize;
+    HAL_PAL_TASKS hal_pal_tasks;
+    HAL_PAL_STATUS hal_pal_status;
+    HAL_PAL_CALLBACK_REGISTER hal_pal_callback_register;
+    HAL_PAL_DATA_REQUEST hal_pal_data_request;
+    HAL_PAL_GET_SNR hal_pal_get_snr;
+    HAL_PAL_GET_ZCT hal_pal_get_zct;
+    HAL_PAL_GET_TIMER hal_pal_get_timer;
+    HAL_PAL_GET_TIMER_EXTENDED hal_pal_get_timer_extended;
+    HAL_PAL_GET_CD hal_pal_get_cd;
+    HAL_PAL_GET_NL hal_pal_get_nl;
+    HAL_PAL_GET_AGC hal_pal_get_agc;
+    HAL_PAL_SET_AGC hal_pal_set_agc;
+    HAL_PAL_GET_CCA hal_pal_get_cca;
+    HAL_PAL_GET_CHANNEL hal_pal_get_channel;
+    HAL_PAL_SET_CHANNEL hal_pal_set_channel;
+    HAL_PAL_PROGRAM_CHANNEL_SWITCH hal_pal_program_channel_switch;
+    HAL_PAL_GET_CONFIGURATION hal_pal_get_configuration;
+    HAL_PAL_SET_CONFIGURATION hal_pal_set_configuration;
+    HAL_PAL_GET_SIGNAL_CAPTURE hal_pal_get_signal_capture ;
+    HAL_PAL_GET_MSG_DURATION hal_pal_get_msg_duration;
+    HAL_PAL_CHECK_MINIMUM_QUALITY hal_pal_check_minimum_quality;
+    HAL_PAL_GET_LESS_ROBUST_MODULATION hal_pal_get_less_robust_modulation;
 
-	hal_debug_report_t debug_report;
-
-	hal_net_get_freq_t net_get_freq;
-
-<#if primePal.PRIME_PAL_PLC_EN == true>
-	hal_plc_send_boot_cmd_t plc_send_boot_cmd;
-	hal_plc_send_wrrd_cmd_t plc_send_wrrd_cmd;
-	hal_plc_enable_interrupt_t plc_enable_int;
-	hal_plc_delay_t plc_delay;
-</#if>
-
-#ifdef HAL_NWK_RECOVERY_INTERFACE
-	hal_nwk_recovery_init_t nwk_recovery_init;
-	hal_nwk_recovery_read_t nwk_recovery_read;
-	hal_nwk_recovery_write_t nwk_recovery_write;
-#endif
-
-	hal_pib_get_request_t pib_get_request;
-	hal_pib_get_request_set_callback_t pib_get_request_set_callback;
-	hal_pib_set_request_t pib_set_request;
-	hal_pib_set_request_set_callback_t pib_set_request_set_callback;
-
-	hal_aes_init_t aes_init;
-	hal_aes_set_callback_t aes_set_callback;
-	hal_aes_key_t aes_key;
-	hal_aes_crypt_t aes_crypt;
-	hal_swap_stack_t swap_stack;
-
-<#if primePal.PRIME_PAL_PLC_EN == true>
-	hal_plc_set_stby_mode_t plc_set_stby_mode;
-	hal_plc_get_thermal_warning_t plc_get_thermal_warning;
-</#if>
-
-	/* New functions must be added at the end */
-
-
-	hal_timer_1us_get_t timer_1us_get;
-	hal_timer_1us_set_int_t timer_1us_set_int;
-	hal_timer_1us_cancel_int_t timer_1us_cancel_int;
-	hal_timer_1us_enable_interrupt_t timer_1us_enable_interrupt;
-    
     /* New functions must be added at the end */
 
-<#if primePal.PRIME_PAL_RF_EN == true>
-	hal_prf_if_init_t prf_if_init;
-	hal_prf_if_reset_t prf_if_reset;
-	hal_prf_if_enable_interrupt_t prf_if_enable_interrupt;
-	hal_prf_if_set_handler_t prf_if_set_handler;
-	hal_prf_if_send_spi_cmd_t prf_if_send_spi_cmd;
-	hal_prf_if_is_spi_busy_t prf_if_is_spi_busy;
-	hal_prf_if_led_t prf_if_led;
-</#if>
+} HAL_API;
 
 //DOM-IGNORE-BEGIN
 #ifdef __cplusplus

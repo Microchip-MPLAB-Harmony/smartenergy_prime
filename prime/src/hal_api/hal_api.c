@@ -1,6 +1,6 @@
 /*******************************************************************************
-  PRIME Hardware Abstraction Layer API Source 
-   
+  PRIME Hardware Abstraction Layer API Source
+
   Company:
     Microchip Technology Inc.
 
@@ -47,6 +47,18 @@ Microchip or any third party.
 // *****************************************************************************
 
 #include <stdio.h>
+#include "service/storage/srv_storage.h"
+#include "service/user_pib/srv_user_pib.h"
+#include "service/reset_handler/srv_reset_handler.h"
+#include "service/pcrc/srv_pcrc.h"
+#include "service/random/srv_random.h"
+#include "service/log_report/srv_log_report.h"
+#include "service/usi/srv_usi.h"
+#include "service/security/aes_wrapper.h"
+#include "service/security/cipher_wrapper.h"
+#include "service/time_management/srv_time_management.h"
+#include "stack/pal/pal.h"
+#include "stack/pal/pal_types.h"
 #include "hal_api.h"
 
 // *****************************************************************************
@@ -55,7 +67,7 @@ Microchip or any third party.
 // *****************************************************************************
 // *****************************************************************************
 
-/* HAL API functions 
+/* HAL API functions
 
   Summary:
     HAL API functions.
@@ -64,104 +76,86 @@ Microchip or any third party.
     This structure contains the list of available functions in the HAL API.
 
   Remarks:
-    The functions in this structure correspond to the required services by the 
+    The functions in this structure correspond to the required services by the
     PRIME stack.
  */
- 
-const HAL_API hal_api = {
+
+const HAL_API primeHalAPI = {
 	SRV_RESET_HANDLER_RestartSystem,
-    
+
 	SRV_PCRC_GetValue,
 	SRV_PCRC_ConfigureSNA,
-    
+
     SRV_STORAGE_GetConfigInfo,
 	SRV_STORAGE_SetConfigInfo,
-    
+
     SRV_USI_Open,
 	SRV_USI_CallbackRegister,
 	SRV_USI_Send_Message,
-    
-    SRV_LOG_REPORT_Message_With_Code,
-    
+
+    NULL, //SRV_LOG_REPORT_Message_With_Code,
+
     SRV_USER_PIB_GetRequest,
 	SRV_USER_PIB_GetRequestCallbackRegister,
 	SRV_USER_PIB_SetRequest,
 	SRV_USER_PIB_SetRequestCallbackRegister,
-    
+
     SRV_RANDOM_Get32bits,
-    
-    CIPHER_Wrapper_AesCmacDirect,
-    CIPHER_Wrapper_AesCcmSetkey,
-    CIPHER_Wrapper_AesCcmEncryptAndTag,
-    CIPHER_Wrapper_AesCcmAuthDecrypt,
-    AES_Wrapper_WrapKey,
-    AES_Wrapper_UnwrapKey,
-    
+
+    NULL, //CIPHER_Wrapper_AesCmacDirect,
+    NULL, //CIPHER_Wrapper_AesCcmSetkey,
+    NULL, //CIPHER_Wrapper_AesCcmEncryptAndTag,
+    NULL, //CIPHER_Wrapper_AesCcmAuthDecrypt,
+    NULL, //AES_Wrapper_WrapKey,
+    NULL, //AES_Wrapper_UnwrapKey,
+
     SRV_TIME_MANAGEMENT_GetTimeUS64,
     SRV_TIME_MANAGEMENT_GetTimeUS,
-    
-	hal_fu_data_read,
-	hal_fu_data_write,
-	hal_fu_data_cfg_read,
-	hal_fu_data_cfg_write,
-	hal_fu_start,
-	hal_fu_end,
-	hal_fu_revert,
-	hal_fu_crc_calculate,
-	hal_fu_crc_set_callback,
-	hal_fu_signature_image_check,
-	hal_fu_signature_image_check_set_callback,
-	hal_fu_get_bitmap,
-<#if primePal.PRIME_PAL_PLC_EN == true>
-	hal_plc_init,
-	hal_plc_reset,
-	hal_plc_set_handler,
-	hal_plc_tx_signal,
-	hal_plc_rx_signal,
-</#if>
-	SRV_STORAGE_GetConfigInfo,
-	SRV_STORAGE_SetConfigInfo,
-    SRV_USI_Open,
-	SRV_USI_CallbackRegister,
-	SRV_USI_Send_Message,
-	SRV_RANDOM_Get32bits,
-	SRV_LOG_REPORT_Message_With_Code,
-	hal_net_get_freq,
-<#if primePal.PRIME_PAL_PLC_EN == true>
-	hal_plc_send_boot_cmd,
-	hal_plc_send_wrrd_cmd,
-	hal_plc_enable_interrupt,
-	hal_plc_delay,
-</#if>
-#ifdef HAL_NWK_RECOVERY_INTERFACE
-	hal_nwk_recovery_init,
-	hal_nwk_recovery_read,
-	hal_nwk_recovery_write,
-#endif
-	SRV_USER_PIB_GetRequest,
-	SRV_USER_PIB_GetRequestCallbackRegister,
-	SRV_USER_PIB_SetRequest,
-	SRV_USER_PIB_SetRequestCallbackRegister,
-	hal_aes_init,
-	hal_aes_set_callback,
-	hal_aes_key,
-	hal_aes_crypt,
-	hal_swap_stack,
-<#if primePal.PRIME_PAL_PLC_EN == true>
-	hal_plc_set_stby_mode,
-	hal_plc_get_thermal_warning,
-</#if>
-	timer_1us_get,
-	timer_1us_set_int,
-	timer_1us_cancel_int,
-	timer_1us_enable_interrupt,
-<#if primePal.PRIME_PAL_RF_EN == true>
-	prf_if_init,
-	prf_if_reset,
-	prf_if_enable_interrupt,
-	prf_if_set_handler,
-	prf_if_send_spi_cmd,
-	prf_if_is_spi_busy,
-	prf_if_led,
-</#if>
+    SRV_TIME_MANAGEMENT_CallbackRegisterUS,
+
+	NULL, //hal_fu_data_read,
+	NULL, //hal_fu_data_write,
+	NULL, //hal_fu_data_cfg_read,
+	NULL, //hal_fu_data_cfg_write,
+	NULL, //hal_fu_start,
+	NULL, //hal_fu_end,
+	NULL, //hal_fu_revert,
+	NULL, //hal_fu_crc_calculate,
+	NULL, //hal_fu_crc_set_callback,
+	NULL, //hal_fu_signature_image_check,
+	NULL, //hal_fu_signature_image_check_set_callback,
+	NULL, //hal_fu_get_bitmap,
+
+	NULL, //hal_net_get_freq,
+
+	NULL, //hal_nwk_recovery_init,
+	NULL, //hal_nwk_recovery_read,
+	NULL, //hal_nwk_recovery_write,
+
+    PAL_Initialize,
+    PAL_Tasks,
+    PAL_Status,
+    PAL_CallbackRegister,
+    PAL_DataRequest,
+    PAL_GetSNR,
+    PAL_GetZCT,
+    PAL_GetTimer,
+    PAL_GetTimerExtended,
+    PAL_GetCD,
+    PAL_GetNL,
+    PAL_GetAGC,
+    PAL_SetAGC,
+    PAL_GetCCA,
+    PAL_GetChannel,
+    PAL_SetChannel,
+    PAL_ProgramChannelSwitch,
+    PAL_GetConfiguration,
+    PAL_SetConfiguration,
+    PAL_GetSignalCapture,
+    PAL_GetMsgDuration,
+    PAL_CheckMinimumQuality,
+    PAL_GetLessRobustModulation,
+
+    /* New functions must be added at the end */
+
 };

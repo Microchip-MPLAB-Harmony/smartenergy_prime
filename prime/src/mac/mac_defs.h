@@ -661,7 +661,7 @@ typedef void (*MAC_REDIRECT_RESPONSE)(uint16_t conHandle, uint8_t *eui48,
   Remarks:
     None.
 */
-typedef void (*MAC_JOIN_REQUEST)(MAC_JOIN_MODE conMode, uint16_t conHandle, 
+typedef void (*MAC_JOIN_REQUEST)(MAC_JOIN_REQUEST_MODE conMode, uint16_t conHandle, 
     uint8_t *eui48, MAC_CONNECTION_TYPE conType, uint8_t *data, uint16_t dataLen, 
     uint8_t ae);
 

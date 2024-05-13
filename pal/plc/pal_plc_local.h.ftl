@@ -48,8 +48,9 @@ Microchip or any third party.
 
 #include <stdbool.h>
 #include <stdint.h>
-#include "service/pcoup/srv_pcoup.h"
 #include "pal_types.h"
+#include "driver/driver_common.h"
+#include "driver/plc/phy/drv_plc_phy_comm.h"
 
 <#if PRIME_PAL_PHY_SNIFFER == true>
 #define PAL_SNIFFER_DATA_MAX_SIZE      512

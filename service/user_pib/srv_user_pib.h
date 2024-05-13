@@ -227,7 +227,7 @@ void SRV_USER_PIB_Initialize(void);
 // *****************************************************************************
 /* Function:
     void SRV_USER_PIB_GetRequestCallbackRegister(
-        USER_PIB_GET_REQUEST_CALLBACK callback)
+        SRV_USER_PIB_GET_REQUEST_CALLBACK callback)
 
   Summary:
     Register a function to be called to get the requested user PIB.
@@ -320,7 +320,7 @@ void SRV_USER_PIB_GetRequest(uint16_t pibAttrib);
 // *****************************************************************************
 /* Function:
     void SRV_USER_PIB_SetRequestCallbackRegister(
-        USER_PIB_SET_REQUEST_CALLBACK callback)
+        SRV_USER_PIB_GET_REQUEST_CALLBACK callback)
 
   Summary:
     Register a function to be called to get the result of setting a user PIB.

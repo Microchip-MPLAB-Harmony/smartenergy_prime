@@ -298,7 +298,7 @@ typedef void (*BMNG_FUP_STATUS_INDICATION_CB)(BMNG_FUP_NODE_STATE nodeState,
   Remarks:
     None.
 */
-typedef void (*BMNG_FUP_ERROR_INDICATION_CB)(BMNG_FUP_ERRORerrorCode, 
+typedef void (*BMNG_FUP_ERROR_INDICATION_CB)(BMNG_FUP_ERROR errorCode, 
     uint8_t *eui48);
 
 // *****************************************************************************
@@ -403,7 +403,7 @@ typedef void (*BMNG_PPROF_GET_RESPONSE_CB)(uint8_t *eui48, uint16_t dataLen,
   Remarks:
     None.
 */
-typedef void (*(*BMNG_PPROF_GET_ENHANCED_RESPONSE_CB)(uint8_t *eui48, 
+typedef void (*BMNG_PPROF_GET_ENHANCED_RESPONSE_CB)(uint8_t *eui48, 
     uint16_t dataLen, uint8_t *data);
 
 // *****************************************************************************

@@ -49,6 +49,7 @@ Microchip or any third party.
 #include <stdbool.h>
 #include <stdint.h>
 #include "configuration.h"
+#include "driver/driver_common.h"
 #include "driver/rf215/drv_rf215.h"
 #include "pal_types.h"
 
