@@ -157,48 +157,48 @@ static void lPRIME_API_PrimeDataStartup(void)
   </#if>
 static void lPRIME_API_SetPrimeVersion(MAC_VERSION_INFO *macInfo)
 {
-	uint8_t sizeConfig, sizeInfo;
-	uint8_t copyLen;
+    uint8_t sizeConfig, sizeInfo;
+    uint8_t copyLen;
 
-	memset(macInfo, 0, sizeof(MAC_VERSION_INFO));
+    memset(macInfo, 0, sizeof(MAC_VERSION_INFO));
 
-	/* Update MODEL */
-	sizeConfig = sizeof(PRIME_FW_MODEL);
-	sizeInfo = sizeof(macInfo->fwModel);
-	if (sizeConfig < sizeInfo) 
+    /* Update MODEL */
+    sizeConfig = sizeof(PRIME_FW_MODEL);
+    sizeInfo = sizeof(macInfo->fwModel);
+    if (sizeConfig < sizeInfo) 
     {
-		copyLen = sizeConfig;
-	} 
+        copyLen = sizeConfig;
+    } 
     else 
     {
-		copyLen = sizeInfo;
-	}
+        copyLen = sizeInfo;
+    }
 
-	memcpy(macInfo->fwModel, PRIME_FW_MODEL, copyLen);
-	macInfo->pibModel = PRIME_PIB_MODEL;
+    memcpy(macInfo->fwModel, PRIME_FW_MODEL, copyLen);
+    macInfo->pibModel = PRIME_PIB_MODEL;
 
-	/* Update VENDOR */
-	sizeConfig = sizeof(PRIME_FW_VENDOR);
-	sizeInfo = sizeof(macInfo->fwVendor);
-	if (sizeConfig < sizeInfo) {
-		copyLen = sizeConfig;
-	} else {
-		copyLen = sizeInfo;
-	}
+    /* Update VENDOR */
+    sizeConfig = sizeof(PRIME_FW_VENDOR);
+    sizeInfo = sizeof(macInfo->fwVendor);
+    if (sizeConfig < sizeInfo) {
+        copyLen = sizeConfig;
+    } else {
+        copyLen = sizeInfo;
+    }
 
-	memcpy(macInfo->fwVendor, PRIME_FW_VENDOR, copyLen);
-	macInfo->pibVendor = PRIME_PIB_VENDOR;
+    memcpy(macInfo->fwVendor, PRIME_FW_VENDOR, copyLen);
+    macInfo->pibVendor = PRIME_PIB_VENDOR;
 
-	/* Update VERSION */
-	sizeConfig = sizeof(PRIME_FW_VERSION);
-	sizeInfo = sizeof(macInfo->fwVersion);
-	if (sizeConfig < sizeInfo) {
-		copyLen = sizeConfig;
-	} else {
-		copyLen = sizeInfo;
-	}
+    /* Update VERSION */
+    sizeConfig = sizeof(PRIME_FW_VERSION);
+    sizeInfo = sizeof(macInfo->fwVersion);
+    if (sizeConfig < sizeInfo) {
+        copyLen = sizeConfig;
+    } else {
+        copyLen = sizeInfo;
+    }
 
-	memcpy(macInfo->fwVersion, PRIME_FW_VERSION, copyLen);
+    memcpy(macInfo->fwVersion, PRIME_FW_VERSION, copyLen);
 }
 
 // *****************************************************************************
@@ -208,20 +208,20 @@ static void lPRIME_API_SetPrimeVersion(MAC_VERSION_INFO *macInfo)
 // *****************************************************************************
 void PRIME_API_Initialize(void *halApi)
 {
-	MAC_VERSION_INFO macInfo;
+    MAC_VERSION_INFO macInfo;
 
-	/* Set critical region */
-	__set_BASEPRI( 2 << (8 - __NVIC_PRIO_BITS));
+    /* Set critical region */
+    __set_BASEPRI( 2 << (8 - __NVIC_PRIO_BITS));
 
   <#if PRIME_MODE == "SN" && PRIME_PROJECT == "bin project">
-	lPRIME_API_PrimeDataStartup();
+    lPRIME_API_PrimeDataStartup();
   </#if>
 
-	/* Set PRIME HAL wrapper */
-	PRIME_HAL_WRP_Configure(halApi);
+    /* Set PRIME HAL wrapper */
+    PRIME_HAL_WRP_Configure(halApi);
 
-	/* Set PRIME version from configuration */
-	lPRIME_API_SetPrimeVersion(&macInfo);
+    /* Set PRIME version from configuration */
+    lPRIME_API_SetPrimeVersion(&macInfo);
 
 //	/* Initialize MAC layer */
 //	MAC_Initialize(&macInfo, (uint8_t)MAC_SECURITY_PROFILE);
@@ -233,14 +233,14 @@ void PRIME_API_Initialize(void *halApi)
 //	/* Initialize Management Plane */
 //	MNGP_Initialize(&macInfo, (uint8_t)MNGP_SPROF_USI_PORT);
 
-	/* Set critical region */
-	__set_BASEPRI(0);
+    /* Set critical region */
+    __set_BASEPRI(0);
 }
 
 void PRIME_API_Tasks(void)
 {
-	/* Set critical region */
-	__set_BASEPRI( 3 << (8 - __NVIC_PRIO_BITS));
+    /* Set critical region */
+    __set_BASEPRI( 3 << (8 - __NVIC_PRIO_BITS));
 
 //	/* Process MAC layer */
 //	MAC_Tasks();
@@ -250,8 +250,8 @@ void PRIME_API_Tasks(void)
 //	MNGP_Tasks();
   </#if>
 
-	/* Set critical region */
-	__set_BASEPRI(0);
+    /* Set critical region */
+    __set_BASEPRI(0);
 }
 
   <#if PRIME_MODE == "BN">

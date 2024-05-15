@@ -497,24 +497,24 @@ typedef void (*TBD)(void);
     None.
 */
 typedef struct {
-	HAL_RESTART_SYSTEM restart_system;
+    HAL_RESTART_SYSTEM restart_system;
 
-	HAL_PCRC_CALCULATE pcrc_calc;
-	HAL_PCRC_CONFIGURE_SNA pcrc_config_sna;
+    HAL_PCRC_CALCULATE pcrc_calc;
+    HAL_PCRC_CONFIGURE_SNA pcrc_config_sna;
 
     HAL_GET_CONFIG_INFO get_config_info;
-	HAL_SET_CONFIG_INFO set_config_info;
+    HAL_SET_CONFIG_INFO set_config_info;
 
     HAL_USI_OPEN usi_open;
-	HAL_USI_SET_CALLBACK usi_set_callback;
-	HAL_USI_SEND usi_send;
+    HAL_USI_SET_CALLBACK usi_set_callback;
+    HAL_USI_SEND usi_send;
 
     HAL_DEBUG_REPORT debug_report;
 
     HAL_PIB_GET_REQUEST pib_get_request;
-	HAL_PIB_GET_REQUEST_SET_CALLBACK pib_get_request_set_callback;
-	HAL_PIB_SET_REQUEST pib_set_request;
-	HAL_PIB_SET_REQUEST_SET_CALLBACK pib_set_request_set_callback;
+    HAL_PIB_GET_REQUEST_SET_CALLBACK pib_get_request_set_callback;
+    HAL_PIB_SET_REQUEST pib_set_request;
+    HAL_PIB_SET_REQUEST_SET_CALLBACK pib_set_request_set_callback;
 
     HAL_RNG_GET rng_get;
 
@@ -529,24 +529,24 @@ typedef struct {
     HAL_TIMER_GetTimeUS timer_get_us;
     HAL_TIMER_CallbackRegisterUS timer_callback_register_us;
 
-	TBD tbd1; //hal_fu_data_read_t fu_data_read;
-	TBD tbd2; //hal_fu_data_write_t fu_data_write;
-	TBD tbd3; //hal_fu_data_cfg_read_t fu_data_cfg_read;
-	TBD tbd4; //hal_fu_data_cfg_write_t fu_data_cfg_write;
-	TBD tbd5; //hal_fu_start_t fu_start;
-	TBD tbd6; //hal_fu_end_t fu_end;
-	TBD tbd7; //hal_fu_revert_t fu_revert;
-	TBD tbd8; //hal_fu_crc_calculate_t fu_crc_calculate;
-	TBD tbd9; //hal_fu_crc_set_callback_t fu_crc_set_callback;
-	TBD tbd10; //hal_fu_signature_image_check_t fu_signature_image_check;
-	TBD tbd11; //hal_fu_signature_image_check_set_callback_t fu_signature_image_check_set_callback;
-	TBD tbd12; //hal_fu_get_bitmap_t fu_get_bitmap;
+    TBD tbd1; //hal_fu_data_read_t fu_data_read;
+    TBD tbd2; //hal_fu_data_write_t fu_data_write;
+    TBD tbd3; //hal_fu_data_cfg_read_t fu_data_cfg_read;
+    TBD tbd4; //hal_fu_data_cfg_write_t fu_data_cfg_write;
+    TBD tbd5; //hal_fu_start_t fu_start;
+    TBD tbd6; //hal_fu_end_t fu_end;
+    TBD tbd7; //hal_fu_revert_t fu_revert;
+    TBD tbd8; //hal_fu_crc_calculate_t fu_crc_calculate;
+    TBD tbd9; //hal_fu_crc_set_callback_t fu_crc_set_callback;
+    TBD tbd10; //hal_fu_signature_image_check_t fu_signature_image_check;
+    TBD tbd11; //hal_fu_signature_image_check_set_callback_t fu_signature_image_check_set_callback;
+    TBD tbd12; //hal_fu_get_bitmap_t fu_get_bitmap;
 
-	TBD tbd13; //hal_net_get_freq_t net_get_freq;
+    TBD tbd13; //hal_net_get_freq_t net_get_freq;
 
-	TBD tbd14; //hal_nwk_recovery_init_t nwk_recovery_init;
-	TBD tbd15; //hal_nwk_recovery_read_t nwk_recovery_read;
-	TBD tbd16; //hal_nwk_recovery_write_t nwk_recovery_write;
+    TBD tbd14; //hal_nwk_recovery_init_t nwk_recovery_init;
+    TBD tbd15; //hal_nwk_recovery_read_t nwk_recovery_read;
+    TBD tbd16; //hal_nwk_recovery_write_t nwk_recovery_write;
 
     HAL_PAL_INITIALIZE hal_pal_initialize;
     HAL_PAL_TASKS hal_pal_tasks;

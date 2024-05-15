@@ -65,36 +65,36 @@ static HAL_API *pPrimeHalApi;
 
 void PRIME_HAL_WRP_Configure(HAL_API *pHalApi)
 {
-	pPrimeHalApi = pHalApi;
+    pPrimeHalApi = pHalApi;
 }
 
 void PRIME_HAL_WRP_RestartSystem(SRV_RESET_HANDLER_RESET_CAUSE resetType)
 {
-	pPrimeHalApi->restart_system(resetType);
+    pPrimeHalApi->restart_system(resetType);
 }
 
 uint32_t PRIME_HAL_WRAPPER_PcrcCalculate(uint8_t *pData, size_t length,
     PCRC_HEADER_TYPE hdrType, PCRC_CRC_TYPE crcType, uint32_t initValue, 
     bool v14Mode)
 {
-	return pPrimeHalApi->pcrc_calc(pData, length, hdrType, crcType, initValue, v14Mode);
+    return pPrimeHalApi->pcrc_calc(pData, length, hdrType, crcType, initValue, v14Mode);
 }
     
 void PRIME_HAL_WRP_PcrcConfigureSNA(uint8_t *sna)
 {
-	pPrimeHalApi->pcrc_config_sna(sna);
+    pPrimeHalApi->pcrc_config_sna(sna);
 }
 
 bool PRIME_HAL_WRP_GetConfigInfo(SRV_STORAGE_TYPE infoType, uint8_t size, 
     void* pData)
 {
-	return pPrimeHalApi->get_config_info(infoType, size, pData);
+    return pPrimeHalApi->get_config_info(infoType, size, pData);
 }
 
 bool PRIME_HAL_WRP_SetConfigInfo(SRV_STORAGE_TYPE infoType, uint8_t size, 
     void* pData)
 {
-	return pPrimeHalApi->set_config_info(infoType, size, pData);
+    return pPrimeHalApi->set_config_info(infoType, size, pData);
 }
 
 
@@ -112,39 +112,39 @@ void PRIME_HAL_WRP_UsiSetCallback(SRV_USI_HANDLE handle, SRV_USI_PROTOCOL_ID pro
 void PRIME_HAL_WRP_UsiSend(SRV_USI_HANDLE handle, SRV_USI_PROTOCOL_ID protocol, 
     uint8_t *data, size_t length)
 {
-	pPrimeHalApi->usi_send(handle, protocol, data, length);
+    pPrimeHalApi->usi_send(handle, protocol, data, length);
 }
 
 void PRIME_HAL_WRP_DebugReport(SRV_LOG_REPORT_LEVEL logLevel, 
     SRV_LOG_REPORT_CODE code, const char *info, ...)
 {
-	pPrimeHalApi->debug_report(logLevel, code, info);
+    pPrimeHalApi->debug_report(logLevel, code, info);
 }
 
 void PRIME_HAL_WRP_PibGetRequest(uint16_t pibAttrib)
 {
-	pPrimeHalApi->pib_get_request(pibAttrib);
+    pPrimeHalApi->pib_get_request(pibAttrib);
 }
 
 void PRIME_HAL_WRP_PIBGetRequestSetCallback(SRV_USER_PIB_GET_REQUEST_CALLBACK callback)
 {
-	pPrimeHalApi->pib_get_request_set_callback(callback);
+    pPrimeHalApi->pib_get_request_set_callback(callback);
 }
 
 void PRIME_HAL_WRP_PibSetRequest(uint16_t pibAttrib, void *pibValue, 
     uint8_t pibSize)
 {
-	pPrimeHalApi->pib_set_request(pibAttrib, pibValue, pibSize);
+    pPrimeHalApi->pib_set_request(pibAttrib, pibValue, pibSize);
 }
 
 void PRIME_HAL_WRP_PIBSetRequestSetCallback(SRV_USER_PIB_SET_REQUEST_CALLBACK callback)
 {
-	pPrimeHalApi->pib_set_request_set_callback(callback);
+    pPrimeHalApi->pib_set_request_set_callback(callback);
 }
 
 uint32_t PRIME_HAL_WRP_RngGet(void)
 {
-	return pPrimeHalApi->rng_get();
+    return pPrimeHalApi->rng_get();
 }
 
 int32_t PRIME_HAL_WRP_AesCmacDirect(uint8_t *input, uint32_t inputLen, 

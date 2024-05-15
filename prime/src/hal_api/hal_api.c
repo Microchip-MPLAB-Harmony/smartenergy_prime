@@ -81,24 +81,24 @@ Microchip or any third party.
  */
 
 const HAL_API primeHalAPI = {
-	SRV_RESET_HANDLER_RestartSystem,
+    SRV_RESET_HANDLER_RestartSystem,
 
-	SRV_PCRC_GetValue,
-	SRV_PCRC_ConfigureSNA,
+    SRV_PCRC_GetValue,
+    SRV_PCRC_ConfigureSNA,
 
     SRV_STORAGE_GetConfigInfo,
-	SRV_STORAGE_SetConfigInfo,
+    SRV_STORAGE_SetConfigInfo,
 
     SRV_USI_Open,
-	SRV_USI_CallbackRegister,
-	SRV_USI_Send_Message,
+    SRV_USI_CallbackRegister,
+    SRV_USI_Send_Message,
 
     NULL, //SRV_LOG_REPORT_Message_With_Code,
 
     SRV_USER_PIB_GetRequest,
-	SRV_USER_PIB_GetRequestCallbackRegister,
-	SRV_USER_PIB_SetRequest,
-	SRV_USER_PIB_SetRequestCallbackRegister,
+    SRV_USER_PIB_GetRequestCallbackRegister,
+    SRV_USER_PIB_SetRequest,
+    SRV_USER_PIB_SetRequestCallbackRegister,
 
     SRV_RANDOM_Get32bits,
 
@@ -113,24 +113,24 @@ const HAL_API primeHalAPI = {
     SRV_TIME_MANAGEMENT_GetTimeUS,
     SRV_TIME_MANAGEMENT_CallbackRegisterUS,
 
-	NULL, //hal_fu_data_read,
-	NULL, //hal_fu_data_write,
-	NULL, //hal_fu_data_cfg_read,
-	NULL, //hal_fu_data_cfg_write,
-	NULL, //hal_fu_start,
-	NULL, //hal_fu_end,
-	NULL, //hal_fu_revert,
-	NULL, //hal_fu_crc_calculate,
-	NULL, //hal_fu_crc_set_callback,
-	NULL, //hal_fu_signature_image_check,
-	NULL, //hal_fu_signature_image_check_set_callback,
-	NULL, //hal_fu_get_bitmap,
+    NULL, //hal_fu_data_read,
+    NULL, //hal_fu_data_write,
+    NULL, //hal_fu_data_cfg_read,
+    NULL, //hal_fu_data_cfg_write,
+    NULL, //hal_fu_start,
+    NULL, //hal_fu_end,
+    NULL, //hal_fu_revert,
+    NULL, //hal_fu_crc_calculate,
+    NULL, //hal_fu_crc_set_callback,
+    NULL, //hal_fu_signature_image_check,
+    NULL, //hal_fu_signature_image_check_set_callback,
+    NULL, //hal_fu_get_bitmap,
 
-	NULL, //hal_net_get_freq,
+    NULL, //hal_net_get_freq,
 
-	NULL, //hal_nwk_recovery_init,
-	NULL, //hal_nwk_recovery_read,
-	NULL, //hal_nwk_recovery_write,
+    NULL, //hal_nwk_recovery_init,
+    NULL, //hal_nwk_recovery_read,
+    NULL, //hal_nwk_recovery_write,
 
     PAL_Initialize,
     PAL_Tasks,
