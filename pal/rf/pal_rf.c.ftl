@@ -498,7 +498,7 @@ uint8_t PAL_RF_DataRequest(PAL_MSG_REQUEST_DATA *pMessageData)
 <#if PRIME_PAL_PHY_SNIFFER == true>
         if (palRfData.snifferCallback)
         {
-            SRV_RSNIFFER_SetTxMessage(txReqObj, rfPhyTxReqHandle);
+            SRV_RSNIFFER_SetTxMessage(txReqObj, &palRfData.rfPhyConfig, rfPhyTxReqHandle);
         }
 
 </#if>
