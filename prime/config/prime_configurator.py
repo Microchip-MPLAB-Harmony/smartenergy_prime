@@ -182,8 +182,6 @@ def primeAddSnFiles():
     # BN only
     pBmngApiHeaderFile.setEnabled(False)
     pBmngDefsHeaderFile.setEnabled(False)
-    pClNullApiHeaderFile.setEnabled(False)
-    pCl432ApiHeaderFile.setEnabled(False)
 
     # No libraries by default
     pPrime13BnLibFile.setEnabled(False)
@@ -198,7 +196,9 @@ def primeAddSnFiles():
         pMacHeaderFile.setEnabled(True)
         pMngpHeaderFile.setEnabled(True)
         pClNullHeaderFile.setEnabled(True)
+        pClNullApiHeaderFile.setEnabled(True)
         pCl432HeaderFile.setEnabled(True)
+        pCl432ApiHeaderFile.setEnabled(True)
         pHalApiSourceFile.setEnabled(False)
         pHalApiPalTypesFile.setEnabled(True)
         pHalApiPalHeaderFile.setEnabled(True)
@@ -218,7 +218,9 @@ def primeAddSnFiles():
         pMacHeaderFile.setEnabled(False)
         pMngpHeaderFile.setEnabled(False)
         pClNullHeaderFile.setEnabled(False)
+        pClNullApiHeaderFile.setEnabled(False)
         pCl432HeaderFile.setEnabled(False)
+        pCl432ApiHeaderFile.setEnabled(False)
         pHalApiSourceFile.setEnabled(True)
         pHalApiPalTypesFile.setEnabled(False)
         pHalApiPalHeaderFile.setEnabled(False)
@@ -748,12 +750,13 @@ def instantiateComponent(primeStackConfigComponent):
     pPrimeApiDefsHeaderFile.setEnabled(True)
 
     pPrimeApiTypesHeaderFile = primeStackConfigComponent.createFileSymbol("PRIME_API_TYPES_HEADER", None)
-    pPrimeApiTypesHeaderFile.setSourcePath("prime/src/prime_api/prime_api_types.h")
+    pPrimeApiTypesHeaderFile.setSourcePath("prime/src/prime_api/prime_api_types.h.ftl")
     pPrimeApiTypesHeaderFile.setOutputName("prime_api_types.h")
     pPrimeApiTypesHeaderFile.setDestPath("stack/prime/prime_api")
     pPrimeApiTypesHeaderFile.setProjectPath("config/" + configName + "/stack/prime/prime_api")
     pPrimeApiTypesHeaderFile.setType("HEADER")
     pPrimeApiTypesHeaderFile.setEnabled(True)
+    pPrimeApiTypesHeaderFile.setMarkup(True);
 
     global pPrimeHalWrapperHeaderFile
     pPrimeHalWrapperHeaderFile = primeStackConfigComponent.createFileSymbol("PRIME_HAL_WRAPPER_HEADER", None)

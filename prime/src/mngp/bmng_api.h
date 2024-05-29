@@ -170,7 +170,7 @@ void BMNG_FUP_StartFuRequest(uint8_t cmd, uint8_t enable);
   Remarks:
     The command is acknowledged with the FUP ACK callback.
 */
-void BMNG_FUP_ClearTargetListRequest(uint8_t ucmd);
+void BMNG_FUP_ClearTargetListRequest(uint8_t cmd);
 
 // *****************************************************************************
 /* Function:
@@ -405,8 +405,8 @@ void BMNG_FUP_DataFrameRequest(uint8_t cmd, uint16_t frameNumber,
     process.
 
   Description:
-    This routine requests to check the CRC of the transmitted file for a firmware 
-    upgrade process.
+    This routine requests to check the CRC of the transmitted file for a 
+    firmware upgrade process.
     
   Precondition:
     The firmware upgrade process must have been started before. 
@@ -481,7 +481,8 @@ void BMNG_FUP_AbortFuRequest(uint8_t cmd, uint8_t *eui48);
     Requests to set the matching rules for a firmware upgrade process.
 
   Description:
-    This routine requests to set the matching rules for a firmware upgrade process.
+    This routine requests to set the matching rules for a firmware upgrade 
+    process.
     
   Precondition:
     The firmware upgrade process must have been started before. 
@@ -499,7 +500,8 @@ void BMNG_FUP_AbortFuRequest(uint8_t cmd, uint8_t *eui48);
     </code>
 
   Remarks:
-    If M and/or V are set, only the nodes matching model and/or vendor will be upgraded.
+    If M and/or V are set, only the nodes matching model and/or vendor will be 
+    upgraded.
     The command is acknowledged with the FUP ACK callback.
 */
 void BMNG_FUP_SetMatchRuleRequest(uint8_t cmd, uint8_t rules);
@@ -517,7 +519,8 @@ void BMNG_FUP_SetMatchRuleRequest(uint8_t cmd, uint8_t rules);
     Requests to set the signature data for a firmware upgrade process.
 
   Description:
-    This routine requests to set the signature data for a firmware upgrade process.
+    This routine requests to set the signature data for a firmware upgrade
+    process.
     
   Precondition:
     The firmware upgrade process must have been started before. 
@@ -885,10 +888,10 @@ void BMNG_PPROF_GetZcDiffRequest(uint8_t cmd, uint8_t *eui48);
     )
 
   Summary:
-    Requests to add a node in the Whitelist.
+    Requests to add a node to the Whitelist.
 
   Description:
-    This routine requests to add a node in the Whitelist.
+    This routine requests to add a node to the Whitelist.
     
   Precondition:
     None. 

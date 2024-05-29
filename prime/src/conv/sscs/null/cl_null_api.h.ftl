@@ -878,7 +878,7 @@ void CL_NULL_MlmeMpDemoteRequest(uint8_t lsid);
     uint8_t eui48[6];
     memset(eui48, 0x12, 6);
     
-	CL_NULL_MlmeRegisterRequest(eui48, 0);
+	CL_NULL_MlmePromoteRequest(eui48, 0);
     </code>
 
   Remarks:
@@ -923,7 +923,7 @@ void CL_NULL_MlmePromoteRequest(uint8_t *eui48, uint8_t bcnMode);
     uint8_t eui48[6];
     memset(eui48, 0x12, 6);
     
-	CL_NULL_MlmeRegisterRequest(eui48, 0, 16);
+	CL_NULL_MlmeMpPromoteRequest(eui48, 0, 16);
     </code>
 
   Remarks:

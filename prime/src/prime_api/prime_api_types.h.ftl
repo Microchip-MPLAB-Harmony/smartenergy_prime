@@ -51,8 +51,11 @@ Microchip or any third party.
 
 #include <stdint.h>
 #include <stdbool.h>
-//#include "stack/prime/mac/mac_defs.h"
-//#include "stack/prime/conv/sscs/iec_4_32/cl_432_defs.h"
+#include "stack/prime/mac/mac_defs.h"
+#include "stack/prime/conv/sscs/iec_4_32/cl_432_defs.h"
+<#if PRIME_MODE == "BN" && BN_SLAVE_EN == false>
+#include "stack/prime/mngp/bmng_defs.h"
+</#if>
 
 // DOM-IGNORE-BEGIN
 #ifdef __cplusplus  // Provide C++ Compatibility
@@ -97,7 +100,19 @@ typedef void (*PRIME_API_INITIALIZE)(void *halApi);
 */
 typedef void (*PRIME_API_TASKS)(void);
 
+// *****************************************************************************
+/* PRIME API definition
 
+  Summary:
+    Definition of the PRIME API.
+
+  Description:
+    This structure defines the functions that are included in the PRIME API 
+    pointer.
+
+  Remarks:
+    None.
+*/
 typedef struct
 {
     uint16_t                     vendor;
@@ -110,31 +125,63 @@ typedef struct
 //    MAC_ESTABLISH_RESPONSE       MacEstablishResponse;
 //    MAC_RELEASE_REQUEST          MacReleaseRequest;
 //    MAC_RELEASE_RESPONSE         MacReleaseResponse;
+<#if PRIME_MODE == "BN" && BN_SLAVE_EN == false>
+//    MAC_REDIRECT_RESPONSE        MacRedirectResponse;
+</#if>
 //    MAC_JOIN_REQUEST             MacJoinRequest;
 //    MAC_JOIN_RESPONSE            MacJoinResponse;
 //    MAC_LEAVE_REQUEST            MacLeaveRequest;
-//    MAC_DATA_REQUEST             MacLeaveResponse;
+//    MAC_DATA_REQUEST             MacDataRequest;
 //    PLME_RESET_REQUEST           PlmeResetRequest;
 //    PLME_SLEEP_REQUEST           PlmeSleepRequest;
 //    PLME_RESUME_REQUEST          PlmeResumeRequest;
 //    PLME_TESTMODE_REQUEST        PlmeTestModeRequest;
 //    PLME_GET_REQUEST             PlmeGetRequest;
 //    PLME_SET_REQUEST             PlmeSetRequest;
+<#if (PRIME_MODE == "SN") || (PRIME_MODE == "BN" && BN_SLAVE_EN == true)>
 //    MLME_REGISTER_REQUEST        MlmeRegisterRequest;
 //    MLME_UNREGISTER_REQUEST      MlmeUnregisterRequest;
+</#if>
 //    MLME_PROMOTE_REQUEST         MlmePromoteRequest;
+//    MLME_MP_PROMOTE_REQUEST      MlmeMpPromoteRequest;
+<#if (PRIME_MODE == "SN") || (PRIME_MODE == "BN" && BN_SLAVE_EN == true)>
 //    MLME_DEMOTE_REQUEST          MlmeDemoteRequest;
+//    MLME_MP_DEMOTE_REQUEST       MlmeMpDemoteRequest;
+</#if>
 //    MLME_RESET_REQUEST           MlmeResetRequest;
 //    MLME_GET_REQUEST             MlmeGetRequest;
 //    MLME_LIST_GET_REQUEST        MlmeListGetRequest;
 //    MLME_SET_REQUEST             MlmeSetRequest;
 //    CL_432_SET_CALLBACKS         Cl432SetCallbacks;
+<#if (PRIME_MODE == "SN") || (PRIME_MODE == "BN" && BN_SLAVE_EN == true)>
 //    CL_432_ESTABLISH_REQUEST     Cl432EstablishRequest;
+</#if>
 //    CL_432_RELEASE_REQUEST       Cl432ReleaseRequest;
 //    CL_432_DL_DATA_REQUEST       Cl432DlDataRequest;
-//    MLME_MP_PROMOTE_REQUEST      MlmeMpPromoteRequest;
-//    MLME_MP_DEMOTE_REQUEST       MlmeMpDemoteRequest;
-
+<#if PRIME_MODE == "BN" && BN_SLAVE_EN == false>
+//    BMNG_SET_CALLBACKS                     BmngSetCallbacks;
+//    BMNG_FUP_CLEAR_TARGET_LIST_REQUEST     BmngFupClearTargetListRequest;
+//    BMNG_FUP_ADD_TARGET_REQUEST            BmngFupAddTargetRequest;
+//    BMNG_FUP_SET_FW_DATA_REQUEST           BmngFupSetFwDataRequest;
+//    BMNG_FUP_SET_UPGRADE_OPTIONS_REQUEST   BmngFupSetUpgradeOptionsRequest;
+//    BMNG_FUP_INIT_FILE_TX_REQUEST          BmngFupInitFileTxRequest;
+//    BMNG_FUP_DATA_FRAME_REQUEST            BmngFupDataFrameRequest;
+//    BMNG_FUP_CHECK_CRC_REQUEST             BmngFupCheckCrcRequest;
+//    BMNG_FUP_ABORT_FU_REQUEST              BmngFupAbortFuRequest;
+//    BMNG_FUP_START_FU_REQUEST              BmngFupStartFuRequest;
+//    BMNG_FUP_SET_MATCH_RULE_REQUEST        BmngFupSetMatchRuleRequest;
+//    BMNG_FUP_GET_VERSION_REQUEST           BmngFupGetVersionRequest;
+//    BMNG_FUP_GET_STATE_REQUEST             BmngFupGetStateRequest;
+//    BMNG_FUP_SET_SIGNATURE_DATA_REQUEST    BmngFupSetSignatureDataRequest;
+//    BMNG_PPROF_GET_REQUEST                 BmngPprofGetRequest;
+//    BMNG_PPROF_SET_REQUEST                 BmngPprofSetRequest;
+//    BMNG_PPROF_RESET_REQUEST               BmngPprofResetRequest;
+//    BMNG_PPROF_REBOOT_REQUEST              BmngPprofRebootRequest;
+//    BMNG_PPROF_GET_ENHANCED_REQUEST        BmngPprofGetEnhancedRequest;
+//    BMNG_PPROF_GET_ZC_DIFF_REQUEST         BmngPprofGetZcDiffRequest;
+//    BMNG_WHITELIST_ADD_REQUEST             BmngWhitelistAddRequest;
+//    BMNG_WHITELIST_REMOVE_REQUEST          BmngWhitelistRemoveRequest;
+</#if>    
 } PRIME_API;
 
 //DOM-IGNORE-BEGIN
