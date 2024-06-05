@@ -47,6 +47,7 @@ Microchip or any third party.
 // *****************************************************************************
 
 #include <stdio.h>
+#include "hal_api.h"
 #include "service/storage/srv_storage.h"
 #include "service/user_pib/srv_user_pib.h"
 #include "service/reset_handler/srv_reset_handler.h"
@@ -58,8 +59,6 @@ Microchip or any third party.
 #include "service/security/cipher_wrapper.h"
 #include "service/time_management/srv_time_management.h"
 #include "stack/pal/pal.h"
-#include "stack/pal/pal_types.h"
-#include "hal_api.h"
 
 // *****************************************************************************
 // *****************************************************************************
@@ -93,7 +92,7 @@ const HAL_API primeHalAPI = {
     SRV_USI_CallbackRegister,
     SRV_USI_Send_Message,
 
-    NULL, //SRV_LOG_REPORT_Message_With_Code,
+    SRV_LOG_REPORT_Message_With_Code,
 
     SRV_USER_PIB_GetRequest,
     SRV_USER_PIB_GetRequestCallbackRegister,
@@ -102,12 +101,12 @@ const HAL_API primeHalAPI = {
 
     SRV_RANDOM_Get32bits,
 
-    NULL, //CIPHER_Wrapper_AesCmacDirect,
-    NULL, //CIPHER_Wrapper_AesCcmSetkey,
-    NULL, //CIPHER_Wrapper_AesCcmEncryptAndTag,
-    NULL, //CIPHER_Wrapper_AesCcmAuthDecrypt,
-    NULL, //AES_Wrapper_WrapKey,
-    NULL, //AES_Wrapper_UnwrapKey,
+    CIPHER_Wrapper_AesCmacDirect,
+    CIPHER_Wrapper_AesCcmSetkey,
+    CIPHER_Wrapper_AesCcmEncryptAndTag,
+    CIPHER_Wrapper_AesCcmAuthDecrypt,
+    AES_Wrapper_WrapKey,
+    AES_Wrapper_UnwrapKey,
 
     SRV_TIME_MANAGEMENT_GetTimeUS64,
     SRV_TIME_MANAGEMENT_GetTimeUS,
@@ -125,12 +124,6 @@ const HAL_API primeHalAPI = {
     NULL, //hal_fu_signature_image_check,
     NULL, //hal_fu_signature_image_check_set_callback,
     NULL, //hal_fu_get_bitmap,
-
-    NULL, //hal_net_get_freq,
-
-    NULL, //hal_nwk_recovery_init,
-    NULL, //hal_nwk_recovery_read,
-    NULL, //hal_nwk_recovery_write,
 
     PAL_Initialize,
     PAL_Tasks,

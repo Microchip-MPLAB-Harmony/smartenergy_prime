@@ -151,7 +151,7 @@ void PAL_Tasks(SYS_MODULE_OBJ object);
   Description:
     This routine provides the current status of the PAL module.
 
-  Preconditions:
+  Precondition:
     Function PAL_Initialize should have been called before calling
     this function.
 
@@ -198,7 +198,7 @@ SYS_STATUS PAL_Status(SYS_MODULE_OBJ object);
     function.
 
   Parameters:
-    pal_cbs         Callbacks structure
+    pCallbacks         Callbacks structure
 
   Returns:
     None
@@ -216,8 +216,8 @@ SYS_STATUS PAL_Status(SYS_MODULE_OBJ object);
 
         PAL_Initialize();
 
-        memset(pal_cbs, NULL, sizeof(pal_cbs));
-        pal_cbs.palDataConfirm = _data_confirm_handler;
+        memset(palCBs, NULL, sizeof(palCBs));
+        palCBs.palDataConfirm = _data_confirm_handler;
 
         PAL_SetCallbacks(&palCBs);
     }
@@ -472,7 +472,8 @@ uint8_t PAL_GetTimerExtended(uint16_t pch, uint64_t *timer);
   Remarks:
     Not available for both PHY Serial and PHY RF.
 */
-uint8_t PAL_GetCD(uint16_t pch, uint8_t *cd, uint8_t *rssi, uint32_t *time, uint8_t *header);
+uint8_t PAL_GetCD(uint16_t pch, uint8_t *cd, uint8_t *rssi, uint32_t *time, 
+    uint8_t *header);
 
 // ****************************************************************************
 /* Function:
@@ -626,7 +627,7 @@ uint8_t PAL_GetCCA(uint16_t pch, uint8_t *pState);
 
 // ****************************************************************************
 /* Function:
-    uint8_t PAL_GetChannel(uint16_t *pPch, uint16_t channelReference)
+    uint8_t PAL_GetChannel(uint16_t *pch, uint16_t channelReference)
 
   Summary:
     Get the band (PLC) or the pch (RF).
@@ -639,7 +640,7 @@ uint8_t PAL_GetCCA(uint16_t pch, uint8_t *pState);
     function.
 
   Parameters:
-    pPch              Pointer to store the Physical channel in use
+    pch               Pointer to store the Physical channel in use
     channelReference  Physical channel in the same channels range
 
   Returns:
@@ -658,7 +659,7 @@ uint8_t PAL_GetCCA(uint16_t pch, uint8_t *pState);
   Remarks:
     Not available for PHY Serial.
 */
-uint8_t PAL_GetChannel(uint16_t *pPch, uint16_t channelReference);
+uint8_t PAL_GetChannel(uint16_t *pch, uint16_t channelReference);
 
 // ****************************************************************************
 /* Function:
@@ -694,10 +695,14 @@ uint8_t PAL_GetChannel(uint16_t *pPch, uint16_t channelReference);
 */
 uint8_t PAL_SetChannel(uint16_t pch);
 
-
 // ****************************************************************************
 /* Function:
-    void PAL_ProgramChannelSwitch(uint16_t pch, uint32_t timeSync, uint8_t timeMode)
+    void PAL_ProgramChannelSwitch
+    (
+        uint16_t pch, 
+        uint32_t timeSync, 
+        uint8_t timeMode
+    )
 
   Summary:
     Program a pch switch in the given time.
@@ -729,7 +734,8 @@ uint8_t PAL_SetChannel(uint16_t pch);
   Remarks:
     Only available for PHY RF.
 */
-void PAL_ProgramChannelSwitch(uint16_t pch, uint32_t timeSync, uint8_t timeMode);
+void PAL_ProgramChannelSwitch(uint16_t pch, uint32_t timeSync, 
+    uint8_t timeMode);
 
 // ****************************************************************************
 /* Function:
@@ -773,7 +779,8 @@ void PAL_ProgramChannelSwitch(uint16_t pch, uint32_t timeSync, uint8_t timeMode)
   Remarks:
     None
 */
-uint8_t PAL_GetConfiguration(uint16_t pch, uint16_t id, void *val, uint16_t length);
+uint8_t PAL_GetConfiguration(uint16_t pch, uint16_t id, void *val, 
+    uint16_t length);
 
 // ****************************************************************************
 /* Function:
@@ -817,7 +824,8 @@ uint8_t PAL_GetConfiguration(uint16_t pch, uint16_t id, void *val, uint16_t leng
   Remarks:
     Not available for PHY Serial.
 */
-uint8_t PAL_SetConfiguration(uint16_t pch, uint16_t id, void *val, uint16_t length);
+uint8_t PAL_SetConfiguration(uint16_t pch, uint16_t id, void *val, 
+    uint16_t length);
 
 // ****************************************************************************
 /* Function:
@@ -888,7 +896,8 @@ uint16_t PAL_GetSignalCapture(uint16_t pch, uint8_t *noiseCapture, uint8_t mode,
     pch             Physical channel used
     msgLen          Message length
     scheme          Modulation scheme of message
-    mode            Indicates if the message to transmit is type A, type B or type BC
+    mode            Indicates if the message to transmit is type A, type B or 
+                    type BC
     duration        Pointer to message duration in us (output)
 
   Returns:
@@ -910,7 +919,8 @@ uint16_t PAL_GetSignalCapture(uint16_t pch, uint8_t *noiseCapture, uint8_t mode,
   Remarks:
     Not available for PHY serial.
 */
-uint8_t PAL_GetMsgDuration(uint16_t pch, uint16_t length, PAL_SCHEME scheme, uint8_t mode, uint32_t *duration);
+uint8_t PAL_GetMsgDuration(uint16_t pch, uint16_t length, PAL_SCHEME scheme, 
+    uint8_t mode, uint32_t *duration);
 
 // ****************************************************************************
 /* Function:

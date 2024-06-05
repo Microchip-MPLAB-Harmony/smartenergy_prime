@@ -77,7 +77,8 @@ uint32_t PRIME_HAL_WRAPPER_PcrcCalculate(uint8_t *pData, size_t length,
     PCRC_HEADER_TYPE hdrType, PCRC_CRC_TYPE crcType, uint32_t initValue, 
     bool v14Mode)
 {
-    return pPrimeHalApi->pcrc_calc(pData, length, hdrType, crcType, initValue, v14Mode);
+    return pPrimeHalApi->pcrc_calc(pData, length, hdrType, crcType, initValue, 
+                                   v14Mode);
 }
     
 void PRIME_HAL_WRP_PcrcConfigureSNA(uint8_t *sna)
@@ -103,14 +104,14 @@ SRV_USI_HANDLE PRIME_HAL_WRP_UsiOpen(const SYS_MODULE_INDEX index)
     return pPrimeHalApi->usi_open(index);
 }
 
-void PRIME_HAL_WRP_UsiSetCallback(SRV_USI_HANDLE handle, SRV_USI_PROTOCOL_ID protocol, 
-    SRV_USI_CALLBACK callback)
+void PRIME_HAL_WRP_UsiSetCallback(SRV_USI_HANDLE handle, 
+    SRV_USI_PROTOCOL_ID protocol, SRV_USI_CALLBACK callback)
 {
     pPrimeHalApi->usi_set_callback(handle, protocol, callback);
 }
 
-void PRIME_HAL_WRP_UsiSend(SRV_USI_HANDLE handle, SRV_USI_PROTOCOL_ID protocol, 
-    uint8_t *data, size_t length)
+void PRIME_HAL_WRP_UsiSend(SRV_USI_HANDLE handle, 
+    SRV_USI_PROTOCOL_ID protocol, uint8_t *data, size_t length)
 {
     pPrimeHalApi->usi_send(handle, protocol, data, length);
 }
@@ -126,7 +127,8 @@ void PRIME_HAL_WRP_PibGetRequest(uint16_t pibAttrib)
     pPrimeHalApi->pib_get_request(pibAttrib);
 }
 
-void PRIME_HAL_WRP_PIBGetRequestSetCallback(SRV_USER_PIB_GET_REQUEST_CALLBACK callback)
+void PRIME_HAL_WRP_PIBGetRequestSetCallback(
+    SRV_USER_PIB_GET_REQUEST_CALLBACK callback)
 {
     pPrimeHalApi->pib_get_request_set_callback(callback);
 }
@@ -137,7 +139,8 @@ void PRIME_HAL_WRP_PibSetRequest(uint16_t pibAttrib, void *pibValue,
     pPrimeHalApi->pib_set_request(pibAttrib, pibValue, pibSize);
 }
 
-void PRIME_HAL_WRP_PIBSetRequestSetCallback(SRV_USER_PIB_SET_REQUEST_CALLBACK callback)
+void PRIME_HAL_WRP_PIBSetRequestSetCallback(
+    SRV_USER_PIB_SET_REQUEST_CALLBACK callback)
 {
     pPrimeHalApi->pib_set_request_set_callback(callback);
 }
@@ -247,7 +250,8 @@ uint8_t PRIME_HAL_WRP_PAL_GetTimerExtended(uint16_t pch, uint64_t *timer)
     return pPrimeHalApi->hal_pal_get_timer_extended(pch, timer);
 }
 
-uint8_t PRIME_HAL_WRP_PAL_GetCD(uint16_t pch, uint8_t *cd, uint8_t *rssi, uint32_t *time, uint8_t *header)
+uint8_t PRIME_HAL_WRP_PAL_GetCD(uint16_t pch, uint8_t *cd, uint8_t *rssi, 
+    uint32_t *time, uint8_t *header)
 {
     return pPrimeHalApi->hal_pal_get_cd(pch, cd, rssi, time, header);
 }
@@ -282,43 +286,49 @@ uint8_t PRIME_HAL_WRP_PAL_SetChannel(uint16_t pch)
     return pPrimeHalApi->hal_pal_set_channel(pch);
 }
 
-void PRIME_HAL_WRP_PAL_ProgramChannelSwitch(uint16_t pch, uint32_t timeSync, uint8_t timeMode)
+void PRIME_HAL_WRP_PAL_ProgramChannelSwitch(uint16_t pch, uint32_t timeSync, 
+    uint8_t timeMode)
 {
     return pPrimeHalApi->hal_pal_program_channel_switch(pch, timeSync, timeMode);
 }
 
-uint8_t PRIME_HAL_WRP_PAL_GetConfiguration(uint16_t pch, uint16_t id, void *val, uint16_t length)
+uint8_t PRIME_HAL_WRP_PAL_GetConfiguration(uint16_t pch, uint16_t id, void *val, 
+    uint16_t length)
 {
     return pPrimeHalApi->hal_pal_get_configuration(pch, id, val, length);
 }
 
-uint8_t PRIME_HAL_WRP_PAL_SetConfiguration(uint16_t pch, uint16_t id, void *val, uint16_t length)
+uint8_t PRIME_HAL_WRP_PAL_SetConfiguration(uint16_t pch, uint16_t id, void *val, 
+    uint16_t length)
 {
     return pPrimeHalApi->hal_pal_set_configuration(pch, id, val, length);
 }
 
-uint16_t PRIME_HAL_WRP_PAL_GetSignalCapture(uint16_t pch, uint8_t *noiseCapture, uint8_t mode, 
-                              uint32_t timeStart, uint32_t duration)
+uint16_t PRIME_HAL_WRP_PAL_GetSignalCapture(uint16_t pch, uint8_t *noiseCapture, 
+    uint8_t mode, uint32_t timeStart, uint32_t duration)
 {
     return pPrimeHalApi->hal_pal_get_signal_capture(pch, noiseCapture, mode, 
-                              timeStart, duration);
+        timeStart, duration);
 }
 
-uint8_t PRIME_HAL_WRP_PAL_GetMsgDuration(uint16_t pch, uint16_t length, PAL_SCHEME scheme, uint8_t mode, uint32_t *duration)
+uint8_t PRIME_HAL_WRP_PAL_GetMsgDuration(uint16_t pch, uint16_t length, 
+    PAL_SCHEME scheme, uint8_t mode, uint32_t *duration)
 {
-    return pPrimeHalApi->hal_pal_get_msg_duration(pch, length, scheme, mode, duration);
+    return pPrimeHalApi->hal_pal_get_msg_duration(pch, length, scheme, mode, 
+        duration);
 }
 
-bool PRIME_HAL_WRP_PAL_CheckMinimumQuality(uint16_t pch, uint8_t reference, uint8_t modulation)
+bool PRIME_HAL_WRP_PAL_CheckMinimumQuality(uint16_t pch, uint8_t reference, 
+    uint8_t modulation)
 {
     return pPrimeHalApi->hal_pal_check_minimum_quality(pch, reference, modulation);
 }
 
-uint8_t PRIME_HAL_WRP_PAL_GetLessRobustModulation(uint16_t pch, uint8_t mod1, uint8_t mod2)
+uint8_t PRIME_HAL_WRP_PAL_GetLessRobustModulation(uint16_t pch, uint8_t mod1, 
+    uint8_t mod2)
 {
     return pPrimeHalApi->hal_pal_get_less_robust_modulation(pch, mod1, mod2);
 }
-
 
 /* @cond 0 */
 /**INDENT-OFF**/

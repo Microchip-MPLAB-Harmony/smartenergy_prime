@@ -149,15 +149,10 @@ void PRIME_HAL_WRP_RestartSystem(SRV_RESET_HANDLER_RESET_CAUSE resetType);
 
   Parameters:
     pData       - Pointer to buffer containing the data stream
-
     length      - Length of the data stream
-
     hdrType     - Header type to determine the method to obtain CRC
-
     crcType     - CRC type(8, 16 or 32 bits)
-
     initValue   - Initialization value for CRC computation 
-    
     v14Mode     - True for PRIME v1.4 mode and otherwise false
  
   Returns:
@@ -197,7 +192,7 @@ uint32_t PRIME_HAL_WRAPPER_PcrcCalculate(uint8_t *pData, size_t length,
     None.
 
   Parameters:
-    sna    -    Pointer to buffer containing SNA value
+    sna    - Pointer to buffer containing SNA value
 
   Returns:
     None.
@@ -371,14 +366,15 @@ SRV_USI_HANDLE PRIME_HAL_WRP_UsiOpen(const SYS_MODULE_INDEX index);
 
     }
 
-    PRIME_HAL_WRP_UsiSetCallback(handle, SRV_USI_PROT_ID_MNGP_PRIME, PRIME_USIEventHandler);
+    PRIME_HAL_WRP_UsiSetCallback(handle, SRV_USI_PROT_ID_MNGP_PRIME, 
+                                 PRIME_USIEventHandler);
     </code>
     
   Remarks:
     Related to USI service.
 */
-void PRIME_HAL_WRP_UsiSetCallback(SRV_USI_HANDLE handle, SRV_USI_PROTOCOL_ID protocol, 
-    SRV_USI_CALLBACK callback);
+void PRIME_HAL_WRP_UsiSetCallback(SRV_USI_HANDLE handle, 
+    SRV_USI_PROTOCOL_ID protocol, SRV_USI_CALLBACK callback);
 
 // *****************************************************************************
 /* Function:
@@ -413,7 +409,8 @@ void PRIME_HAL_WRP_UsiSetCallback(SRV_USI_HANDLE handle, SRV_USI_PROTOCOL_ID pro
     <code>
     uint8_t pData[] = "Message to send through USI";
 
-    PRIME_HAL_WRP_UsiSend(handle, SRV_USI_PROT_ID_MNGP_PRIME, pData, sizeof(pData));
+    PRIME_HAL_WRP_UsiSend(handle, SRV_USI_PROT_ID_MNGP_PRIME, pData, 
+                          sizeof(pData));
     </code>
 
   Remarks:
@@ -538,7 +535,8 @@ void PRIME_HAL_WRP_PibGetRequest(uint16_t us_pib_attrib);
   Remarks:
     Related to User PIB service.
 */
-void PRIME_HAL_WRP_PIBGetRequestSetCallback(SRV_USER_PIB_GET_REQUEST_CALLBACK callback);
+void PRIME_HAL_WRP_PIBGetRequestSetCallback(
+    SRV_USER_PIB_GET_REQUEST_CALLBACK callback);
 
 // *****************************************************************************
 /* Function:
@@ -630,7 +628,8 @@ void PRIME_HAL_WRP_PibSetRequest(uint16_t pibAttrib, void *pibValue,
   Remarks:
     Related to User PIB service.
 */
-void PRIME_HAL_WRP_PIBSetRequestSetCallback(SRV_USER_PIB_SET_REQUEST_CALLBACK callback);
+void PRIME_HAL_WRP_PIBSetRequestSetCallback(
+    SRV_USER_PIB_SET_REQUEST_CALLBACK callback);
 
 //******************************************************************************
 /* Function:
@@ -1033,69 +1032,56 @@ uint32_t PRIME_HAL_WRP_GetTimeUS(void);
 
 // *****************************************************************************
 /* Function:
-    SYS_TIME_HANDLE PRIME_HAL_WRP_TIMER_CallbackRegisterUS ( SYS_TIME_CALLBACK callback,
-                        uintptr_t context, uint32_t us, SYS_TIME_CALLBACK_TYPE type )
+    SYS_TIME_HANDLE PRIME_HAL_WRP_TIMER_CallbackRegisterUS 
+    ( 
+        SYS_TIME_CALLBACK callback,
+        uintptr_t context, 
+        uint32_t us, 
+        SYS_TIME_CALLBACK_TYPE type
+    )
 
    Summary:
-        Registers a function with the time system service to be called back when the
-        requested number of microseconds have expired (either once or repeatedly).
+    Registers a function with the time system service to be called back when the
+    requested number of microseconds have expired (either once or repeatedly).
 
    Description:
-        Creates a timer object and registers a function with it to be called back
-        when the requested delay (specified in microseconds) has completed.  The
-        caller must identify if the timer should call the function once or repeatedly
-        every time the given delay period expires.
+    This function creates a timer object and registers a function with it to be 
+    called back when the requested delay (specified in microseconds) has completed.  
+    The caller must identify if the timer should call the function once or 
+    repeatedly every time the given delay period expires.
+
+  Precondition:
+    None.
 
    Parameters:
-    callback    - Pointer to the function to be called.
-                  For single shot timers, the callback cannot be NULL.
-                  For periodic timers, if the callback pointer is given as NULL,
-                  no callback will occur, but SYS_TIME_TimerPeriodHasExpired can
-                  still be polled to determine if the period has expired for a
-                  periodic timer.
-
-    context     - A client-defined value that is passed to the callback function.
-
-    us          - Time period in microseconds.
-
-    type        - Type of callback requested. If type is SYS_TIME_SINGLE, the
-                  Callback function will be called once when the time period expires.
-                  After the time period expires, the timer object will be freed.
-                  If type is SYS_TIME_PERIODIC Callback function will be called
-                  repeatedly, every time the time period expires until the timer
-                  object is stopped or deleted.
-
+    callback    - Pointer to the function to be called
+    context     - A client-defined value that is passed to the callback function
+    us          - Time period in microseconds
+    type        - Type of callback requested
 
    Returns:
-        SYS_TIME_HANDLE - A valid timer object handle if the call succeeds.
-                      SYS_TIME_HANDLE_INVALID if it fails.
+    SYS_TIME_HANDLE - A valid timer object handle if the call succeeds.
+    SYS_TIME_HANDLE_INVALID if it fails.
 
    Example:
-      Given a callback function implementation matching the following prototype:
-      <code>
-      void MyCallback ( uintptr_t context);
-      </code>
+    Given a callback function implementation matching the following prototype:
+    <code>
+    void MyCallback ( uintptr_t context);
+    </code>
 
-      The following example call will register it, requesting a 500 microsecond
-      periodic callback.
-      <code>
-     
-      SYS_TIME_HANDLE handle = PRIME_HAL_WRP_TIMER_CallbackRegisterUS(MyCallback, (uintptr_t)0, 
-                500, SYS_TIME_PERIODIC);
-      if (handle != SYS_TIME_HANDLE_INVALID)
-      {
-           
-      }
-      </code>
+    The following example call will register it, requesting a 500 microsecond
+    periodic callback.
+    <code>
+    SYS_TIME_HANDLE handle = PRIME_HAL_WRP_TIMER_CallbackRegisterUS(MyCallback, 
+        (uintptr_t)0, 500, SYS_TIME_PERIODIC);
+    if (handle != SYS_TIME_HANDLE_INVALID)
+    {
+       
+    }
+    </code>
 
    Remarks:
-       Will give a callback after the requested number of microseconds or longer
-       have elapsed, depending on system performance. In tick-based mode, the requested
-       delay will be ceiled to the next timer tick. For example, if the 
-       timer tick is set to 1 msec and the requested delay is 1500 usec, a 
-       delay of 2 msec will be generated.
-
-       Delay values of 0 will return SYS_TIME_ERROR.
+    Related to Time Management service.
 */
 SYS_TIME_HANDLE PRIME_HAL_WRP_TIMER_CallbackRegisterUS(SYS_TIME_CALLBACK callback,
     uintptr_t context, uint32_t us, SYS_TIME_CALLBACK_TYPE type);
@@ -1118,33 +1104,925 @@ SYS_TIME_HANDLE PRIME_HAL_WRP_TIMER_CallbackRegisterUS(SYS_TIME_CALLBACK callbac
 // /* @} */
 
 
-/** \brief PAL Interface */
+// ****************************************************************************
+/* Function:
+    SYS_MODULE_OBJ PRIME_HAL_WRP_PAL_Initialize(
+        const SYS_MODULE_INDEX index
+    )
 
+  Summary:
+    Initializes PRIME PAL module.
+
+  Description:
+    This routine initializes the PAL module, making it ready for clients to
+    use it. The initialization data is specified by the init parameter. It is a
+    single instance module, so this function should be called only once.
+
+  Precondition:
+    None.
+
+  Parameters:
+    index - Identifier for the instance to be initialized. Only one instance
+            (index 0) supported.
+
+  Returns:
+    If successful, returns a valid handle to a module instance object.
+    Otherwise, returns SYS_MODULE_OBJ_INVALID.
+
+  Example:
+    <code>
+    PRIME_HAL_WRP_PAL_Initialize(PRIME_PAL_INDEX);
+    </code>
+
+  Remarks:
+    Related to PRIME PAL.
+*/
 SYS_MODULE_OBJ PRIME_HAL_WRP_PAL_Initialize(const SYS_MODULE_INDEX index);
+
+// ****************************************************************************
+/* Function:
+    void PRIME_HAL_WRP_PAL_Tasks(SYS_MODULE_OBJ object)
+
+  Summary:
+    Maintains the PAL state machine.
+
+  Description:
+    This function is used to maintain the PAL internal state machine and
+    generate callbacks.
+
+  Precondition:
+    None.
+
+  Parameters:
+    object - Identifier for the object instance
+
+  Returns:
+    None.
+
+  Example:
+    <code>
+    SYS_MODULE_OBJ sysObjPal;
+    sysObjPal = PRIME_HAL_WRP_PAL_Initialize(PRIME_PAL_INDEX);
+
+    while (true)
+    {
+        PRIME_HAL_WRP_PAL_Tasks(sysObjPal);
+    }
+    </code>
+
+  Remarks:
+    Related to PRIME PAL.
+*/
 void PRIME_HAL_WRP_PAL_Tasks(SYS_MODULE_OBJ object);
+
+// *************************************************************************
+/* Function:
+    SYS_STATUS PRIME_HAL_WRP_PAL_Status( SYS_MODULE_OBJ object )
+
+  Summary:
+    Gets the current status of the PAL module.
+
+  Description:
+    This routine provides the current status of the PAL module.
+
+  Precondition:
+    None.
+
+  Parameters:
+    object - Identifier for the object instance
+
+  Returns:
+    SYS_STATUS_READY: Indicates that the driver is ready and accept
+    requests for new operations.
+
+    SYS_STATUS_UNINITIALIZED: Indicates the driver is not initialized.
+
+    SYS_STATUS_ERROR: Indicates the driver is not initialized correctly.
+
+    SYS_STATUS_BUSY: Indicates the driver is initializing.
+
+  Example:
+    <code>
+    SYS_MODULE_OBJ sysObjPal;
+    sysObjPal = PRIME_HAL_WRP_PAL_Initialize(PRIME_PAL_INDEX);
+    SYS_STATUS status;
+
+    status = PRIME_HAL_WRP_PAL_Status(sysObjPal);
+    </code>
+
+  Remarks:
+    Related to PRIME PAL.
+*/
+
 SYS_STATUS PRIME_HAL_WRP_PAL_Status(SYS_MODULE_OBJ object);
+
+// ****************************************************************************
+/* Function:
+    void PRIME_HAL_WRP_PAL_CallbackRegister(PAL_CALLBACKS *pCallbacks)
+
+  Summary:
+    Sets PAL layer callback functions
+
+  Description:
+    This routine links callback functions between upper layer and phy layer.
+
+  Precondition:
+    None.
+
+  Parameters:
+    pCallbacks         Callbacks structure
+
+  Returns:
+    None
+
+  Example:
+    <code>
+    static void _data_confirm_handler(PAL_MSG_CONFIRM_DATA *dataConfirm)
+    {
+        ...
+    }
+
+    void main(void)
+    {
+        PAL_CALLBACKS palCBs;
+
+        PRIME_HAL_WRP_PAL_Initialize();
+
+        memset(palCBs, NULL, sizeof(palCBs));
+        palCBs.palDataConfirm = _data_confirm_handler;
+
+        PRIME_HAL_WRP_PAL_SetCallbacks(&palCBs);
+    }
+    </code>
+
+  Remarks:
+    Related to PRIME PAL.
+*/
 void PRIME_HAL_WRP_PAL_CallbackRegister(PAL_CALLBACKS *pCallbacks);
+
+// ****************************************************************************
+/* Function:
+    uint8_t PRIME_HAL_WRP_PAL_DataRequestTransmission
+    (
+        PAL_MSG_REQUEST_DATA *requestMsg
+    )
+
+  Summary:
+    Request to transmit a message
+
+  Description:
+    This functions is used to initiate the transmission process of a PPDU
+    (PHY Protocol Data Unit) to the medium indicated in the transmission
+    information structure.
+
+  Precondition:
+    None.
+
+  Parameters:
+    requestMsg         MPDU data transmission structure
+
+  Returns:
+    PAL Transmission results.
+
+  Example:
+    <code>
+    uint8_t result=PAL_TX_RESULT_SUCCESS;
+    PAL_MSG_REQUEST_DATA requestMsg;
+    uint8_t msg[30];
+
+    requestMsg.dataBuf = &msg;
+    requestMsg.timeDelay = 10000;
+    requestMsg.dataLength = sizeof(msg);
+    requestMsg.pch = 16;
+    requestMsg.buffIdentifier = 2;
+    requestMsg.attLevel = 0;
+    requestMsg.scheme = PAL_PLC_DBPSK_R;
+    requestMsg.disableRx = 0;
+    requestMsg.mode = PAL_MODE_TYPE_B;
+    requestMsg.timeMode = PAL_TX_MODE_ABSOLUTE;
+    requestMsg.numSenses = 3;
+    requestMsg.senseDelayMs = 3;
+
+    result = PRIME_HAL_WRP_PAL_DataRequestTransmission(&requestMsg);
+    </code>
+
+  Remarks:
+    None
+*/
 uint8_t PRIME_HAL_WRP_PAL_DataRequest(PAL_MSG_REQUEST_DATA *pData);
+
+// ****************************************************************************
+/* Function:
+    uint8_t PRIME_HAL_WRP_PAL_GetSNR(uint16_t pch, uint8_t *snr, uint8_t qt)
+
+  Summary:
+    Convert QT value to Signal Noise Ratio (SNR).
+
+  Description:
+    This function is used to get the value of the Signal to Noise Ratio,
+    defined as the ratio of measured received signal level to noise level of
+    last received PPDU (PHY Protocol Data Unit).
+
+  Precondition:
+    None.
+
+  Parameters:
+    pch         Physical channel
+    snr         Signal to noise ratio output parameter
+    qt          QT input parameter to get SNR level
+
+  Returns:
+    PAL_CFG_SUCCESS         - If successful
+    PAL_CFG_INVALID_INPUT   - If unsuccessful
+
+  Example:
+    <code>
+    uint8_t result=PAL_CFG_SUCCESS;
+    uint8_t snr=0;
+    uint8_t qt=5;
+    uint16_t pch=1;
+
+    result = PRIME_HAL_WRP_PAL_GetSNR(pch, &snr, qt);
+    </code>
+
+  Remarks:
+    Not available in PHY Serial medium.
+    Related to PRIME PAL.
+*/
 uint8_t PRIME_HAL_WRP_PAL_GetSNR(uint16_t pch, uint8_t *snr, uint8_t qt);
+
+// ****************************************************************************
+/* Function:
+    uint8_t PRIME_HAL_WRP_PAL_GetZCT(uint16_t pch, uint32_t *zct)
+
+  Summary:
+    Get zero-cross time (ZCT).
+
+  Description:
+    This function is used to get the value of the zero-cross time of the mains
+    and the time between the last transmission or reception and the zero cross
+    of the mains.
+
+  Precondition:
+    None.
+
+  Parameters:
+    pch         Physical channel
+    zct         Zero time output parameter
+
+  Returns:
+    PAL_CFG_SUCCESS         - If successful
+    PAL_CFG_INVALID_INPUT   - If unsuccessful
+
+  Example:
+    <code>
+    uint8_t result=PAL_CFG_SUCCESS;
+    uint8_t zct=0;
+    uint16_t pch=1;
+
+    result = PRIME_HAL_WRP_PAL_GetZCT(pch, &zct);
+    </code>
+
+  Remarks:
+    Not available for both PHY Serial and RF medium.
+    Related to PRIME PAL.
+*/
 uint8_t PRIME_HAL_WRP_PAL_GetZCT(uint16_t pch, uint32_t *zct);
+
+// ****************************************************************************
+/* Function:
+    uint8_t PRIME_HAL_WRP_PAL_GetTimer(uint16_t pch, uint32_t *timer)
+
+  Summary:
+    Get the current PHY time in us.
+
+  Description:
+    This routine is used to get current PHY time.
+
+  Precondition:
+    None.
+
+  Parameters:
+    pch             Physical channel
+    timer           Current output time of PHY
+
+  Returns:
+    PAL_CFG_SUCCESS         - If successful
+    PAL_CFG_INVALID_INPUT   - If unsuccessful
+
+  Example:
+    <code>
+    uint8_t result=PAL_CFG_SUCCESS;
+    uint32_t timer=0;
+    uint16_t pch=1;
+
+    result = PRIME_HAL_WRP_PAL_GetTimer(pch, &timer);
+    </code>
+
+  Remarks:
+    Related to PRIME PAL.
+*/
 uint8_t PRIME_HAL_WRP_PAL_GetTimer(uint16_t pch, uint32_t *timer);
+
+// ****************************************************************************
+/* Function:
+    uint8_t PRIME_HAL_WRP_PAL_GetTimerExtended(uint16_t pch, uint64_t *timer)
+
+  Summary:
+    Get the extended PHY time in us.
+
+  Description:
+    This routine is used to get the extended PHY time.
+
+  Precondition:
+    None.
+
+  Parameters:
+    pch             Physical channel
+    timer           Extended output time  of PHY
+
+  Returns:
+    PAL_CFG_SUCCESS         - If successful
+    PAL_CFG_INVALID_INPUT   - If unsuccessful
+
+  Example:
+    <code>
+    uint8_t  result=PAL_CFG_SUCCESS;
+    uint64_t timer=0;
+    uint16_t pch=1;
+
+    result = PRIME_HAL_WRP_PAL_GetTimerExtended(pch, &timer);
+    </code>
+
+  Remarks:
+    Related to PRIME PAL.
+*/
 uint8_t PRIME_HAL_WRP_PAL_GetTimerExtended(uint16_t pch, uint64_t *timer);
+
+// ****************************************************************************
+/* Function:
+    uint8_t PRIME_HAL_WRP_PAL_GetCD(
+        uint16_t pch,
+        uint8_t *cd,
+        uint8_t *rssi,
+        uint32_t *time,
+        uint8_t *header)
+
+  Summary:
+    Get the carrier detect signal.
+
+  Description:
+    This routine is used to get the value of carrier detect signal.
+
+  Precondition:
+    None.
+
+  Parameters:
+    pch             Physical channel
+    cd              Carrier detect signal output parameter
+    rssi            Received signal strength indicator
+    time            Current time in us
+    header          Header type
+
+  Returns:
+    PAL_CFG_SUCCESS         - If successful
+    PAL_CFG_INVALID_INPUT   - If unsuccessful
+
+  Example:
+    <code>
+    uint8_t result=PAL_CFG_SUCCESS;
+    uint8_t cd=0;
+    uint8_t rssi=0;
+    uint32_t time=0;
+    uint8_t header=0;
+    uint16_t pch=1;
+
+    result = PRIME_HAL_WRP_PAL_GetCD(pch, &cd, &rssi, &time, &header);
+    </code>
+
+  Remarks:
+    Not available for both PHY Serial and PHY RF.
+    Related to PRIME PAL.
+*/
 uint8_t PRIME_HAL_WRP_PAL_GetCD(uint16_t pch, uint8_t *cd, uint8_t *rssi, uint32_t *time, uint8_t *header);
+
+// ****************************************************************************
+/* Function:
+    uint8_t PRIME_HAL_WRP_PAL_GetNL(uint16_t pch, uint8_t *noise)
+
+  Summary:
+    Get the noise floor level value.
+
+  Description:
+    This routine is used to know the noise level present in the powerline.
+
+  Precondition:
+    None.
+
+  Parameters:
+    pch            Physical channel
+    noise          Noise floor level output parameter
+
+  Returns:
+    PAL_CFG_SUCCESS         - If successful
+    PAL_CFG_INVALID_INPUT   - If unsuccessful
+
+  Example:
+    <code>
+    uint8_t result=PAL_CFG_SUCCESS;
+    uint8_t nl=0;
+    uint16_t pch=1;
+
+    result = PRIME_HAL_WRP_PAL_GetNL(pch, &nl);
+    </code>
+
+  Remarks:
+    Not available for PHY Serial.
+    Related to PRIME PAL.
+*/
 uint8_t PRIME_HAL_WRP_PAL_GetNL(uint16_t pch, uint8_t *noise);
+
+// ****************************************************************************
+/* Function:
+    uint8_t PRIME_HAL_WRP_PAL_GetAGC(uint16_t pch, uint8_t *mode, uint8_t *gain)
+
+  Summary:
+    Get the automatic gain mode of the PHY PLC layer.
+
+  Description:
+    This routine is used to get Automatic Gain Mode (AGC) of the PHY PLC layer.
+
+  Precondition:
+    None.
+
+  Parameters:
+    pch            Physical channel
+    mode           Auto/Manual mode
+    gain           Initial receiving gain in auto mode
+
+  Returns:
+    PAL_CFG_SUCCESS         - If successful
+    PAL_CFG_INVALID_INPUT   - If unsuccessful
+
+  Example:
+    <code>
+    uint8_t result=PAL_CFG_SUCCESS;
+    uint8_t mode=0;
+    uint8_t gain=0;
+    uint16_t pch=1;
+
+    result = PRIME_HAL_WRP_PAL_GetAGC(&mode, &gain);
+    </code>
+
+  Remarks:
+    Not available for PHY Serial and PHY RF.
+    Related to PRIME PAL.
+*/
 uint8_t PRIME_HAL_WRP_PAL_GetAGC(uint16_t pch, uint8_t *mode, uint8_t *gain);
+
+// ****************************************************************************
+/* Function:
+    uint8_t PRIME_HAL_WRP_PAL_SetAGC(uint16_t pch, uint8_t mode, uint8_t gain)
+
+  Summary:
+    Set the automatic gain mode of the PHY PLC layer.
+
+  Description:
+    This routine is used to set Automatic Gain Mode (AGC) of the PHY PLC layer.
+
+  Precondition:
+    None.
+
+  Parameters:
+    pch             Physical channel
+    mode            Auto/Manual mode (auto mode(0), manual mode(1))
+    gain            Initial receiving gain in auto mode
+
+  Returns:
+    PAL_CFG_SUCCESS         - If successful
+    PAL_CFG_INVALID_INPUT   - If unsuccessful
+
+  Example:
+    <code>
+    uint8_t result=PAL_CFG_SUCCESS;
+    uint8_t mode=0;
+    uint8_t gain=0;
+    uint16_t pch=1;
+
+    result = PRIME_HAL_WRP_PAL_SetAGC(pch, mode, gain);
+    </code>
+
+  Remarks:
+    Not available for PHY Serial and PHY RF.
+    Related to PRIME PAL.
+*/
 uint8_t PRIME_HAL_WRP_PAL_SetAGC(uint16_t pch, uint8_t mode, uint8_t gain);
+
+// ****************************************************************************
+/* Function:
+    uint8_t PRIME_HAL_WRP_PAL_GetCCA(uint16_t pch, uint8_t *pState)
+
+  Summary:
+    Get clear pch assessment mode value.
+
+  Description:
+    This routine is used to get the clear pch assesment mode.
+    The pch state helps to know whether or not the RF physical medium is
+    free.
+
+  Precondition:
+    None.
+
+  Parameters:
+    pch                    Physical channel
+    pState                 Channel state (0: busy, 1: free) of RF module
+
+  Returns:
+    PAL_CFG_SUCCESS         - If successful
+    PAL_CFG_INVALID_INPUT   - If unsuccessful
+
+  Example:
+    <code>
+    uint8_t result=PAL_CFG_SUCCESS;
+    uint8_t pState=0;
+    uint16 pch = 512;
+
+    result = PRIME_HAL_WRP_PAL_GetCCA(pch, &pState);
+    </code>
+
+  Remarks:
+    Only implemented in PHY RF interface.
+    Related to PRIME PAL.
+*/
 uint8_t PRIME_HAL_WRP_PAL_GetCCA(uint16_t pch, uint8_t *pState);
-uint8_t PRIME_HAL_WRP_PAL_GetChannel(uint16_t *pPch, uint16_t channelReference);
+
+// ****************************************************************************
+/* Function:
+    uint8_t PRIME_HAL_WRP_PAL_GetChannel(uint16_t *pch, uint16_t channelReference)
+
+  Summary:
+    Get the band (PLC) or the pch (RF).
+
+  Description:
+    This routine is used to get the pch or band used for the communication.
+
+  Precondition:
+    None.
+
+  Parameters:
+    pch               Pointer to store the Physical channel in use
+    channelReference  Physical channel in the same channels range
+
+  Returns:
+    PAL_CFG_SUCCESS         - If successful
+    PAL_CFG_INVALID_INPUT   - If unsuccessful
+
+  Example:
+    <code>
+    uint8_t result=PAL_CFG_SUCCESS;
+    uint16_t pch=0;
+    uint16_t channelRef=1; // Select a reference in PLC channels
+
+    result = PRIME_HAL_WRP_PAL_GetChannel(&pch, channelRef);
+    </code>
+
+  Remarks:
+    Not available for PHY Serial.
+    Related to PRIME PAL.
+*/
+uint8_t PRIME_HAL_WRP_PAL_GetChannel(uint16_t *pch, uint16_t channelReference);
+
+// ****************************************************************************
+/* Function:
+    uint8_t PRIME_HAL_WRP_PAL_SetChannel(uint16_t pch)
+
+  Summary:
+    Set the band (PLC) or the pch (RF).
+
+  Description:
+    This routine is used to set the pch or band used for the communication.
+
+  Precondition:
+    None.
+
+  Parameters:
+    pch       Physical channel
+
+  Returns:
+    PAL_CFG_SUCCESS         - If successful
+    PAL_CFG_INVALID_INPUT   - If unsuccessful
+
+  Example:
+    <code>
+    uint8_t result=PAL_CFG_SUCCESS;
+    uint16_t pch=1; // This mask belongs to PLC channels
+
+    result = PRIME_HAL_WRP_PAL_SetChannel(pch);
+    </code>
+
+  Remarks:
+    Not available for PHY Serial.
+    Related to PRIME PAL.
+*/
 uint8_t PRIME_HAL_WRP_PAL_SetChannel(uint16_t pch);
+
+// ****************************************************************************
+/* Function:
+    void PRIME_HAL_WRP_PAL_ProgramChannelSwitch(uint16_t pch, uint32_t timeSync, uint8_t timeMode)
+
+  Summary:
+    Program a pch switch in the given time.
+
+  Description:
+    This routine is used to program a pch switch in the given time.
+
+  Precondition:
+    None.
+
+  Parameters:
+    pch               Physical Channel to be updated
+    timeSync          Initial pch switch time in us
+    timeMode          Channel switch time mode
+
+  Returns:
+    None
+
+  Example:
+    <code>
+    uint32_t timeSync = 10000
+    uint16_t pch = 600;
+    uint8_t timeMode = PAL_TX_MODE_ABSOLUTE;
+
+    PRIME_HAL_WRP_PAL_ProgramChannelSwitch(pch, timeSync, timeMode);
+    </code>
+
+  Remarks:
+    Only available for PHY RF.
+    Related to PRIME PAL.
+*/
 void PRIME_HAL_WRP_PAL_ProgramChannelSwitch(uint16_t pch, uint32_t timeSync, uint8_t timeMode);
+
+// ****************************************************************************
+/* Function:
+    uint8_t PRIME_HAL_WRP_PAL_GetConfiguration(
+        uint16_t pch,
+        uint16_t id,
+        void *val,
+        uint16_t len)
+
+  Summary:
+    Get a PHY attribute.
+
+  Description:
+    This function is used to get a PHY attribute from the selected medium.
+
+  Precondition:
+    None.
+
+  Parameters:
+    pch             Physical channel
+    id              Identifiers requested from the MAC layer
+    val             Output parameter value
+    length          Length of the parameter
+
+  Returns:
+    PAL_CFG_SUCCESS         - If successful
+    PAL_CFG_INVALID_INPUT   - If unsuccessful
+
+  Example:
+    <code>
+    uint8_t result=PAL_CFG_SUCCESS;
+    uint16_t id=PAL_ID_CFG_ATTENUATION;
+    void val=0;
+    uint16_t len=1;
+    uint16_t pch = 16;
+
+    result = PRIME_HAL_WRP_PAL_GetConfiguration(pch, id, &val, len);
+    </code>
+
+  Remarks:
+    Related to PRIME PAL.
+*/
 uint8_t PRIME_HAL_WRP_PAL_GetConfiguration(uint16_t pch, uint16_t id, void *val, uint16_t length);
+
+// ****************************************************************************
+/* Function:
+    uint8_t PRIME_HAL_WRP_PAL_SetConfiguration(
+        uint16_t pch,
+        uint16_t id,
+        void *val,
+        uint16_t len)
+
+  Summary:
+    Set PHY attribute.
+
+  Description:
+    This function is used to set a PHY attribute in the selected medium.
+
+  Precondition:
+    None.
+
+  Parameters:
+    pch             Physical channel
+    id              PHY attribute identifier
+    val             Input parameter value
+    len             Length of the parameter
+
+  Returns:
+    PAL_CFG_SUCCESS         - If successful
+    PAL_CFG_INVALID_INPUT   - If unsuccessful
+
+  Example:
+    <code>
+    uint8_t result=PAL_CFG_SUCCESS;
+    uint16_t id=PAL_ID_CFG_ATTENUATION;
+    void val=2;
+    uint16_t len=1;
+    uint16_t pch = 16;
+
+    result = PRIME_HAL_WRP_PAL_SetConfiguration(pch, id, &val, len);
+    </code>
+
+  Remarks:
+    Not available for PHY Serial.
+    Related to PRIME PAL.
+*/
 uint8_t PRIME_HAL_WRP_PAL_SetConfiguration(uint16_t pch, uint16_t id, void *val, uint16_t length);
+
+// ****************************************************************************
+/* Function:
+    uint16_t PRIME_HAL_WRP_PAL_GetSignalCapture(
+        uint16_t pch,
+        uint8_t *noiseCapture,
+        uint8_t mode,
+        uint32_t timeStart,
+        uint32_t duration)
+
+  Summary:
+    Get Capture Noise Data
+
+  Description:
+    This routine is used to read noise data for PLC medium communication.
+
+  Precondition:
+    None.
+
+  Parameters:
+    pch             Physical channel
+    noiseCapture    Pointer to destination buffer to store data
+    mode            Capture mode
+    timeStart       Start time in us based on PL360 timer reference
+    duration        Duration time in us
+
+  Returns:
+    Size in bytes of data capture.
+
+  Example:
+    <code>
+    uint32_t timeStart = 10000;
+    uint32_t duration = 5000;
+    uint8_t noiseCapture[300];
+    uint16_t noiseSize;
+    uint8_t mode = PAL_MODE_TYPE_B;
+    uint8_t pch = 1;
+
+    noiseSize = PRIME_HAL_WRP_PAL_GetSignalCapture(pch, &noiseCapture, mode, timeStart, duration);
+    </code>
+
+  Remarks:
+    Only available for PHY PLC.
+    Related to PRIME PAL.
+*/
 uint16_t PRIME_HAL_WRP_PAL_GetSignalCapture(uint16_t pch, uint8_t *noiseCapture, uint8_t mode, 
                               uint32_t timeStart, uint32_t duration);
-uint8_t PRIME_HAL_WRP_PAL_GetMsgDuration(uint16_t pch, uint16_t length, PAL_SCHEME scheme, uint8_t mode, uint32_t *duration);
-bool PRIME_HAL_WRP_PAL_CheckMinimumQuality(uint16_t pch, uint8_t reference, uint8_t modulation);
-uint8_t PRIME_HAL_WRP_PAL_GetLessRobustModulation(uint16_t pch, uint8_t mod1, uint8_t mod2);
+// ****************************************************************************
+/* Function:
+    uint8_t PRIME_HAL_WRP_PAL_GetMsgDuration(
+        uint16_t pch,
+        uint16_t msgLen,
+        PAL_SCHEME scheme,
+        uint8_t mode,
+        uint32_t *duration)
 
+  Summary:
+    Get message duration
+
+  Description:
+    This function is used to calculate the message duration.
+
+  Precondition:
+    None.
+
+  Parameters:
+    pch             Physical channel used
+    msgLen          Message length
+    scheme          Modulation scheme of message
+    mode            Indicates if the message to transmit is type A, type B or 
+                    type BC
+    duration        Pointer to message duration in us (output)
+
+  Returns:
+    PAL_CFG_SUCCESS         - If successful
+    PAL_CFG_INVALID_INPUT   - If unsuccessful
+
+  Example:
+    <code>
+    uint32_t duration = 0;
+    uint16_t pch = 16;
+    uint16_t msgLen = 30;
+    PAL_SCHEME scheme = PAL_PLC_DBPSK_R;
+    uint8_t mode = PAL_MODE_TYPE_B;
+    uint8_t result=PAL_CFG_SUCCESS;
+
+    result = PRIME_HAL_WRP_PAL_GetMsgDuration(pch, msgLen, scheme, mode, &duration);
+    </code>
+
+  Remarks:
+    Not available for PHY serial.
+    Related to PRIME PAL.
+*/
+uint8_t PRIME_HAL_WRP_PAL_GetMsgDuration(uint16_t pch, uint16_t length, 
+    PAL_SCHEME scheme, uint8_t mode, uint32_t *duration);
+
+// ****************************************************************************
+/* Function:
+   bool PRIME_HAL_WRP_PAL_HasMinimumQuality(
+    uint16_t pch,
+    PAL_SCHEME scheme,
+    uint8_t lessRobustMode)
+
+  Summary:
+    Check minimum quality for modulation scheme
+
+  Description:
+    This routine is used to check if the modulation is good enough for a low FER
+    (Frame Error rate) for the given scheme.
+
+  Precondition:
+    None.
+
+  Parameters:
+    pch                 Physical channel used
+    scheme              Modulation scheme of message
+    lessRobustMode      Less robust modulation
+
+  Returns:
+    true         - If successful
+    false        - If unsuccessful
+
+  Example:
+    <code>
+    uint16_t pch = 16;
+    PAL_SCHEME scheme = PAL_PLC_DBPSK_R;
+    uint8_t lessRobustMode = PAL_PLC_DQPSK;
+    bool result=true;
+
+    result = PRIME_HAL_WRP_PAL_HasMinimumQuality(pch, scheme, lessRobustMode);
+    </code>
+
+  Remarks:
+    Not available for PHY Serial.
+    Related to PRIME PAL.
+*/
+bool PRIME_HAL_WRP_PAL_CheckMinimumQuality(uint16_t pch, uint8_t reference, uint8_t modulation);
+
+// ****************************************************************************
+/* Function:
+    uint8_t PRIME_HAL_WRP_PAL_GetLessRobustModulation(uint16_t pch, uint8_t mod1, uint8_t mod2)
+
+  Summary:
+    Get less robust modulation scheme.
+
+  Description:
+    This routine is used to get less robust modulation scheme for a selected
+    pch.
+
+  Precondition:
+    None.
+
+  Parameters:
+    pch             Physical channel used
+    mod1            Modulation 1 to compare
+    mod2            Modulation 2 to compare
+
+  Returns:
+   mod1 or mod2 scheme
+
+  Example:
+    <code>
+    uint16_t pch=1;
+    uint8_t mod;
+    uint8_t mod1=PAL_PLC_DBPSK_R;
+    uint8_t mod2=PAL_PLC_DQPSK;
+
+    mod = PRIME_HAL_WRP_PAL_GetLessRobustModulation(pch, mod1, mod2);
+    </code>
+
+  Remarks:
+    Not available for PHY Serial.
+    Related to PRIME PAL.
+*/
+uint8_t PRIME_HAL_WRP_PAL_GetLessRobustModulation(uint16_t pch, uint8_t mod1, uint8_t mod2);
 
 /* @cond 0 */
 /**INDENT-OFF**/

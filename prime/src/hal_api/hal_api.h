@@ -61,6 +61,7 @@ Microchip or any third party.
 #include "service/security/aes_wrapper.h"
 #include "service/security/cipher_wrapper.h"
 #include "service/time_management/srv_time_management.h"
+#include "stack/pal/pal.h"
 #include "stack/pal/pal_types.h"
 
 // DOM-IGNORE-BEGIN
@@ -290,7 +291,7 @@ typedef void (*HAL_PIB_SET_REQUEST_SET_CALLBACK)(SRV_USER_PIB_SET_REQUEST_CALLBA
 typedef uint32_t (*HAL_RNG_GET)(void);
 
 // *****************************************************************************
-/*  Perform AES-CMAC
+/* Perform AES-CMAC
 
   Summary:
     Function pointer to perform AES-CMAC to generate the MAC in single step
@@ -307,7 +308,7 @@ typedef int32_t (*HAL_AES_CMAC_DIRECT)(uint8_t *input, uint32_t inputLen,
     uint8_t *outputMac, uint8_t *key);
 
 // *****************************************************************************
-/*  Set the encryption key for AES-CCM
+/* Set the encryption key for AES-CCM
 
   Summary:
     Function pointer to initialize the AES-CCM context and set the encryption
@@ -323,7 +324,7 @@ typedef int32_t (*HAL_AES_CMAC_DIRECT)(uint8_t *input, uint32_t inputLen,
 typedef int32_t (*HAL_AES_CCM_SET_KEY)(uint8_t *key);
 
 // *****************************************************************************
-/*  Perform AES-CCM authenticated encryption of a buffer
+/* Perform AES-CCM authenticated encryption of a buffer
 
   Summary:
     Function pointer to perform AES-CCM authenticated encryption of a buffer.
@@ -340,7 +341,7 @@ typedef int32_t (*HAL_AES_CCM_ENCRYPT_TAG)(uint8_t *data, uint32_t dataLen,
     uint32_t tagLen);
 
 // *****************************************************************************
-/*  Perform AES-CCM authenticated decryption of a buffer
+/* Perform AES-CCM authenticated decryption of a buffer
 
   Summary:
     Function pointer to perform AES-CCM authenticated decryption of a buffer.
@@ -357,7 +358,7 @@ typedef int32_t (*HAL_AES_CCM_AUTH_DECRYPT)(uint8_t *data, uint32_t dataLen,
     uint32_t tagLen);
 
 // *****************************************************************************
-/*  Wrap a key with AES Key Wrap Algorithm
+/* Wrap a key with AES Key Wrap Algorithm
 
   Summary:
     Function pointer to wrap a key with AES Key Wrap Algorithm.
@@ -372,7 +373,7 @@ typedef void (*HAL_AES_WRAP_KEY)(const uint8_t *key, uint32_t keyLen,
     const uint8_t *in, uint32_t inLen, uint8_t *out);
 
 // *****************************************************************************
-/*  Unwrap a key with AES Key Wrap Algorithm
+/* Unwrap a key with AES Key Wrap Algorithm
 
   Summary:
     Function pointer to unwrap a key with AES Key Wrap Algorithm.
@@ -387,8 +388,7 @@ typedef bool (*HAL_AES_UNWRAP_KEY)(const uint8_t *key, uint32_t keyLen, const ui
     uint32_t inLen, uint8_t *out);
 
 // *****************************************************************************
-/*  Gets the time in a 64 bit variable in microseconds
-
+/* Get the time in a 64 bit variable in microseconds
 
   Summary:
     Function pointer to get the value of a counter and convert it in a 64 bit
@@ -404,8 +404,7 @@ typedef bool (*HAL_AES_UNWRAP_KEY)(const uint8_t *key, uint32_t keyLen, const ui
 typedef uint64_t (*HAL_TIMER_GetTimeUS64)(void);
 
 // *****************************************************************************
-/*  Gets the time in a 32 bit variable in microseconds
-
+/* Get the time in a 32 bit variable in microseconds
 
   Summary:
     Function pointer to get the value of a counter and convert it in a 32 bit
@@ -423,24 +422,24 @@ typedef uint32_t (*HAL_TIMER_GetTimeUS)(void);
 // *****************************************************************************
 /* Register a callback function with the time system service
 
-   Summary:
-        Function pointer to register a function with the time system service
-        to be called back when the requested number of microseconds have expired
-        (either once or repeatedly).
+  Summary:
+    Function pointer to register a function with the time system service to be 
+    called back when the requested number of microseconds have expired (either 
+    once or repeatedly).
 
-   Description:
-        Creates a timer object and registers a function with it to be called back
-        when the requested delay (specified in microseconds) has completed.  The
-        caller must identify if the timer should call the function once or repeatedly
-        every time the given delay period expires.
+  Description:
+    This function pointer creates a timer object and registers a function with 
+    it to be called back when the requested delay (specified in microseconds) 
+    has completed. The caller must identify if the timer should call the 
+    function once or repeatedly every time the given delay period expires.
 
-   Returns:
-        SYS_TIME_HANDLE - A valid timer object handle if the call succeeds.
-                      SYS_TIME_HANDLE_INVALID if it fails.
+  Remarks:
+    Related to Time Management service.
 
 */
-typedef SYS_TIME_HANDLE (*HAL_TIMER_CallbackRegisterUS)(SYS_TIME_CALLBACK callback,
-                        uintptr_t context, uint32_t us, SYS_TIME_CALLBACK_TYPE type);
+typedef SYS_TIME_HANDLE (*HAL_TIMER_CallbackRegisterUS)(
+    SYS_TIME_CALLBACK callback, uintptr_t context, uint32_t us, 
+    SYS_TIME_CALLBACK_TYPE type);
 
 
 // Related to FU service - TBD
@@ -458,32 +457,360 @@ typedef SYS_TIME_HANDLE (*HAL_TIMER_CallbackRegisterUS)(SYS_TIME_CALLBACK callba
 // typedef uint16_t (*hal_fu_get_bitmap_t)(uint8_t *puc_bitmap, uint32_t *pus_num_rcv_pages);
 // typedef void (*hal_swap_stack_t)(uint8_t uc_traffic);
 
-// Related to PAL - TBD
-typedef SYS_MODULE_OBJ (*HAL_PAL_INITIALIZE)(const SYS_MODULE_INDEX index);
-typedef void (*HAL_PAL_TASKS)(SYS_MODULE_OBJ object);
-typedef SYS_STATUS (*HAL_PAL_STATUS)(SYS_MODULE_OBJ object);
-typedef void (*HAL_PAL_CALLBACK_REGISTER)(PAL_CALLBACKS *pCallbacks);
-typedef uint8_t (*HAL_PAL_DATA_REQUEST)(PAL_MSG_REQUEST_DATA *pData);
-typedef uint8_t (*HAL_PAL_GET_SNR)(uint16_t pch, uint8_t *snr, uint8_t qt);
-typedef uint8_t (*HAL_PAL_GET_ZCT)(uint16_t pch, uint32_t *zct);
-typedef uint8_t (*HAL_PAL_GET_TIMER)(uint16_t pch, uint32_t *timer);
-typedef uint8_t (*HAL_PAL_GET_TIMER_EXTENDED)(uint16_t pch, uint64_t *timer);
-typedef uint8_t (*HAL_PAL_GET_CD)(uint16_t pch, uint8_t *cd, uint8_t *rssi, uint32_t *time, uint8_t *header);
-typedef uint8_t (*HAL_PAL_GET_NL)(uint16_t pch, uint8_t *noise);
-typedef uint8_t (*HAL_PAL_GET_AGC)(uint16_t pch, uint8_t *mode, uint8_t *gain);
-typedef uint8_t (*HAL_PAL_SET_AGC)(uint16_t pch, uint8_t mode, uint8_t gain);
-typedef uint8_t (*HAL_PAL_GET_CCA)(uint16_t pch, uint8_t *pState);
-typedef uint8_t (*HAL_PAL_GET_CHANNEL)(uint16_t *pPch, uint16_t channelReference);
-typedef uint8_t (*HAL_PAL_SET_CHANNEL)(uint16_t pch);
-typedef void (*HAL_PAL_PROGRAM_CHANNEL_SWITCH)(uint16_t pch, uint32_t timeSync, uint8_t timeMode);
-typedef uint8_t (*HAL_PAL_GET_CONFIGURATION)(uint16_t pch, uint16_t id, void *val, uint16_t length);
-typedef uint8_t (*HAL_PAL_SET_CONFIGURATION)(uint16_t pch, uint16_t id, void *val, uint16_t length);
-typedef uint16_t (*HAL_PAL_GET_SIGNAL_CAPTURE)(uint16_t pch, uint8_t *noiseCapture, uint8_t mode, uint32_t timeStart, uint32_t duration);
-typedef uint8_t (*HAL_PAL_GET_MSG_DURATION)(uint16_t pch, uint16_t length, PAL_SCHEME scheme, uint8_t mode, uint32_t *duration);
-typedef bool (*HAL_PAL_CHECK_MINIMUM_QUALITY)(uint16_t pch, uint8_t reference, uint8_t modulation);
-typedef uint8_t (*HAL_PAL_GET_LESS_ROBUST_MODULATION)(uint16_t pch, uint8_t mod1, uint8_t mod2);
+// *****************************************************************************
+/*  Initializes PAL 
 
-typedef void (*TBD)(void);
+  Summary:
+    Function pointer to initialize the PRIME PAL module.
+
+  Description:
+    This function pointer is used to initialize the PRIME PAL module.
+
+  Remarks:
+    Related to PRIME PAL.
+*/
+typedef SYS_MODULE_OBJ (*HAL_PAL_INITIALIZE)(const SYS_MODULE_INDEX index);
+
+// *****************************************************************************
+/* Maintains the PAL state machine
+
+  Summary:
+    Function pointer to maintain the PRIME PAL module.
+
+  Description:
+    This function pointer is used to maintain the PAL internal state machine and
+    generate callbacks.
+
+  Remarks:
+    Related to PRIME PAL.
+*/
+typedef void (*HAL_PAL_TASKS)(SYS_MODULE_OBJ object);
+
+// *************************************************************************
+/* Get PAL status
+
+  Summary:
+    Function pointer to get the current status of the PRIME PAL module.
+
+  Description:
+    This function pointer is used to get the current status of the PRIME 
+    PAL module.
+
+  Remarks:
+    Related to PRIME PAL.
+*/
+typedef SYS_STATUS (*HAL_PAL_STATUS)(SYS_MODULE_OBJ object);
+
+// ****************************************************************************
+/* Set PAL callback functions
+
+  Summary:
+    Function pointer to set PRIME PAL layer callback functions.
+
+  Description:
+    This function pointer is used to link callback functions between upper 
+    layer and PHY layer.
+
+  Remarks:
+    Related to PRIME PAL.
+*/
+typedef void (*HAL_PAL_CALLBACK_REGISTER)(PAL_CALLBACKS *pCallbacks);
+
+// ****************************************************************************
+/* Transmit message
+
+  Summary:
+    Function pointer to request to transmit a message.
+
+  Description:
+    This functions pointer is used to initiate the transmission process of a 
+    PPDU (PHY Protocol Data Unit) to the medium indicated in the transmission
+    information structure.
+
+  Remarks:
+    Related to PRIME PAL.
+*/
+typedef uint8_t (*HAL_PAL_DATA_REQUEST)(PAL_MSG_REQUEST_DATA *pData);
+
+// ****************************************************************************
+/* Convert QT to SNR
+
+  Summary:
+    Function pointer to convert QT value to Signal Noise Ratio (SNR).
+
+  Description:
+    This function pointer is used to get the value of the Signal to Noise Ratio,
+    defined as the ratio of measured received signal level to noise level of
+    last received PPDU (PHY Protocol Data Unit).
+
+  Remarks:
+    Related to PRIME PAL.
+*/
+typedef uint8_t (*HAL_PAL_GET_SNR)(uint16_t pch, uint8_t *snr, uint8_t qt);
+
+// ****************************************************************************
+/* Get ZCT
+
+  Summary:
+    Function pointer to get the zero-cross time (ZCT).
+
+  Description:
+    This function pointer is used to get the value of the zero-cross time of 
+    the mains and the time between the last transmission or reception and the 
+    zero cross of the mains.
+
+  Remarks:
+    Related to PRIME PAL.
+*/
+typedef uint8_t (*HAL_PAL_GET_ZCT)(uint16_t pch, uint32_t *zct);
+
+// ****************************************************************************
+/* Get current PHY time
+
+  Summary:
+    Function pointer to get the current PHY time in us.
+
+  Description:
+    This function pointer is used to get current PHY time in microseconds.
+
+  Remarks:
+    Related to PRIME PAL.
+*/
+typedef uint8_t (*HAL_PAL_GET_TIMER)(uint16_t pch, uint32_t *timer);
+
+// ****************************************************************************
+/* Get extended PHY time
+
+  Summary:
+    Function pointer to get the extended PHY time in us.
+
+  Description:
+    This function pointer is used to get the extended PHY time in microseconds.
+
+  Remarks:
+    Related to PRIME PAL.
+*/
+typedef uint8_t (*HAL_PAL_GET_TIMER_EXTENDED)(uint16_t pch, uint64_t *timer);
+
+// ****************************************************************************
+/* Get carrier detect
+
+  Summary:
+    Function pointer to get the carrier detect signal.
+
+  Description:
+    This function pointer is used to get the value of carrier detect signal.
+
+  Remarks:
+    Related to PRIME PAL.
+*/
+typedef uint8_t (*HAL_PAL_GET_CD)(uint16_t pch, uint8_t *cd, uint8_t *rssi, 
+    uint32_t *time, uint8_t *header);
+
+// ****************************************************************************
+/* Get noise floor level
+
+  Summary:
+    Function pointer to get the noise floor level value.
+
+  Description:
+    This function pointer is used to know the noise level present in the 
+    powerline.
+
+  Remarks:
+    Related to PRIME PAL.
+*/
+typedef uint8_t (*HAL_PAL_GET_NL)(uint16_t pch, uint8_t *noise);
+
+// ****************************************************************************
+/* Get AGC
+
+  Summary:
+    Function pointer to get the automatic gain mode of the PHY PLC layer.
+
+  Description:
+    This fucntion pointer is used to get Automatic Gain Mode (AGC) of the PHY 
+    PLC layer.
+
+  Remarks:
+    Related to PRIME PAL.
+*/
+typedef uint8_t (*HAL_PAL_GET_AGC)(uint16_t pch, uint8_t *mode, uint8_t *gain);
+
+// ****************************************************************************
+/* Set AGC
+
+  Summary:
+    Function pointer to set the automatic gain mode of the PHY PLC layer.
+
+  Description:
+    This fucntion pointer is used to set Automatic Gain Mode (AGC) of the PHY 
+    PLC layer.
+
+  Remarks:
+    Related to PRIME PAL.
+*/
+typedef uint8_t (*HAL_PAL_SET_AGC)(uint16_t pch, uint8_t mode, uint8_t gain);
+
+// ****************************************************************************
+/* Get clear channel assessment mode
+
+  Summary:
+    Function pointer to get the clear pch assessment mode value.
+
+  Description:
+    This function pointer is used to get the clear pch assesment mode.
+    The pch state helps to know whether or not the RF physical medium is
+    free.
+
+  Remarks:
+    Related to PRIME PAL.
+*/
+typedef uint8_t (*HAL_PAL_GET_CCA)(uint16_t pch, uint8_t *pState);
+
+// ****************************************************************************
+/* Get physical channel
+
+  Summary:
+    Function pointer to get the band (PLC) or the physical channel (RF).
+
+  Description:
+    This function pointer is used to get the physical channel or band used for
+    the communication.
+
+  Remarks:
+    Related to PRIME PAL.
+*/
+typedef uint8_t (*HAL_PAL_GET_CHANNEL)(uint16_t *pch, uint16_t channelReference);
+
+// ****************************************************************************
+/* Set physical channel
+
+  Summary:
+    Function pointer to set the band (PLC) or the physical channel (RF).
+
+  Description:
+    This function pointer is used to set the physical channel or band used for 
+    the communication.
+
+  Remarks:
+    Related to PRIME PAL.
+*/
+typedef uint8_t (*HAL_PAL_SET_CHANNEL)(uint16_t pch);
+
+// ****************************************************************************
+/* Program channel switch
+
+  Summary:
+    Function pointer to program a physical channel switch in the given time.
+
+  Description:
+    This function pointer is used to program a physical channel switch in the 
+    given time.
+
+  Remarks:
+    Related to PRIME PAL.
+*/
+typedef void (*HAL_PAL_PROGRAM_CHANNEL_SWITCH)(uint16_t pch, uint32_t timeSync, 
+    uint8_t timeMode);
+
+// ****************************************************************************
+/* Get PHY attribute
+
+  Summary:
+    Function pointer to get a PHY attribute.
+
+  Description:
+    This function pointer is used to get a PHY attribute from the selected 
+    medium.
+
+  Remarks:
+    Related to PRIME PAL.
+*/
+typedef uint8_t (*HAL_PAL_GET_CONFIGURATION)(uint16_t pch, uint16_t id, 
+    void *val, uint16_t length);
+
+// ****************************************************************************
+/* Set PHY attribute
+
+  Summary:
+    Function pointer to set a PHY attribute.
+
+  Description:
+    This function pointer is used to set a PHY attribute from the selected 
+    medium.
+
+  Remarks:
+    Related to PRIME PAL.
+*/
+typedef uint8_t (*HAL_PAL_SET_CONFIGURATION)(uint16_t pch, uint16_t id, 
+    void *val, uint16_t length);
+
+// ****************************************************************************
+/* Get capture noise data
+
+  Summary:
+    Function pointer to get the Capture Noise Data.
+
+  Description:
+    This function pointer is used to read noise data for PLC medium 
+    communication.
+
+  Remarks:
+    Related to PRIME PAL.
+*/
+typedef uint16_t (*HAL_PAL_GET_SIGNAL_CAPTURE)(uint16_t pch, 
+    uint8_t *noiseCapture, uint8_t mode, uint32_t timeStart, uint32_t duration);
+
+// ****************************************************************************
+/* Get message duration
+
+  Summary:
+    Function pinter to get the  duration.
+
+  Description:
+    This function pointer is used to calculate the message duration.
+
+  Remarks:
+    Related to PRIME PAL.
+*/
+typedef uint8_t (*HAL_PAL_GET_MSG_DURATION)(uint16_t pch, uint16_t length, 
+    PAL_SCHEME scheme, uint8_t mode, uint32_t *duration);
+
+// ****************************************************************************
+/* Check minimum quality
+
+  Summary:
+    Function pointer to check the minimum quality for a given modulation scheme.
+
+  Description:
+    This function pointer is used to check if the modulation is good enough for 
+    a low FER (Frame Error rate) for the given scheme.
+
+  Remarks:
+    Related to PRIME PAL.
+*/
+typedef bool (*HAL_PAL_CHECK_MINIMUM_QUALITY)(uint16_t pch, uint8_t reference, 
+    uint8_t modulation);
+
+// ****************************************************************************
+/* Get less robust modulation
+
+  Summary:
+    Function pointer to get the less robust modulation scheme.
+
+  Description:
+    This function pointer is used to get less robust modulation scheme for a 
+    selected pch.
+
+  Remarks:
+    Related to PRIME PAL.
+*/
+typedef uint8_t (*HAL_PAL_GET_LESS_ROBUST_MODULATION)(uint16_t pch, uint8_t mod1, 
+    uint8_t mod2);
+
+typedef void (*TBD)(void);    /************************************************************** remove when FU completed */
+
 // *****************************************************************************
 /* HAL API functions structure
 
@@ -541,12 +868,6 @@ typedef struct {
     TBD tbd10; //hal_fu_signature_image_check_t fu_signature_image_check;
     TBD tbd11; //hal_fu_signature_image_check_set_callback_t fu_signature_image_check_set_callback;
     TBD tbd12; //hal_fu_get_bitmap_t fu_get_bitmap;
-
-    TBD tbd13; //hal_net_get_freq_t net_get_freq;
-
-    TBD tbd14; //hal_nwk_recovery_init_t nwk_recovery_init;
-    TBD tbd15; //hal_nwk_recovery_read_t nwk_recovery_read;
-    TBD tbd16; //hal_nwk_recovery_write_t nwk_recovery_write;
 
     HAL_PAL_INITIALIZE hal_pal_initialize;
     HAL_PAL_TASKS hal_pal_tasks;
