@@ -125,8 +125,8 @@ void SRV_USER_PIB_Initialize(void)
 <#if DEFAULT_PIB_HANDLING_EN == true>
     /* Store PIB values */
 <#if __PROCESSOR?matches("PIC32CX.*MT.*")>
-<#if (prime_stack_config)??>
-<#if (prime_stack_config.PRIME_MODE == "SN") || (prime_stack_config.PRIME_MODE == "BN" && prime_stack_config.BN_SLAVE_EN == true)>
+<#if (prime_config)??>
+<#if (prime_config.PRIME_MODE == "SN") || (prime_config.PRIME_MODE == "BN" && prime_config.BN_SLAVE_EN == true)>
     srvUserPibValues[PIB_USER_RESET_INFO & 0x000F] = SUPC_GPBRRead(GPBR_REGS_5);
     srvUserPibValues[PIB_USER_PC & 0x000F] = SUPC_GPBRRead(GPBR_REGS_6);
     srvUserPibValues[PIB_USER_LR & 0x000F] = SUPC_GPBRRead(GPBR_REGS_7);
@@ -154,8 +154,8 @@ void SRV_USER_PIB_Initialize(void)
 </#if>
 </#if>
 <#if __PROCESSOR?matches("ATSAME70*")>
-<#if (prime_stack_config)??>
-<#if (prime_stack_config.PRIME_MODE == "SN") || (prime_stack_config.PRIME_MODE == "BN" && prime_stack_config.BN_SLAVE_EN == true)>
+<#if (prime_config)??>
+<#if (prime_config.PRIME_MODE == "SN") || (prime_config.PRIME_MODE == "BN" && prime_config.BN_SLAVE_EN == true)>
     srvUserPibValues[PIB_USER_RESET_INFO & 0x000F] = SUPC_GPBRRead(GPBR_REGS_5);
     srvUserPibValues[PIB_USER_PC & 0x000F] = SUPC_GPBRRead(GPBR_REGS_6);
     srvUserPibValues[PIB_USER_LR & 0x000F] = SUPC_GPBRRead(GPBR_REGS_7);
@@ -185,8 +185,8 @@ void SRV_USER_PIB_Initialize(void)
 
     /* Clear registers (except reset information) */
 <#if __PROCESSOR?matches("PIC32CX.*MT.*")>
-<#if (prime_stack_config)??>
-<#if (prime_stack_config.PRIME_MODE == "SN") || (prime_stack_config.PRIME_MODE == "BN" && prime_stack_config.BN_SLAVE_EN == true)>
+<#if (prime_config)??>
+<#if (prime_config.PRIME_MODE == "SN") || (prime_config.PRIME_MODE == "BN" && prime_config.BN_SLAVE_EN == true)>
     SUPC_GPBRWrite(GPBR_REGS_6, 0);
     SUPC_GPBRWrite(GPBR_REGS_7, 0);
     SUPC_GPBRWrite(GPBR_REGS_8, 0);
@@ -212,8 +212,8 @@ void SRV_USER_PIB_Initialize(void)
 </#if>
 </#if>
 <#if __PROCESSOR?matches("ATSAME70*")>
-<#if (prime_stack_config)??>
-<#if (prime_stack_config.PRIME_MODE == "SN") || (prime_stack_config.PRIME_MODE == "BN" && prime_stack_config.BN_SLAVE_EN == true)>
+<#if (prime_config)??>
+<#if (prime_config.PRIME_MODE == "SN") || (prime_config.PRIME_MODE == "BN" && prime_config.BN_SLAVE_EN == true)>
     SUPC_GPBRWrite(GPBR_REGS_6, 0);
     SUPC_GPBRWrite(GPBR_REGS_7, 0);
 <#else>

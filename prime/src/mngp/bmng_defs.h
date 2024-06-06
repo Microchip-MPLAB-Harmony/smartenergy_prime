@@ -319,7 +319,7 @@ typedef void (*BMNG_FUP_ADD_TARGET_REQUEST)(uint8_t cmd, uint8_t *eui48);
   Remarks:
     The command is acknowledged with the FUP ACK callback.
 */
-typdef void (*BMNG_FUP_SET_FW_DATA_REQUEST)(uint8_t cmd, uint8_t vendorLen, 
+typedef void (*BMNG_FUP_SET_FW_DATA_REQUEST)(uint8_t cmd, uint8_t vendorLen, 
     char *vendor, uint8_t modelLen, char *model, uint8_t versionLen, 
     char *version);
     
@@ -387,7 +387,7 @@ typedef void (*BMNG_FUP_INIT_FILE_TX_REQUEST)(uint8_t cmd, uint16_t frameNumber,
   Remarks:
     The command is acknowledged with the FUP ACK callback.
 */
-typedef void (*BMNG_FUP_DATA_FRAME_REQUEST(uint8_t cmd, uint16_t frameNumber, 
+typedef void (*BMNG_FUP_DATA_FRAME_REQUEST)(uint8_t cmd, uint16_t frameNumber, 
     uint16_t dataLen, uint8_t *data);
 
 // *****************************************************************************

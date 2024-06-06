@@ -636,8 +636,6 @@ static void lPAL_PLC_PLC_ExceptionCb(DRV_PLC_PHY_EXCEPTION exception, uintptr_t 
 // *****************************************************************************
 SYS_MODULE_OBJ PAL_PLC_Initialize(void)
 {
-    uint8_t bufferId;
-
     /* Check previously initialized */
     if (palPlcData.status != PAL_PLC_STATUS_UNINITIALIZED)
     {
