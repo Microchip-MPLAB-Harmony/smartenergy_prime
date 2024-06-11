@@ -49,7 +49,7 @@ Microchip or any third party.
 // *****************************************************************************
 // *****************************************************************************
 
-#include "stack/prime/hal_api/hal_api.h"
+#include "../hal_api/hal_api.h"
 
 // DOM-IGNORE-BEGIN
 #ifdef __cplusplus  // Provide C++ Compatibility

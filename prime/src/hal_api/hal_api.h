@@ -51,18 +51,18 @@ Microchip or any third party.
 
 #include <stdint.h>
 #include <stdbool.h>
-#include "service/storage/srv_storage.h"
-#include "service/user_pib/srv_user_pib.h"
-#include "service/reset_handler/srv_reset_handler.h"
-#include "service/pcrc/srv_pcrc.h"
-#include "service/random/srv_random.h"
-#include "service/log_report/srv_log_report.h"
-#include "service/usi/srv_usi.h"
-#include "service/security/aes_wrapper.h"
-#include "service/security/cipher_wrapper.h"
-#include "service/time_management/srv_time_management.h"
-#include "stack/pal/pal.h"
-#include "stack/pal/pal_types.h"
+#include "../../../service/storage/srv_storage.h"
+#include "../../../service/user_pib/srv_user_pib.h"
+#include "../../../service/reset_handler/srv_reset_handler.h"
+#include "../../service/pcrc/srv_pcrc.h"
+#include "../../service/random/srv_random.h"
+#include "../../service/log_report/srv_log_report.h"
+#include "../../service/usi/srv_usi.h"
+#include "../../service/security/aes_wrapper.h"
+#include "../../service/security/cipher_wrapper.h"
+#include "../../service/time_management/srv_time_management.h"
+#include "../../../pal/pal.h"
+#include "../../../pal/pal_types.h"
 
 // DOM-IGNORE-BEGIN
 #ifdef __cplusplus  // Provide C++ Compatibility
