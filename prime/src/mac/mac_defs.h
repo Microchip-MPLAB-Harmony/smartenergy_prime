@@ -87,6 +87,7 @@ Microchip or any third party.
 #define MAC_BN_DIRECT_CON_HANDLER               3
 #define MAC_BN_DIRECT_CON_ERROR_HANDLER         4
 #define MAC_SN_DIRECT_CON_HANDLER_MSK           0x0080
+#define MAC_RESERVED_HANDLER                    0
 
 // *****************************************************************************
 // *****************************************************************************

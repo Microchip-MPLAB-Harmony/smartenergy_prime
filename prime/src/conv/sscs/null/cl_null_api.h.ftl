@@ -267,7 +267,7 @@ void CL_NULL_ReleaseRequest(uint16_t conHandle);
 
   Example:
     <code>
-	CL_NULL_ReleaseResponse(3, MAC_RELEASE_RESPONSE_ACCEPT);
+	CL_NULL_ReleaseResponse(3, MAC_RELEASE_RESPONSE_ANSWER_ACCEPT);
     </code>
 
   Remarks:
