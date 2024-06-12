@@ -1085,6 +1085,494 @@ uint32_t PRIME_HAL_WRP_GetTimeUS(void);
 */
 SYS_TIME_HANDLE PRIME_HAL_WRP_TIMER_CallbackRegisterUS(SYS_TIME_CALLBACK callback,
     uintptr_t context, uint32_t us, SYS_TIME_CALLBACK_TYPE type);
+    
+//***************************************************************************
+/*
+  Function:
+    void PRIME_HAL_WRP_QueueInit
+    (
+        SRV_QUEUE *queue, 
+        uint16_t capacity, 
+        SRV_QUEUE_TYPE typede
+    )
+
+  Summary:
+    Initializes a queue.
+
+  Description:
+    This function initializes a queue.
+
+  Precondition:
+    None.
+
+  Parameters:
+    queue          - Pointer to the queue to be initialized.
+    capacity       - Maximum number of elements in the queue.
+    type           - Queue type (single or priority queue).
+
+  Returns:
+    None.
+
+  Example:
+    <code>
+    #define NUM_MAX_NODES    750
+    static SRV_QUEUE nodeQueue;
+
+    PRIME_HAL_WRP_QueueInit(&nodeQueue, NUM_MAX_NODES, SRV_QUEUE_TYPE_SINGLE);
+    </code>
+
+  Remarks:
+    Related to Queue service.
+*/
+void PRIME_HAL_WRP_QueueInit(SRV_QUEUE *queue, uint16_t capacity, 
+    SRV_QUEUE_TYPE type);
+
+//***************************************************************************
+/*
+  Function:
+    void PRIME_HAL_WRP_QueueAppend(SRV_QUEUE *queue, 
+                                   SRV_QUEUE_ELEMENT *element)
+
+  Summary:
+    Appends an element into a queue.
+
+  Description:
+    This function appends an element into a queue.
+
+  Precondition:
+    None.
+
+  Parameters:
+    queue          - Pointer to the queue where to append the element.
+    element        - Pointer to the element to be appended.
+
+  Returns:
+    None.
+
+  Example:
+    <code>
+    #define NUM_MAX_NODES    750
+    typedef struct _node_info_tag
+    {
+        struct _node_info_tag *prev;
+        struct _node_info_tag *next;
+        uint8_t macAddress[8]
+    } NODE_INFO;
+
+    static SRV_QUEUE nodeQueue;
+    static NODE_INFO nodeInfo;
+
+    PRIME_HAL_WRP_QueueInit(&nodeQueue, NUM_MAX_NODES, SRV_QUEUE_TYPE_SINGLE);
+    memset(nodeInfo.macAddress, 0xFF, 8);
+    PRIME_HAL_WRP_QueueAppend(&nodeQueue, (SRV_QUEUE_ELEMENT *)&nodeInfo);
+    </code>
+
+  Remarks:
+    Related to Queue service.
+*/
+void PRIME_HAL_WRP_QueueAppend(SRV_QUEUE *queue, SRV_QUEUE_ELEMENT *element);
+
+//***************************************************************************
+/*
+  Function:
+    void PRIME_HAL_WRP_QueueAppend_With_Priority
+    (
+        SRV_QUEUE *queue, 
+        uint32_t priority,
+        SRV_QUEUE_ELEMENT *element
+    )
+
+  Summary:
+    Appends an element into a priority queue.
+
+  Description:
+    This function appends an element into a priority queue.
+
+  Precondition:
+    None.
+
+  Parameters:
+    queue          - Pointer to the queue where to append the element.
+    priority       - Priority of the element to be appended.
+    element        - Pointer to the element to be appended.
+
+  Returns:
+    None.
+
+  Example:
+    <code>
+    #define NUM_MAX_NODES    750
+    typedef struct node_info
+    {
+        SRV_QUEUE_ELEMENT queueElement;
+        uint8_t macAddress[8]
+    } NODE_INFO;
+
+    static SRV_QUEUE nodeQueue;
+    static NODE_INFO nodeInfo;
+
+    PRIME_HAL_WRP_QueueInit(&nodeQueue, NUM_MAX_NODES, SRV_QUEUE_TYPE_PRIORITY);
+    memset(nodeInfo.macAddress, 0xFF, 8);
+    PRIME_HAL_WRP_QueueAppend_With_Priority(&nodeQueue, 3, &nodeInfo.queueElement);
+    </code>
+
+  Remarks:
+    Related to Queue service.
+*/
+void PRIME_HAL_WRP_QueueAppend_With_Priority(SRV_QUEUE *queue, 
+    uint32_t priority, SRV_QUEUE_ELEMENT *element);
+
+//***************************************************************************
+/*
+  Function:
+    void PRIME_HAL_WRP_QueueInsert_Before(SRV_QUEUE *queue,
+                                 SRV_QUEUE_ELEMENT *currentElement,
+                                 SRV_QUEUE_ELEMENT *element)
+
+  Summary:
+    Inserts an element into a queue before a given element.
+
+  Description:
+    This function inserts an element into a queue before a given element.
+
+  Precondition:
+    None.
+
+  Parameters:
+    queue          - Pointer to the queue where to insert the element.
+    currentElement - Pointer to an element in the queue.
+    element        - Pointer to the element to be inserted.
+
+  Returns:
+    None.
+
+  Example:
+    <code>
+    #define NUM_MAX_NODES    750
+    typedef struct _node_info_tag
+    {
+        struct _node_info_tag *prev;
+        struct _node_info_tag *next;
+        uint8_t macAddress[8]
+    } NODE_INFO;
+
+    static SRV_QUEUE nodeQueue;
+    static NODE_INFO nodeInfo1;
+    static NODE_INFO nodeInfo2;
+
+    PRIME_HAL_WRP_QueueInit(&nodeQueue, NUM_MAX_NODES, SRV_QUEUE_TYPE_SINGLE);
+    memset(nodeInfo1.macAddress, 0xFF, 8);
+    PRIME_HAL_WRP_QueueAppend(&nodeQueue, (SRV_QUEUE_ELEMENT *)&nodeInfo1);
+    memset(nodeInfo2.macAddress, 0xEE, 8);
+    PRIME_HAL_WRP_QueueInsert_Before(&nodeQueue, (SRV_QUEUE_ELEMENT *)&nodeInfo1,
+                            (SRV_QUEUE_ELEMENT *)&nodeInfo2);
+    </code>
+
+  Remarks:
+    Related to Queue service.
+*/
+void PRIME_HAL_WRP_QueueInsert_Before(SRV_QUEUE *queue,
+    SRV_QUEUE_ELEMENT *currentElement, SRV_QUEUE_ELEMENT *element);
+
+//***************************************************************************
+/*
+  Function:
+    void PRIME_HAL_WRP_QueueInsert_After(SRV_QUEUE *queue,
+                                SRV_QUEUE_ELEMENT *currentElement,
+                                SRV_QUEUE_ELEMENT *element)
+
+  Summary:
+    Inserts an element into a queue after a given element.
+
+  Description:
+    This function inserts an element into a queue after a given element.
+
+  Precondition:
+    None.
+
+  Parameters:
+    queue          - Pointer to the queue where to insert the element.
+    currentElement - Pointer to an element in the queue.
+    element        - Pointer to the element to be inserted.
+
+  Returns:
+    None.
+
+  Example:
+    <code>
+    #define NUM_MAX_NODES    750
+    typedef struct _node_info_tag
+    {
+        struct _node_info_tag *prev;
+        struct _node_info_tag *next;
+        uint8_t macAddress[8]
+    } NODE_INFO;
+
+    static SRV_QUEUE nodeQueue;
+    static NODE_INFO nodeInfo1;
+    static NODE_INFO nodeInfo2;
+
+    PRIME_HAL_WRP_QueueInit(&nodeQueue, NUM_MAX_NODES, SRV_QUEUE_TYPE_SINGLE);
+    memset(nodeInfo1.macAddress, 0xFF, 8);
+    PRIME_HAL_WRP_QueueAppend(&nodeQueue, (SRV_QUEUE_ELEMENT *)&nodeInfo1);
+    memset(nodeInfo2.macAddress, 0xEE, 8);
+    PRIME_HAL_WRP_QueueInsert_After(&nodeQueue, (SRV_QUEUE_ELEMENT *)&nodeInfo1,
+                           (SRV_QUEUE_ELEMENT *)&nodeInfo2);
+    </code>
+
+  Remarks:
+    Related to Queue service.
+*/
+void PRIME_HAL_WRP_QueueInsert_After(SRV_QUEUE *queue,
+    SRV_QUEUE_ELEMENT *currentElement, SRV_QUEUE_ELEMENT *element);
+
+//***************************************************************************
+/*
+  Function:
+    PRIME_HAL_WRP_QueueELEMENT *PRIME_HAL_WRP_QueueRead_Or_Remove
+    (
+        SRV_QUEUE *queue,
+        SRV_QUEUE_MODE accessMode,
+        SRV_QUEUE_POSITION position)
+
+  Summary:
+    Reads or removes an element from a queue.
+
+  Description:
+    This function reads or removes an element from a queue.
+
+  Precondition:
+    None.
+
+  Parameters:
+    queue      - Pointer to the queue from which the element must be read or
+                 removed.
+    accessMode - Access mode (read or remove).
+    position   - Position in the queue to read or remove (head or tail).
+
+  Returns:
+    In case of remove, the element will be removed from queue and returned.
+    In case of read, the element will be returned without removing it from
+    the queue.
+    If the queue is empty, NULL is returned.
+
+  Example:
+    <code>
+    #define NUM_MAX_NODES    750
+    typedef struct _node_info_tag
+    {
+        struct _node_info_tag *prev;
+        struct _node_info_tag *next;
+        uint8_t macAddress[8]
+    } NODE_INFO;
+
+    static SRV_QUEUE nodeQueue;
+    static NODE_INFO nodeInfo;
+    NODE_INFO *removedNode;
+
+    PRIME_HAL_WRP_QueueInit(&nodeQueue, NUM_MAX_NODES, SRV_QUEUE_TYPE_SINGLE);
+    memset(nodeInfo.macAddress, 0xFF, 8);
+    PRIME_HAL_WRP_QueueAppend(&nodeQueue, (SRV_QUEUE_ELEMENT *)&nodeInfo);
+    removedNode = PRIME_HAL_WRP_QueueRead_Or_Remove(&nodeQueue, 
+                    SRV_QUEUE_MODE_REMOVE, SRV_QUEUE_POSITION_HEAD);
+    </code>
+
+  Remarks:
+    Related to Queue service.
+*/
+SRV_QUEUE_ELEMENT *PRIME_HAL_WRP_QueueRead_Or_Remove(SRV_QUEUE *queue,
+    SRV_QUEUE_MODE accessMode, SRV_QUEUE_POSITION position);
+
+//***************************************************************************
+/*
+  Function:
+    SRV_QUEUE_ELEMENT *PRIME_HAL_WRP_QueueRead_Element(SRV_QUEUE *queue,
+                                              uint16_t elementIndex)
+
+  Summary:
+    Reads an element from a queue at the given index.
+
+  Description:
+    This function reads an element from a queue at the given index.
+
+  Precondition:
+    The queue must have been initialized previously with
+    function SRV_QUEUE_Init.
+
+  Parameters:
+    queue        - Pointer to the queue from which the element must be read.
+    elementIndex - Position of the element in the queue.
+
+  Returns:
+    Pointer to the queue element.
+    If the queue is empty, NULL is returned.
+
+  Example:
+    <code>
+    #define NUM_MAX_NODES    750
+    typedef struct _node_info_tag
+    {
+        struct _node_info_tag *prev;
+        struct _node_info_tag *next;
+        uint8_t macAddress[8]
+    } NODE_INFO;
+
+    static SRV_QUEUE nodeQueue;
+    static NODE_INFO nodeInfo1;
+    static NODE_INFO nodeInfo2;
+    NODE_INFO *nodeInfo3;
+
+    PRIME_HAL_WRP_QueueInit(&nodeQueue, NUM_MAX_NODES, SRV_QUEUE_TYPE_SINGLE);
+    memset(nodeInfo1.macAddress, 0xFF, 8);
+    PRIME_HAL_WRP_QueueAppend(&nodeQueue, (SRV_QUEUE_ELEMENT *)&nodeInfo1);
+    memset(nodeInfo2.macAddress, 0xEE, 8);
+    PRIME_HAL_WRP_QueueInsert_After(&nodeQueue, (SRV_QUEUE_ELEMENT *)&nodeInfo1,
+                           (SRV_QUEUE_ELEMENT *)&nodeInfo2);
+    nodeInfo3 = PRIME_HAL_WRP_QueueRead_Element(&nodeQueue, 2);
+    </code>
+
+  Remarks:
+    Related to Queue service.
+*/
+SRV_QUEUE_ELEMENT *PRIME_HAL_WRP_QueueRead_Element(SRV_QUEUE *queue,
+    uint16_t elementIndex);
+
+//***************************************************************************
+/*
+  Function:
+    void PRIME_HAL_WRP_QueueRemove_Element(SRV_QUEUE *queue, 
+                                           SRV_QUEUE_ELEMENT *element)
+
+  Summary:
+    Removes the given element from a queue.
+
+  Description:
+    This function removes a given element from a queue.
+
+  Precondition:
+    None.
+
+  Parameters:
+    queue   - Pointer to the queue from which the element must be removed.
+    element - Element to be removed.
+
+  Returns:
+    None.
+
+  Example:
+    <code>
+    #define NUM_MAX_NODES    750
+    typedef struct _node_info_tag
+    {
+        struct _node_info_tag *prev;
+        struct _node_info_tag *next;
+        uint8_t macAddress[8]
+    } NODE_INFO;
+
+    static SRV_QUEUE nodeQueue;
+    static NODE_INFO nodeInfo;
+
+    PRIME_HAL_WRP_QueueInit(&nodeQueue, NUM_MAX_NODES, SRV_QUEUE_TYPE_SINGLE);
+    memset(nodeInfo.macAddress, 0xFF, 8);
+    PRIME_HAL_WRP_QueueAppend(&nodeQueue, (SRV_QUEUE_ELEMENT *)&nodeInfo);
+    PRIME_HAL_WRP_QueueRemove_Element(&nodeQueue, (SRV_QUEUE_ELEMENT *)&nodeInfo);
+    </code>
+
+  Remarks:
+    Related to Queue service.
+*/
+void PRIME_HAL_WRP_QueueRemove_Element(SRV_QUEUE *queue, 
+    SRV_QUEUE_ELEMENT *element);
+
+//***************************************************************************
+/*
+  Function:
+    void PRIME_HAL_WRP_QueueFlush(SRV_QUEUE *queue)
+
+  Summary:
+    Flushes the given queue.
+
+  Description:
+    This function flushes the given queue.
+
+  Precondition:
+    None.
+
+  Parameters:
+    queue          - Pointer to the queue to be flushed.
+
+  Returns:
+    None.
+
+  Example:
+    <code>
+    #define NUM_MAX_NODES    750
+    typedef struct _node_info_tag
+    {
+        struct _node_info_tag *prev;
+        struct _node_info_tag *next;
+        uint8_t macAddress[8]
+    } NODE_INFO;
+
+    static SRV_QUEUE nodeQueue;
+    static node_info_t nodeInfo;
+
+    PRIME_HAL_WRP_QueueInit(&nodeQueue, NUM_MAX_NODES, SRV_QUEUE_TYPE_SINGLE);
+    memset(nodeInfo.macAddress, 0xFF, 8);
+    PRIME_HAL_WRP_QueueAppend(&nodeQueue, (SRV_QUEUE_ELEMENT *)&nodeInfo);
+    PRIME_HAL_WRP_QueueFlush(&nodeQueue);
+    </code>
+
+  Remarks:
+    Related to Queue service.
+*/
+void PRIME_HAL_WRP_QueueFlush(SRV_QUEUE *queue);
+
+//***************************************************************************
+/*
+  Function:
+    void PRIME_HAL_WRP_QueueSet_Capacity(SRV_QUEUE *queue, uint16_t capacity)
+
+  Summary:
+    Modifies the total capacity of a queue.
+
+  Description:
+    This function modifies the total capacity of a queue.
+
+  Precondition:
+    The queue must have been initialized previously with
+    function SRV_QUEUE_Init.
+
+  Parameters:
+    queue          - Pointer to the queue.
+    capacity       - New capacity of the queue.
+
+  Returns:
+    None.
+
+  Example:
+    <code>
+    #define NUM_MAX_NODES    750
+    typedef struct _node_info_tag
+    {
+        struct _node_info_tag *prev;
+        struct _node_info_tag *next;
+        uint8_t macAddress[8]
+    } NODE_INFO;
+
+    static SRV_QUEUE nodeQueue;
+    static node_info_t nodeInfo;
+
+    PRIME_HAL_WRP_QueueInit(&nodeQueue, NUM_MAX_NODES, SRV_QUEUE_TYPE_SINGLE);
+    memset(nodeInfo.macAddress, 0xFF, 8);
+    PRIME_HAL_WRP_QueueAppend(&nodeQueue, (SRV_QUEUE_ELEMENT *)&nodeInfo);
+    PRIME_HAL_WRP_QueueSet_Capacity(&nodeQueue, (NUM_MAX_NODES + 10));
+    </code>
+
+  Remarks:
+    Related to Queue service.
+*/
+void PRIME_HAL_WRP_QueueSet_Capacity(SRV_QUEUE *queue, uint16_t capacity);
 
 // /** \brief Firmware Upgrade Interface */
 // /* @{ */

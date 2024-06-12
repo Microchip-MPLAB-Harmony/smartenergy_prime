@@ -61,6 +61,7 @@ Microchip or any third party.
 #include "../../service/security/aes_wrapper.h"
 #include "../../service/security/cipher_wrapper.h"
 #include "../../service/time_management/srv_time_management.h"
+#include "../../service/queue/srv_queue.h"
 #include "../../../pal/pal.h"
 #include "../../../pal/pal_types.h"
 
@@ -428,10 +429,11 @@ typedef uint32_t (*HAL_TIMER_GetTimeUS)(void);
     once or repeatedly).
 
   Description:
-    This function pointer creates a timer object and registers a function with 
-    it to be called back when the requested delay (specified in microseconds) 
-    has completed. The caller must identify if the timer should call the 
-    function once or repeatedly every time the given delay period expires.
+    This function pointer is used to create a timer object and registers a 
+    function with it to be called back when the requested delay (specified in 
+    microseconds) has completed. The caller must identify if the timer should 
+    call the function once or repeatedly every time the given delay period 
+    expires.
 
   Remarks:
     Related to Time Management service.
@@ -441,6 +443,155 @@ typedef SYS_TIME_HANDLE (*HAL_TIMER_CallbackRegisterUS)(
     SYS_TIME_CALLBACK callback, uintptr_t context, uint32_t us, 
     SYS_TIME_CALLBACK_TYPE type);
 
+//***************************************************************************
+/* Queue initialization
+
+  Summary:
+    Function pointer to initialize a queue.
+
+  Description:
+    This function pointer is used to initialize a queue.
+
+  Remarks:
+    Related to Queue service.
+*/
+typedef void (*HAL_QUEUE_INIT)(SRV_QUEUE *queue, uint16_t capacity, 
+    SRV_QUEUE_TYPE type);
+
+//***************************************************************************
+/* Queue append
+
+  Summary:
+    Function pointer to append an element into a queue.
+
+  Description:
+    This function pointer is used to append an element into a queue.
+   
+  Remarks:
+    Related to Queue service.
+*/
+typedef void (*HAL_QUEUE_APPEND)(SRV_QUEUE *queue, SRV_QUEUE_ELEMENT *element);
+
+//***************************************************************************
+/* Queue append with priority
+
+  Summary:
+    Function pointer to append an element into a priority queue.
+
+  Description:
+    This function pointer is used to append an element into a priority queue.
+
+  Remarks:
+    Related to Queue service.
+*/
+typedef void (*HAL_QUEUE_APPEND_WITH_PRIORITY)(SRV_QUEUE *queue, uint32_t priority,
+    SRV_QUEUE_ELEMENT *element);
+
+//***************************************************************************
+/* Insert before
+ 
+  Summary:
+    Function pointer to insert an element into a queue before a given element.
+
+  Description:
+    This function pointer is used to insert an element into a queue before a 
+    given element.
+
+  Remarks:
+    Related to Queue service.
+*/
+typedef void (*HAL_QUEUE_INSERT_BEFORE)(SRV_QUEUE *queue,
+    SRV_QUEUE_ELEMENT *currentElement, SRV_QUEUE_ELEMENT *element);
+
+//***************************************************************************
+/* Insert after
+
+  Summary:
+    Function pointer to insert an element into a queue after a given element.
+
+  Description:
+    This function pointer is used to insert an element into a queue after a 
+    given element.
+
+  Remarks:
+    Related to Queue service.
+*/
+typedef void (*HAL_QUEUE_INSERT_AFTER)(SRV_QUEUE *queue,
+    SRV_QUEUE_ELEMENT *currentElement, SRV_QUEUE_ELEMENT *element);
+
+//***************************************************************************
+/* Read or remove
+  
+  Summary:
+    Function pointer to read or remove an element from a queue.
+
+  Description:
+    This function pointer is used to read or remove an element from a queue.
+
+  Remarks:
+    Related to Queue service.
+*/
+typedef SRV_QUEUE_ELEMENT *(*HAL_QUEUE_READ_OR_REMOVE)(SRV_QUEUE *queue,
+    SRV_QUEUE_MODE accessMode, SRV_QUEUE_POSITION position);
+
+//***************************************************************************
+/* Read with index
+
+  Summary:
+    Function pointer to read an element from a queue at the given index.
+
+  Description:
+    This function pointer is used to read an element from a queue at the
+    given index.
+
+  Remarks:
+    Related to Queue service.
+*/
+typedef SRV_QUEUE_ELEMENT *(*HAL_QUEUE_READ_ELEMENT)(SRV_QUEUE *queue,
+    uint16_t elementIndex);
+
+//***************************************************************************
+/* Remove element
+
+  Summary:
+    Function pointer to remove the given element from a queue.
+
+  Description:
+    This function pointer is used to remove a given element from a queue.
+
+  Remarks:
+    Related to Queue service.
+*/
+typedef void (*HAL_QUEUE_REMOVE_ELEMENT)(SRV_QUEUE *queue, 
+    SRV_QUEUE_ELEMENT *element);
+
+//***************************************************************************
+/* Queue flush
+
+  Summary:
+    Function pointer to flush the given queue.
+
+  Description:
+    This function pointer is used to flush the given queue.
+
+  Remarks:
+    Related to Queue service.
+*/
+typedef void (*HAL_QUEUE_FLUSH)(SRV_QUEUE *queue);
+
+//***************************************************************************
+/* Set queue capacity
+
+  Summary:
+    Function pointer to modify the total capacity of a queue.
+
+  Description:
+    This function pointer is used to modify the total capacity of a queue.
+
+  Remarks:
+    Related to Queue service.
+*/
+typedef void (*HAL_QUEUE_SET_CAPACITY)(SRV_QUEUE *queue, uint16_t capacity);
 
 // Related to FU service - TBD
 // typedef void (*hal_fu_data_read_t)(uint32_t addr, uint8_t *puc_buf, uint16_t us_size);
@@ -855,6 +1006,17 @@ typedef struct {
     HAL_TIMER_GetTimeUS64 timer_get_us64;
     HAL_TIMER_GetTimeUS timer_get_us;
     HAL_TIMER_CallbackRegisterUS timer_callback_register_us;
+    
+    HAL_QUEUE_INIT queue_init;
+    HAL_QUEUE_APPEND queue_append;
+    HAL_QUEUE_APPEND_WITH_PRIORITY queue_append_with_priority;
+    HAL_QUEUE_INSERT_BEFORE queue_insert_before;
+    HAL_QUEUE_INSERT_AFTER queue_insert_after;
+    HAL_QUEUE_READ_OR_REMOVE queue_read_or_remove;
+    HAL_QUEUE_READ_ELEMENT queue_read_element;
+    HAL_QUEUE_REMOVE_ELEMENT queue_remove_element;
+    HAL_QUEUE_FLUSH queue_flush;
+    HAL_QUEUE_SET_CAPACITY queue_set_capacity;
 
     TBD tbd1; //hal_fu_data_read_t fu_data_read;
     TBD tbd2; //hal_fu_data_write_t fu_data_write;

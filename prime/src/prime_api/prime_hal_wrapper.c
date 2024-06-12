@@ -205,6 +205,63 @@ SYS_TIME_HANDLE PRIME_HAL_WRP_TIMER_CallbackRegisterUS(SYS_TIME_CALLBACK callbac
     return pPrimeHalApi->timer_callback_register_us(callback, context, us, type);
 }
 
+void PRIME_HAL_WRP_QueueInit(SRV_QUEUE *queue, uint16_t capacity, 
+    SRV_QUEUE_TYPE type)
+{
+    pPrimeHalApi->queue_init(queue, capacity, type);
+}
+
+void PRIME_HAL_WRP_QueueAppend(SRV_QUEUE *queue, SRV_QUEUE_ELEMENT *element)
+{
+    pPrimeHalApi->queue_append(queue, element);
+}
+
+void PRIME_HAL_WRP_QueueAppend_With_Priority(SRV_QUEUE *queue, 
+    uint32_t priority, SRV_QUEUE_ELEMENT *element)
+{
+    pPrimeHalApi->queue_append_with_priority(queue, priority, element);
+}
+
+void PRIME_HAL_WRP_QueueInsert_Before(SRV_QUEUE *queue,
+    SRV_QUEUE_ELEMENT *currentElement, SRV_QUEUE_ELEMENT *element)
+{
+    pPrimeHalApi->queue_insert_before(queue, currentElement, element);
+}
+
+void PRIME_HAL_WRP_QueueInsert_After(SRV_QUEUE *queue,
+    SRV_QUEUE_ELEMENT *currentElement, SRV_QUEUE_ELEMENT *element)
+{
+    pPrimeHalApi->queue_insert_after(queue, currentElement, element);
+}
+
+SRV_QUEUE_ELEMENT *PRIME_HAL_WRP_QueueRead_Or_Remove(SRV_QUEUE *queue,
+    SRV_QUEUE_MODE accessMode, SRV_QUEUE_POSITION position)
+{
+    return pPrimeHalApi->queue_read_or_remove(queue, accessMode, position);
+}
+
+SRV_QUEUE_ELEMENT *PRIME_HAL_WRP_QueueRead_Element(SRV_QUEUE *queue,
+    uint16_t elementIndex)
+{
+    return pPrimeHalApi->queue_read_element(queue, elementIndex);
+}
+
+void PRIME_HAL_WRP_QueueRemove_Element(SRV_QUEUE *queue, 
+    SRV_QUEUE_ELEMENT *element)
+{
+    pPrimeHalApi->queue_remove_element(queue, element);
+}
+
+void PRIME_HAL_WRP_QueueFlush(SRV_QUEUE *queue)
+{
+    pPrimeHalApi->queue_flush(queue);
+}
+
+void PRIME_HAL_WRP_QueueSet_Capacity(SRV_QUEUE *queue, uint16_t capacity)
+{
+    pPrimeHalApi->queue_set_capacity(queue, capacity);
+}
+
 SYS_MODULE_OBJ PRIME_HAL_WRP_PAL_Initialize(const SYS_MODULE_INDEX index)
 {
     return pPrimeHalApi->hal_pal_initialize(index);

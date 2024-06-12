@@ -111,6 +111,17 @@ const HAL_API primeHalAPI = {
     SRV_TIME_MANAGEMENT_GetTimeUS64,
     SRV_TIME_MANAGEMENT_GetTimeUS,
     SRV_TIME_MANAGEMENT_CallbackRegisterUS,
+    
+    SRV_QUEUE_Init,
+    SRV_QUEUE_Append,
+    SRV_QUEUE_Append_With_Priority,
+    SRV_QUEUE_Insert_Before,
+    SRV_QUEUE_Insert_After,
+    SRV_QUEUE_Read_Or_Remove,
+    SRV_QUEUE_Read_Element,
+    SRV_QUEUE_Remove_Element,
+    SRV_QUEUE_Flush,
+    SRV_QUEUE_Set_Capacity,
 
     NULL, //hal_fu_data_read,
     NULL, //hal_fu_data_write,
