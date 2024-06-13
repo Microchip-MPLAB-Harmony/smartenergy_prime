@@ -64,6 +64,20 @@ Microchip or any third party.
 
 // *****************************************************************************
 // *****************************************************************************
+// Section: Macros
+// *****************************************************************************
+// *****************************************************************************
+
+/* PRIME versions */
+#define PRIME_VERSION_1_3           1
+#define PRIME_VERSION_1_4           2    
+
+/* PRIME mode */
+#define PRIME_MODE_BN               1
+#define PRIME_MODE_SN               2
+
+// *****************************************************************************
+// *****************************************************************************
 // Section: Data Types
 // *****************************************************************************
 // *****************************************************************************
@@ -93,6 +107,161 @@ typedef enum
     SRV_STORAGE_TYPE_END_LIST
 
 } SRV_STORAGE_TYPE;
+
+// *****************************************************************************
+/* MAC configuration information
+
+  Summary:
+    Structure and key to define the MAC configuration information that needs to
+    be kept in non-volatile storage.
+
+  Description:
+    This data type defines the structure and key to define the MAC configuration 
+    information used by the PRIME stack that needs to be kept in non-volatile 
+    storage.
+
+  Remarks:
+    None
+*/
+
+#define SRV_STORAGE_MAC_CONFIG_KEY      0xAA55
+
+typedef struct {
+	uint16_t cfgKey;
+	uint8_t mac[6];
+} SRV_STORAGE_MAC_CONFIG;
+
+// *****************************************************************************
+/* PHY configuration information
+
+  Summary:
+    Structure and key to define the PHY configuration information that needs to
+    be kept in non-volatile storage.
+
+  Description:
+    This data type defines the structure and key to define the PHY configuration 
+    information used by the PRIME stack that needs to be kept in non-volatile 
+    storage.
+
+  Remarks:
+    None
+*/
+
+#define SRV_STORAGE_PHY_CONFIG_KEY      0xAA99
+
+typedef struct {
+	uint16_t cfgKey;
+	uint16_t rfChannel;
+	uint8_t txrxChannel;
+	uint8_t txrxChannelList;
+	uint8_t txrxDoubleChannelList;
+} SRV_STORAGE_PHY_CONFIG;
+
+// *****************************************************************************
+/* Base Node configuration information
+
+  Summary:
+    Structure and key to define the Base Node configuration information that 
+    needs to be kept in non-volatile storage.
+
+  Description:
+    This data type defines the structure and key to define the Base Node 
+    configuration information used by the PRIME stack that needs to be kept in 
+    non-volatile storage.
+
+  Remarks:
+    None
+*/
+
+#define SRV_STORAGE_BN_INFO_CONFIG_KEY_13    0xAA55
+#define SRV_STORAGE_BN_INFO_CONFIG_KEY_14    0xAA66
+
+typedef struct {
+	uint16_t cfgKey;
+	uint16_t macLnidOffset;
+	uint8_t confSar;
+	uint8_t confModBcnAuto;
+	uint8_t confRmForced;
+	uint8_t confBcnSwitchRate;
+	uint8_t confSecProf;
+} SRV_STORAGE_BN_INFO_CONFIG;
+
+// *****************************************************************************
+/* PRIME board configuration information
+
+  Summary:
+    Structure and key to define the PRIME board configuration information that 
+    needs to be kept in non-volatile storage.
+
+  Description:
+    This data type defines the structure and key to define the PRIME board 
+    configuration information used by the PRIME stack as well as the user 
+    application that needs to be kept in non-volatile storage.
+    PRIME version indicates the PRIME version protocol (PRIME_VERSION_1_3 or
+    PRIME_VERSION_1_4).
+    The board mode indicates the board function (PRIME_MODE_BN or PRIME_MODE_SN).
+
+  Remarks:
+    None
+*/
+
+#define SRV_STORAGE_PRIME_MODE_INFO_CONFIG_KEY    0xA55A
+
+typedef struct {
+	uint16_t cfgKey;
+	uint8_t primeVersion;
+	uint8_t boardMode;
+} SRV_STORAGE_PRIME_MODE_INFO_CONFIG;
+
+// *****************************************************************************
+/* Security configuration information
+
+  Summary:
+    Structure and key to define the security configuration information that 
+    needs to be kept in non-volatile storage.
+
+  Description:
+    This data type defines the structure and key to define the security 
+    configuration information used by the PRIME stack that needs to be kept in 
+    non-volatile storage.
+
+  Remarks:
+    None
+*/
+
+#define SRV_STORAGE_SEC_CONFIG_KEY      0x5AA5
+
+typedef struct {
+	uint16_t cfgKey;
+	uint8_t duk[16];
+} SRV_STORAGE_SEC_CONFIG;
+
+// *****************************************************************************
+/* Boot configuration information
+
+  Summary:
+    Structure and key to define the boot configuration information that needs to 
+    be kept in non-volatile storage.
+
+  Description:
+    This data type defines the structure and key to define the boot configuration 
+    information used by the Firmware Upgrade service and the PRIME Bootloader
+    application that needs to be kept in non-volatile storage.
+
+  Remarks:
+    None
+*/
+
+#define SRV_STORAGE_BOOT_CONFIG_KEY     0x55AA55AA
+
+typedef struct {
+	uint32_t cfgKey;
+	uint32_t imgSize;
+	uint32_t origAddr;
+	uint32_t destAddr;
+	uint8_t pagesCounter;
+	uint8_t bootState;
+} x_boot_info_cfg_t;
 
 // *****************************************************************************
 // *****************************************************************************
