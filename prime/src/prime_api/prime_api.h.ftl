@@ -50,6 +50,7 @@ Microchip or any third party.
 // *****************************************************************************
 // *****************************************************************************
 #include "prime_api_types.h"
+#include "stack/prime/prime_api/prime_hal_wrapper.h"
 
 </#if>
 // DOM-IGNORE-BEGIN
@@ -73,6 +74,33 @@ Microchip or any third party.
 #define PRIME_PIB_MODEL          0x${PRIME_PIB_MODEL}
 
 </#if>
+
+// *****************************************************************************
+// *****************************************************************************
+// Section: Data Types
+// *****************************************************************************
+// *****************************************************************************
+
+// *****************************************************************************
+/* PRIME API Init Structure
+
+   Summary:
+    Initialization data for PRIME API to be provided on Initialize routine.
+
+   Description:
+    Defines application data required in the PRIME stack.
+
+   Remarks:
+    None.
+*/
+typedef struct
+{
+    /* PAL index from configuration */
+    uint8_t palIndex;
+    /* HAL API pointer */
+    HAL_API *halApi;
+} PRIME_API_INIT;
+
 // *****************************************************************************
 // *****************************************************************************
 // Section: PRIME API Control Interface Routines
@@ -85,7 +113,7 @@ void PRIME_API_GetPrime14API(PRIME_API **pPrimeApi);
 <#else>
 // *****************************************************************************
 /* Function:
-    void PRIME_API_Initialize(void *halApi)
+    void PRIME_API_Initialize(PRIME_API_INIT *init)
 
   Summary:
     Initializes the PRIME stack.
@@ -97,21 +125,27 @@ void PRIME_API_GetPrime14API(PRIME_API **pPrimeApi);
     None.
 
   Parameters:
-    halApi      - Pointer to the HAL API functions
+    init  - Pointer to the init data structure containing any data necessary to
+            initialize the module.
 
   Returns:
     None.
 
   Example:
     <code>
-    PRIME_API_Initialize((HAL_API*)&halApi);
+    PRIME_API_INIT init;
+    
+    init.palIndex = PRIME_PAL_INDEX;
+    init.halApi = (HAL_API*)&halApi;
+    
+    PRIME_API_Initialize((&init);
     </code>
 
   Remarks:
     This routine is normally not called directly by an application. The 
     PRIME application must use the function located in the header table.
 */
-void PRIME_API_Initialize(void *halApi);
+void PRIME_API_Initialize(PRIME_API_INIT *init);
 
 // ****************************************************************************
 /* Function:

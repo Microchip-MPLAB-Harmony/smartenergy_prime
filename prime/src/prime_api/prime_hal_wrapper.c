@@ -98,7 +98,6 @@ bool PRIME_HAL_WRP_SetConfigInfo(SRV_STORAGE_TYPE infoType, uint8_t size,
     return pPrimeHalApi->set_config_info(infoType, size, pData);
 }
 
-
 SRV_USI_HANDLE PRIME_HAL_WRP_UsiOpen(const SYS_MODULE_INDEX index)
 {
     return pPrimeHalApi->usi_open(index);

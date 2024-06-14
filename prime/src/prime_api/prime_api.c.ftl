@@ -71,7 +71,7 @@ void PRIME_API_GetPrime14API(PRIME_API **pPrimeApi)
 #include "stack/prime/mngp/mngp.h"
 #include "stack/prime/conv/sscs/null/cl_null.h"
 #include "stack/prime/conv/sscs/null/cl_null_api.h"
-//#include "stack/prime/conv/sscs/iec_4_32/cl_432.h"
+#include "stack/prime/conv/sscs/iec_4_32/cl_432.h"
 #include "stack/prime/conv/sscs/iec_4_32/cl_432_api.h"
 <#if PRIME_MODE == "BN" && BN_SLAVE_EN == false>
 #include "stack/prime/mngp/bmng_api.h"
@@ -178,6 +178,9 @@ const PRIME_API PRIME_API_Interface =
   </#if> 
 };
 
+/* Object obtained from PAL Initialize */
+static SYS_MODULE_OBJ palSysObj;
+
 // *****************************************************************************
 // *****************************************************************************
 // Section: File scope functions
@@ -238,12 +241,13 @@ static void lPRIME_API_SetPrimeVersion(MAC_VERSION_INFO *macInfo)
 
 // *****************************************************************************
 // *****************************************************************************
-// Section: CRC Service Interface Implementation
+// Section: PRIME API Interface Implementation
 // *****************************************************************************
 // *****************************************************************************
-void PRIME_API_Initialize(void *halApi)
+void PRIME_API_Initialize(PRIME_API_INIT *init)
 {
     MAC_VERSION_INFO macInfo;
+    PAL_STATUS palStatus;
 
     /* Set critical region */
     __set_BASEPRI( 2 << (8 - __NVIC_PRIO_BITS));
@@ -253,20 +257,23 @@ void PRIME_API_Initialize(void *halApi)
   </#if>
 
     /* Set PRIME HAL wrapper */
-    PRIME_HAL_WRP_Configure((HAL_API*)halApi);
+    PRIME_HAL_WRP_Configure(init->halApi);
 
     /* Set PRIME version from configuration */
     lPRIME_API_SetPrimeVersion(&macInfo);
+    
+    /* Initialize PAL layer */
+    palSysObj = PRIME_HAL_WRP_PAL_Initialize(init->palIndex);
 
-//	/* Initialize MAC layer */
-//	MAC_Initialize(&macInfo, (uint8_t)MAC_SECURITY_PROFILE);
-//
-//	/* Initialize Convergence layers */
-//	CL_NULL_Initialize();
-//	CL_432_Initialize();
-//
-//	/* Initialize Management Plane */
-//	MNGP_Initialize(&macInfo, (uint8_t)MNGP_SPROF_USI_PORT);
+    /* Initialize MAC layer */
+    MAC_Initialize(&macInfo, (uint8_t)MAC_SECURITY_PROFILE);
+
+    /* Initialize Convergence layers */
+    CL_NULL_Initialize();
+    CL_432_Initialize();
+
+    /* Initialize Management Plane */
+    MNGP_Initialize(&macInfo, (uint8_t)MNGP_SPROF_USI_PORT);
 
     /* Set critical region */
     __set_BASEPRI(0);
@@ -276,13 +283,16 @@ void PRIME_API_Tasks(void)
 {
     /* Set critical region */
     __set_BASEPRI( 3 << (8 - __NVIC_PRIO_BITS));
+    
+    /* Proccess PAL layer */
+    PRIME_HAL_WRP_PAL_Tasks(palSysObj);
 
-//	/* Process MAC layer */
-//	MAC_Tasks();
+	/* Process MAC layer */
+	MAC_Tasks();
 
   <#if (PRIME_MODE == "SN") || (PRIME_MODE == "BN" && BN_SLAVE_EN == true)>
-//	/* Process Management Plane */
-//	MNGP_Tasks();
+	/* Process Management Plane */
+	MNGP_Tasks();
   </#if>
 
     /* Set critical region */
