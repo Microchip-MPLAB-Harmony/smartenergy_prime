@@ -189,22 +189,6 @@ bool PRIME_HAL_WRP_AesUnwrapKey(const uint8_t *key, uint32_t keyLen,
     return pPrimeHalApi->aes_unwrap_key(key, keyLen, in, inLen, out);
 }
 
-uint64_t PRIME_HAL_WRP_GetTimeUS64(void)
-{
-    return pPrimeHalApi->timer_get_us64();
-}
-
-uint32_t PRIME_HAL_WRP_GetTimeUS(void)
-{
-    return pPrimeHalApi->timer_get_us();
-}
-
-SYS_TIME_HANDLE PRIME_HAL_WRP_TIMER_CallbackRegisterUS(SYS_TIME_CALLBACK callback,
-    uintptr_t context, uint32_t us, SYS_TIME_CALLBACK_TYPE type)
-{
-    return pPrimeHalApi->timer_callback_register_us(callback, context, us, type);
-}
-
 void PRIME_HAL_WRP_QueueInit(SRV_QUEUE *queue, uint16_t capacity, 
     SRV_QUEUE_TYPE type)
 {

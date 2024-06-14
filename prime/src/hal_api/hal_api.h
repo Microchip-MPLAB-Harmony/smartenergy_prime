@@ -60,7 +60,6 @@ Microchip or any third party.
 #include "../../service/usi/srv_usi.h"
 #include "../../service/security/aes_wrapper.h"
 #include "../../service/security/cipher_wrapper.h"
-#include "../../service/time_management/srv_time_management.h"
 #include "../../service/queue/srv_queue.h"
 #include "../../../pal/pal.h"
 #include "../../../pal/pal_types.h"
@@ -387,61 +386,6 @@ typedef void (*HAL_AES_WRAP_KEY)(const uint8_t *key, uint32_t keyLen,
 */
 typedef bool (*HAL_AES_UNWRAP_KEY)(const uint8_t *key, uint32_t keyLen, const uint8_t *in,
     uint32_t inLen, uint8_t *out);
-
-// *****************************************************************************
-/* Get the time in a 64 bit variable in microseconds
-
-  Summary:
-    Function pointer to get the value of a counter and convert it in a 64 bit
-    variable in microseconds.
-
-  Description:
-    This function pointer is used to get the value of a counter and convert it
-    in a 64 bit variable in microseconds.
-
-  Remarks:
-    Related to Time Management service.
-*/
-typedef uint64_t (*HAL_TIMER_GetTimeUS64)(void);
-
-// *****************************************************************************
-/* Get the time in a 32 bit variable in microseconds
-
-  Summary:
-    Function pointer to get the value of a counter and convert it in a 32 bit
-    variable in microseconds.
-
-  Description:
-    This function pointer is used to get the value of a counter and convert it
-    in a 32 bit variable in microseconds.
-
-  Remarks:
-    Related to Time Management service.
-*/
-typedef uint32_t (*HAL_TIMER_GetTimeUS)(void);
-
-// *****************************************************************************
-/* Register a callback function with the time system service
-
-  Summary:
-    Function pointer to register a function with the time system service to be 
-    called back when the requested number of microseconds have expired (either 
-    once or repeatedly).
-
-  Description:
-    This function pointer is used to create a timer object and registers a 
-    function with it to be called back when the requested delay (specified in 
-    microseconds) has completed. The caller must identify if the timer should 
-    call the function once or repeatedly every time the given delay period 
-    expires.
-
-  Remarks:
-    Related to Time Management service.
-
-*/
-typedef SYS_TIME_HANDLE (*HAL_TIMER_CallbackRegisterUS)(
-    SYS_TIME_CALLBACK callback, uintptr_t context, uint32_t us, 
-    SYS_TIME_CALLBACK_TYPE type);
 
 //***************************************************************************
 /* Queue initialization
@@ -1002,10 +946,6 @@ typedef struct {
     HAL_AES_CCM_AUTH_DECRYPT aes_ccm_auth_decrypt;
     HAL_AES_WRAP_KEY aes_wrap_key;
     HAL_AES_UNWRAP_KEY aes_unwrap_key;
-
-    HAL_TIMER_GetTimeUS64 timer_get_us64;
-    HAL_TIMER_GetTimeUS timer_get_us;
-    HAL_TIMER_CallbackRegisterUS timer_callback_register_us;
     
     HAL_QUEUE_INIT queue_init;
     HAL_QUEUE_APPEND queue_append;

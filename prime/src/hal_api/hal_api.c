@@ -107,10 +107,6 @@ const HAL_API primeHalAPI = {
     CIPHER_Wrapper_AesCcmAuthDecrypt,
     AES_Wrapper_WrapKey,
     AES_Wrapper_UnwrapKey,
-
-    SRV_TIME_MANAGEMENT_GetTimeUS64,
-    SRV_TIME_MANAGEMENT_GetTimeUS,
-    SRV_TIME_MANAGEMENT_CallbackRegisterUS,
     
     SRV_QUEUE_Init,
     SRV_QUEUE_Append,
