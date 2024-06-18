@@ -1266,8 +1266,7 @@ SRV_QUEUE_ELEMENT *PRIME_HAL_WRP_QueueRead_Or_Remove(SRV_QUEUE *queue,
     This function reads an element from a queue at the given index.
 
   Precondition:
-    The queue must have been initialized previously with
-    function SRV_QUEUE_Init.
+    None.
 
   Parameters:
     queue        - Pointer to the queue from which the element must be read.
@@ -1410,8 +1409,7 @@ void PRIME_HAL_WRP_QueueFlush(SRV_QUEUE *queue);
     This function modifies the total capacity of a queue.
 
   Precondition:
-    The queue must have been initialized previously with
-    function SRV_QUEUE_Init.
+    None.
 
   Parameters:
     queue          - Pointer to the queue.
@@ -1444,23 +1442,406 @@ void PRIME_HAL_WRP_QueueFlush(SRV_QUEUE *queue);
 */
 void PRIME_HAL_WRP_QueueSet_Capacity(SRV_QUEUE *queue, uint16_t capacity);
 
-// /** \brief Firmware Upgrade Interface */
-// /* @{ */
-// void prime_hal_fu_data_read(uint32_t addr, uint8_t *puc_buf, uint16_t us_size);
-// uint8_t prime_hal_fu_data_write(uint32_t addr, uint8_t *puc_buf, uint16_t us_size);
-// void prime_hal_fu_data_cfg_read(void *pv_dst, uint16_t us_size);
-// uint8_t prime_hal_fu_data_cfg_write(void *pv_src, uint16_t us_size);
-// void prime_hal_fu_start(hal_fu_info_t *x_fu_info);
-// void prime_hal_fu_end(hal_fu_result_t uc_hal_res);
-// void prime_hal_fu_revert(void);
-// void prime_hal_fu_crc_calculate(void);
-// void prime_hal_fu_crc_set_callback(void (*p_handler)(uint32_t ul_crc));
-// uint16_t prime_hal_fu_get_bitmap(uint8_t *puc_bitmap, uint32_t *pus_num_rcv_pages);
-// void prime_hal_fu_signature_image_check(void);
-// void prime_hal_fu_signature_image_check_set_callback(void (*p_handler)(hal_fu_verif_result_t uc_result));
-// void prime_hal_swap_stack(uint8_t uc_traffic);
-// /* @} */
+// ****************************************************************************
+/* Function:
+    void PRIME_HAL_WRP_FuStart(SRV_FU_INFO *fuInfo)
 
+  Summary:
+    Starts the firmware upgrade process. 
+
+  Description:
+    This function is used to start the firmware upgrade process by initializing
+    and unlocking the memory.
+
+  Precondition:
+    None.
+
+  Parameters:
+    fuInfo    - Pointer to the firmware upgrade information
+
+  Returns:
+    None.
+
+  Example:
+    <code>
+    SRV_FU_INFO fuInfo;
+    
+    fuInfo.imageSize = 0x1000;
+    fuInfo.pageSize = 192;
+    fuInfo.signAlgorithm = SRV_FU_SIGNATURE_ALGO_NO_SIGNATURE;
+    fuInfo.signLength = 0;
+    
+    PRIME_HAL_WRP_FuStart(&fuInfo);    
+    </code>
+
+  Remarks:
+    Related to Firmware Upgrade service.
+*/
+void PRIME_HAL_WRP_FuStart(SRV_FU_INFO *fuInfo);
+
+// ****************************************************************************
+/* Function:
+   void PRIME_HAL_WRP_FuEnd(SRV_FU_RESULT fuResult)
+
+  Summary:
+    Ends the firmware upgrade process. 
+
+  Description:
+    This function is used to finish the firmare upgrade process and to trigger the
+    execution of the new firmware.
+
+  Precondition:
+    None.
+
+  Parameters:
+    fuResult    - Result of the firmware upgrade process
+
+  Returns:
+    None.
+
+  Example:
+    <code>
+    PRIME_HAL_WRP_FuEnd(SRV_FU_RESULT_SUCCESS);
+    </code>
+
+  Remarks:
+    Related to Firmware Upgrade service.
+*/
+void PRIME_HAL_WRP_FuEnd(SRV_FU_RESULT fuResult);
+
+// ****************************************************************************
+/* Function:
+   void PRIME_HAL_WRP_FuCfgRead(void *dst, uint16_t size)
+
+  Summary:
+    Reads the firmware upgrade information.
+
+  Description:
+    This function is used to read the firmare upgrade information, which is 
+    stored out of the PRIME stack.
+
+  Precondition:
+    None.
+
+  Parameters:
+    dst    - Pointer to the buffer to store the information
+    size   - Number of bytes to read
+
+  Returns:
+    None.
+
+  Example:
+    <code>
+    uint32_t fuData[3];
+    PRIME_HAL_WRP_FuCfgRead(&fuData, sizeof(fuData));
+    </code>
+
+  Remarks:
+    Related to Firmware Upgrade service.
+*/
+void PRIME_HAL_WRP_FuCfgRead(void *dst, uint16_t size);
+
+// ****************************************************************************
+/* Function:
+   void PRIME_HAL_WRP_FuCfgWrite(void *src, uint16_t size)
+
+  Summary:
+    Writes the firmware upgrade information.
+
+  Description:
+    This function is used to write the firmare upgrade information, which is 
+    stored out of the PRIME stack.
+
+  Precondition:
+    None.
+
+  Parameters:
+    src    - Pointer to the buffer with the information to write
+    size   - Number of bytes to write
+
+  Returns:
+    1 if there is no error, otherwise returns 0.
+
+  Example:
+    <code>
+    uint32_t fuData[3];
+    PRIME_HAL_WRP_FuCfgWrite(&fuData, sizeof(fuData));
+    </code>
+
+  Remarks:
+    Related to Firmware Upgrade service.
+*/
+uint8_t PRIME_HAL_WRP_FuCfgWrite(void *src, uint16_t size);
+
+// ****************************************************************************
+/* Function:
+   void PRIME_HAL_WRP_FuDataRead(uint32_t addr, uint8_t *buf, uint16_t size)
+
+  Summary:
+    Reads image from memory.
+
+  Description:
+    This function is used to read the image from memory.
+
+  Precondition:
+    None.
+
+  Parameters:
+    addr   - Image address to read
+    dst    - Pointer to the buffer to store the information
+    size   - Number of bytes to read
+
+  Returns:
+    None.
+
+  Example:
+    <code>
+    uint32_t image[100];
+    PRIME_HAL_WRP_FuDataRead(x0100, &image, sizeof(image));
+    </code>
+
+  Remarks:
+    Related to Firmware Upgrade service.
+*/
+void PRIME_HAL_WRP_FuDataRead(uint32_t addr, uint8_t *buf, uint16_t size);
+
+// ****************************************************************************
+/* Function:
+   uint8_t PRIME_HAL_WRP_FuDataWrite(uint32_t addr, uint8_t *buf, uint16_t size)
+
+  Summary:
+    Writes image in memory.
+
+  Description:
+    This function is used to write the image in memory.
+
+  Precondition:
+    None.
+
+  Parameters:
+    addr   - Image address to write
+    dst    - Pointer to the buffer with the information
+    size   - Number of bytes to write
+
+  Returns:
+    1 if there is no error, otherwise returns 0.
+
+  Example:
+    <code>
+    uint32_t image[100];
+    PRIME_HAL_WRP_FuDataWrite(x0100, &image, sizeof(image));
+    </code>
+
+  Remarks:
+    Related to Firmware Upgrade service.
+*/
+uint8_t PRIME_HAL_WRP_FuDataWrite(uint32_t addr, uint8_t *buf, uint16_t size);
+
+// ****************************************************************************
+/* Function:
+    void PRIME_HAL_WRP_FuRegisterCallbackCrc(SRV_FU_CRC_CB callback)
+
+  Summary:
+    Registers a function to be called back when the CRC of the received image
+    has been calculated.
+
+  Description:
+    This function allows the PRIME stack to register a function to be called 
+    back when the CRC of the received image has been calculated.
+
+  Precondition:
+   None.
+
+  Parameters:
+    callback       - Pointer to the callback function
+
+  Returns:
+    None.
+
+  Example:
+    <code>
+    void _check_crc(uint32_t crc)
+    {
+        ...
+    }
+
+    void main(void)
+    {
+        SRV_FU_Initialize();
+
+        PRIME_HAL_WRP_FuRegisterCallbackCrc(_check_crc);
+    }
+    </code>
+
+  Remarks:
+    Related to Firmware Upgrade service.
+*/
+void PRIME_HAL_WRP_FuRegisterCallbackCrc(SRV_FU_CRC_CB callback);
+
+// ****************************************************************************
+/* Function:
+   void PRIME_HAL_WRP_FuCalculateCrc(void)
+
+  Summary:
+    Calculates the CRC of the received image.
+
+  Description:
+    This function is used to calculate the CRC of the received image.
+
+  Precondition:
+    None.
+
+  Parameters:
+    None.
+
+  Returns:
+    None.
+
+  Example:
+    <code>
+    PRIME_HAL_WRP_FuCalculateCrc();
+    </code>
+
+  Remarks:
+    Related to Firmware Upgrade service.
+*/
+void PRIME_HAL_WRP_FuCalculateCrc(void);
+
+// ****************************************************************************
+/* Function:
+    void PRIME_HAL_WRP_FuRegisterCallbackVerify(SRV_FU_IMAGE_VERIFY_CB callback)
+
+  Summary:
+    Registers a function to be called back when the received image has been 
+    verified.
+
+  Description:
+    This function allows the PRIME stack to register a function to be called 
+    back when the received image has been verified.
+
+  Precondition:
+    None.
+
+  Parameters:
+    callback       - Pointer to the callback function
+
+  Returns:
+    None.
+
+  Example:
+    <code>
+    void _image_verification(SRV_FU_VERIFY_RESULT verifyResult)
+    {
+        ...
+    }
+
+    void main(void)
+    {
+        SRV_FU_Initialize();
+
+        PRIME_HAL_WRP_FuRegisterCallbackVerify(_image_verification);
+    }
+    </code>
+
+  Remarks:
+    Related to Firmware Upgrade service.
+*/
+void PRIME_HAL_WRP_FuRegisterCallbackVerify(SRV_FU_IMAGE_VERIFY_CB callback);
+
+// ****************************************************************************
+/* Function:
+   void PRIME_HAL_WRP_FuVerifyImage(void)
+
+  Summary:
+    Verifies the received image.
+
+  Description:
+    This function is used to verify the received image. Metadata and signature,
+    if available, are checked.
+
+  Precondition:
+    None.
+
+  Parameters:
+    None.
+
+  Returns:
+    None.
+
+  Example:
+    <code>
+    PRIME_HAL_WRP_FuVerifyImage();
+    </code>
+
+  Remarks:
+    Related to Firmware Upgrade service.
+*/
+void PRIME_HAL_WRP_FuVerifyImage(void);
+
+// ****************************************************************************
+/* Function:
+   uint16_t PRIME_HAL_WRP_FuGetBitmap(uint8_t *bitmap, uint32_t *numRxPages)
+
+  Summary:
+    Gets the bitmap with the information about the status of each page of the 
+    image.
+
+  Description:
+    This function is used to gets the bitmap with the information about the 
+    status of each page of the image.
+
+  Precondition:
+    None.
+
+  Parameters:
+    bitmap        - Pointer to the bitmap information
+    numRxPages    - Pointer to the number of pages received
+
+  Returns:
+    Size of bitmap. Maximum value is 1024 bytes. In case of returning 0, the 
+    bitmap buffer will be initialized internally in the PRIME stack.
+
+  Example:
+    <code>
+    uint8_t bitmap[1024];
+    uint32_t numPages = 0;
+    
+    PRIME_HAL_WRP_FuGetBitmap(&bitmap, &numPages);
+    </code>
+
+  Remarks:
+    Related to Firmware Upgrade service.
+*/
+uint16_t PRIME_HAL_WRP_FuGetBitmap(uint8_t *bitmap, uint32_t *numRxPages);
+
+// ****************************************************************************
+/* Function:
+   void PRIME_HAL_WRP_FuSwap(SRV_FU_TRAFFIC_VERSION trafficVersion)
+
+  Summary:
+    Requests to swap the PRIME stack version.
+
+  Description:
+    This function is used to request to swap the PRIME stack version.
+
+  Precondition:
+    None.
+
+  Parameters:
+    None.
+
+  Returns:
+    None.
+
+  Example:
+    <code>
+    PRIME_HAL_WRP_FuSwap(SRV_FU_TRAFFIC_VERSION_PRIME_1_3);
+    </code>
+
+  Remarks:
+    Related to Firmware Upgrade service.
+*/
+void PRIME_HAL_WRP_FuSwap(SRV_FU_TRAFFIC_VERSION trafficVersion);
 
 // ****************************************************************************
 /* Function:

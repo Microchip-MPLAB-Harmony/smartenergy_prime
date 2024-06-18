@@ -61,6 +61,7 @@ Microchip or any third party.
 #include "../../service/security/aes_wrapper.h"
 #include "../../service/security/cipher_wrapper.h"
 #include "../../service/queue/srv_queue.h"
+#include "../../../service/firmware_upgrade/srv_firmware_upgrade.h"
 #include "../../../pal/pal.h"
 #include "../../../pal/pal_types.h"
 
@@ -537,20 +538,184 @@ typedef void (*HAL_QUEUE_FLUSH)(SRV_QUEUE *queue);
 */
 typedef void (*HAL_QUEUE_SET_CAPACITY)(SRV_QUEUE *queue, uint16_t capacity);
 
-// Related to FU service - TBD
-// typedef void (*hal_fu_data_read_t)(uint32_t addr, uint8_t *puc_buf, uint16_t us_size);
-// typedef uint8_t (*hal_fu_data_write_t)(uint32_t addr, uint8_t *puc_buf, uint16_t us_size);
-// typedef void (*hal_fu_data_cfg_read_t)(void *pv_dst, uint16_t us_size);
-// typedef uint8_t (*hal_fu_data_cfg_write_t)(void *pv_src, uint16_t us_size);
-// typedef void (*hal_fu_start_t)(hal_fu_info_t *x_fu_info);
-// typedef void (*hal_fu_end_t)(hal_fu_result_t uc_hal_res);
-// typedef void (*hal_fu_revert_t)(void);
-// typedef void (*hal_fu_crc_calculate_t)(void);
-// typedef void (*hal_fu_crc_set_callback_t)(void (*p_handler)(uint32_t ul_crc));
-// typedef void (*hal_fu_signature_image_check_t)(void);
-// typedef void (*hal_fu_signature_image_check_set_callback_t)(void (*p_handler)(hal_fu_verif_result_t uc_result));
-// typedef uint16_t (*hal_fu_get_bitmap_t)(uint8_t *puc_bitmap, uint32_t *pus_num_rcv_pages);
-// typedef void (*hal_swap_stack_t)(uint8_t uc_traffic);
+// ****************************************************************************
+/* Start FU
+
+  Summary:
+    Function pointer to start the firmware upgrade process. 
+
+  Description:
+    This function pointer is used to start the firmware upgrade process by 
+    initializing and unlocking the memory.
+
+  Remarks:
+    Related to Firmware Upgrade service.
+*/
+typedef void (*HAL_FU_START)(SRV_FU_INFO *fuInfo);
+
+// ****************************************************************************
+/* End FU
+
+  Summary:
+    Function pointer to end the firmware upgrade process. 
+
+  Description:
+    This function pointer is used to finish the firmare upgrade process and to 
+    trigger the execution of the new firmware.
+
+  Remarks:
+    Related to Firmware Upgrade service.
+*/
+typedef void (*HAL_FU_END)(SRV_FU_RESULT fuResult);
+
+// ****************************************************************************
+/* Read FU information
+
+  Summary:
+    Function pointer to read the firmware upgrade information.
+
+  Description:
+    This function pointer is used to read the firmare upgrade information, which 
+    is stored out of the PRIME stack.
+
+  Remarks:
+    Related to Firmware Upgrade service.
+*/
+typedef void (*HAL_FU_CFG_READ)(void *dst, uint16_t size);
+
+// ****************************************************************************
+/* Write FU information
+
+  Summary:
+    Function pointer to write the firmware upgrade information.
+
+  Description:
+    This function pointer is used to write the firmare upgrade information, which 
+    is stored out of the PRIME stack.
+
+  Remarks:
+    Related to Firmware Upgrade service.
+*/
+typedef uint8_t (*HAL_FU_CFG_WRITE)(void *src, uint16_t size);
+
+// ****************************************************************************
+/* Read image
+
+  Summary:
+    Function pointer to read image from memory.
+
+  Description:
+    This function pointer is used to read the image from memory.
+
+  Remarks:
+    Related to Firmware Upgrade service.
+*/
+typedef void (*HAL_FU_DATA_READ)(uint32_t addr, uint8_t *buf, uint16_t size);
+
+// ****************************************************************************
+/* Write image
+
+  Summary:
+    Function pointer to write image in memory.
+
+  Description:
+    This function pointer is used to write the image in memory.
+
+  Remarks:
+    Related to Firmware Upgrade service.
+*/
+typedef uint8_t (*HAL_FU_DATA_WRITE)(uint32_t addr, uint8_t *buf, uint16_t size);
+
+// ****************************************************************************
+/* Callback for CRC
+
+  Summary:
+    Function pointer to register a function to be called back when the CRC of 
+    the received image has been calculated.
+
+  Description:
+    This function pointer allows the PRIME stack to register a function to be 
+    called back when the CRC of the received image has been calculated.
+
+  Remarks:
+    Related to Firmware Upgrade service.
+*/
+typedef void (*HAL_FU_REGISTER_CRC_CB)(SRV_FU_CRC_CB callback);
+
+// ****************************************************************************
+/* Calculate CRC
+
+  Summary:
+    Function pointer to calculate the CRC of the received image.
+
+  Description:
+    This function pointer is used to calculate the CRC of the received image.
+
+  Remarks:
+    Related to Firmware Upgrade service.
+*/
+typedef void (*HAL_FU_CALCULATE_CRC)(void);
+
+// ****************************************************************************
+/* Callback for verification
+
+  Summary:
+    Function pointer to register a function to be called back when the received 
+    image has been verified.
+
+  Description:
+    This function pointer allows the PRIME stack to register a function to be 
+    called back when the received image has been verified.
+
+  Remarks:
+    Related to Firmware Upgrade service.
+*/
+typedef void (*HAL_FU_REGISTER_VERIFY_CB)(SRV_FU_IMAGE_VERIFY_CB callback);
+
+// ****************************************************************************
+/* Verify image
+
+  Summary:
+    Function pointer to verify the received image.
+
+  Description:
+    This function pointer is used to verify the received image. Metadata and 
+    signature, if available, are checked.
+
+  Remarks:
+    Related to Firmware Upgrade service.
+*/
+typedef void (*HAL_FU_VERIFY_IMAGE)(void);
+
+// ****************************************************************************
+/* Get bitmap
+
+  Summary:
+    Function pointer to get the bitmap with the information about the status of 
+    each page of the image.
+
+  Description:
+    This function pointer is used to gets the bitmap with the information about 
+    the status of each page of the image.
+
+  Remarks:
+    Related to Firmware Upgrade service.
+*/
+typedef uint16_t (*HAL_FU_GET_BITMAP)(uint8_t *bitmap, uint32_t *numRxPages);
+
+// ****************************************************************************
+/* Swap stack
+
+  Summary:
+    Function pointer to request to swap the PRIME stack version.
+
+  Description:
+    This function pointer is used to request to swap the PRIME stack version.
+
+  Remarks:
+    Related to Firmware Upgrade service.
+*/
+typedef void (*HAL_FU_SWAP)(SRV_FU_TRAFFIC_VERSION trafficVersion);
 
 // *****************************************************************************
 /*  Initializes PAL 
@@ -904,8 +1069,6 @@ typedef bool (*HAL_PAL_CHECK_MINIMUM_QUALITY)(uint16_t pch, uint8_t reference,
 typedef uint8_t (*HAL_PAL_GET_LESS_ROBUST_MODULATION)(uint16_t pch, uint8_t mod1, 
     uint8_t mod2);
 
-typedef void (*TBD)(void);    /************************************************************** remove when FU completed */
-
 // *****************************************************************************
 /* HAL API functions structure
 
@@ -957,19 +1120,19 @@ typedef struct {
     HAL_QUEUE_REMOVE_ELEMENT queue_remove_element;
     HAL_QUEUE_FLUSH queue_flush;
     HAL_QUEUE_SET_CAPACITY queue_set_capacity;
-
-    TBD tbd1; //hal_fu_data_read_t fu_data_read;
-    TBD tbd2; //hal_fu_data_write_t fu_data_write;
-    TBD tbd3; //hal_fu_data_cfg_read_t fu_data_cfg_read;
-    TBD tbd4; //hal_fu_data_cfg_write_t fu_data_cfg_write;
-    TBD tbd5; //hal_fu_start_t fu_start;
-    TBD tbd6; //hal_fu_end_t fu_end;
-    TBD tbd7; //hal_fu_revert_t fu_revert;
-    TBD tbd8; //hal_fu_crc_calculate_t fu_crc_calculate;
-    TBD tbd9; //hal_fu_crc_set_callback_t fu_crc_set_callback;
-    TBD tbd10; //hal_fu_signature_image_check_t fu_signature_image_check;
-    TBD tbd11; //hal_fu_signature_image_check_set_callback_t fu_signature_image_check_set_callback;
-    TBD tbd12; //hal_fu_get_bitmap_t fu_get_bitmap;
+    
+    HAL_FU_START fu_start;
+    HAL_FU_END fu_end;
+    HAL_FU_CFG_READ fu_cfg_read;
+    HAL_FU_CFG_WRITE fu_cfg_write; 
+    HAL_FU_DATA_READ fu_data_read;
+    HAL_FU_DATA_WRITE fu_data_write;
+    HAL_FU_REGISTER_CRC_CB fu_register_callback_crc;
+    HAL_FU_CALCULATE_CRC fu_calculate_crc;
+    HAL_FU_REGISTER_VERIFY_CB fu_register_callback_verify;
+    HAL_FU_VERIFY_IMAGE fu_verify_image;
+    HAL_FU_GET_BITMAP fu_get_bitmap;
+    HAL_FU_SWAP fu_swap;
 
     HAL_PAL_INITIALIZE hal_pal_initialize;
     HAL_PAL_TASKS hal_pal_tasks;
