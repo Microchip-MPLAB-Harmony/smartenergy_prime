@@ -86,10 +86,9 @@ void PRIME_API_GetPrime14API(PRIME_API **pPrimeApi)
 /* PIC32CXMT */
 #define __NVIC_PRIO_BITS         4
   <#if (PRIME_MODE == "BN" && BN_SLAVE_EN == false)>
-#define NUM_MAX_NODES            ${NUM_MAX_NODES}
+//#define NUM_MAX_NODES            ${NUM_MAX_NODES}
   </#if>
 #define MAC_SECURITY_PROFILE     ${MAC_SECURITY_PROFILE}
-#define MNGP_SPROF_USI_PORT      ${MNGP_SPROF_USI_PORT}
   <#if (MAC_SNIFFER_EN?? && MAC_SNIFFER_EN == true)>
 #define MAC_SNIFFER_USI_PORT     ${MAC_SNIFFER_USI_PORT}
   </#if>
@@ -116,65 +115,65 @@ const PRIME_API PRIME_API_Interface =
     .version = PRIME_FW_VERSION,
     .Initialize = PRIME_API_Initialize,
     .Tasks = PRIME_API_Tasks,
-    // .MacSetCallbacks = CL_NULL_SetCallbacks,     
-    // .MacEstablishRequest = CL_NULL_EstablishRequest, 
-    // .MacEstablishResponse = CL_NULL_EstablishResponse,
-    // .MacReleaseRequest = CL_NULL_ReleaseRequest,
-    // .MacReleaseResponse = CL_NULL_ReleaseResponse,
+    .MacSetCallbacks = CL_NULL_SetCallbacks,     
+    .MacEstablishRequest = CL_NULL_EstablishRequest, 
+    .MacEstablishResponse = CL_NULL_EstablishResponse,
+    .MacReleaseRequest = CL_NULL_ReleaseRequest,
+    .MacReleaseResponse = CL_NULL_ReleaseResponse,
   <#if PRIME_MODE == "BN" && BN_SLAVE_EN == false>
-    // .MacRedirectResponse = CL_NULL_RedirectResponse;
+    .MacRedirectResponse = CL_NULL_RedirectResponse;
   </#if>
-    // .MacJoinRequest = CL_NULL_JoinRequest,
-    // .MacJoinResponse = CL_NULL_JoinResponse,
-    // .MacLeaveRequest = CL_NULL_LeaveRequest,
-    // .MacDataRequest = CL_NULL_DataRequest,
-    // .PlmeResetRequest = CL_NULL_PlmeResetRequest,
-    // .PlmeSleepRequest = CL_NULL_PlmeSleepRequest,
-    // .PlmeResumeRequest = CL_NULL_PlmeResumeRequest,
-    // .PlmeTestModeRequest = CL_NULL_PlmeTestModeRequest,
-    // .PlmeGetRequest = CL_NULL_PlmeGetRequest,
-    // .PlmeSetRequest = CL_NULL_PlmeSetRequest,
+    .MacJoinRequest = CL_NULL_JoinRequest,
+    .MacJoinResponse = CL_NULL_JoinResponse,
+    .MacLeaveRequest = CL_NULL_LeaveRequest,
+    .MacDataRequest = CL_NULL_DataRequest,
+    .PlmeResetRequest = CL_NULL_PlmeResetRequest,
+    .PlmeSleepRequest = CL_NULL_PlmeSleepRequest,
+    .PlmeResumeRequest = CL_NULL_PlmeResumeRequest,
+    .PlmeTestModeRequest = CL_NULL_PlmeTestModeRequest,
+    .PlmeGetRequest = CL_NULL_PlmeGetRequest,
+    .PlmeSetRequest = CL_NULL_PlmeSetRequest,
   <#if (PRIME_MODE == "SN") || (PRIME_MODE == "BN" && BN_SLAVE_EN == true)>
-    // .MlmeRegisterRequest = CL_NULL_MlmeRegisterRequest,
-    // .MlmeUnregisterRequest = CL_NULL_MlmeUnregisterRequest;
+    .MlmeRegisterRequest = CL_NULL_MlmeRegisterRequest,
+    .MlmeUnregisterRequest = CL_NULL_MlmeUnregisterRequest;
   </#if>
-    // .MlmePromoteRequest = CL_NULL_MlmePromoteRequest,    
-    // .MlmeMpPromoteRequest = CL_NULL_MlmeMpPromoteRequest,
+    .MlmePromoteRequest = CL_NULL_MlmePromoteRequest,    
+    .MlmeMpPromoteRequest = CL_NULL_MlmeMpPromoteRequest,
   <#if (PRIME_MODE == "SN") || (PRIME_MODE == "BN" && BN_SLAVE_EN == true)>
-    // .MlmeDemoteRequest = CL_NULL_MlmeDemoteRequest;
-    // .MlmeMpDemoteRequest = CL_NULL_MlmeMpDemoteRequest;
+    .MlmeDemoteRequest = CL_NULL_MlmeDemoteRequest;
+    .MlmeMpDemoteRequest = CL_NULL_MlmeMpDemoteRequest;
   </#if>
-    // .MlmeResetRequest = CL_NULL_MlmeResetRequest,
-    // .MlmeGetRequest = CL_NULL_MlmeGetRequest,
-    // .MlmeListGetRequest = CL_NULL_MlmeListGetRequest,
-    // .MlmeSetRequest = CL_NULL_MlmeSetRequest,
-    // .Cl432SetCallbacks = CL_432_SetCallbacks,
-    // .Cl432EstablishRequest = CL_432_EstablishRequest,
-    // .Cl432ReleaseRequest = CL_432_ReleaseRequest,
-    // .Cl432DlDataRequest = CL_432_DlDataRequest,
+    .MlmeResetRequest = CL_NULL_MlmeResetRequest,
+    .MlmeGetRequest = CL_NULL_MlmeGetRequest,
+    .MlmeListGetRequest = CL_NULL_MlmeListGetRequest,
+    .MlmeSetRequest = CL_NULL_MlmeSetRequest,
+    .Cl432SetCallbacks = CL_432_SetCallbacks,
+    .Cl432EstablishRequest = CL_432_EstablishRequest,
+    .Cl432ReleaseRequest = CL_432_ReleaseRequest,
+    .Cl432DlDataRequest = CL_432_DlDataRequest,
   <#if PRIME_MODE == "BN" && BN_SLAVE_EN == false>
-    // .BmngSetCallbacks = BMNG_SetCallbacks,
-    // .BmngFupClearTargetListRequest = BMNG_FUP_ClearTargetListRequest;
-    // .BmngFupAddTargetRequest = BMNG_FUP_AddTargetRequest;
-    // .BmngFupSetFwDataRequest = BMNG_FUP_SetFwDataRequest;
-    // .BmngFupSetUpgradeOptionsRequest = BMNG_FUP_SetUpgradeOptionsRequest;
-    // .BmngFupInitFileTxRequest = BMNG_FUP_InitFileTxRequest;
-    // .BmngFupDataFrameRequest = BMNG_FUP_DataFrameRequest;
-    // .BmngFupCheckCrcRequest = BMNG_FUP_CheckCrcRequest;
-    // .BmngFupAbortFuRequest = BMNG_FUP_AbortFuRequest;
-    // .BmngFupStartFuRequest = BMNG_FUP_StartFuRequest;
-    // .BmngFupSetMatchRuleRequest = BMNG_FUP_SetMatchRuleRequest;
-    // .BmngFupGetVersionRequest =  BMNG_FUP_GetVersionRequest;
-    // .BmngFupGetStateRequest = BMNG_FUP_GetStateRequest;
-    // .BmngFupSetSignatureDataRequest = BMNG_FUP_SetSignatureDataRequest;
-    // .BmngPprofGetRequest = BMNG_PPROF_GetRequest;
-    // .BmngPprofSetRequest = BMNG_PPROF_SetRequest;
-    // .BmngPprofResetRequest = BMNG_PPROF_ResetRequest;
-    // .BmngPprofRebootRequest = BMNG_PPROF_RebootRequest;
-    // .BmngPprofGetEnhancedRequest = BMNG_PPROF_GetEnhancedRequest;
-    // .BmngPprofGetZcDiffRequest = BMNG_PPROF_GetZcDiffRequest;
-    // .BmngWhitelistAddRequest = BMNG_WHITELIST_AddRequest;
-    // .BmngWhitelistRemoveRequest = BMNG_WHITELIST_RemoveRequest;
+    .BmngSetCallbacks = BMNG_SetCallbacks,
+    .BmngFupClearTargetListRequest = BMNG_FUP_ClearTargetListRequest;
+    .BmngFupAddTargetRequest = BMNG_FUP_AddTargetRequest;
+    .BmngFupSetFwDataRequest = BMNG_FUP_SetFwDataRequest;
+    .BmngFupSetUpgradeOptionsRequest = BMNG_FUP_SetUpgradeOptionsRequest;
+    .BmngFupInitFileTxRequest = BMNG_FUP_InitFileTxRequest;
+    .BmngFupDataFrameRequest = BMNG_FUP_DataFrameRequest;
+    .BmngFupCheckCrcRequest = BMNG_FUP_CheckCrcRequest;
+    .BmngFupAbortFuRequest = BMNG_FUP_AbortFuRequest;
+    .BmngFupStartFuRequest = BMNG_FUP_StartFuRequest;
+    .BmngFupSetMatchRuleRequest = BMNG_FUP_SetMatchRuleRequest;
+    .BmngFupGetVersionRequest =  BMNG_FUP_GetVersionRequest;
+    .BmngFupGetStateRequest = BMNG_FUP_GetStateRequest;
+    .BmngFupSetSignatureDataRequest = BMNG_FUP_SetSignatureDataRequest;
+    .BmngPprofGetRequest = BMNG_PPROF_GetRequest;
+    .BmngPprofSetRequest = BMNG_PPROF_SetRequest;
+    .BmngPprofResetRequest = BMNG_PPROF_ResetRequest;
+    .BmngPprofRebootRequest = BMNG_PPROF_RebootRequest;
+    .BmngPprofGetEnhancedRequest = BMNG_PPROF_GetEnhancedRequest;
+    .BmngPprofGetZcDiffRequest = BMNG_PPROF_GetZcDiffRequest;
+    .BmngWhitelistAddRequest = BMNG_WHITELIST_AddRequest;
+    .BmngWhitelistRemoveRequest = BMNG_WHITELIST_RemoveRequest;
   </#if> 
 };
 
@@ -273,7 +272,7 @@ void PRIME_API_Initialize(PRIME_API_INIT *init)
     CL_432_Initialize();
 
     /* Initialize Management Plane */
-    MNGP_Initialize(&macInfo, (uint8_t)MNGP_SPROF_USI_PORT);
+    MNGP_Initialize(&macInfo, init->mngPlaneUsiPort);
 
     /* Set critical region */
     __set_BASEPRI(0);

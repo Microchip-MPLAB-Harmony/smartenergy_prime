@@ -72,7 +72,7 @@ global pHalApiPalHeaderFile
 # Libraries
 global pPrime13BnLibFile
 global pPrime13SnLibFile
-global pPrime14BnLibFile
+global pPrime14BnMLibFile
 global pPrime14SnLibFile
 
 # Linker Options
@@ -81,11 +81,11 @@ global pPrimeXc32LdPrepMacroSym
 PRIME_USER_APP_OFFSET_HEX = "0x10000"
 PRIME_USER_APP_SIZE_HEX = "0x40000"
 PRIME_FW_STACK_14_OFFSET_HEX = "0x90000"
-PRIME_FW_STACK_14_SIZE_HEX = "0x28000"
+PRIME_FW_STACK_14_SIZE_HEX = "0x22000"
 PRIME_PHY_OFFSET_HEX = "0xB8000"
 PRIME_PHY_SIZE_HEX = "0x18000"
 PRIME_FW_STACK_13_OFFSET_HEX = "0xD0000"
-PRIME_FW_STACK_13_SIZE_HEX = "0x30000"
+PRIME_FW_STACK_13_SIZE_HEX = "0x20000"
 
 PRIME_FW_STACK_RAM_SIZE = "0x0000B000"  # TBD !!!!!
 
@@ -138,11 +138,11 @@ def createGroupServices():
         for component in primeServices:
             primeServicesGroup.addComponent(component)
         Database.activateComponents(primeServices, "PRIME SERVICES")
+        
+    # Debug traces enabled
+    setVal("srvLogReport", "ENABLE_TRACES", True)
 
 def primeAddBnFiles():
-    # SN only
-    # pPrimeApiAsFile.setEnabled(False)
-
     # BN API files
     pPrimeHalWrapperHeaderFile.setEnabled(True)
     pPrimeHalWrapperSourceFile.setEnabled(True)
@@ -161,7 +161,7 @@ def primeAddBnFiles():
     # No libraries by default
     pPrime13BnLibFile.setEnabled(False)
     pPrime13SnLibFile.setEnabled(False)
-    pPrime14BnLibFile.setEnabled(False)
+    pPrime14BnMLibFile.setEnabled(False)
     pPrime14SnLibFile.setEnabled(False)
 
     # BN library
@@ -173,7 +173,11 @@ def primeAddBnFiles():
         else:
             pPrime13BnLibFile.setEnabled(True)
     elif (primeConfigVersion.getValue() == "1.4"):
-        pPrime14BnLibFile.setEnabled(True)
+        if ("PIC32CX" in processor) and ("MT" in processor):
+            pPrime14BnMLibFile.setEnabled(True)
+        else:
+            # Other libraries and platforms TBD
+            pass
     else:
         # Unknown option: no library by default
         pass
@@ -186,7 +190,7 @@ def primeAddSnFiles():
     # No libraries by default
     pPrime13BnLibFile.setEnabled(False)
     pPrime13SnLibFile.setEnabled(False)
-    pPrime14BnLibFile.setEnabled(False)
+    pPrime14BnMLibFile.setEnabled(False)
     pPrime14SnLibFile.setEnabled(False)
 
     if (primeConfigProject.getValue() == "bin project"):
@@ -275,6 +279,9 @@ def primeShowSNAppConfiguration(primeVersion):
     primeConfigProject.setVisible(True)
     primeConfigComment.setVisible(True)
     primeConfigFWVersion.setVisible(True)
+    primeMngpConfig.setVisible(True)
+    primeConfigMngpSprof.setVisible(True)
+    primeConfigSprofUsiPort.setVisible(True)
 
     primeSNAppAddress.setVisible(True)
     primeSNFUComment.setVisible(True)
@@ -297,9 +304,6 @@ def primeShowSNAppConfiguration(primeVersion):
     primeConfigPIBModel.setVisible(False)
     primeMacConfig.setVisible(False)
     primeConfigMaxNumNodes.setVisible(False)
-    primeMngpConfig.setVisible(False)
-    primeConfigMngpSprof.setVisible(False)
-    primeConfigSprofUsiPort.setVisible(False)
     primeConfigSecProfile.setVisible(False)
 
     if (primeVersion == "1.4"):
@@ -318,9 +322,6 @@ def primeShowSNBinConfiguration(primeVersion):
     primeConfigPIBVendor.setVisible(True)
     primeConfigPIBModel.setVisible(True)
     primeMacConfig.setVisible(True)
-    primeMngpConfig.setVisible(True)
-    primeConfigMngpSprof.setVisible(True)
-    primeConfigSprofUsiPort.setVisible(True)
     primeConfigSecProfile.setVisible(True)
 
     # Hide SN Binary options
@@ -329,6 +330,9 @@ def primeShowSNBinConfiguration(primeVersion):
     primeConfigComment.setVisible(False)
     primeConfigBnSlaveEn.setVisible(False)
     primeConfigBnSlaveEn.setValue(False)
+    primeMngpConfig.setVisible(False)
+    primeConfigMngpSprof.setVisible(False)
+    primeConfigSprofUsiPort.setVisible(False)
 
     primeSNAppAddress.setVisible(False)
     primeSNFUComment.setVisible(False)
@@ -365,7 +369,7 @@ def primeShowBNConfiguration(primeVersion):
     primeConfigPIBVendor.setVisible(True)
     primeConfigPIBModel.setVisible(True)
     primeMacConfig.setVisible(True)
-    primeConfigMaxNumNodes.setVisible(True)
+    primeConfigMaxNumNodes.setVisible(False)
     primeMngpConfig.setVisible(True)
     primeConfigMngpSprof.setVisible(True)
     primeConfigSprofUsiPort.setVisible(True)
@@ -667,13 +671,13 @@ def instantiateComponent(primeStackConfigComponent):
     primeMngpConfig = primeStackConfigComponent.createMenuSymbol("PRIME_MNGP", None)
     primeMngpConfig.setLabel("PRIME Management Plane Configuration")
     primeMngpConfig.setDescription("Configure the PRIME Management Plane options")
-    primeMngpConfig.setVisible(False)
+    primeMngpConfig.setVisible(True)
 
     # Management Plane Serial Profile is always enabled
     global primeConfigMngpSprof
     primeConfigMngpSprof = primeStackConfigComponent.createCommentSymbol("MNGP_SPROFILE", primeMngpConfig)
     primeConfigMngpSprof.setLabel("Management Plane Serial Profile")
-    primeConfigMngpSprof.setVisible(False)
+    primeConfigMngpSprof.setVisible(True)
 
     # Private symbol for USI instance of Serial Profile
     primeConfigSprof = primeStackConfigComponent.createBooleanSymbol("MNGP_SERIAL_PROFILE", primeConfigMngpSprof)
@@ -683,10 +687,10 @@ def instantiateComponent(primeStackConfigComponent):
 
     # Select serial profile USI port
     global primeConfigSprofUsiPort
-    primeConfigSprofUsiPort = primeStackConfigComponent.createIntegerSymbol("MNGP_SPROF_USI_PORT", primeConfigMngpSprof)
+    primeConfigSprofUsiPort = primeStackConfigComponent.createIntegerSymbol("MNGP_SPROF_USI_INSTANCE", primeConfigMngpSprof)
     primeConfigSprofUsiPort.setLabel("USI Instance")
     primeConfigSprofUsiPort.setDescription("USI instance used for the Management Plane Serial Profile")
-    primeConfigSprofUsiPort.setVisible(False)
+    primeConfigSprofUsiPort.setVisible(True)
     primeConfigSprofUsiPort.setDefaultValue(0)
     primeConfigSprofUsiPort.setMax(0)
     primeConfigSprofUsiPort.setMin(0)
@@ -930,12 +934,12 @@ def instantiateComponent(primeStackConfigComponent):
     pPrime13SnLibFile.setDestPath("stack/prime/libs")
     pPrime13SnLibFile.setEnabled(False)
 
-    global pPrime14BnLibFile
-    pPrime14BnLibFile = primeStackConfigComponent.createLibrarySymbol("PRIME_1_4_BN_LIBRARY", None)
-    pPrime14BnLibFile.setSourcePath("prime/libs/prime14_lib_bn.a")
-    pPrime14BnLibFile.setOutputName("prime14_lib_bn.a")
-    pPrime14BnLibFile.setDestPath("stack/prime/libs")
-    pPrime14BnLibFile.setEnabled(False)
+    global pPrime14BnMLibFile
+    pPrime14BnMLibFile = primeStackConfigComponent.createLibrarySymbol("PRIME_1_4_BN_LIBRARY", None)
+    pPrime14BnMLibFile.setSourcePath("prime/libs/prime14_lib_bn_m.a")
+    pPrime14BnMLibFile.setOutputName("prime14_lib_bn.a")
+    pPrime14BnMLibFile.setDestPath("stack/prime/libs")
+    pPrime14BnMLibFile.setEnabled(False)
 
     global pPrime14SnLibFile
     pPrime14SnLibFile = primeStackConfigComponent.createLibrarySymbol("PRIME_1_4_SN_LIBRARY", None)

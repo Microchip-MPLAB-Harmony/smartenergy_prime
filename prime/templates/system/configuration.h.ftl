@@ -1,3 +1,9 @@
+<#if (PRIME_MODE == "SN" && PRIME_PROJECT == "application project") || (PRIME_MODE == "BN")>
+/* Management Plane USI port */
+#define PRIME_MNG_PLANE_USI_INDEX                   ${MNGP_SPROF_USI_INSTANCE}U
+
+</#if>
+
 <#if PRIME_MODE == "SN" && PRIME_PROJECT == "application project">
 /* PRIME SN Application Memory Region */
 #define PRIME_SN_APP_ADDRESS                        ${PRIME_SN_APP_ADDRESS?string}

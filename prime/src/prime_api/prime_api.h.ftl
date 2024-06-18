@@ -95,10 +95,12 @@ Microchip or any third party.
 */
 typedef struct
 {
-    /* PAL index from configuration */
-    uint8_t palIndex;
     /* HAL API pointer */
     HAL_API *halApi;
+    /* PAL index from configuration */
+    uint8_t palIndex;
+    /* USI port for Management Plane */
+    uint8_t mngPlaneUsiPort;
 } PRIME_API_INIT;
 
 // *****************************************************************************
