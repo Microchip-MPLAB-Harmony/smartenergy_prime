@@ -93,22 +93,6 @@ def instantiateComponent(primeFirmwareUpgradeComponent):
     srvFUSystemInitFile.setSourcePath("service/firmware_upgrade/templates/system/system_initialize.c.ftl")
     srvFUSystemInitFile.setMarkup(True)
 
-'''
-15:59:15.987    INFO: {Harmony}<Harmony Database> -> satisfied: HarmonyCoreService, drv_memory_HarmonyCoreDependency
-15:59:15.987    FINE: {Harmony}<Event>[Info]: Broadcasting event: ComponentActivatedEvent - drv_memory_0
-15:59:15.987    FINE: {Harmony}<Event>[Info]: Broadcasting event: Graph.RepaintEvent - 
-15:59:15.987    FINE: {Harmony}<Event>[Info]: Broadcasting event: RefreshUIEvent - 
-15:59:15.988    FINE: {Harmony}<Event>[Info]: Broadcasting event: ComponentAttachmentStateChanged - [drv_memory_0:drv_media:DRV_MEDIA]
-15:59:15.988    FINE: {Harmony}<Event>[Info]: Broadcasting event: Graph.RepaintEvent - 
-15:59:15.988    FINE: {Harmony}<Event>[Info]: Broadcasting event: ComponentAttachmentStateChanged - [primeFirwmareUpgrade:Memory_dep:DRV_MEDIA]
-15:59:15.988    FINE: {Harmony}<Event>[Info]: Broadcasting event: Graph.RepaintEvent - 
-15:59:15.989    INFO: {Harmony}<Harmony Database> -> satisfied: Memory_dep, drv_media
-
-primeFUMemDrv = primeFirmwareUpgradeComponent.createStringSymbol("PRIME_FU_MEM_DRV", None)
-primeFUMemInstance = primeFirmwareUpgradeComponent.createIntegerSymbol("PRIME_FU_MEM_INSTANCE", None)
-
-'''
-
 def onAttachmentConnected(source, target):
     localComponent = source["component"]
     connectID = source["id"]
@@ -117,14 +101,24 @@ def onAttachmentConnected(source, target):
     targetID = target["id"]
 
     if connectID == "Memory_dep" :
-        print("DD Debug: Connecting Memory_dep")
-        print("DD Debug: Local component" + localComponent)
-        print("DD Debug: Remote component " + str(remoteID) + " instance number " + str(remoteComponent.getInstanceNumber()))
-
-    print("DD satisfied: " + connectID + ", " + targetID)
+        print("Connecting Memory_dep")
+        primeFUMemDrv = localComponent.getSymbolByID("PRIME_FU_MEM_DRV")
+        primeFUMemDrv.setValue(str(remoteID))
+        primeFUMemInstance = localComponent.getSymbolByID("PRIME_FU_MEM_INSTANCE")
+        primeFUMemInstance.setValue(remoteComponent.getInstanceNumber())
 
 def onAttachmentDisconnected(source, target):
     localComponent = source["component"]
-    localConnectID = source["id"]
+    connectID = source["id"]
     remoteComponent = target["component"]
-    remoteComponentID = remoteComponent.getID()
+    remoteID = remoteComponent.getID()
+    targetID = target["id"]
+
+    if connectID == "Memory_dep" :
+        print("Desconnecting Memory_dep")
+
+        primeFUMemDrv = localComponent.getSymbolByID("PRIME_FU_MEM_DRV")
+        primeFUMemDrv.clearValue()
+        primeFUMemInstance = localComponent.getSymbolByID("PRIME_FU_MEM_INSTANCE")
+        primeFUMemInstance.clearValue()
+
