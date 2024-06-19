@@ -61,9 +61,9 @@ Microchip or any third party.
 #include "../../service/security/aes_wrapper.h"
 #include "../../service/security/cipher_wrapper.h"
 #include "../../service/queue/srv_queue.h"
-#include "../../../service/firmware_upgrade/srv_firmware_upgrade.h"
-#include "../../../pal/pal.h"
-#include "../../../pal/pal_types.h"
+//#include "../../../service/firmware_upgrade/srv_firmware_upgrade.h"
+#include "../../pal/pal.h"
+#include "../../pal/pal_types.h"
 
 // DOM-IGNORE-BEGIN
 #ifdef __cplusplus  // Provide C++ Compatibility
@@ -551,7 +551,7 @@ typedef void (*HAL_QUEUE_SET_CAPACITY)(SRV_QUEUE *queue, uint16_t capacity);
   Remarks:
     Related to Firmware Upgrade service.
 */
-typedef void (*HAL_FU_START)(SRV_FU_INFO *fuInfo);
+//typedef void (*HAL_FU_START)(SRV_FU_INFO *fuInfo);
 
 // ****************************************************************************
 /* End FU
@@ -566,7 +566,7 @@ typedef void (*HAL_FU_START)(SRV_FU_INFO *fuInfo);
   Remarks:
     Related to Firmware Upgrade service.
 */
-typedef void (*HAL_FU_END)(SRV_FU_RESULT fuResult);
+//typedef void (*HAL_FU_END)(SRV_FU_RESULT fuResult);
 
 // ****************************************************************************
 /* Read FU information
@@ -581,7 +581,7 @@ typedef void (*HAL_FU_END)(SRV_FU_RESULT fuResult);
   Remarks:
     Related to Firmware Upgrade service.
 */
-typedef void (*HAL_FU_CFG_READ)(void *dst, uint16_t size);
+//typedef void (*HAL_FU_CFG_READ)(void *dst, uint16_t size);
 
 // ****************************************************************************
 /* Write FU information
@@ -596,7 +596,7 @@ typedef void (*HAL_FU_CFG_READ)(void *dst, uint16_t size);
   Remarks:
     Related to Firmware Upgrade service.
 */
-typedef uint8_t (*HAL_FU_CFG_WRITE)(void *src, uint16_t size);
+//typedef uint8_t (*HAL_FU_CFG_WRITE)(void *src, uint16_t size);
 
 // ****************************************************************************
 /* Read image
@@ -610,7 +610,7 @@ typedef uint8_t (*HAL_FU_CFG_WRITE)(void *src, uint16_t size);
   Remarks:
     Related to Firmware Upgrade service.
 */
-typedef void (*HAL_FU_DATA_READ)(uint32_t addr, uint8_t *buf, uint16_t size);
+//typedef void (*HAL_FU_DATA_READ)(uint32_t addr, uint8_t *buf, uint16_t size);
 
 // ****************************************************************************
 /* Write image
@@ -624,7 +624,7 @@ typedef void (*HAL_FU_DATA_READ)(uint32_t addr, uint8_t *buf, uint16_t size);
   Remarks:
     Related to Firmware Upgrade service.
 */
-typedef uint8_t (*HAL_FU_DATA_WRITE)(uint32_t addr, uint8_t *buf, uint16_t size);
+//typedef uint8_t (*HAL_FU_DATA_WRITE)(uint32_t addr, uint8_t *buf, uint16_t size);
 
 // ****************************************************************************
 /* Callback for CRC
@@ -640,7 +640,7 @@ typedef uint8_t (*HAL_FU_DATA_WRITE)(uint32_t addr, uint8_t *buf, uint16_t size)
   Remarks:
     Related to Firmware Upgrade service.
 */
-typedef void (*HAL_FU_REGISTER_CRC_CB)(SRV_FU_CRC_CB callback);
+//typedef void (*HAL_FU_REGISTER_CRC_CB)(SRV_FU_CRC_CB callback);
 
 // ****************************************************************************
 /* Calculate CRC
@@ -654,7 +654,7 @@ typedef void (*HAL_FU_REGISTER_CRC_CB)(SRV_FU_CRC_CB callback);
   Remarks:
     Related to Firmware Upgrade service.
 */
-typedef void (*HAL_FU_CALCULATE_CRC)(void);
+//typedef void (*HAL_FU_CALCULATE_CRC)(void);
 
 // ****************************************************************************
 /* Callback for verification
@@ -670,7 +670,7 @@ typedef void (*HAL_FU_CALCULATE_CRC)(void);
   Remarks:
     Related to Firmware Upgrade service.
 */
-typedef void (*HAL_FU_REGISTER_VERIFY_CB)(SRV_FU_IMAGE_VERIFY_CB callback);
+//typedef void (*HAL_FU_REGISTER_VERIFY_CB)(SRV_FU_IMAGE_VERIFY_CB callback);
 
 // ****************************************************************************
 /* Verify image
@@ -685,7 +685,7 @@ typedef void (*HAL_FU_REGISTER_VERIFY_CB)(SRV_FU_IMAGE_VERIFY_CB callback);
   Remarks:
     Related to Firmware Upgrade service.
 */
-typedef void (*HAL_FU_VERIFY_IMAGE)(void);
+//typedef void (*HAL_FU_VERIFY_IMAGE)(void);
 
 // ****************************************************************************
 /* Get bitmap
@@ -701,7 +701,7 @@ typedef void (*HAL_FU_VERIFY_IMAGE)(void);
   Remarks:
     Related to Firmware Upgrade service.
 */
-typedef uint16_t (*HAL_FU_GET_BITMAP)(uint8_t *bitmap, uint32_t *numRxPages);
+//typedef uint16_t (*HAL_FU_GET_BITMAP)(uint8_t *bitmap, uint32_t *numRxPages);
 
 // ****************************************************************************
 /* Swap stack
@@ -715,7 +715,7 @@ typedef uint16_t (*HAL_FU_GET_BITMAP)(uint8_t *bitmap, uint32_t *numRxPages);
   Remarks:
     Related to Firmware Upgrade service.
 */
-typedef void (*HAL_FU_SWAP)(SRV_FU_TRAFFIC_VERSION trafficVersion);
+//typedef void (*HAL_FU_SWAP)(SRV_FU_TRAFFIC_VERSION trafficVersion);
 
 // *****************************************************************************
 /*  Initializes PAL 
@@ -1121,18 +1121,18 @@ typedef struct {
     HAL_QUEUE_FLUSH queue_flush;
     HAL_QUEUE_SET_CAPACITY queue_set_capacity;
     
-    HAL_FU_START fu_start;
-    HAL_FU_END fu_end;
-    HAL_FU_CFG_READ fu_cfg_read;
-    HAL_FU_CFG_WRITE fu_cfg_write; 
-    HAL_FU_DATA_READ fu_data_read;
-    HAL_FU_DATA_WRITE fu_data_write;
-    HAL_FU_REGISTER_CRC_CB fu_register_callback_crc;
-    HAL_FU_CALCULATE_CRC fu_calculate_crc;
-    HAL_FU_REGISTER_VERIFY_CB fu_register_callback_verify;
-    HAL_FU_VERIFY_IMAGE fu_verify_image;
-    HAL_FU_GET_BITMAP fu_get_bitmap;
-    HAL_FU_SWAP fu_swap;
+//    HAL_FU_START fu_start;
+//    HAL_FU_END fu_end;
+//    HAL_FU_CFG_READ fu_cfg_read;
+//    HAL_FU_CFG_WRITE fu_cfg_write; 
+//    HAL_FU_DATA_READ fu_data_read;
+//    HAL_FU_DATA_WRITE fu_data_write;
+//    HAL_FU_REGISTER_CRC_CB fu_register_callback_crc;
+//    HAL_FU_CALCULATE_CRC fu_calculate_crc;
+//    HAL_FU_REGISTER_VERIFY_CB fu_register_callback_verify;
+//    HAL_FU_VERIFY_IMAGE fu_verify_image;
+//    HAL_FU_GET_BITMAP fu_get_bitmap;
+//    HAL_FU_SWAP fu_swap;
 
     HAL_PAL_INITIALIZE hal_pal_initialize;
     HAL_PAL_TASKS hal_pal_tasks;

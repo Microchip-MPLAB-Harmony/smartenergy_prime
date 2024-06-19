@@ -1477,7 +1477,7 @@ void PRIME_HAL_WRP_QueueSet_Capacity(SRV_QUEUE *queue, uint16_t capacity);
   Remarks:
     Related to Firmware Upgrade service.
 */
-void PRIME_HAL_WRP_FuStart(SRV_FU_INFO *fuInfo);
+//void PRIME_HAL_WRP_FuStart(SRV_FU_INFO *fuInfo);
 
 // ****************************************************************************
 /* Function:
@@ -1507,7 +1507,7 @@ void PRIME_HAL_WRP_FuStart(SRV_FU_INFO *fuInfo);
   Remarks:
     Related to Firmware Upgrade service.
 */
-void PRIME_HAL_WRP_FuEnd(SRV_FU_RESULT fuResult);
+//void PRIME_HAL_WRP_FuEnd(SRV_FU_RESULT fuResult);
 
 // ****************************************************************************
 /* Function:
@@ -1539,7 +1539,7 @@ void PRIME_HAL_WRP_FuEnd(SRV_FU_RESULT fuResult);
   Remarks:
     Related to Firmware Upgrade service.
 */
-void PRIME_HAL_WRP_FuCfgRead(void *dst, uint16_t size);
+//void PRIME_HAL_WRP_FuCfgRead(void *dst, uint16_t size);
 
 // ****************************************************************************
 /* Function:
@@ -1571,7 +1571,7 @@ void PRIME_HAL_WRP_FuCfgRead(void *dst, uint16_t size);
   Remarks:
     Related to Firmware Upgrade service.
 */
-uint8_t PRIME_HAL_WRP_FuCfgWrite(void *src, uint16_t size);
+//uint8_t PRIME_HAL_WRP_FuCfgWrite(void *src, uint16_t size);
 
 // ****************************************************************************
 /* Function:
@@ -1603,7 +1603,7 @@ uint8_t PRIME_HAL_WRP_FuCfgWrite(void *src, uint16_t size);
   Remarks:
     Related to Firmware Upgrade service.
 */
-void PRIME_HAL_WRP_FuDataRead(uint32_t addr, uint8_t *buf, uint16_t size);
+//void PRIME_HAL_WRP_FuDataRead(uint32_t addr, uint8_t *buf, uint16_t size);
 
 // ****************************************************************************
 /* Function:
@@ -1635,7 +1635,7 @@ void PRIME_HAL_WRP_FuDataRead(uint32_t addr, uint8_t *buf, uint16_t size);
   Remarks:
     Related to Firmware Upgrade service.
 */
-uint8_t PRIME_HAL_WRP_FuDataWrite(uint32_t addr, uint8_t *buf, uint16_t size);
+//uint8_t PRIME_HAL_WRP_FuDataWrite(uint32_t addr, uint8_t *buf, uint16_t size);
 
 // ****************************************************************************
 /* Function:
@@ -1676,7 +1676,7 @@ uint8_t PRIME_HAL_WRP_FuDataWrite(uint32_t addr, uint8_t *buf, uint16_t size);
   Remarks:
     Related to Firmware Upgrade service.
 */
-void PRIME_HAL_WRP_FuRegisterCallbackCrc(SRV_FU_CRC_CB callback);
+//void PRIME_HAL_WRP_FuRegisterCallbackCrc(SRV_FU_CRC_CB callback);
 
 // ****************************************************************************
 /* Function:
@@ -1705,7 +1705,7 @@ void PRIME_HAL_WRP_FuRegisterCallbackCrc(SRV_FU_CRC_CB callback);
   Remarks:
     Related to Firmware Upgrade service.
 */
-void PRIME_HAL_WRP_FuCalculateCrc(void);
+//void PRIME_HAL_WRP_FuCalculateCrc(void);
 
 // ****************************************************************************
 /* Function:
@@ -1746,7 +1746,7 @@ void PRIME_HAL_WRP_FuCalculateCrc(void);
   Remarks:
     Related to Firmware Upgrade service.
 */
-void PRIME_HAL_WRP_FuRegisterCallbackVerify(SRV_FU_IMAGE_VERIFY_CB callback);
+//void PRIME_HAL_WRP_FuRegisterCallbackVerify(SRV_FU_IMAGE_VERIFY_CB callback);
 
 // ****************************************************************************
 /* Function:
@@ -1776,7 +1776,7 @@ void PRIME_HAL_WRP_FuRegisterCallbackVerify(SRV_FU_IMAGE_VERIFY_CB callback);
   Remarks:
     Related to Firmware Upgrade service.
 */
-void PRIME_HAL_WRP_FuVerifyImage(void);
+//void PRIME_HAL_WRP_FuVerifyImage(void);
 
 // ****************************************************************************
 /* Function:
@@ -1812,7 +1812,7 @@ void PRIME_HAL_WRP_FuVerifyImage(void);
   Remarks:
     Related to Firmware Upgrade service.
 */
-uint16_t PRIME_HAL_WRP_FuGetBitmap(uint8_t *bitmap, uint32_t *numRxPages);
+//uint16_t PRIME_HAL_WRP_FuGetBitmap(uint8_t *bitmap, uint32_t *numRxPages);
 
 // ****************************************************************************
 /* Function:
@@ -1841,7 +1841,7 @@ uint16_t PRIME_HAL_WRP_FuGetBitmap(uint8_t *bitmap, uint32_t *numRxPages);
   Remarks:
     Related to Firmware Upgrade service.
 */
-void PRIME_HAL_WRP_FuSwap(SRV_FU_TRAFFIC_VERSION trafficVersion);
+//void PRIME_HAL_WRP_FuSwap(SRV_FU_TRAFFIC_VERSION trafficVersion);
 
 // ****************************************************************************
 /* Function:

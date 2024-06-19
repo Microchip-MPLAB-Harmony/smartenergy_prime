@@ -49,8 +49,9 @@ Microchip or any third party.
 // Section: Include Files
 // *****************************************************************************
 // *****************************************************************************
+
+#include "prime_api_defs.h"
 #include "prime_api_types.h"
-#include "stack/prime/prime_api/prime_hal_wrapper.h"
 
 </#if>
 // DOM-IGNORE-BEGIN
@@ -80,28 +81,6 @@ Microchip or any third party.
 // Section: Data Types
 // *****************************************************************************
 // *****************************************************************************
-
-// *****************************************************************************
-/* PRIME API Init Structure
-
-   Summary:
-    Initialization data for PRIME API to be provided on Initialize routine.
-
-   Description:
-    Defines application data required in the PRIME stack.
-
-   Remarks:
-    None.
-*/
-typedef struct
-{
-    /* HAL API pointer */
-    HAL_API *halApi;
-    /* PAL index from configuration */
-    uint8_t palIndex;
-    /* USI port for Management Plane */
-    uint8_t mngPlaneUsiPort;
-} PRIME_API_INIT;
 
 // *****************************************************************************
 // *****************************************************************************

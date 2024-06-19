@@ -121,7 +121,7 @@ const PRIME_API PRIME_API_Interface =
     .MacReleaseRequest = CL_NULL_ReleaseRequest,
     .MacReleaseResponse = CL_NULL_ReleaseResponse,
   <#if PRIME_MODE == "BN" && BN_SLAVE_EN == false>
-    .MacRedirectResponse = CL_NULL_RedirectResponse;
+    .MacRedirectResponse = CL_NULL_RedirectResponse,
   </#if>
     .MacJoinRequest = CL_NULL_JoinRequest,
     .MacJoinResponse = CL_NULL_JoinResponse,
@@ -135,45 +135,47 @@ const PRIME_API PRIME_API_Interface =
     .PlmeSetRequest = CL_NULL_PlmeSetRequest,
   <#if (PRIME_MODE == "SN") || (PRIME_MODE == "BN" && BN_SLAVE_EN == true)>
     .MlmeRegisterRequest = CL_NULL_MlmeRegisterRequest,
-    .MlmeUnregisterRequest = CL_NULL_MlmeUnregisterRequest;
+    .MlmeUnregisterRequest = CL_NULL_MlmeUnregisterRequest,
   </#if>
     .MlmePromoteRequest = CL_NULL_MlmePromoteRequest,    
     .MlmeMpPromoteRequest = CL_NULL_MlmeMpPromoteRequest,
   <#if (PRIME_MODE == "SN") || (PRIME_MODE == "BN" && BN_SLAVE_EN == true)>
-    .MlmeDemoteRequest = CL_NULL_MlmeDemoteRequest;
-    .MlmeMpDemoteRequest = CL_NULL_MlmeMpDemoteRequest;
+    .MlmeDemoteRequest = CL_NULL_MlmeDemoteRequest,
+    .MlmeMpDemoteRequest = CL_NULL_MlmeMpDemoteRequest,
   </#if>
     .MlmeResetRequest = CL_NULL_MlmeResetRequest,
     .MlmeGetRequest = CL_NULL_MlmeGetRequest,
     .MlmeListGetRequest = CL_NULL_MlmeListGetRequest,
     .MlmeSetRequest = CL_NULL_MlmeSetRequest,
     .Cl432SetCallbacks = CL_432_SetCallbacks,
+  <#if (PRIME_MODE == "SN") || (PRIME_MODE == "BN" && BN_SLAVE_EN == true)>
     .Cl432EstablishRequest = CL_432_EstablishRequest,
+  </#if>
     .Cl432ReleaseRequest = CL_432_ReleaseRequest,
     .Cl432DlDataRequest = CL_432_DlDataRequest,
   <#if PRIME_MODE == "BN" && BN_SLAVE_EN == false>
     .BmngSetCallbacks = BMNG_SetCallbacks,
-    .BmngFupClearTargetListRequest = BMNG_FUP_ClearTargetListRequest;
-    .BmngFupAddTargetRequest = BMNG_FUP_AddTargetRequest;
-    .BmngFupSetFwDataRequest = BMNG_FUP_SetFwDataRequest;
-    .BmngFupSetUpgradeOptionsRequest = BMNG_FUP_SetUpgradeOptionsRequest;
-    .BmngFupInitFileTxRequest = BMNG_FUP_InitFileTxRequest;
-    .BmngFupDataFrameRequest = BMNG_FUP_DataFrameRequest;
-    .BmngFupCheckCrcRequest = BMNG_FUP_CheckCrcRequest;
-    .BmngFupAbortFuRequest = BMNG_FUP_AbortFuRequest;
-    .BmngFupStartFuRequest = BMNG_FUP_StartFuRequest;
-    .BmngFupSetMatchRuleRequest = BMNG_FUP_SetMatchRuleRequest;
-    .BmngFupGetVersionRequest =  BMNG_FUP_GetVersionRequest;
-    .BmngFupGetStateRequest = BMNG_FUP_GetStateRequest;
-    .BmngFupSetSignatureDataRequest = BMNG_FUP_SetSignatureDataRequest;
-    .BmngPprofGetRequest = BMNG_PPROF_GetRequest;
-    .BmngPprofSetRequest = BMNG_PPROF_SetRequest;
-    .BmngPprofResetRequest = BMNG_PPROF_ResetRequest;
-    .BmngPprofRebootRequest = BMNG_PPROF_RebootRequest;
-    .BmngPprofGetEnhancedRequest = BMNG_PPROF_GetEnhancedRequest;
-    .BmngPprofGetZcDiffRequest = BMNG_PPROF_GetZcDiffRequest;
-    .BmngWhitelistAddRequest = BMNG_WHITELIST_AddRequest;
-    .BmngWhitelistRemoveRequest = BMNG_WHITELIST_RemoveRequest;
+    .BmngFupClearTargetListRequest = BMNG_FUP_ClearTargetListRequest,
+    .BmngFupAddTargetRequest = BMNG_FUP_AddTargetRequest,
+    .BmngFupSetFwDataRequest = BMNG_FUP_SetFwDataRequest,
+    .BmngFupSetUpgradeOptionsRequest = BMNG_FUP_SetUpgradeOptionsRequest,
+    .BmngFupInitFileTxRequest = BMNG_FUP_InitFileTxRequest,
+    .BmngFupDataFrameRequest = BMNG_FUP_DataFrameRequest,
+    .BmngFupCheckCrcRequest = BMNG_FUP_CheckCrcRequest,
+    .BmngFupAbortFuRequest = BMNG_FUP_AbortFuRequest,
+    .BmngFupStartFuRequest = BMNG_FUP_StartFuRequest,
+    .BmngFupSetMatchRuleRequest = BMNG_FUP_SetMatchRuleRequest,
+    .BmngFupGetVersionRequest =  BMNG_FUP_GetVersionRequest,
+    .BmngFupGetStateRequest = BMNG_FUP_GetStateRequest,
+    .BmngFupSetSignatureDataRequest = BMNG_FUP_SetSignatureDataRequest,
+    .BmngPprofGetRequest = BMNG_PPROF_GetRequest,
+    .BmngPprofSetRequest = BMNG_PPROF_SetRequest,
+    .BmngPprofResetRequest = BMNG_PPROF_ResetRequest,
+    .BmngPprofRebootRequest = BMNG_PPROF_RebootRequest,
+    .BmngPprofGetEnhancedRequest = BMNG_PPROF_GetEnhancedRequest,
+    .BmngPprofGetZcDiffRequest = BMNG_PPROF_GetZcDiffRequest,
+    .BmngWhitelistAddRequest = BMNG_WHITELIST_AddRequest,
+    .BmngWhitelistRemoveRequest = BMNG_WHITELIST_RemoveRequest,
   </#if> 
 };
 

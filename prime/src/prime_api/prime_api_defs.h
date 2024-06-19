@@ -51,6 +51,7 @@ Microchip or any third party.
 
 #include <stdint.h>
 #include <stdbool.h>
+#include "../hal_api/hal_api.h"
 
 // DOM-IGNORE-BEGIN
 #ifdef __cplusplus  // Provide C++ Compatibility
@@ -67,6 +68,28 @@ Microchip or any third party.
 // *****************************************************************************
 
 // *****************************************************************************
+/* PRIME API Init Structure
+
+   Summary:
+    Initialization data for PRIME API to be provided on Initialize routine.
+
+   Description:
+    Defines application data required in the PRIME stack.
+
+   Remarks:
+    None.
+*/
+typedef struct
+{
+    /* HAL API pointer */
+    HAL_API *halApi;
+    /* PAL index from configuration */
+    uint8_t palIndex;
+    /* USI port for Management Plane */
+    uint8_t mngPlaneUsiPort;
+} PRIME_API_INIT;
+
+// *****************************************************************************
 /* PRIME stack initialization
 
   Summary:
@@ -78,7 +101,7 @@ Microchip or any third party.
   Remarks:
     None.
 */
-typedef void (*PRIME_API_INITIALIZE)(void *halApi);
+typedef void (*PRIME_API_INITIALIZE)(PRIME_API_INIT *init);
 
 // *****************************************************************************
 /* PRIME stack state machine maintenance
