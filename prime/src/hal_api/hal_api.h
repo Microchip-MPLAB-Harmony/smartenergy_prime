@@ -370,8 +370,8 @@ typedef int32_t (*HAL_AES_CCM_AUTH_DECRYPT)(uint8_t *data, uint32_t dataLen,
   Remarks:
     Related to Security service.
 */
-typedef void (*HAL_AES_WRAP_KEY)(const uint8_t *key, uint32_t keyLen,
-    const uint8_t *in, uint32_t inLen, uint8_t *out);
+typedef void (*HAL_AES_WRAP_KEY)(uint8_t *key, uint32_t keyLen, uint8_t *in, 
+    uint32_t inLen, uint8_t *out);
 
 // *****************************************************************************
 /* Unwrap a key with AES Key Wrap Algorithm
@@ -385,7 +385,7 @@ typedef void (*HAL_AES_WRAP_KEY)(const uint8_t *key, uint32_t keyLen,
   Remarks:
     Related to Security service.
 */
-typedef bool (*HAL_AES_UNWRAP_KEY)(const uint8_t *key, uint32_t keyLen, const uint8_t *in,
+typedef bool (*HAL_AES_UNWRAP_KEY)(uint8_t *key, uint32_t keyLen, uint8_t *in,
     uint32_t inLen, uint8_t *out);
 
 //***************************************************************************

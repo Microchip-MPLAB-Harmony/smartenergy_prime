@@ -176,14 +176,14 @@ int32_t PRIME_HAL_WRP_AesCcmAuthDecrypt(uint8_t *data, uint32_t dataLen,
         aadLen,  tag, tagLen);
 }
 
-void PRIME_HAL_WRP_AesWrapKey(const uint8_t *key, uint32_t keyLen, 
-    const uint8_t *in, uint32_t inLen, uint8_t *out)
+void PRIME_HAL_WRP_AesWrapKey(uint8_t *key, uint32_t keyLen, uint8_t *in, 
+    uint32_t inLen, uint8_t *out)
 {
     pPrimeHalApi->aes_wrap_key(key, keyLen, in, inLen, out);
 }
 
-bool PRIME_HAL_WRP_AesUnwrapKey(const uint8_t *key, uint32_t keyLen, 
-    const uint8_t *in, uint32_t inLen, uint8_t *out)
+bool PRIME_HAL_WRP_AesUnwrapKey(uint8_t *key, uint32_t keyLen, uint8_t *in, 
+    uint32_t inLen, uint8_t *out)
 {
     return pPrimeHalApi->aes_unwrap_key(key, keyLen, in, inLen, out);
 }

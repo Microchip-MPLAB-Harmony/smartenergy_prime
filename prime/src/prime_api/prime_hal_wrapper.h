@@ -870,9 +870,9 @@ int32_t PRIME_HAL_WRP_AesCcmAuthDecrypt(uint8_t *data, uint32_t dataLen,
 /* Function:
     void PRIME_HAL_WRP_AesWrapKey
     (
-        const uint8_t *key, 
+        uint8_t *key, 
         uint32_t keyLen, 
-        const uint8_t *in, 
+        uint8_t *in, 
         uint32_t inLen,
         uint8_t *out
     )
@@ -909,15 +909,15 @@ int32_t PRIME_HAL_WRP_AesCcmAuthDecrypt(uint8_t *data, uint32_t dataLen,
     The wrapped key is one byte longer than the plain key.
     Related to Security service.
 */
-void PRIME_HAL_WRP_AesWrapKey(const uint8_t *key, uint32_t keyLen, 
-    const uint8_t *in, uint32_t inLen, uint8_t *out);    
+void PRIME_HAL_WRP_AesWrapKey(uint8_t *key, uint32_t keyLen, uint8_t *in, 
+    uint32_t inLen, uint8_t *out);    
 
 //******************************************************************************
 /* Function:
     bool PRIME_HAL_WRP_AesUnwrapKey(
-        const uint8_t *key, 
+        uint8_t *key, 
         uint32_t keyLen, 
-        const uint8_t *in, 
+        uint8_t *in, 
         uint32_t inLen,
         uint8_t *out)
     
@@ -953,8 +953,8 @@ void PRIME_HAL_WRP_AesWrapKey(const uint8_t *key, uint32_t keyLen,
     The unwrapped key is one byte shorter than the wrapped key.
     Related to Security service.
 */    
-bool PRIME_HAL_WRP_AesUnwrapKey(const uint8_t *key, uint32_t keyLen, 
-    const uint8_t *in, uint32_t inLen, uint8_t *out);
+bool PRIME_HAL_WRP_AesUnwrapKey(uint8_t *key, uint32_t keyLen, uint8_t *in, 
+    uint32_t inLen, uint8_t *out);
     
 //***************************************************************************
 /*
