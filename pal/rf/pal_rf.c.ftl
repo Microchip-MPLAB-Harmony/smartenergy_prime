@@ -301,7 +301,7 @@ static void lPAL_RF_DataIndCb(DRV_RF215_RX_INDICATION_OBJ* pIndObj, uintptr_t ct
     if (palRfData.rfCallbacks.dataIndication != NULL)
     {
         PAL_MSG_INDICATION_DATA dataInd;
-        DRV_RF215_TX_HANDLE txHandle;
+        DRV_RF215_TX_HANDLE txHandle = DRV_RF215_TX_HANDLE_INVALID;
 
         /* Avoid warning */
         (void)ctxt;
