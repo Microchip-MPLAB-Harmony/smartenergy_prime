@@ -60,7 +60,7 @@
 // DOM-IGNORE-END
 
 SYS_MODULE_OBJ PAL_RF_Initialize(void);
-PAL_RF_STATUS PAL_RF_Status(void);
+SYS_STATUS PAL_RF_Status(void);
 void PAL_RF_Tasks(void);
 void PAL_RF_DataConfirmCallbackRegister(PAL_DATA_CONFIRM_CB callback);
 void PAL_RF_DataIndicationCallbackRegister(PAL_DATA_INDICATION_CB callback);

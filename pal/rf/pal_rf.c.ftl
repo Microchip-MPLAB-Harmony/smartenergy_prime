@@ -366,7 +366,9 @@ static void lPAL_RF_InitCallback(uintptr_t context, SYS_STATUS status)
     if (palRfData.drvRfPhyHandle == DRV_HANDLE_INVALID)
     {
 <#if srvLogReport.ENABLE_TRACES == true>        
-        SRV_LOG_REPORT_Message(SRV_LOG_REPORT_ERROR, PHY_LAYER_RF_NOT_AVAILABLE);
+        SRV_LOG_REPORT_Message_With_Code(SRV_LOG_REPORT_ERROR, 
+                (SRV_LOG_REPORT_CODE)PHY_LAYER_RF_NOT_AVAILABLE,
+                "PRIME_PAL_RF: RF PHY layer not vailable\r\n");
 </#if> 
         palRfData.status = PAL_RF_STATUS_ERROR;
         return;
@@ -401,10 +403,10 @@ SYS_MODULE_OBJ PAL_RF_Initialize(void)
     return (SYS_MODULE_OBJ)DRV_RF215_INDEX_0;
 }
 
-PAL_RF_STATUS PAL_RF_Status(void)
+SYS_STATUS PAL_RF_Status(void)
 {
     /* Return the PAL RF status */
-    return (palRfData.status);
+    return ((SYS_STATUS)palRfData.status);
 }
 
 void PAL_RF_Tasks(void)
@@ -432,7 +434,7 @@ void PAL_RF_ChannelSwitchCallbackRegister(PAL_SWITCH_RF_CH_CB callback)
 uint8_t PAL_RF_DataRequest(PAL_MSG_REQUEST_DATA *pMessageData)
 {
     DRV_RF215_TX_REQUEST_OBJ *txReqObj = &palRfData.txReqObj[pMessageData->buffId];
-    DRV_RF215_TX_HANDLE rfPhyTxReqHandle;
+    DRV_RF215_TX_HANDLE rfPhyTxReqHandle = DRV_RF215_TX_HANDLE_INVALID;
     DRV_RF215_TX_RESULT txResult;
 
     if (palRfData.status != PAL_RF_STATUS_READY)

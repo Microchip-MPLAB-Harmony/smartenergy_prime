@@ -248,7 +248,6 @@ static void lPRIME_API_SetPrimeVersion(MAC_VERSION_INFO *macInfo)
 void PRIME_API_Initialize(PRIME_API_INIT *init)
 {
     MAC_VERSION_INFO macInfo;
-    PAL_STATUS palStatus;
 
     /* Set critical region */
     __set_BASEPRI( 2 << (8 - __NVIC_PRIO_BITS));
