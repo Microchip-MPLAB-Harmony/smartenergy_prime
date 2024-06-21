@@ -163,6 +163,8 @@ def primeAddBnFiles():
     pPrime13SnLibFile.setEnabled(False)
     pPrime14BnMLibFile.setEnabled(False)
     pPrime14SnLibFile.setEnabled(False)
+    
+    processor = Variables.get("__PROCESSOR")
 
     # BN library
     if (primeConfigVersion.getValue() == "1.3.6"):
@@ -935,9 +937,9 @@ def instantiateComponent(primeStackConfigComponent):
     pPrime13SnLibFile.setEnabled(False)
 
     global pPrime14BnMLibFile
-    pPrime14BnMLibFile = primeStackConfigComponent.createLibrarySymbol("PRIME_1_4_BN_LIBRARY", None)
+    pPrime14BnMLibFile = primeStackConfigComponent.createLibrarySymbol("PRIME_1_4_BN_M_LIBRARY", None)
     pPrime14BnMLibFile.setSourcePath("prime/libs/prime14_lib_bn_m.a")
-    pPrime14BnMLibFile.setOutputName("prime14_lib_bn.a")
+    pPrime14BnMLibFile.setOutputName("prime14_lib_bn_m.a")
     pPrime14BnMLibFile.setDestPath("stack/prime/libs")
     pPrime14BnMLibFile.setEnabled(False)
 
