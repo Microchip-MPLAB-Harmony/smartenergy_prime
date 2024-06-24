@@ -126,6 +126,8 @@ static PAL_CFG_RESULT lPAL_RF_SetTxHandler(DRV_RF215_TX_HANDLE txHandle, uint8_t
 static PAL_CFG_RESULT lPAL_RF_GetTxHandler(DRV_RF215_TX_HANDLE *txHandle, uint8_t *pData)
 {
     uint8_t index;
+    
+    *txHandle = DRV_RF215_TX_HANDLE_INVALID;
 
     for (index = 0; index < DRV_RF215_TX_BUFFERS_NUMBER; index++)
     {
@@ -301,7 +303,7 @@ static void lPAL_RF_DataIndCb(DRV_RF215_RX_INDICATION_OBJ* pIndObj, uintptr_t ct
     if (palRfData.rfCallbacks.dataIndication != NULL)
     {
         PAL_MSG_INDICATION_DATA dataInd;
-        DRV_RF215_TX_HANDLE txHandle = DRV_RF215_TX_HANDLE_INVALID;
+        DRV_RF215_TX_HANDLE txHandle;
 
         /* Avoid warning */
         (void)ctxt;
@@ -434,7 +436,7 @@ void PAL_RF_ChannelSwitchCallbackRegister(PAL_SWITCH_RF_CH_CB callback)
 uint8_t PAL_RF_DataRequest(PAL_MSG_REQUEST_DATA *pMessageData)
 {
     DRV_RF215_TX_REQUEST_OBJ *txReqObj = &palRfData.txReqObj[pMessageData->buffId];
-    DRV_RF215_TX_HANDLE rfPhyTxReqHandle = DRV_RF215_TX_HANDLE_INVALID;
+    DRV_RF215_TX_HANDLE rfPhyTxReqHandle;
     DRV_RF215_TX_RESULT txResult;
 
     if (palRfData.status != PAL_RF_STATUS_READY)
