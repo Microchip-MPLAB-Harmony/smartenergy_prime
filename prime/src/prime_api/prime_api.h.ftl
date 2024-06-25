@@ -43,7 +43,6 @@ Microchip or any third party.
 #ifndef PRIME_API_H_INCLUDE
 #define PRIME_API_H_INCLUDE
 
-<#if PRIME_MODE == "BN" || (PRIME_MODE == "SN" && PRIME_PROJECT == "application project")>
 // *****************************************************************************
 // *****************************************************************************
 // Section: Include Files
@@ -53,7 +52,6 @@ Microchip or any third party.
 #include "prime_api_defs.h"
 #include "prime_api_types.h"
 
-</#if>
 // DOM-IGNORE-BEGIN
 #ifdef __cplusplus  // Provide C++ Compatibility
 

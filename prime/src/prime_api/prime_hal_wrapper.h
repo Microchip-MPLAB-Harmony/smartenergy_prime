@@ -497,7 +497,7 @@ void PRIME_HAL_WRP_PibGetRequest(uint16_t us_pib_attrib);
 
 // *****************************************************************************
 /* Function:
-    void PRIME_HAL_WRP_PIBGetRequestSetCallback
+    void PRIME_HAL_WRP_PibGetRequestSetCallback
     ( 
         SRV_USER_PIB_GET_REQUEST_CALLBACK callback
     )
@@ -529,13 +529,13 @@ void PRIME_HAL_WRP_PibGetRequest(uint16_t us_pib_attrib);
         }
     }
     
-    PRIME_HAL_WRP_PIBGetRequestSetCallback(APP_GetRequestHandler);
+    PRIME_HAL_WRP_PibGetRequestSetCallback(APP_GetRequestHandler);
     </code>
 
   Remarks:
     Related to User PIB service.
 */
-void PRIME_HAL_WRP_PIBGetRequestSetCallback(
+void PRIME_HAL_WRP_PibGetRequestSetCallback(
     SRV_USER_PIB_GET_REQUEST_CALLBACK callback);
 
 // *****************************************************************************
@@ -576,7 +576,7 @@ void PRIME_HAL_WRP_PIBGetRequestSetCallback(
     
     uint32_t resetValue = 0;
         
-    PRIME_HAL_WRP_PIBSetRequestSetCallback(PRIME_SetRequestHandler);
+    PRIME_HAL_WRP_PibSetRequestSetCallback(PRIME_SetRequestHandler);
 
     PRIME_HAL_WRP_PibSetRequest(PIB_USER_RESET_INFO, &resetValue, 
         sizeof(resetValue));
@@ -591,7 +591,7 @@ void PRIME_HAL_WRP_PibSetRequest(uint16_t pibAttrib, void *pibValue,
 
 // *****************************************************************************
 /* Function:
-    void PRIME_HAL_WRP_PIBSetRequestSetCallback
+    void PRIME_HAL_WRP_PibSetRequestSetCallback
     (
         SRV_USER_PIB_GET_REQUEST_CALLBACK callback
     )
@@ -622,13 +622,13 @@ void PRIME_HAL_WRP_PibSetRequest(uint16_t pibAttrib, void *pibValue,
         }
     }
         
-    PRIME_HAL_WRP_PIBSetRequestSetCallback(PRIME_SetRequestHandler);
+    PRIME_HAL_WRP_PibSetRequestSetCallback(PRIME_SetRequestHandler);
     </code>
 
   Remarks:
     Related to User PIB service.
 */
-void PRIME_HAL_WRP_PIBSetRequestSetCallback(
+void PRIME_HAL_WRP_PibSetRequestSetCallback(
     SRV_USER_PIB_SET_REQUEST_CALLBACK callback);
 
 //******************************************************************************

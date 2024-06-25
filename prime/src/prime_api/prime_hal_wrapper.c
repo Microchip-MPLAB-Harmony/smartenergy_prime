@@ -126,7 +126,7 @@ void PRIME_HAL_WRP_PibGetRequest(uint16_t pibAttrib)
     pPrimeHalApi->pib_get_request(pibAttrib);
 }
 
-void PRIME_HAL_WRP_PIBGetRequestSetCallback(
+void PRIME_HAL_WRP_PibGetRequestSetCallback(
     SRV_USER_PIB_GET_REQUEST_CALLBACK callback)
 {
     pPrimeHalApi->pib_get_request_set_callback(callback);
@@ -138,7 +138,7 @@ void PRIME_HAL_WRP_PibSetRequest(uint16_t pibAttrib, void *pibValue,
     pPrimeHalApi->pib_set_request(pibAttrib, pibValue, pibSize);
 }
 
-void PRIME_HAL_WRP_PIBSetRequestSetCallback(
+void PRIME_HAL_WRP_PibSetRequestSetCallback(
     SRV_USER_PIB_SET_REQUEST_CALLBACK callback)
 {
     pPrimeHalApi->pib_set_request_set_callback(callback);

@@ -262,6 +262,7 @@ Microchip or any third party.
 #define PIB_MAC_REG_RSS                         0x8103
 #define PIB_PHY_SNIFFER_ENABLED                 0x8106
 #define PIB_MAC_INTERNAL_SW_VERSION             0x8126
+#define PIB_MAC_THRESHOLD_BCNS                  0x8127
 #define PIB_MAC_ACTION_MGMT_MUL_SEND_DATA       0x8132  /* v1.4 */
 #define PIB_MAC_ACTION_CFG_BCN_TX_SCHEME        0x8133  /* v1.4 */
 #define PIB_MAC_ACTION_ALV_TYPE                 0x8134  /* v1.4 */
