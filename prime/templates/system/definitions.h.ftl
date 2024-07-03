@@ -2,6 +2,7 @@
 
 #include "stack/prime/prime_api/prime_api.h"
 #include "stack/prime/prime_api/prime_api_defs.h"
+#include "stack/prime/prime_api/prime_api_types.h"
 <#if (PRIME_MODE == "BN") || (PRIME_MODE == "SN" && PRIME_PROJECT == "bin project")>
 #include "stack/prime/prime_api/prime_hal_wrapper.h"
 </#if>
