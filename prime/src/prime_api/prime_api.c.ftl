@@ -85,13 +85,9 @@ void PRIME_API_GetPrime14API(PRIME_API **pPrimeApi)
 /* Configuration of the CORTEX-M4 Processor and Core Peripherals */
 /* PIC32CXMT */
 #define __NVIC_PRIO_BITS         4
-  <#if (PRIME_MODE == "BN" && BN_SLAVE_EN == false)>
-//#define NUM_MAX_NODES            ${NUM_MAX_NODES}
-  </#if>
+
+/* Security profile for PRIME 1.4 */
 #define MAC_SECURITY_PROFILE     ${MAC_SECURITY_PROFILE}
-  <#if (MAC_SNIFFER_EN?? && MAC_SNIFFER_EN == true)>
-#define MAC_SNIFFER_USI_PORT     ${MAC_SNIFFER_USI_PORT}
-  </#if>
 
 // *****************************************************************************
 // *****************************************************************************

@@ -1,4 +1,3 @@
+
     /* Initialize PRIME */
-    PRIME_API *primeApi;
-    PRIME_API_GetPrimeAPI(&primeApi);
-    primeApi->Initialize((PRIME_API_INIT*)&primeApiInit);
+    sysObj.primeStack = PRIME_Initialize(PRIME_INDEX_0, (SYS_MODULE_INIT *)&primeInitData);

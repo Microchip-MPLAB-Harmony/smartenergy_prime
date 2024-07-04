@@ -1,3 +1,7 @@
+<#if (PRIME_MODE == "BN") || (PRIME_MODE == "SN" && PRIME_PROJECT == "application project")>
+#include "stack/prime/prime_stack.h"
+</#if>
+
 #include "stack/prime/hal_api/hal_api.h"
 
 #include "stack/prime/prime_api/prime_api.h"

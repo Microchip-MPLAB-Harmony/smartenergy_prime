@@ -66,8 +66,11 @@ global pClNullApiHeaderFile
 global pCl432HeaderFile
 global pCl432ApiHeaderFile
 global pHalApiSourceFile
-global pHalApiPalTypesFile
-global pHalApiPalHeaderFile
+global pPalTypesFile
+global pPalHeaderFile
+global pPrimeHeaderFile
+global pPrimeSourceFile
+global pPrimeLocalHeaderFile
 
 # Libraries
 global pPrime13BnLibFile
@@ -144,6 +147,9 @@ def createGroupServices():
 
 def primeAddBnFiles():
     # BN API files
+    pPrimeHeaderFile.setEnabled(True)
+    pPrimeSourceFile.setEnabled(True)
+    pPrimeLocalHeaderFile.setEnabled(True)
     pPrimeHalWrapperHeaderFile.setEnabled(True)
     pPrimeHalWrapperSourceFile.setEnabled(True)
     pMacHeaderFile.setEnabled(True)
@@ -155,8 +161,8 @@ def primeAddBnFiles():
     pCl432HeaderFile.setEnabled(True)
     pCl432ApiHeaderFile.setEnabled(True)
     pHalApiSourceFile.setEnabled(True)
-    pHalApiPalTypesFile.setEnabled(False)
-    pHalApiPalHeaderFile.setEnabled(False)
+    pPalTypesFile.setEnabled(False)
+    pPalHeaderFile.setEnabled(False)
 
     # No libraries by default
     pPrime13BnLibFile.setEnabled(False)
@@ -197,6 +203,9 @@ def primeAddSnFiles():
 
     if (primeConfigProject.getValue() == "bin project"):
         # SN API files in bin
+        pPrimeHeaderFile.setEnabled(False)
+        pPrimeSourceFile.setEnabled(False)
+        pPrimeLocalHeaderFile.setEnabled(False)
         pPrimeHalWrapperHeaderFile.setEnabled(True)
         pPrimeHalWrapperSourceFile.setEnabled(True)
         pMacHeaderFile.setEnabled(True)
@@ -206,8 +215,8 @@ def primeAddSnFiles():
         pCl432HeaderFile.setEnabled(True)
         pCl432ApiHeaderFile.setEnabled(True)
         pHalApiSourceFile.setEnabled(False)
-        pHalApiPalTypesFile.setEnabled(True)
-        pHalApiPalHeaderFile.setEnabled(True)
+        pPalTypesFile.setEnabled(True)
+        pPalHeaderFile.setEnabled(True)
 
         # SN library
         if (primeConfigVersion.getValue() == "1.3.6"):
@@ -219,6 +228,9 @@ def primeAddSnFiles():
             pass
     elif (primeConfigProject.getValue() == "application project"):
         # SN API files in application
+        pPrimeHeaderFile.setEnabled(True)
+        pPrimeSourceFile.setEnabled(True)
+        pPrimeLocalHeaderFile.setEnabled(True)
         pPrimeHalWrapperHeaderFile.setEnabled(False)
         pPrimeHalWrapperSourceFile.setEnabled(False)
         pMacHeaderFile.setEnabled(False)
@@ -228,8 +240,8 @@ def primeAddSnFiles():
         pCl432HeaderFile.setEnabled(False)
         pCl432ApiHeaderFile.setEnabled(False)
         pHalApiSourceFile.setEnabled(True)
-        pHalApiPalTypesFile.setEnabled(False)
-        pHalApiPalHeaderFile.setEnabled(False)
+        pPalTypesFile.setEnabled(False)
+        pPalHeaderFile.setEnabled(False)
 
         # No library in SN application
         pass
@@ -727,6 +739,34 @@ def instantiateComponent(primeStackConfigComponent):
     ############################################################################
 
     configName = Variables.get("__CONFIGURATION_NAME")
+    
+    ##### PRIME API
+    global pPrimeHeaderFile
+    pPrimeHeaderFile = primeStackConfigComponent.createFileSymbol("PRIME_HEADER", None)
+    pPrimeHeaderFile.setSourcePath("prime/src/prime_stack.h")
+    pPrimeHeaderFile.setOutputName("prime_stack.h")
+    pPrimeHeaderFile.setDestPath("stack/prime")
+    pPrimeHeaderFile.setProjectPath("config/" + configName + "/stack/prime")
+    pPrimeHeaderFile.setType("HEADER")
+    pPrimeHeaderFile.setEnabled(False)
+    
+    global pPrimeSourceFile
+    pPrimeSourceFile = primeStackConfigComponent.createFileSymbol("PRIME_SOURCE", None)
+    pPrimeSourceFile.setSourcePath("prime/src/prime_stack.c")
+    pPrimeSourceFile.setOutputName("prime_stack.c")
+    pPrimeSourceFile.setDestPath("stack/prime")
+    pPrimeSourceFile.setProjectPath("config/" + configName + "/stack/prime")
+    pPrimeSourceFile.setType("SOURCE")
+    pPrimeSourceFile.setEnabled(False)
+    
+    global pPrimeLocalHeaderFile
+    pPrimeLocalHeaderFile = primeStackConfigComponent.createFileSymbol("PRIME_LOCAL_HEADER", None)
+    pPrimeLocalHeaderFile.setSourcePath("prime/src/prime_stack_local.h")
+    pPrimeLocalHeaderFile.setOutputName("prime_stack_local.h")
+    pPrimeLocalHeaderFile.setDestPath("stack/prime")
+    pPrimeLocalHeaderFile.setProjectPath("config/" + configName + "/stack/prime")
+    pPrimeLocalHeaderFile.setType("HEADER")
+    pPrimeLocalHeaderFile.setEnabled(False)
 
     ##### PRIME API
     pPrimeApiHeaderFile = primeStackConfigComponent.createFileSymbol("PRIME_API_HEADER", None)
@@ -903,23 +943,23 @@ def instantiateComponent(primeStackConfigComponent):
     pHalApiSourceFile.setType("SOURCE")
     pHalApiSourceFile.setEnabled(True)
 
-    global pHalApiPalTypesFile
-    pHalApiPalTypesFile = primeStackConfigComponent.createFileSymbol("HAL_API_PAL_TYPES", None)
-    pHalApiPalTypesFile.setSourcePath("pal/pal_types.h")
-    pHalApiPalTypesFile.setOutputName("pal_types.h")
-    pHalApiPalTypesFile.setDestPath("stack/pal")
-    pHalApiPalTypesFile.setProjectPath("config/" + configName + "/stack/pal")
-    pHalApiPalTypesFile.setType("HEADER")
-    pHalApiPalTypesFile.setEnabled(False)
+    global pPalTypesFile
+    pPalTypesFile = primeStackConfigComponent.createFileSymbol("PAL_TYPES", None)
+    pPalTypesFile.setSourcePath("pal/pal_types.h")
+    pPalTypesFile.setOutputName("pal_types.h")
+    pPalTypesFile.setDestPath("stack/pal")
+    pPalTypesFile.setProjectPath("config/" + configName + "/stack/pal")
+    pPalTypesFile.setType("HEADER")
+    pPalTypesFile.setEnabled(False)
 
-    global pHalApiPalHeaderFile
-    pHalApiPalHeaderFile = primeStackConfigComponent.createFileSymbol("HAL_API_PAL_HEADER", None)
-    pHalApiPalHeaderFile.setSourcePath("pal/pal.h")
-    pHalApiPalHeaderFile.setOutputName("pal.h")
-    pHalApiPalHeaderFile.setDestPath("stack/pal")
-    pHalApiPalHeaderFile.setProjectPath("config/" + configName + "/stack/pal")
-    pHalApiPalHeaderFile.setType("HEADER")
-    pHalApiPalHeaderFile.setEnabled(False)
+    global pPalHeaderFile
+    pPalHeaderFile = primeStackConfigComponent.createFileSymbol("PAL_HEADER", None)
+    pPalHeaderFile.setSourcePath("pal/pal.h")
+    pPalHeaderFile.setOutputName("pal.h")
+    pPalHeaderFile.setDestPath("stack/pal")
+    pPalHeaderFile.setProjectPath("config/" + configName + "/stack/pal")
+    pPalHeaderFile.setType("HEADER")
+    pPalHeaderFile.setEnabled(False)
 
     ##### PRIME LIBRARIES
     global pPrime13BnLibFile
@@ -950,8 +990,8 @@ def instantiateComponent(primeStackConfigComponent):
     pPrime14SnLibFile.setDestPath("stack/prime/libs")
     pPrime14SnLibFile.setEnabled(False)
 
-#### FreeMaker System Files ######################################################
-
+    ##### PRIME STACK TEMPLATES
+    
     primeStackSystemConfigFile = primeStackConfigComponent.createFileSymbol("PRIME_STACK_CONFIGURATION", None)
     primeStackSystemConfigFile.setType("STRING")
     primeStackSystemConfigFile.setOutputName("core.LIST_SYSTEM_CONFIG_H_MIDDLEWARE_CONFIGURATION")
@@ -963,18 +1003,30 @@ def instantiateComponent(primeStackConfigComponent):
     primeStackSystemDefFile.setOutputName("core.LIST_SYSTEM_DEFINITIONS_H_INCLUDES")
     primeStackSystemDefFile.setSourcePath("prime/templates/system/definitions.h.ftl")
     primeStackSystemDefFile.setMarkup(True)
+    
+    primeStackSystemDefObjFile = primeStackConfigComponent.createFileSymbol("PRIME_STACK_DEF_OBJ", None)
+    primeStackSystemDefObjFile.setType("STRING")
+    primeStackSystemDefObjFile.setOutputName("core.LIST_SYSTEM_DEFINITIONS_H_OBJECTS")
+    primeStackSystemDefObjFile.setSourcePath("prime/templates/system/definitions_objects.h.ftl")
+    primeStackSystemDefObjFile.setMarkup(True)
+    
+    primeStackSystemInitDataFile = primeStackConfigComponent.createFileSymbol("PRIME_STACK_INIT_DATA", None)
+    primeStackSystemInitDataFile.setType("STRING")
+    primeStackSystemInitDataFile.setOutputName("core.LIST_SYSTEM_INIT_C_LIBRARY_INITIALIZATION_DATA")
+    primeStackSystemInitDataFile.setSourcePath("prime/templates/system/initialize_data.c.ftl")
+    primeStackSystemInitDataFile.setMarkup(True)
 
-    #primeSystemInitFile = primeStackConfigComponent.createFileSymbol("PRIME_STACK_INIT", None)
-    #primeSystemInitFile.setType("STRING")
-    #primeSystemInitFile.setOutputName("core.LIST_SYSTEM_INIT_C_INITIALIZE_MIDDLEWARE")
-    #primeSystemInitFile.setSourcePath("prime/templates/system/initialize.c.ftl")
-    #primeSystemInitFile.setMarkup(True)
+    primeSystemInitFile = primeStackConfigComponent.createFileSymbol("PRIME_STACK_INIT", None)
+    primeSystemInitFile.setType("STRING")
+    primeSystemInitFile.setOutputName("core.LIST_SYSTEM_INIT_C_INITIALIZE_MIDDLEWARE")
+    primeSystemInitFile.setSourcePath("prime/templates/system/initialize.c.ftl")
+    primeSystemInitFile.setMarkup(True)
 
-    #primeSystemTasksFile = primeStackConfigComponent.createFileSymbol("PRIME_STACK_SYS_TASK", None)
-    #primeSystemTasksFile.setType("STRING")
-    #primeSystemTasksFile.setOutputName("core.LIST_SYSTEM_TASKS_C_CALL_LIB_TASKS")
-    #primeSystemTasksFile.setSourcePath("prime/templates/system/system_tasks.c.ftl")
-    #primeSystemTasksFile.setMarkup(True)
+    primeSystemTasksFile = primeStackConfigComponent.createFileSymbol("PRIME_STACK_SYS_TASK", None)
+    primeSystemTasksFile.setType("STRING")
+    primeSystemTasksFile.setOutputName("core.LIST_SYSTEM_TASKS_C_CALL_LIB_TASKS")
+    primeSystemTasksFile.setSourcePath("prime/templates/system/system_tasks.c.ftl")
+    primeSystemTasksFile.setMarkup(True)
 
 def destroyComponent(primeStackConfigComponent):
     # Set Application Start Address
