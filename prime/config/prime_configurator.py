@@ -51,7 +51,7 @@ global primeSNAppSize
 global primeSNPFWStack14Size
 global primeSNPHYSize
 global primeSNPFWStack13Size
-global primeSNFUComment
+global primeFUComment
 global primeBNFUComment
 
 # Files
@@ -298,7 +298,7 @@ def primeShowSNAppConfiguration(primeVersion):
     primeConfigSprofUsiPort.setVisible(True)
 
     primeSNAppAddress.setVisible(True)
-    primeSNFUComment.setVisible(True)
+    primeFUComment.setVisible(True)
     primeSNPHYAddress.setVisible(True)
     primeSNPFWStack14Address.setVisible(True)
     primeSNPFWStack13Address.setVisible(True)
@@ -349,7 +349,7 @@ def primeShowSNBinConfiguration(primeVersion):
     primeConfigSprofUsiPort.setVisible(False)
 
     primeSNAppAddress.setVisible(False)
-    primeSNFUComment.setVisible(False)
+    primeFUComment.setVisible(False)
     primeSNPHYAddress.setVisible(False)
 
     primeSNAppSize.setVisible(False)
@@ -359,8 +359,8 @@ def primeShowSNBinConfiguration(primeVersion):
         # SN - v1.4
         primeConfigSecProfile.setReadOnly(False)
         primeConfigFWVersion.setValue("HS14.01.01")
-        primeSNPFWStack14Address.setVisible(True)
-        primeSNPFWStack14Size.setVisible(True)
+        primeSNPFWStack14Address.setVisible(False)
+        primeSNPFWStack14Size.setVisible(False)
         primeSNPFWStack13Address.setVisible(False)
         primeSNPFWStack13Size.setVisible(False)
     else:
@@ -388,7 +388,7 @@ def primeShowBNConfiguration(primeVersion):
     primeConfigMngpSprof.setVisible(True)
     primeConfigSprofUsiPort.setVisible(True)
     primeConfigSecProfile.setVisible(True)
-    primeSNFUComment.setVisible(True)
+    primeFUComment.setVisible(True)
 
     # Hide BN options
     primeConfigProject.setVisible(False)
@@ -491,11 +491,20 @@ def instantiateComponent(primeStackConfigComponent):
     primeConfigMode.setDescription("Select the PRIME mode: base or service node")
     primeConfigMode.setVisible(True)
     primeConfigMode.setDefaultValue("SN")
+    
+    # Select type of project
+    global primeConfigProject
+    primeProjectOptions = ["application project", "bin project"]
+    primeConfigProject = primeStackConfigComponent.createComboSymbol("PRIME_PROJECT", primeStackConfig, primeProjectOptions)
+    primeConfigProject.setLabel("Type of PRIME project for separated applications")
+    primeConfigProject.setDescription("Select the type of PRIME project for separated applications")
+    primeConfigProject.setVisible(True)
+    primeConfigProject.setDefaultValue("application project")
 
     memStartAddressHex, memSizeHex = getFlashMemoryDescription()
 
     global primeSNAppAddress
-    primeSNAppAddress = primeStackConfigComponent.createStringSymbol("PRIME_SN_APP_ADDRESS", primeConfigMode)
+    primeSNAppAddress = primeStackConfigComponent.createStringSymbol("PRIME_SN_APP_ADDRESS", primeStackConfig)
     primeSNAppAddress.setLabel("User Application Address")
     primeSNAppAddress.setDescription("PRIME SN User Application region start address")
     primeSNAppAddress.setVisible(True)
@@ -503,14 +512,14 @@ def instantiateComponent(primeStackConfigComponent):
     primeSNAppAddress.setDefaultValue(address)
 
     global primeSNAppSize
-    primeSNAppSize = primeStackConfigComponent.createStringSymbol("PRIME_SN_APP_SIZE", primeConfigMode)
+    primeSNAppSize = primeStackConfigComponent.createStringSymbol("PRIME_SN_APP_SIZE", primeStackConfig)
     primeSNAppSize.setLabel("User Application Size")
     primeSNAppSize.setDescription("PRIME SN User Application size in bytes")
     primeSNAppSize.setVisible(True)
     primeSNAppSize.setDefaultValue(PRIME_USER_APP_SIZE_HEX)
 
     global primeSNPFWStack14Address
-    primeSNPFWStack14Address = primeStackConfigComponent.createStringSymbol("PRIME_SN_FWSTACK14_ADDRESS", primeConfigMode)
+    primeSNPFWStack14Address = primeStackConfigComponent.createStringSymbol("PRIME_SN_FWSTACK14_ADDRESS", primeStackConfig)
     primeSNPFWStack14Address.setLabel("FW Stack v1.4 Address")
     primeSNPFWStack14Address.setDescription("PRIME v1.4 FW Stack region start address")
     primeSNPFWStack14Address.setVisible(True)
@@ -518,14 +527,14 @@ def instantiateComponent(primeStackConfigComponent):
     primeSNPFWStack14Address.setDefaultValue(address)
 
     global primeSNPFWStack14Size
-    primeSNPFWStack14Size = primeStackConfigComponent.createStringSymbol("PRIME_SN_FWSTACK14_SIZE", primeConfigMode)
+    primeSNPFWStack14Size = primeStackConfigComponent.createStringSymbol("PRIME_SN_FWSTACK14_SIZE", primeStackConfig)
     primeSNPFWStack14Size.setLabel("FW Stack v1.4 Size")
     primeSNPFWStack14Size.setDescription("PRIME SN FW Stack v1.4 size in bytes")
     primeSNPFWStack14Size.setVisible(True)
     primeSNPFWStack14Size.setDefaultValue(PRIME_FW_STACK_14_SIZE_HEX)
 
     global primeSNPHYAddress
-    primeSNPHYAddress = primeStackConfigComponent.createStringSymbol("PRIME_SN_PHY_ADDRESS", primeConfigMode)
+    primeSNPHYAddress = primeStackConfigComponent.createStringSymbol("PRIME_SN_PHY_ADDRESS", primeStackConfig)
     primeSNPHYAddress.setLabel("PHY Layer Address")
     primeSNPHYAddress.setDescription("PRIME PHY layer region start address")
     primeSNPHYAddress.setVisible(True)
@@ -533,14 +542,14 @@ def instantiateComponent(primeStackConfigComponent):
     primeSNPHYAddress.setDefaultValue(address)
 
     global primeSNPHYSize
-    primeSNPHYSize = primeStackConfigComponent.createStringSymbol("PRIME_SN_PHY_SIZE", primeConfigMode)
+    primeSNPHYSize = primeStackConfigComponent.createStringSymbol("PRIME_SN_PHY_SIZE", primeStackConfig)
     primeSNPHYSize.setLabel("PHY Layer Size")
     primeSNPHYSize.setDescription("PRIME SN PHY Layer size in bytes")
     primeSNPHYSize.setVisible(True)
     primeSNPHYSize.setDefaultValue(PRIME_PHY_SIZE_HEX)
 
     global primeSNPFWStack13Address
-    primeSNPFWStack13Address = primeStackConfigComponent.createStringSymbol("PRIME_SN_FWSTACK13_ADDRESS", primeConfigMode)
+    primeSNPFWStack13Address = primeStackConfigComponent.createStringSymbol("PRIME_SN_FWSTACK13_ADDRESS", primeStackConfig)
     primeSNPFWStack13Address.setLabel("FW Stack v1.3 Address")
     primeSNPFWStack13Address.setDescription("PRIME v1.3 FW Stack region start address")
     primeSNPFWStack13Address.setVisible(True)
@@ -548,17 +557,17 @@ def instantiateComponent(primeStackConfigComponent):
     primeSNPFWStack13Address.setDefaultValue(address)
 
     global primeSNPFWStack13Size
-    primeSNPFWStack13Size = primeStackConfigComponent.createStringSymbol("PRIME_SN_FWSTACK13_SIZE", primeConfigMode)
+    primeSNPFWStack13Size = primeStackConfigComponent.createStringSymbol("PRIME_SN_FWSTACK13_SIZE", primeStackConfig)
     primeSNPFWStack13Size.setLabel("FW Stack v1.3 Size")
     primeSNPFWStack13Size.setDescription("PRIME SN FW Stack v1.3 size in bytes")
     primeSNPFWStack13Size.setVisible(True)
     primeSNPFWStack13Size.setDefaultValue(PRIME_FW_STACK_13_SIZE_HEX)
 
     # The FW Image address is configured by PRIME FU Service
-    global primeSNFUComment
-    primeSNFUComment = primeStackConfigComponent.createCommentSymbol("PRIME_SN_FU_COMMENT", primeConfigMode)
-    primeSNFUComment.setLabel("*** PRIME FU address must be configured using the PRIME FU Service ***")
-    primeSNFUComment.setVisible(True)
+    global primeFUComment
+    primeFUComment = primeStackConfigComponent.createCommentSymbol("PRIME_FU_COMMENT", primeStackConfig)
+    primeFUComment.setLabel("*** PRIME FU address must be configured using the PRIME FU Service ***")
+    primeFUComment.setVisible(True)
 
     # Dummy symbol to update files of the PRIME Stack
     primeStackAddressDummy = primeStackConfigComponent.createMenuSymbol("PRIME_Stack_Address_Dummy", None)
@@ -574,15 +583,6 @@ def instantiateComponent(primeStackConfigComponent):
     primeConfigBnSlaveEn.setDescription("Enable/disable the BN slave functionality")
     primeConfigBnSlaveEn.setVisible(False)
     primeConfigBnSlaveEn.setDefaultValue(False)
-
-    # Select type of project
-    global primeConfigProject
-    primeProjectOptions = ["application project", "bin project"]
-    primeConfigProject = primeStackConfigComponent.createComboSymbol("PRIME_PROJECT", primeStackConfig, primeProjectOptions)
-    primeConfigProject.setLabel("Type of PRIME project for separated applications")
-    primeConfigProject.setDescription("Select the type of PRIME project for separated applications")
-    primeConfigProject.setVisible(True)
-    primeConfigProject.setDefaultValue("application project")
 
     # Select version
     global primeConfigVersion
@@ -752,12 +752,13 @@ def instantiateComponent(primeStackConfigComponent):
     
     global pPrimeSourceFile
     pPrimeSourceFile = primeStackConfigComponent.createFileSymbol("PRIME_SOURCE", None)
-    pPrimeSourceFile.setSourcePath("prime/src/prime_stack.c")
+    pPrimeSourceFile.setSourcePath("prime/src/prime_stack.c.ftl")
     pPrimeSourceFile.setOutputName("prime_stack.c")
     pPrimeSourceFile.setDestPath("stack/prime")
     pPrimeSourceFile.setProjectPath("config/" + configName + "/stack/prime")
     pPrimeSourceFile.setType("SOURCE")
     pPrimeSourceFile.setEnabled(False)
+    pPrimeSourceFile.setMarkup(True)
     
     global pPrimeLocalHeaderFile
     pPrimeLocalHeaderFile = primeStackConfigComponent.createFileSymbol("PRIME_LOCAL_HEADER", None)

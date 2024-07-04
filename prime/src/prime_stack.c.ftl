@@ -51,6 +51,9 @@ Microchip or any third party.
 #include "prime_api/prime_api.h"
 #include "prime_api/prime_api_defs.h"
 #include "prime_api/prime_api_types.h"
+<#if PRIME_MODE == "SN" && PRIME_PROJECT == "application project">
+#include "service/storage/srv_storage.h"
+</#if>
 
 // *****************************************************************************
 // *****************************************************************************
@@ -89,11 +92,32 @@ SYS_MODULE_OBJ PRIME_Initialize(const SYS_MODULE_INDEX index,
     /* Fill in initialization data */
     primeApiInit.palIndex = primeInit->palIndex;
     primeApiInit.mngPlaneUsiPort = primeInit->mngPlaneUsiPort;
-    primeApiInit.halApi = (HAL_API *)&primeHalAPI,
+    primeApiInit.halApi = (HAL_API *)&primeHalAPI;
     
-    /* Get PRIME API pointer*/
-    PRIME_API_GetPrimeAPI(&primeObj.primeApi);               /* TBD: different for SN 13 14 !!!!!! */
+<#if PRIME_MODE == "BN">
+    /* Get PRIME API pointer */
+    PRIME_API_GetPrimeAPI(&primeObj.primeApi);
+</#if>
+<#if PRIME_MODE == "SN" && PRIME_PROJECT == "application project">
+    /* Get the PRIME version */
+    SRV_STORAGE_PRIME_MODE_INFO_CONFIG boardInfo;
+    SRV_STORAGE_GetConfigInfo(SRV_STORAGE_TYPE_MODE_PRIME, sizeof(boardInfo), 
+                              (void *)&boardInfo);
     
+    /* Get PRIME API pointer */
+    switch (boardInfo.primeVersion) 
+    {
+        case PRIME_VERSION_1_3:
+            PRIME_API_GetPrime13API(&primeObj.primeApi);
+            break;
+
+        case PRIME_VERSION_1_4:
+        default:
+            PRIME_API_GetPrime14API(&primeObj.primeApi);
+            break;
+    }
+ </#if>
+ 
     /* Initialize PRIME */
     primeObj.primeApi->Initialize((PRIME_API_INIT*)&primeApiInit);
     
