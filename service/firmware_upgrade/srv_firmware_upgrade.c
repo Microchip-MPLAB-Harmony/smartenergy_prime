@@ -83,18 +83,6 @@
 // 					      0x20, 0xbc, 0x5f, 0x5f, 0x9e, 0x73, 0x1c, 0x77,
 // 					      0xcf };
 
-// /** Callback function pointer for CRC result */
-// static void (*_crc_cb_function)(uint32_t ul_crc);
-
-// /** Callback function pointer for signature and binary result */
-// static void (*_signature_image_cb_function)(hal_fu_verif_result_t uc_result);
-
-// /** Callback function pointer for FU result */
-// static void (*_fu_result_cb_function)(hal_fu_result_t *uc_result);
-
-// /** Internal var to manage memory address in FU process */
-// static uint32_t sul_fw_mem_address;
-
 // /** FU information data */
 // static hal_fu_info_t x_fu_data;
 
@@ -116,8 +104,7 @@
 //  * \param x_fu_region    Pointer to FU Region configuration
 //  *
 //  */
-// static uint32_t sul_flash;
-// static uint32_t sul_flash_end;
+
 // static bool deleteActive;
 // static void _erase_flash_region(x_fu_region_cfg_t *x_fu_region)
 // {
@@ -223,10 +210,201 @@
 // }
 // #endif
 
- #include <string.h>
+/*******************************************************************************
+  PRIME Reset Handler Service Implementation.
+
+  Company:
+    Microchip Technology Inc.
+
+  File Name:
+    srv_firmware_upgrade.c
+
+  Summary:
+    PRIME Firmware Upgrade Service Interface Header File.
+
+  Description:
+    The Firmware Upgrade service provides the handling of the firmare upgrade 
+    and version swap for PRIME. This file provides the interface definition for 
+    this service.
+*******************************************************************************/
+
+///DOM-IGNORE-BEGIN
+/*
+Copyright (C) 2024, Microchip Technology Inc., and its subsidiaries. All rights reserved.
+
+The software and documentation is provided by microchip and its contributors
+"as is" and any express, implied or statutory warranties, including, but not
+limited to, the implied warranties of merchantability, fitness for a particular
+purpose and non-infringement of third party intellectual property rights are
+disclaimed to the fullest extent permitted by law. In no event shall microchip
+or its contributors be liable for any direct, indirect, incidental, special,
+exemplary, or consequential damages (including, but not limited to, procurement
+of substitute goods or services; loss of use, data, or profits; or business
+interruption) however caused and on any theory of liability, whether in contract,
+strict liability, or tort (including negligence or otherwise) arising in any way
+out of the use of the software and documentation, even if advised of the
+possibility of such damage.
+
+Except as expressly permitted hereunder and subject to the applicable license terms
+for any third-party software incorporated in the software and any applicable open
+source software license terms, no license or other rights, whether express or
+implied, are granted under any patent or other intellectual property rights of
+Microchip or any third party.
+*/
+//DOM-IGNORE-END
+
+// *****************************************************************************
+// *****************************************************************************
+// Section: Included Files
+// *****************************************************************************
+// *****************************************************************************
+
+
+#include <string.h>
 
 #include "definitions.h"
+#include "srv_firmware_upgrade.h"
 #include "device.h"
+
+#include "driver/memory/drv_memory.h"
+
+// *****************************************************************************
+// *****************************************************************************
+// Section: Global Data
+// *****************************************************************************
+// *****************************************************************************
+
+// *****************************************************************************
+// *****************************************************************************
+// Section: File Scope Data
+// *****************************************************************************
+// *****************************************************************************
+
+/* Callback function pointers */
+static SRV_FU_CRC_CB SRV_FU_CrcCallback;
+static SRV_FU_IMAGE_VERIFY_CB SRV_FU_ImageVerifyCallback;
+static SRV_FU_RESULT_CB SRV_FU_ResultCallback;
+static SRV_FU_SWAP_CB SRV_FU_SwapCallback;
+
+/* Deletion of Flash variables */
+static bool deleteActive;
+static uint32_t sul_flash;
+static uint32_t sul_flash_end;
+
+// /** Internal var to manage memory address in FU process */
+// static uint32_t sul_fw_mem_address;
+
+
+// *****************************************************************************
+// *****************************************************************************
+// Section: File Scope Function Declarations
+// *****************************************************************************
+// *****************************************************************************
+
+// *****************************************************************************
+// *****************************************************************************
+// Section: File scope functions
+// *****************************************************************************
+// *****************************************************************************
+
+
+// *****************************************************************************
+// *****************************************************************************
+// Section: Reset Handler Service Interface Implementation
+// *****************************************************************************
+// *****************************************************************************
+
+void SRV_FU_Initialize(void)
+{
+	SRV_FU_CrcCallback = NULL;
+	SRV_FU_ImageVerifyCallback = NULL;
+	SRV_FU_ResultCallback = NULL;
+	SRV_FU_SwapCallback = NULL;
+
+	deleteActive = false;
+
+SYS_MEDIA_GEOMETRY *geometry = NULL;
+
+APP_SST26_DATA CACHE_ALIGN appSST26Data;
+
+void appTransferHandler
+(
+    DRV_MEMORY_EVENT event,
+    DRV_MEMORY_COMMAND_HANDLE commandHandle,
+    uintptr_t context
+)
+{
+    APP_SST26_DATA *app_data = (APP_SST26_DATA *)context;
+
+    switch(event)
+    {
+        case DRV_MEMORY_EVENT_COMMAND_COMPLETE:
+        {
+            /* Wait until the last request that is Read request is done */
+            if (commandHandle == app_data->readHandle)
+            {
+                appSST26Data.xfer_done = true;
+            }
+            break;
+        }
+
+        case DRV_MEMORY_EVENT_COMMAND_ERROR:
+        {
+            appSST26Data.state = APP_SST26_STATE_ERROR;
+            break;
+        }
+
+        default:
+        {
+            break;
+        }
+    }
+}
+
+void APP_SST26_Initialize ( void )
+{
+    uint32_t i = 0;
+
+    /* Place the App state machine in its initial state. */
+    appSST26Data.state = APP_SST26_STATE_OPEN_DRIVER;
+
+    for (i = 0; i < SST26_BUFFER_SIZE; i++)
+    {
+        appSST26Data.writeBuffer[i] = i;
+    }
+
+}
+
+void DRV_MEMORY_AsyncErase
+(
+    const DRV_HANDLE handle,
+    DRV_MEMORY_COMMAND_HANDLE *commandHandle,
+    uint32_t blockStart,
+    uint32_t nBlock
+);
+
+
+void SRV_FU_Tasks(void)
+{
+	/* Erase used sectors */
+	if(deleteActive) {
+
+	    flash_erase_page(sul_flash, IFLASH_ERASE_PAGES_16);
+
+		sul_flash += HAL_FLASH_16PAGE_SIZE; /* 16 pages */
+
+		if (sul_flash >= sul_flash_end) {
+			deleteActive = false;
+		}
+	}
+}
+
+
+
+
+
+
+
 
 void SRV_FU_DataRead(uint32_t address, uint8_t *buffer, uint16_t size)
 {
@@ -663,38 +841,3 @@ uint8_t SRV_FU_Swap(void)
 }
 #endif
 
-void SRV_FU_Task(void)
-{
-	/* Erase used sectors */
-	if(deleteActive) {
-
-	    flash_erase_page(sul_flash, IFLASH_ERASE_PAGES_16);
-
-		sul_flash += HAL_FLASH_16PAGE_SIZE; /* 16 pages */
-
-		if (sul_flash >= sul_flash_end) {
-			deleteActive = false;
-		}
-	}
-}
-
-/**
- * \brief Initialize module
- *
- */
-void SRV_FU_Initialize(void)
-{
-	_signature_image_cb_function = NULL;
-	_crc_cb_function = NULL;
-	_fu_result_cb_function = NULL;
-
-	deleteActive = false;
-}
-
-/* / @cond 0 */
-/**INDENT-OFF**/
-#ifdef __cplusplus
-}
-#endif
-/**INDENT-ON**/
-/* / @endcond */
