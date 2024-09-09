@@ -50,6 +50,7 @@ Microchip or any third party.
 // *****************************************************************************
 
 #include "system/system.h"
+#include "prime_stack_local.h"
 
 // DOM-IGNORE-BEGIN
 #ifdef __cplusplus  // Provide C++ Compatibility
@@ -58,33 +59,6 @@ Microchip or any third party.
 
 #endif
 // DOM-IGNORE-END
-
-// *****************************************************************************
-// *****************************************************************************
-// Section: Data Types
-// *****************************************************************************
-// *****************************************************************************
-
-// *****************************************************************************
-/* PRIME Initialization Data
-    
-   Summary:
-    Defines the data required to initialize the PRIME stack.
-
-  Description:
-    This data type defines the data required to initialize the PRIME stack and
-    all of its components.
-
-   Remarks:
-    None.
-*/
-typedef struct
-{
-    /* PAL index from configuration */
-    uint8_t palIndex;
-    /* USI port for Management Plane */
-    uint8_t mngPlaneUsiPort;
-} PRIME_STACK_INIT;
 
 // *****************************************************************************
 // *****************************************************************************
@@ -171,7 +145,7 @@ SYS_MODULE_OBJ PRIME_Initialize(const SYS_MODULE_INDEX index,
 
     while (true)
     {
-        PRIME_Tasks(sysObjAdp);
+        PRIME_Tasks(sysObjPrime);
     }
     </code>
 
@@ -191,7 +165,7 @@ void PRIME_Tasks(SYS_MODULE_OBJ object);
     Restart PRIME Stack from a different location.
 
   Description:
-    Restards the PRIME Stack from a different location.
+    Restarts the PRIME Stack from a different location.
 
   Precondition:
     PRIME_Initialize routine must have been called before.
@@ -212,6 +186,47 @@ void PRIME_Tasks(SYS_MODULE_OBJ object);
     None.
 */
 void PRIME_Restart(uint32_t *primePtr);
+
+// *****************************************************************************
+/* Function:
+    PRIME_STATUS PRIME_Status(void)
+
+  Summary:
+    Returns the current status of the PRIME stack.
+
+  Description:
+    This routine provides the current status of the PRIME stack.
+
+  Precondition:
+    None.
+
+  Parameters:
+    None.
+
+  Returns:
+    PRIME_STATUS_UNINITIALIZED - Indicates that the PRIME stack is not 
+                                 initialized.
+
+    PRIME_STATUS_POINTER_READY - Indicates that the PRIME stack has the PRIME 
+                                 API pointer.
+
+    PRIME_STATUS_RUNNING - Indicates that the PRIME stack is running.
+
+    PRIME_STATUS_ERROR - Indicates that there is an error.
+
+  Example:
+    <code>
+    if (PRIME_Status() == PRIME_STATUS_RUNNING)
+    {
+
+    }
+    </code>
+
+  Remarks:
+    None.
+  */
+
+PRIME_STATUS PRIME_Status(void);
 
 //DOM-IGNORE-BEGIN
 #ifdef __cplusplus

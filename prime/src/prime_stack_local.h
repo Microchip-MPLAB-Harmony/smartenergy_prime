@@ -57,6 +57,52 @@ Microchip or any third party.
 // *****************************************************************************
 
 // *****************************************************************************
+/* PRIME Initialization Data
+    
+   Summary:
+    Defines the data required to initialize the PRIME stack.
+
+  Description:
+    This data type defines the data required to initialize the PRIME stack and
+    all of its components.
+
+   Remarks:
+    None.
+*/
+typedef struct
+{
+    /* PAL index from configuration */
+    uint8_t palIndex;
+    /* USI port for Management Plane */
+    uint8_t mngPlaneUsiPort;
+} PRIME_STACK_INIT;
+
+// *****************************************************************************
+/* PRIME stack status
+ 
+  Summary:
+    List of possible values of PRIME stack status.
+
+  Description:
+    This type defines the possible return values for PRIME_Status function.
+
+  Remarks:
+    None.
+*/
+
+typedef enum
+{
+    PRIME_STATUS_UNINITIALIZED,
+
+    PRIME_STATUS_POINTER_READY,
+
+    PRIME_STATUS_RUNNING,
+
+    PRIME_STATUS_ERROR
+
+} PRIME_STATUS;
+
+// *****************************************************************************
 /* PRIME Stack Instance Object
 
   Summary:
@@ -71,6 +117,9 @@ Microchip or any third party.
 
 typedef struct
 {
+    /* State of this instance */
+    PRIME_STATUS status;
+    
     /* Pointer to the PRIME API */
     PRIME_API *primeApi;
 

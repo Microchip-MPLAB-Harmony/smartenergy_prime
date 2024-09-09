@@ -245,9 +245,6 @@ void PRIME_API_Initialize(PRIME_API_INIT *init)
 {
     MAC_VERSION_INFO macInfo;
 
-    /* Set critical region */
-    __set_BASEPRI( 2 << (8 - __NVIC_PRIO_BITS));
-
   <#if PRIME_MODE == "SN" && PRIME_PROJECT == "bin project">
     lPRIME_API_PrimeDataStartup();
   </#if>
@@ -270,16 +267,10 @@ void PRIME_API_Initialize(PRIME_API_INIT *init)
 
     /* Initialize Management Plane */
     MNGP_Initialize(&macInfo, init->mngPlaneUsiPort);
-
-    /* Set critical region */
-    __set_BASEPRI(0);
 }
 
 void PRIME_API_Tasks(void)
 {
-    /* Set critical region */
-    __set_BASEPRI( 3 << (8 - __NVIC_PRIO_BITS));
-    
     /* Proccess PAL layer */
     PRIME_HAL_WRP_PAL_Tasks(palSysObj);
 
@@ -290,9 +281,6 @@ void PRIME_API_Tasks(void)
 	/* Process Management Plane */
 	MNGP_Tasks();
   </#if>
-
-    /* Set critical region */
-    __set_BASEPRI(0);
 }
 
   <#if PRIME_MODE == "BN">

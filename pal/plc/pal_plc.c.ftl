@@ -683,7 +683,7 @@ SYS_MODULE_OBJ PAL_PLC_Initialize(void)
 <#if srvLogReport.ENABLE_TRACES == true>        
         SRV_LOG_REPORT_Message_With_Code(SRV_LOG_REPORT_ERROR, 
                 (SRV_LOG_REPORT_CODE)PHY_LAYER_PLC_NOT_AVAILABLE,
-                "PRIME_PAL_PLC: PLC PHY layer not vailable\r\n");
+                "PRIME_PAL_PLC: PLC PHY layer not available\r\n");
 </#if>        
         palPlcData.status = PAL_PLC_STATUS_ERROR;
         return SYS_MODULE_OBJ_INVALID;
