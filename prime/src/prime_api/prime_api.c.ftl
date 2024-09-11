@@ -73,9 +73,9 @@ void PRIME_API_GetPrime14API(PRIME_API **pPrimeApi)
 #include "stack/prime/conv/sscs/null/cl_null_api.h"
 #include "stack/prime/conv/sscs/iec_4_32/cl_432.h"
 #include "stack/prime/conv/sscs/iec_4_32/cl_432_api.h"
-<#if PRIME_MODE == "BN" && BN_SLAVE_EN == false>
+  <#if PRIME_MODE == "BN" && BN_SLAVE_EN == false>
 #include "stack/prime/mngp/bmng_api.h"
-</#if>
+  </#if>
 
 // *****************************************************************************
 // *****************************************************************************
@@ -178,6 +178,15 @@ const PRIME_API PRIME_API_Interface =
 /* Object obtained from PAL Initialize */
 static SYS_MODULE_OBJ palSysObj;
 
+/* State of the PRIME API */
+static PRIME_API_STATE primeApiState;
+
+/* MAC version information */
+static MAC_VERSION_INFO macInfo;
+
+/* Port for the Management Plane */
+static uint8_t mngPlanePort;
+
 // *****************************************************************************
 // *****************************************************************************
 // Section: File scope functions
@@ -243,8 +252,6 @@ static void lPRIME_API_SetPrimeVersion(MAC_VERSION_INFO *macInfo)
 // *****************************************************************************
 void PRIME_API_Initialize(PRIME_API_INIT *init)
 {
-    MAC_VERSION_INFO macInfo;
-
   <#if PRIME_MODE == "SN" && PRIME_PROJECT == "bin project">
     lPRIME_API_PrimeDataStartup();
   </#if>
@@ -255,32 +262,61 @@ void PRIME_API_Initialize(PRIME_API_INIT *init)
     /* Set PRIME version from configuration */
     lPRIME_API_SetPrimeVersion(&macInfo);
     
+    /* Store port for PRIME initialization */
+    mngPlanePort = init->mngPlaneUsiPort;
+    
     /* Initialize PAL layer */
     palSysObj = PRIME_HAL_WRP_PAL_Initialize(init->palIndex);
-
-    /* Initialize MAC layer */
-    MAC_Initialize(&macInfo, (uint8_t)MAC_SECURITY_PROFILE);
-
-    /* Initialize Convergence layers */
-    CL_NULL_Initialize();
-    CL_432_Initialize();
-
-    /* Initialize Management Plane */
-    MNGP_Initialize(&macInfo, init->mngPlaneUsiPort);
+    
+    primeApiState = PRIME_API_STATE_PAL_INITIALIZED;
 }
 
 void PRIME_API_Tasks(void)
 {
-    /* Proccess PAL layer */
-    PRIME_HAL_WRP_PAL_Tasks(palSysObj);
+    switch (primeApiState)
+    {
+        case PRIME_API_STATE_PAL_INITIALIZED:
+        
+            /* Process PAL layer */
+            PRIME_HAL_WRP_PAL_Tasks(palSysObj);
+        
+            if (PRIME_HAL_WRP_PAL_Status(palSysObj) == SYS_STATUS_READY) 
+            {
+                /* Initialize MAC layer */
+                MAC_Initialize(&macInfo, (uint8_t)MAC_SECURITY_PROFILE);
 
-	/* Process MAC layer */
-	MAC_Tasks();
+                /* Initialize Convergence layers */
+                CL_NULL_Initialize();
+                CL_432_Initialize();
+
+                /* Initialize Management Plane */
+                MNGP_Initialize(&macInfo, mngPlanePort);
+                
+                primeApiState = PRIME_API_STATE_PRIME_RUNNING;
+            }
+        
+            break;
+            
+        case PRIME_API_STATE_PRIME_RUNNING:
+                
+            /* Process PAL layer */
+            PRIME_HAL_WRP_PAL_Tasks(palSysObj);
+                
+            /* Process MAC layer */
+            MAC_Tasks();
 
   <#if (PRIME_MODE == "SN") || (PRIME_MODE == "BN" && BN_SLAVE_EN == true)>
-	/* Process Management Plane */
-	MNGP_Tasks();
+            /* Process Management Plane */
+            MNGP_Tasks();
+
   </#if>
+  
+            break;
+            
+        default:
+            break;
+    }
+    
 }
 
   <#if PRIME_MODE == "BN">

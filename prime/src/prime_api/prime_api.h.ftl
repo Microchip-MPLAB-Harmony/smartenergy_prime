@@ -81,6 +81,27 @@ Microchip or any third party.
 // *****************************************************************************
 
 // *****************************************************************************
+/* PRIME API state
+ 
+  Summary:
+    List of possible values of PRIME API state.
+
+  Description:
+    This type defines the possible PRIME API states.
+
+  Remarks:
+    None.
+*/
+
+typedef enum
+{
+    PRIME_API_STATE_PAL_INITIALIZED,
+    
+    PRIME_API_STATE_PRIME_RUNNING
+
+} PRIME_API_STATE;
+
+// *****************************************************************************
 // *****************************************************************************
 // Section: PRIME API Control Interface Routines
 // *****************************************************************************
