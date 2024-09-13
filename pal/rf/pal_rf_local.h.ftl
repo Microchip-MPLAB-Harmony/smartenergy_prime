@@ -57,6 +57,7 @@ Microchip or any third party.
 // *****************************************************************************
 // Section: Data Types
 // *****************************************************************************
+// *****************************************************************************
 <#if PRIME_PAL_RF_FREQ_HOPPING == true>
 #define RF_MAX_NUM_CHANNELS                512
 #define RF_MAX_NUM_BYTES_CHANNELS          (RF_MAX_NUM_CHANNELS >> 3)
