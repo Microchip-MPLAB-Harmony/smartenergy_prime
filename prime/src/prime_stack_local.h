@@ -48,6 +48,7 @@ Microchip or any third party.
 // *****************************************************************************
 // *****************************************************************************
 
+#include "system/system.h"
 #include "stack/prime/prime_api/prime_api_types.h"
 
 // *****************************************************************************
@@ -77,29 +78,25 @@ typedef struct
     uint8_t mngPlaneUsiPort;
 } PRIME_STACK_INIT;
 
-// *****************************************************************************
-/* PRIME stack status
- 
+/* PRIME Status
+
   Summary:
-    List of possible values of PRIME stack status.
+    Identifies the current status/state of the PRIME stack.
 
   Description:
-    This type defines the possible return values for PRIME_Status function.
+    This enumeration identifies the current status/state of the PRIME stack.
 
   Remarks:
-    None.
+    This enumeration is the return type for the PRIME_Status routine. The
+    upper layer must ensure that PRIME_Status returns PRIME_STATUS_READY
+    before performing PRIME operations.
 */
-
-typedef enum
-{
-    PRIME_STATUS_UNINITIALIZED,
-
-    PRIME_STATUS_POINTER_READY,
-
-    PRIME_STATUS_RUNNING,
-
-    PRIME_STATUS_ERROR
-
+typedef enum {
+    PRIME_STATUS_UNINITIALIZED = SYS_STATUS_UNINITIALIZED,
+    PRIME_STATUS_INITIALIZING = SYS_STATUS_BUSY,
+    PRIME_STATUS_RUNNING = SYS_STATUS_READY,
+    PRIME_STATUS_ERROR = SYS_STATUS_ERROR,
+    PRIME_STATUS_POINTER_READY = SYS_STATUS_ERROR_EXTENDED - 1,
 } PRIME_STATUS;
 
 // *****************************************************************************

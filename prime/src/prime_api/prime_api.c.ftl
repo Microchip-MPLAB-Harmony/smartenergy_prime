@@ -111,6 +111,7 @@ const PRIME_API PRIME_API_Interface =
     .version = PRIME_FW_VERSION,
     .Initialize = PRIME_API_Initialize,
     .Tasks = PRIME_API_Tasks,
+    .Status = PRIME_API_Status,
     .MacSetCallbacks = CL_NULL_SetCallbacks,     
     .MacEstablishRequest = CL_NULL_EstablishRequest, 
     .MacEstablishResponse = CL_NULL_EstablishResponse,
@@ -182,10 +183,10 @@ static SYS_MODULE_OBJ palSysObj;
 static PRIME_API_STATE primeApiState;
 
 /* MAC version information */
-static MAC_VERSION_INFO macInfo;
+static MAC_VERSION_INFO primeApiMacInfo;
 
 /* Port for the Management Plane */
-static uint8_t mngPlanePort;
+static uint8_t primeApiMngPlanePort;
 
 // *****************************************************************************
 // *****************************************************************************
@@ -260,22 +261,22 @@ void PRIME_API_Initialize(PRIME_API_INIT *init)
     PRIME_HAL_WRP_Configure(init->halApi);
 
     /* Set PRIME version from configuration */
-    lPRIME_API_SetPrimeVersion(&macInfo);
+    lPRIME_API_SetPrimeVersion(&primeApiMacInfo);
     
     /* Store port for PRIME initialization */
-    mngPlanePort = init->mngPlaneUsiPort;
+    primeApiMngPlanePort = init->mngPlaneUsiPort;
     
     /* Initialize PAL layer */
     palSysObj = PRIME_HAL_WRP_PAL_Initialize(init->palIndex);
     
-    primeApiState = PRIME_API_STATE_PAL_INITIALIZED;
+    primeApiState = PRIME_API_STATE_PAL_INITIALIZING;
 }
 
 void PRIME_API_Tasks(void)
 {
     switch (primeApiState)
     {
-        case PRIME_API_STATE_PAL_INITIALIZED:
+        case PRIME_API_STATE_PAL_INITIALIZING:
         
             /* Process PAL layer */
             PRIME_HAL_WRP_PAL_Tasks(palSysObj);
@@ -283,14 +284,14 @@ void PRIME_API_Tasks(void)
             if (PRIME_HAL_WRP_PAL_Status(palSysObj) == SYS_STATUS_READY) 
             {
                 /* Initialize MAC layer */
-                MAC_Initialize(&macInfo, (uint8_t)MAC_SECURITY_PROFILE);
+                MAC_Initialize(&primeApiMacInfo, (uint8_t)MAC_SECURITY_PROFILE);
 
                 /* Initialize Convergence layers */
                 CL_NULL_Initialize();
                 CL_432_Initialize();
 
                 /* Initialize Management Plane */
-                MNGP_Initialize(&macInfo, mngPlanePort);
+                MNGP_Initialize(&primeApiMacInfo, primeApiMngPlanePort);
                 
                 primeApiState = PRIME_API_STATE_PRIME_RUNNING;
             }
@@ -308,7 +309,6 @@ void PRIME_API_Tasks(void)
   <#if (PRIME_MODE == "SN") || (PRIME_MODE == "BN" && BN_SLAVE_EN == true)>
             /* Process Management Plane */
             MNGP_Tasks();
-
   </#if>
   
             break;
@@ -317,6 +317,29 @@ void PRIME_API_Tasks(void)
             break;
     }
     
+}
+
+SYS_STATUS PRIME_API_Status(void)
+{
+    SYS_STATUS status;
+    
+    /* Return the PRIME API status */
+    switch (primeApiState)
+    {
+        case PRIME_API_STATE_PAL_INITIALIZING:
+            status = SYS_STATUS_BUSY;
+            break;
+            
+        case PRIME_API_STATE_PRIME_RUNNING:
+            status = SYS_STATUS_READY;
+            break;
+            
+        default:
+            status = SYS_STATUS_UNINITIALIZED;
+            break;
+    }
+    
+    return status;
 }
 
   <#if PRIME_MODE == "BN">

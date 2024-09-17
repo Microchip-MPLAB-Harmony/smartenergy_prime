@@ -98,8 +98,7 @@ Microchip or any third party.
     PRIME_STACK_INIT initData;
     SYS_MODULE_OBJ sysObjPrime;
 
-    sysObjPrime = PRIME_Initialize(PRIME_INDEX_0, 
-                                   (SYS_MODULE_INIT *)&initData);
+    sysObjPrime = PRIME_Initialize(PRIME_INDEX_0, (SYS_MODULE_INIT *)&initData);
     if (sysObjPrime == SYS_MODULE_OBJ_INVALID)
     {
 
@@ -140,8 +139,7 @@ SYS_MODULE_OBJ PRIME_Initialize(const SYS_MODULE_INDEX index,
     PRIME_STACK_INIT initData;
     SYS_MODULE_OBJ sysObjPrime;
 
-    sysObjPrime = PRIME_Initialize(PRIME_INDEX_0, 
-                                   (SYS_MODULE_INIT *)&initData);
+    sysObjPrime = PRIME_Initialize(PRIME_INDEX_0, (SYS_MODULE_INIT *)&initData);
 
     while (true)
     {
@@ -171,6 +169,7 @@ void PRIME_Tasks(SYS_MODULE_OBJ object);
     PRIME_Initialize routine must have been called before.
 
   Parameters:
+    object   - Identifier for the object instance
     primePtr - Pointer to the PRIME API
 
   Returns:
@@ -178,6 +177,10 @@ void PRIME_Tasks(SYS_MODULE_OBJ object);
 
   Example:
     <code>
+    PRIME_STACK_INIT initData;
+
+    PRIME_Initialize(PRIME_INDEX_0, (SYS_MODULE_INIT *)&initData);
+
     PRIME_API *primeApiPtr = PRIME_SN_FWSTACK13_ADDRESS;
     PRIME_Restart((uint32_t *)primeApiPtr);
     </code>
@@ -189,34 +192,37 @@ void PRIME_Restart(uint32_t *primePtr);
 
 // *****************************************************************************
 /* Function:
-    PRIME_STATUS PRIME_Status(void)
+    SYS_STATUS PRIME_Status(void)
 
   Summary:
-    Returns the current status of the PRIME stack.
+    Gets the current status of the PRIME stack.
 
   Description:
     This routine provides the current status of the PRIME stack.
 
   Precondition:
-    None.
+    PRIME_Initialize routine must have been called before.
 
   Parameters:
     None.
 
   Returns:
-    PRIME_STATUS_UNINITIALIZED - Indicates that the PRIME stack is not 
-                                 initialized.
+    SYS_STATUS_READY: Indicates that the PRIME stack is ready and accepts
+    requests for new operations.
 
-    PRIME_STATUS_POINTER_READY - Indicates that the PRIME stack has the PRIME 
-                                 API pointer.
+    SYS_STATUS_UNINITIALIZED: Indicates the PRIME stack is not initialized.
 
-    PRIME_STATUS_RUNNING - Indicates that the PRIME stack is running.
+    SYS_STATUS_ERROR: Indicates the PRIME stack is not initialized correctly.
 
-    PRIME_STATUS_ERROR - Indicates that there is an error.
+    SYS_STATUS_BUSY: Indicates the PRIME stack is initializing.
 
   Example:
     <code>
-    if (PRIME_Status() == PRIME_STATUS_RUNNING)
+    PRIME_STACK_INIT initData;
+
+    PRIME_Initialize(PRIME_INDEX_0, (SYS_MODULE_INIT *)&initData);
+    
+    if (PRIME_Status() == SYS_STATUS_READY)
     {
 
     }
@@ -226,7 +232,7 @@ void PRIME_Restart(uint32_t *primePtr);
     None.
   */
 
-PRIME_STATUS PRIME_Status(void);
+SYS_STATUS PRIME_Status(void);
 
 //DOM-IGNORE-BEGIN
 #ifdef __cplusplus

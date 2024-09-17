@@ -49,6 +49,7 @@ Microchip or any third party.
 // *****************************************************************************
 // *****************************************************************************
 
+#include "system/system.h"
 #include "prime_api_defs.h"
 #include "prime_api_types.h"
 
@@ -95,10 +96,8 @@ Microchip or any third party.
 
 typedef enum
 {
-    PRIME_API_STATE_PAL_INITIALIZED,
-    
+    PRIME_API_STATE_PAL_INITIALIZING,
     PRIME_API_STATE_PRIME_RUNNING
-
 } PRIME_API_STATE;
 
 // *****************************************************************************
@@ -137,6 +136,7 @@ void PRIME_API_GetPrime14API(PRIME_API **pPrimeApi);
     
     init.palIndex = PRIME_PAL_INDEX;
     init.halApi = (HAL_API*)&halApi;
+    init.mngPlaneUsiPort = PRIME_MNG_PLANE_USI_INDEX;
     
     PRIME_API_Initialize((&init);
     </code>
@@ -182,6 +182,55 @@ void PRIME_API_Initialize(PRIME_API_INIT *init);
     and call it periodically.
 */
 void PRIME_API_Tasks(void);
+
+// *****************************************************************************
+/* Function:
+    SYS_STATUS PRIME_API_Status(void)
+
+  Summary:
+    Gets the status of the PRIME stack.
+
+  Description:
+    This routine gets the status of the PRIME stack.
+
+  Precondition:
+    The PRIME_API_Initialize function should have been called before calling this 
+    function.
+
+  Parameters:
+    None.
+
+  Returns:
+    SYS_STATUS_READY: Indicates that the PRIME stack is ready and accepts
+    requests for new operations.
+
+    SYS_STATUS_UNINITIALIZED: Indicates the PRIME stack is not initialized.
+
+    SYS_STATUS_ERROR: Indicates the PRIME stack is not initialized correctly.
+
+    SYS_STATUS_BUSY: Indicates the PRIME stack is initializing.
+
+  Example:
+    <code>
+    PRIME_API_INIT init;
+    
+    init.palIndex = PRIME_PAL_INDEX;
+    init.halApi = (HAL_API*)&halApi;
+    init.mngPlaneUsiPort = PRIME_MNG_PLANE_USI_INDEX;
+    
+    PRIME_API_Initialize((&init);
+
+    if (PRIME_API_Status() == SYS_STATUS_READY)
+    {
+
+    }
+    </code>
+
+  Remarks:
+    This routine is normally not called directly by an application. The 
+    PRIME application must use the function located in the header table.
+*/
+SYS_STATUS PRIME_API_Status(void);
 </#if>
 
 <#if PRIME_MODE == "BN">

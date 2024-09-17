@@ -86,7 +86,7 @@ SYS_MODULE_OBJ PRIME_Initialize(const SYS_MODULE_INDEX index,
     /* Validate the request */
     if (index >= PRIME_INSTANCES_NUMBER)
     {
-        primeObj.status = PRIME_STATUS_UNINITIALIZED;
+        primeObj.status = PRIME_STATUS_ERROR;
         return SYS_MODULE_OBJ_INVALID;
     }
     
@@ -134,6 +134,7 @@ void PRIME_Tasks(SYS_MODULE_OBJ object)
     if (object != (SYS_MODULE_OBJ)0)
     {
         /* Invalid object */
+        primeObj.status = PRIME_STATUS_ERROR;
         return;
     }
     
@@ -141,7 +142,21 @@ void PRIME_Tasks(SYS_MODULE_OBJ object)
     {
         case PRIME_STATUS_POINTER_READY:
             primeObj.primeApi->Initialize((PRIME_API_INIT*)&primeApiInit);
-            primeObj.status = PRIME_STATUS_RUNNING;
+            primeObj.status = PRIME_STATUS_INITIALIZING;
+            break;
+            
+            
+        case PRIME_STATUS_INITIALIZING:
+            /* Complete initialization of PRIME stack takes several cycles */
+            /* due to the initialization of PAL and drivers */
+            primeObj.primeApi->Tasks();
+            
+            /* Do not allow the application to call PRIME until ready */
+            if (primeObj.primeApi->Status() == SYS_STATUS_READY)
+            {
+                primeObj.status = PRIME_STATUS_RUNNING;
+            }
+            
             break;
             
         case PRIME_STATUS_RUNNING:
@@ -166,7 +181,8 @@ void PRIME_Restart(uint32_t *primePtr)
     }
 }
 
-PRIME_STATUS PRIME_Status(void)
+SYS_STATUS PRIME_Status(void)
 {
-    return primeObj.status;
+    /* Return the PRIME status */
+    return ((SYS_STATUS)primeObj.status);
 }
