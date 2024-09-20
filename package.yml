@@ -9,10 +9,7 @@ package:
   dependencies:
     - name: "smartenergy"
       type: "package"
-      version: "v1.3.0"
-    - name: "core"
+      version: "SMS-4010-fix-required-misra-c-violations-in-prime-repo"
+    - name: "crypto_v4"
       type: "package"
-      version: "v3.13.5"
-    - name: "crypto"
-      type: "package"
-      version: "v4.0.0-E1"
+      version: "master"

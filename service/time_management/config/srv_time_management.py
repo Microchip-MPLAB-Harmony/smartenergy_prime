@@ -22,14 +22,14 @@ implied, are granted under any patent or other intellectual property rights of
 Microchip or any third party.
 """
 def instantiateComponent(primeTimeManagementComponent):
-    
+
     Log.writeInfoMessage("Loading Time Management service for PRIME")
 
     ############################################################################
     #### Code Generation ####
     ############################################################################
     configName = Variables.get("__CONFIGURATION_NAME")
-    
+
     # Time Management Files
     pTimeMgmtSource = primeTimeManagementComponent.createFileSymbol("SRV_TIME_MANAGEMENT_SOURCE", None)
     pTimeMgmtSource.setSourcePath("service/time_management/srv_time_management.c")
@@ -37,7 +37,7 @@ def instantiateComponent(primeTimeManagementComponent):
     pTimeMgmtSource.setDestPath("service/time_management")
     pTimeMgmtSource.setProjectPath("config/" + configName + "/service/time_management/")
     pTimeMgmtSource.setType("SOURCE")
-    
+
     pTimeMgmtHeader = primeTimeManagementComponent.createFileSymbol("SRV_TIME_MANAGEMENT_HEADER", None)
     pTimeMgmtHeader.setSourcePath("service/time_management/srv_time_management.h")
     pTimeMgmtHeader.setOutputName("srv_time_management.h")
@@ -52,4 +52,4 @@ def instantiateComponent(primeTimeManagementComponent):
     pTimeMgmtSystemDefFile.setOutputName("core.LIST_SYSTEM_DEFINITIONS_H_INCLUDES")
     pTimeMgmtSystemDefFile.setSourcePath("service/time_management/templates/system/definitions.h.ftl")
     pTimeMgmtSystemDefFile.setMarkup(True)
-  
+

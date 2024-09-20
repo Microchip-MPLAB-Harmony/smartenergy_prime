@@ -1,6 +1,6 @@
 /*******************************************************************************
-  PRIME API Source 
-   
+  PRIME API Source
+
   Company:
     Microchip Technology Inc.
 
@@ -46,20 +46,20 @@ Microchip or any third party.
 // *****************************************************************************
 
 #include <stdio.h>
-#include "cmsis_compiler.h" 
+#include "cmsis_compiler.h"
 #include "prime_api.h"
 #include "prime_api_types.h"
 <#if PRIME_MODE == "SN" && PRIME_PROJECT == "application project">
 #include "configuration.h"
 
-void PRIME_API_GetPrime13API(PRIME_API **pPrimeApi)
+void PRIME_API_GetPrime13API(const PRIME_API **pPrimeApi)
 {
-    *pPrimeApi = (PRIME_API *)PRIME_SN_FWSTACK13_ADDRESS;
+    *pPrimeApi = (const PRIME_API *)PRIME_SN_FWSTACK13_ADDRESS;
 }
 
-void PRIME_API_GetPrime14API(PRIME_API **pPrimeApi)
+void PRIME_API_GetPrime14API(const PRIME_API **pPrimeApi)
 {
-    *pPrimeApi = (PRIME_API *)PRIME_SN_FWSTACK14_ADDRESS;
+    *pPrimeApi = (const PRIME_API *)PRIME_SN_FWSTACK14_ADDRESS;
 }
 
 <#else>
@@ -82,9 +82,26 @@ void PRIME_API_GetPrime14API(PRIME_API **pPrimeApi)
 // Section: Macro Definitions
 // *****************************************************************************
 // *****************************************************************************
+
+    /* MISRA C-2012 deviation block start */
+    /* MISRA C-2012 Rule 21.1 deviated once. Deviation record ID - H3_MISRAC_2012_R_21_1_DR_1 */
+<#if core.COVERITY_SUPPRESS_DEVIATION?? && core.COVERITY_SUPPRESS_DEVIATION>
+    <#if core.COMPILER_CHOICE == "XC32">
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wunknown-pragmas"
+    </#if>
+    #pragma coverity compliance block deviate "MISRA C-2012 Rule 21.1" "H3_MISRAC_2012_R_21_1_DR_1"
+</#if>
 /* Configuration of the CORTEX-M4 Processor and Core Peripherals */
 /* PIC32CXMT */
 #define __NVIC_PRIO_BITS         4
+<#if core.COVERITY_SUPPRESS_DEVIATION?? && core.COVERITY_SUPPRESS_DEVIATION>
+    #pragma coverity compliance end_block "MISRA C-2012 Rule 21.1"
+    <#if core.COMPILER_CHOICE == "XC32">
+    #pragma GCC diagnostic pop
+    </#if>
+</#if>
+    /* MISRA C-2012 deviation block end */
 
 /* Security profile for PRIME 1.4 */
 #define MAC_SECURITY_PROFILE     ${MAC_SECURITY_PROFILE}
@@ -95,16 +112,33 @@ void PRIME_API_GetPrime14API(PRIME_API **pPrimeApi)
 // *****************************************************************************
 // *****************************************************************************
   <#if PRIME_MODE == "SN" && PRIME_PROJECT == "bin project">
+
+/* MISRA C-2012 deviation block start */
+/* MISRA C-2012 Rule 8.4 deviated once. Deviation record ID - H3_MISRAC_2012_R_8_4_DR_1 */
+<#if core.COVERITY_SUPPRESS_DEVIATION?? && core.COVERITY_SUPPRESS_DEVIATION>
+    <#if core.COMPILER_CHOICE == "XC32">
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wunknown-pragmas"
+    </#if>
+    #pragma coverity compliance block deviate "MISRA C-2012 Rule 8.4" "H3_MISRAC_2012_R_8_4_DR_1"
+</#if>
 void __attribute__((optimize("-O1"), section(".text.Reset_Handler"), long_call)) Reset_Handler(void)
 {
     // Avoid warning in compilation. Reset Handler is not needed.
 }
+<#if core.COVERITY_SUPPRESS_DEVIATION?? && core.COVERITY_SUPPRESS_DEVIATION>
+    #pragma coverity compliance end_block "MISRA C-2012 Rule 8.4"
+    <#if core.COMPILER_CHOICE == "XC32">
+    #pragma GCC diagnostic pop
+    </#if>
+</#if>
+/* MISRA C-2012 deviation block end */
 
   </#if>
   <#if PRIME_MODE == "SN" && PRIME_PROJECT == "bin project">
 __attribute__ ((section(".vectors"), used))
   </#if>
-const PRIME_API PRIME_API_Interface =
+static const PRIME_API PRIME_API_Interface =
 {
     .vendor = PRIME_PIB_VENDOR,
     .model = PRIME_PIB_MODEL,
@@ -112,8 +146,8 @@ const PRIME_API PRIME_API_Interface =
     .Initialize = PRIME_API_Initialize,
     .Tasks = PRIME_API_Tasks,
     .Status = PRIME_API_Status,
-    .MacSetCallbacks = CL_NULL_SetCallbacks,     
-    .MacEstablishRequest = CL_NULL_EstablishRequest, 
+    .MacSetCallbacks = CL_NULL_SetCallbacks,
+    .MacEstablishRequest = CL_NULL_EstablishRequest,
     .MacEstablishResponse = CL_NULL_EstablishResponse,
     .MacReleaseRequest = CL_NULL_ReleaseRequest,
     .MacReleaseResponse = CL_NULL_ReleaseResponse,
@@ -134,7 +168,7 @@ const PRIME_API PRIME_API_Interface =
     .MlmeRegisterRequest = CL_NULL_MlmeRegisterRequest,
     .MlmeUnregisterRequest = CL_NULL_MlmeUnregisterRequest,
   </#if>
-    .MlmePromoteRequest = CL_NULL_MlmePromoteRequest,    
+    .MlmePromoteRequest = CL_NULL_MlmePromoteRequest,
     .MlmeMpPromoteRequest = CL_NULL_MlmeMpPromoteRequest,
   <#if (PRIME_MODE == "SN") || (PRIME_MODE == "BN" && BN_SLAVE_EN == true)>
     .MlmeDemoteRequest = CL_NULL_MlmeDemoteRequest,
@@ -173,7 +207,7 @@ const PRIME_API PRIME_API_Interface =
     .BmngPprofGetZcDiffRequest = BMNG_PPROF_GetZcDiffRequest,
     .BmngWhitelistAddRequest = BMNG_WHITELIST_AddRequest,
     .BmngWhitelistRemoveRequest = BMNG_WHITELIST_RemoveRequest,
-  </#if> 
+  </#if>
 };
 
 /* Object obtained from PAL Initialize */
@@ -205,45 +239,96 @@ static void lPRIME_API_SetPrimeVersion(MAC_VERSION_INFO *macInfo)
     uint8_t sizeConfig, sizeInfo;
     uint8_t copyLen;
 
-    memset(macInfo, 0, sizeof(MAC_VERSION_INFO));
+    (void)memset(macInfo, 0, sizeof(MAC_VERSION_INFO));
 
     /* Update MODEL */
-    sizeConfig = sizeof(PRIME_FW_MODEL);
-    sizeInfo = sizeof(macInfo->fwModel);
-    if (sizeConfig < sizeInfo) 
+    sizeConfig = (uint8_t)sizeof(PRIME_FW_MODEL);
+    sizeInfo = (uint8_t)sizeof(macInfo->fwModel);
+    if (sizeConfig < sizeInfo)
     {
         copyLen = sizeConfig;
-    } 
-    else 
+    }
+    else
     {
         copyLen = sizeInfo;
     }
 
-    memcpy(macInfo->fwModel, PRIME_FW_MODEL, copyLen);
+    /* MISRA C-2012 deviation block start */
+    /* MISRA C-2012 Rule 7.4 deviated once. Deviation record ID - H3_MISRAC_2012_R_7_4_DR_1 */
+<#if core.COVERITY_SUPPRESS_DEVIATION?? && core.COVERITY_SUPPRESS_DEVIATION>
+    <#if core.COMPILER_CHOICE == "XC32">
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wunknown-pragmas"
+    </#if>
+    #pragma coverity compliance block deviate "MISRA C-2012 Rule 7.4" "H3_MISRAC_2012_R_7_4_DR_1"
+</#if>
+    (void)memcpy(macInfo->fwModel, PRIME_FW_MODEL, copyLen);
+<#if core.COVERITY_SUPPRESS_DEVIATION?? && core.COVERITY_SUPPRESS_DEVIATION>
+    #pragma coverity compliance end_block "MISRA C-2012 Rule 7.4"
+    <#if core.COMPILER_CHOICE == "XC32">
+    #pragma GCC diagnostic pop
+    </#if>
+</#if>
+    /* MISRA C-2012 deviation block end */
+
     macInfo->pibModel = PRIME_PIB_MODEL;
 
     /* Update VENDOR */
-    sizeConfig = sizeof(PRIME_FW_VENDOR);
-    sizeInfo = sizeof(macInfo->fwVendor);
+    sizeConfig = (uint8_t)sizeof(PRIME_FW_VENDOR);
+    sizeInfo = (uint8_t)sizeof(macInfo->fwVendor);
     if (sizeConfig < sizeInfo) {
         copyLen = sizeConfig;
     } else {
         copyLen = sizeInfo;
     }
 
-    memcpy(macInfo->fwVendor, PRIME_FW_VENDOR, copyLen);
+    /* MISRA C-2012 deviation block start */
+    /* MISRA C-2012 Rule 7.4 deviated once. Deviation record ID - H3_MISRAC_2012_R_7_4_DR_1 */
+<#if core.COVERITY_SUPPRESS_DEVIATION?? && core.COVERITY_SUPPRESS_DEVIATION>
+    <#if core.COMPILER_CHOICE == "XC32">
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wunknown-pragmas"
+    </#if>
+    #pragma coverity compliance block deviate "MISRA C-2012 Rule 7.4" "H3_MISRAC_2012_R_7_4_DR_1"
+</#if>
+    (void)memcpy(macInfo->fwVendor, PRIME_FW_VENDOR, copyLen);
+<#if core.COVERITY_SUPPRESS_DEVIATION?? && core.COVERITY_SUPPRESS_DEVIATION>
+    #pragma coverity compliance end_block "MISRA C-2012 Rule 7.4"
+    <#if core.COMPILER_CHOICE == "XC32">
+    #pragma GCC diagnostic pop
+    </#if>
+</#if>
+    /* MISRA C-2012 deviation block end */
+
     macInfo->pibVendor = PRIME_PIB_VENDOR;
 
     /* Update VERSION */
-    sizeConfig = sizeof(PRIME_FW_VERSION);
-    sizeInfo = sizeof(macInfo->fwVersion);
+    sizeConfig = (uint8_t)sizeof(PRIME_FW_VERSION);
+    sizeInfo = (uint8_t)sizeof(macInfo->fwVersion);
     if (sizeConfig < sizeInfo) {
         copyLen = sizeConfig;
     } else {
         copyLen = sizeInfo;
     }
 
-    memcpy(macInfo->fwVersion, PRIME_FW_VERSION, copyLen);
+    /* MISRA C-2012 deviation block start */
+    /* MISRA C-2012 Rule 7.4 deviated once. Deviation record ID - H3_MISRAC_2012_R_7_4_DR_1 */
+<#if core.COVERITY_SUPPRESS_DEVIATION?? && core.COVERITY_SUPPRESS_DEVIATION>
+    <#if core.COMPILER_CHOICE == "XC32">
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wunknown-pragmas"
+    </#if>
+    #pragma coverity compliance block deviate "MISRA C-2012 Rule 7.4" "H3_MISRAC_2012_R_7_4_DR_1"
+</#if>
+    (void)memcpy(macInfo->fwVersion, PRIME_FW_VERSION, copyLen);
+<#if core.COVERITY_SUPPRESS_DEVIATION?? && core.COVERITY_SUPPRESS_DEVIATION>
+    #pragma coverity compliance end_block "MISRA C-2012 Rule 7.4"
+    <#if core.COMPILER_CHOICE == "XC32">
+    #pragma GCC diagnostic pop
+    </#if>
+</#if>
+    /* MISRA C-2012 deviation block end */
+
 }
 
 // *****************************************************************************
@@ -262,13 +347,13 @@ void PRIME_API_Initialize(PRIME_API_INIT *init)
 
     /* Set PRIME version from configuration */
     lPRIME_API_SetPrimeVersion(&primeApiMacInfo);
-    
+
     /* Store port for PRIME initialization */
     primeApiMngPlanePort = init->mngPlaneUsiPort;
-    
+
     /* Initialize PAL layer */
     palSysObj = PRIME_HAL_WRP_PAL_Initialize(init->palIndex);
-    
+
     primeApiState = PRIME_API_STATE_PAL_INITIALIZING;
 }
 
@@ -277,11 +362,11 @@ void PRIME_API_Tasks(void)
     switch (primeApiState)
     {
         case PRIME_API_STATE_PAL_INITIALIZING:
-        
+
             /* Process PAL layer */
             PRIME_HAL_WRP_PAL_Tasks(palSysObj);
-        
-            if (PRIME_HAL_WRP_PAL_Status(palSysObj) == SYS_STATUS_READY) 
+
+            if (PRIME_HAL_WRP_PAL_Status(palSysObj) == SYS_STATUS_READY)
             {
                 /* Initialize MAC layer */
                 MAC_Initialize(&primeApiMacInfo, (uint8_t)MAC_SECURITY_PROFILE);
@@ -292,17 +377,17 @@ void PRIME_API_Tasks(void)
 
                 /* Initialize Management Plane */
                 MNGP_Initialize(&primeApiMacInfo, primeApiMngPlanePort);
-                
+
                 primeApiState = PRIME_API_STATE_PRIME_RUNNING;
             }
-        
+
             break;
-            
+
         case PRIME_API_STATE_PRIME_RUNNING:
-                
+
             /* Process PAL layer */
             PRIME_HAL_WRP_PAL_Tasks(palSysObj);
-                
+
             /* Process MAC layer */
             MAC_Tasks();
 
@@ -310,42 +395,58 @@ void PRIME_API_Tasks(void)
             /* Process Management Plane */
             MNGP_Tasks();
   </#if>
-  
+
             break;
-            
-        default:
+
+    /* MISRA C-2012 deviation block start */
+    /* MISRA C-2012 Rule 16.4 deviated once. Deviation record ID - H3_MISRAC_2012_R_16_4_DR_1 */
+<#if core.COVERITY_SUPPRESS_DEVIATION?? && core.COVERITY_SUPPRESS_DEVIATION>
+    <#if core.COMPILER_CHOICE == "XC32">
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wunknown-pragmas"
+    </#if>
+    #pragma coverity compliance block deviate "MISRA C-2012 Rule 16.4" "H3_MISRAC_2012_R_16_4_DR_1"
+</#if>
+         default:
             break;
+<#if core.COVERITY_SUPPRESS_DEVIATION?? && core.COVERITY_SUPPRESS_DEVIATION>
+    #pragma coverity compliance end_block "MISRA C-2012 Rule 16.4"
+    <#if core.COMPILER_CHOICE == "XC32">
+    #pragma GCC diagnostic pop
+    </#if>
+</#if>
+    /* MISRA C-2012 deviation block end */
     }
-    
+
 }
 
 SYS_STATUS PRIME_API_Status(void)
 {
     SYS_STATUS status;
-    
+
     /* Return the PRIME API status */
     switch (primeApiState)
     {
         case PRIME_API_STATE_PAL_INITIALIZING:
             status = SYS_STATUS_BUSY;
             break;
-            
+
         case PRIME_API_STATE_PRIME_RUNNING:
             status = SYS_STATUS_READY;
             break;
-            
+
         default:
             status = SYS_STATUS_UNINITIALIZED;
             break;
     }
-    
+
     return status;
 }
 
   <#if PRIME_MODE == "BN" || (PRIME_MODE == "SN" && PRIME_PROJECT == "monolithic project")>
-void PRIME_API_GetPrimeAPI(PRIME_API **pPrimeApi)
+void PRIME_API_GetPrimeAPI(const PRIME_API **pPrimeApi)
 {
-    *pPrimeApi = (PRIME_API *)&PRIME_API_Interface;
+    *pPrimeApi = (const PRIME_API *)&PRIME_API_Interface;
 }
 
   </#if>

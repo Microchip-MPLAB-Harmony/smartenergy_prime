@@ -1,6 +1,6 @@
 /*******************************************************************************
-  PRIME API Header 
-   
+  PRIME API Header
+
   Company:
     Microchip Technology Inc.
 
@@ -11,7 +11,7 @@
     PRIME API Header File
 
   Description:
-    This module converts the PRIME stack library interface into a global 
+    This module converts the PRIME stack library interface into a global
     interface to be used by the PRIME application.
 *******************************************************************************/
 
@@ -83,7 +83,7 @@ Microchip or any third party.
 
 // *****************************************************************************
 /* PRIME API state
- 
+
   Summary:
     List of possible values of PRIME API state.
 
@@ -107,8 +107,8 @@ typedef enum
 // *****************************************************************************
 
 <#if PRIME_MODE == "SN" && PRIME_PROJECT == "application project">
-void PRIME_API_GetPrime13API(PRIME_API **pPrimeApi);
-void PRIME_API_GetPrime14API(PRIME_API **pPrimeApi);
+void PRIME_API_GetPrime13API(const PRIME_API **pPrimeApi);
+void PRIME_API_GetPrime14API(const PRIME_API **pPrimeApi);
 <#else>
 // *****************************************************************************
 /* Function:
@@ -133,16 +133,16 @@ void PRIME_API_GetPrime14API(PRIME_API **pPrimeApi);
   Example:
     <code>
     PRIME_API_INIT init;
-    
+
     init.palIndex = PRIME_PAL_INDEX;
     init.halApi = (HAL_API*)&halApi;
     init.mngPlaneUsiPort = PRIME_MNG_PLANE_USI_INDEX;
-    
+
     PRIME_API_Initialize((&init);
     </code>
 
   Remarks:
-    This routine is normally not called directly by an application. The 
+    This routine is normally not called directly by an application. The
     PRIME application must use the function located in the header table.
 */
 void PRIME_API_Initialize(PRIME_API_INIT *init);
@@ -152,14 +152,14 @@ void PRIME_API_Initialize(PRIME_API_INIT *init);
     void PRIME_API_Tasks(void)
 
   Summary:
-    Maintains the PRIME stack state machine. 
+    Maintains the PRIME stack state machine.
 
   Description:
-    This function is used to maintain the PRIME stack internal state machine and 
+    This function is used to maintain the PRIME stack internal state machine and
     generate callbacks.
 
   Precondition:
-    The PRIME_API_Initialize function should have been called before calling this 
+    The PRIME_API_Initialize function should have been called before calling this
     function.
 
   Parameters:
@@ -177,8 +177,8 @@ void PRIME_API_Initialize(PRIME_API_INIT *init);
     </code>
 
   Remarks:
-    This routine is normally not called directly by an application. The 
-    PRIME application must use the function located in the header table 
+    This routine is normally not called directly by an application. The
+    PRIME application must use the function located in the header table
     and call it periodically.
 */
 void PRIME_API_Tasks(void);
@@ -194,7 +194,7 @@ void PRIME_API_Tasks(void);
     This routine gets the status of the PRIME stack.
 
   Precondition:
-    The PRIME_API_Initialize function should have been called before calling this 
+    The PRIME_API_Initialize function should have been called before calling this
     function.
 
   Parameters:
@@ -213,11 +213,11 @@ void PRIME_API_Tasks(void);
   Example:
     <code>
     PRIME_API_INIT init;
-    
+
     init.palIndex = PRIME_PAL_INDEX;
     init.halApi = (HAL_API*)&halApi;
     init.mngPlaneUsiPort = PRIME_MNG_PLANE_USI_INDEX;
-    
+
     PRIME_API_Initialize((&init);
 
     if (PRIME_API_Status() == SYS_STATUS_READY)
@@ -227,14 +227,14 @@ void PRIME_API_Tasks(void);
     </code>
 
   Remarks:
-    This routine is normally not called directly by an application. The 
+    This routine is normally not called directly by an application. The
     PRIME application must use the function located in the header table.
 */
 SYS_STATUS PRIME_API_Status(void);
 </#if>
 
 <#if PRIME_MODE == "BN" || (PRIME_MODE == "SN" && PRIME_PROJECT == "monolithic project")>
-void PRIME_API_GetPrimeAPI(PRIME_API **pPrimeApi);
+void PRIME_API_GetPrimeAPI(const PRIME_API **pPrimeApi);
 </#if>
 
 //DOM-IGNORE-BEGIN

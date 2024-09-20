@@ -59,10 +59,10 @@ Microchip or any third party.
 #include "pal_serial.h"
 </#if>
 <#if PRIME_PAL_PHY_SNIFFER == true>
-  <#if (srv_psniffer.SRV_PSNF_PLC_PROFILE)??>  
+  <#if (srv_psniffer.SRV_PSNF_PLC_PROFILE)??>
 #include "service/psniffer/srv_psniffer.h"
   </#if>
-  <#if (srv_rsniffer.SRV_RSNF_PROTOCOL)??>  
+  <#if (srv_rsniffer.SRV_RSNF_PROTOCOL)??>
 #include "service/rsniffer/srv_rsniffer.h"
   </#if>
 </#if>
@@ -75,16 +75,6 @@ Microchip or any third party.
 
 static PAL_DATA palData;
 
-<#if PRIME_PAL_PLC_EN == true>
-extern const PAL_INTERFACE PAL_PLC_Interface;
-</#if>
-<#if PRIME_PAL_RF_EN == true>
-extern const PAL_INTERFACE PAL_RF_Interface;
-</#if>
-<#if PRIME_PAL_SERIAL_EN == true>
-extern const PAL_INTERFACE PAL_SERIAL_Interface;
-</#if>
-
 // *****************************************************************************
 // *****************************************************************************
 // Section: File scope functions
@@ -93,14 +83,16 @@ extern const PAL_INTERFACE PAL_SERIAL_Interface;
 <#if PRIME_PAL_PLC_EN == true>
 static void lPAL_PlcDataConfirmCallback(PAL_MSG_CONFIRM_DATA *pData)
 {
-    if (palData.dataConfirmCallback) {
+    if((palData.dataConfirmCallback) != NULL)
+    {
         palData.dataConfirmCallback(pData);
     }
 }
 
 static void lPAL_PlcDataIndicationCallback(PAL_MSG_INDICATION_DATA *pData)
 {
-    if (palData.dataIndicationCallback) {
+    if((palData.dataIndicationCallback) != NULL)
+    {
         palData.dataIndicationCallback(pData);
     }
 }
@@ -109,14 +101,16 @@ static void lPAL_PlcDataIndicationCallback(PAL_MSG_INDICATION_DATA *pData)
 <#if PRIME_PAL_RF_EN == true>
 static void lPAL_RfDataConfirmCallback(PAL_MSG_CONFIRM_DATA *pData)
 {
-    if (palData.dataConfirmCallback) {
+    if((palData.dataConfirmCallback) != NULL)
+    {
         palData.dataConfirmCallback(pData);
     }
 }
 
 static void lPAL_RfDataIndicationCallback(PAL_MSG_INDICATION_DATA *pData)
 {
-    if (palData.dataIndicationCallback) {
+    if((palData.dataIndicationCallback) != NULL)
+    {
         palData.dataIndicationCallback(pData);
     }
 }
@@ -124,7 +118,8 @@ static void lPAL_RfDataIndicationCallback(PAL_MSG_INDICATION_DATA *pData)
 <#if PRIME_PAL_RF_FREQ_HOPPING == true>
 static void lPAL_RfCHannelSwitchCallback(uint16_t pch)
 {
-    if (palData.channelSwitchCallback) {
+    if ((palData.channelSwitchCallback) != NULL)
+    {
         palData.channelSwitchCallback(pch);
     }
 }
@@ -134,14 +129,16 @@ static void lPAL_RfCHannelSwitchCallback(uint16_t pch)
 <#if PRIME_PAL_SERIAL_EN == true>
 static void lPAL_SerialDataConfirmCallback(PAL_MSG_CONFIRM_DATA *pData)
 {
-    if (palData.dataConfirmCallback) {
+    if((palData.dataConfirmCallback) != NULL)
+    {
         palData.dataConfirmCallback(pData);
     }
 }
 
 static void lPAL_SerialDataIndicationCallback(PAL_MSG_INDICATION_DATA *pData)
 {
-    if (palData.dataIndicationCallback) {
+    if((palData.dataIndicationCallback) != NULL)
+    {
         palData.dataIndicationCallback(pData);
     }
 }
@@ -150,9 +147,9 @@ static void lPAL_SerialDataIndicationCallback(PAL_MSG_INDICATION_DATA *pData)
 <#if PRIME_PAL_PHY_SNIFFER == true>
 static void lPAL_PhySnifferCallback(uint8_t *pData, uint16_t length)
 {
-    if (palData.snifferEnabled > 0)
+    if(palData.snifferEnabled > 0U)
     {
-        SRV_USI_Send_Message(palData.usiHandler, SRV_USI_PROT_ID_SNIF_PRIME, 
+        (void)SRV_USI_Send_Message(palData.usiHandler, SRV_USI_PROT_ID_SNIF_PRIME,
                 pData, length);
     }
 }
@@ -162,7 +159,7 @@ static void lPAL_UsiSnifferEventCb(uint8_t *pData, size_t length)
     uint8_t command;
 
     /* Protection for invalid length */
-    if (!length)
+    if(length == 0U)
     {
         return;
     }
@@ -170,72 +167,91 @@ static void lPAL_UsiSnifferEventCb(uint8_t *pData, size_t length)
     /* Process received command */
     command = *pData;
 
-    switch (command)
+    switch(command)
     {
-<#if (srv_psniffer.SRV_PSNF_PLC_PROFILE)??>  
-        case SRV_PSNIFFER_CMD_SET_PLC_CHANNEL:
+<#if (srv_psniffer.SRV_PSNF_PLC_PROFILE)??>
+        case (uint8_t)SRV_PSNIFFER_CMD_SET_PLC_CHANNEL:
         {
             uint8_t channel;
 
             channel = *(pData + 1);
-            PAL_SetConfiguration(1, PLC_ID_CHANNEL_CFG, &channel, 1);
+            (void)PAL_SetConfiguration(1, (uint16_t)PLC_ID_CHANNEL_CFG, &channel, 1);
             break;
         }
 </#if>
 
 <#if (srv_rsniffer.SRV_RSNF_PROTOCOL)??>
-        case SRV_RSNIFFER_CMD_SET_RF_BAND_OPM_CHANNEL:
+        case (uint8_t)SRV_RSNIFFER_CMD_SET_RF_BAND_OPM_CHANNEL:
         {
             uint16_t rfBandOpMode, rfChannel;
+            uint16_t rfPhyChannel=0U;
 
             /* Parse Band, Operating Mode and Channel parameters */
             SRV_RSNIFFER_ParseConfigCommand(pData, &rfBandOpMode, &rfChannel);
 
             /* Set configuration in RF PHY */
-            PAL_SetConfiguration(PRIME_PAL_RF_CHN_MASK, PAL_ID_RF_PHY_BAND_OPERATING_MODE, &rfBandOpMode, 2);
-            PAL_SetChannel(PRIME_PAL_RF_CHN_MASK | rfChannel);
+            (void)PAL_SetConfiguration(PRIME_PAL_RF_CHN_MASK, (uint16_t)PAL_ID_RF_PHY_BAND_OPERATING_MODE, &rfBandOpMode, 2U);
+
+            rfPhyChannel = (uint16_t)(PRIME_PAL_RF_CHN_MASK | rfChannel);
+
+            (void)PAL_SetChannel(rfPhyChannel);
+
             break;
         }
 </#if>
 
         default:
+            /* Do Nothing */
             break;
     }
 }
 
 </#if>
+
+static __inline__ PAL_INTERFACE* __attribute__((always_inline)) lPAL_PointerToPalInterface(void const * pParam)
+{
+    union
+    {
+        const void* pPtr;
+        PAL_INTERFACE * pPalIntf;
+    }PAL_INTF_UNION;
+
+    PAL_INTF_UNION.pPtr = pParam;
+    return PAL_INTF_UNION.pPalIntf;
+}
+
 static PAL_INTERFACE * lPAL_GetInterface(uint16_t pch)
 {
 <#if PRIME_PAL_PLC_EN == true && PRIME_PAL_RF_EN == false && PRIME_PAL_SERIAL_EN == false>
     (void)pch;
-    return (PAL_INTERFACE *)&PAL_PLC_Interface;
+    return lPAL_PointerToPalInterface(&PAL_PLC_Interface);
 <#elseif PRIME_PAL_PLC_EN == false && PRIME_PAL_RF_EN == true && PRIME_PAL_SERIAL_EN == false>
     (void)pch;
-    return (PAL_INTERFACE *)&PAL_RF_Interface;
+    return lPAL_PointerToPalInterface(&PAL_RF_Interface);
 <#elseif PRIME_PAL_PLC_EN == false && PRIME_PAL_RF_EN == false && PRIME_PAL_SERIAL_EN == true>
     (void)pch;
-    return (PAL_INTERFACE *)&PAL_SERIAL_Interface;
+    return lPAL_PointerToPalInterface(&PAL_SERIAL_Interface);
 <#elseif PRIME_PAL_PLC_EN == false && PRIME_PAL_RF_EN == false && PRIME_PAL_SERIAL_EN == false>
     #warning PAL interface is not defined. Please, review PRIME PAL interface configuration in MCC.
 <#else>
   <#if PRIME_PAL_PLC_EN == true>
     if (pch < PRIME_PAL_RF_CHN_MASK)
     {
-        return (PAL_INTERFACE *)&PAL_PLC_Interface;
+        return lPAL_PointerToPalInterface(&PAL_PLC_Interface);
     }
 
   </#if>
   <#if PRIME_PAL_RF_EN == true>
     if (pch < PRIME_PAL_SERIAL_CHN_MASK)
     {
-        return (PAL_INTERFACE *)&PAL_RF_Interface;
+        return lPAL_PointerToPalInterface(&PAL_RF_Interface);
     }
 
   </#if>
   <#if PRIME_PAL_SERIAL_EN == true>
     if (pch == PRIME_PAL_SERIAL_CHN_MASK)
     {
-        return (PAL_INTERFACE *)&PAL_SERIAL_Interface;
+        return lPAL_PointerToPalInterface(&PAL_SERIAL_Interface);
     }
 
   </#if>
@@ -366,7 +382,7 @@ SYS_STATUS PAL_Status(SYS_MODULE_OBJ object)
     {
         return SYS_STATUS_BUSY;
     }
-    
+
     return plcStatus;
 </#if>
 <#if (PRIME_PAL_PLC_EN == false) && (PRIME_PAL_RF_EN == true) && (PRIME_PAL_SERIAL_EN == false)>
@@ -374,7 +390,7 @@ SYS_STATUS PAL_Status(SYS_MODULE_OBJ object)
     {
         return SYS_STATUS_BUSY;
     }
-    
+
     return rfStatus;
 </#if>
 <#if (PRIME_PAL_PLC_EN == false) &&(PRIME_PAL_RF_EN == false) && (PRIME_PAL_SERIAL_EN == true)>
@@ -382,7 +398,7 @@ SYS_STATUS PAL_Status(SYS_MODULE_OBJ object)
     {
         return SYS_STATUS_BUSY;
     }
-    
+
     return serialStatus;
 </#if>
 <#if (PRIME_PAL_PLC_EN == true) && (PRIME_PAL_RF_EN == true) && (PRIME_PAL_SERIAL_EN == false)>
@@ -392,12 +408,12 @@ SYS_STATUS PAL_Status(SYS_MODULE_OBJ object)
     {
         return SYS_STATUS_READY;
     }
-    
+
     if ((plcStatus == SYS_STATUS_ERROR) && (rfStatus == SYS_STATUS_ERROR))
     {
         return SYS_STATUS_ERROR;
     }
-    
+
     return SYS_STATUS_BUSY;
 </#if>
 <#if (PRIME_PAL_PLC_EN == true) && (PRIME_PAL_RF_EN == false) && (PRIME_PAL_SERIAL_EN == true)>
@@ -407,12 +423,12 @@ SYS_STATUS PAL_Status(SYS_MODULE_OBJ object)
     {
         return SYS_STATUS_READY;
     }
-    
+
     if ((plcStatus == SYS_STATUS_ERROR) && (serialStatus == SYS_STATUS_ERROR))
     {
         return SYS_STATUS_ERROR;
     }
-    
+
     return SYS_STATUS_BUSY;
 </#if>
 <#if (PRIME_PAL_PLC_EN == false) && (PRIME_PAL_RF_EN == true) && (PRIME_PAL_SERIAL_EN == true)>
@@ -422,12 +438,12 @@ SYS_STATUS PAL_Status(SYS_MODULE_OBJ object)
     {
         return SYS_STATUS_READY;
     }
-    
+
     if ((rfStatus == SYS_STATUS_ERROR) && (serialStatus == SYS_STATUS_ERROR))
     {
         return SYS_STATUS_ERROR;
     }
-    
+
     return SYS_STATUS_BUSY;
 </#if>
 <#if (PRIME_PAL_PLC_EN == true) && (PRIME_PAL_RF_EN == true) && (PRIME_PAL_SERIAL_EN == true)>
@@ -441,12 +457,12 @@ SYS_STATUS PAL_Status(SYS_MODULE_OBJ object)
     {
         return SYS_STATUS_READY;
     }
-    
+
     if ((plcStatus == SYS_STATUS_ERROR) && (rfStatus == SYS_STATUS_ERROR) && (serialStatus == SYS_STATUS_ERROR))
     {
         return SYS_STATUS_ERROR;
     }
-    
+
     return SYS_STATUS_BUSY;
 </#if>
 }
@@ -460,136 +476,136 @@ void PAL_CallbackRegister(PAL_CALLBACKS *pCallbacks)
 uint8_t PAL_DataRequest(PAL_MSG_REQUEST_DATA *pData)
 {
     PAL_INTERFACE *palIface = lPAL_GetInterface(pData->pch);
-    return palIface->PAL_DataRequest(pData);
+    return(palIface->MPAL_DataRequest(pData));
 }
 
 uint8_t PAL_GetSNR(uint16_t pch, uint8_t *snr, uint8_t qt)
 {
     PAL_INTERFACE *palIface = lPAL_GetInterface(pch);
-    return palIface->PAL_GetSNR(snr, qt);
+    return(palIface->MPAL_GetSNR(snr, qt));
 }
 
 uint8_t PAL_GetZCT(uint16_t pch, uint32_t *zct)
 {
     PAL_INTERFACE *palIface = lPAL_GetInterface(pch);
-    return palIface->PAL_GetZCT(zct);
+    return(palIface->MPAL_GetZCT(zct));
 }
 
 uint8_t PAL_GetTimer(uint16_t pch, uint32_t *timer)
 {
     PAL_INTERFACE *palIface = lPAL_GetInterface(pch);
-    return palIface->PAL_GetTimer(timer);
+    return(palIface->MPAL_GetTimer(timer));
 }
 
 uint8_t PAL_GetTimerExtended(uint16_t pch, uint64_t *timer)
 {
     PAL_INTERFACE *palIface = lPAL_GetInterface(pch);
-    return palIface->PAL_GetTimerExtended(timer);
+    return(palIface->MPAL_GetTimerExtended(timer));
 }
 
-uint8_t PAL_GetCD(uint16_t pch, uint8_t *cd, uint8_t *rssi, uint32_t *time, uint8_t *header)
+uint8_t PAL_GetCD(uint16_t pch, uint8_t *cd, uint8_t *rssi, uint32_t *timeVal, uint8_t *header)
 {
     PAL_INTERFACE *palIface = lPAL_GetInterface(pch);
-    return palIface->PAL_GetCD(cd, rssi, time, header);
+    return(palIface->MPAL_GetCD(cd, rssi, timeVal, header));
 }
 
 uint8_t PAL_GetNL(uint16_t pch, uint8_t *noise)
 {
     PAL_INTERFACE *palIface = lPAL_GetInterface(pch);
-    return palIface->PAL_GetNL(noise);
+    return(palIface->MPAL_GetNL(noise));
 }
 
-uint8_t PAL_GetAGC(uint16_t pch, uint8_t *frameType, uint8_t *gain)
+uint8_t PAL_GetAGC(uint16_t pch, uint8_t *mode, uint8_t *gain)
 {
     PAL_INTERFACE *palIface = lPAL_GetInterface(pch);
-    return palIface->PAL_GetAGC(frameType, gain);
+    return(palIface->MPAL_GetAGC(mode, gain));
 }
 
-uint8_t PAL_SetAGC(uint16_t pch, PAL_FRAME frameType, uint8_t gain)
+uint8_t PAL_SetAGC(uint16_t pch, uint8_t mode, uint8_t gain)
 {
     PAL_INTERFACE *palIface = lPAL_GetInterface(pch);
-    return palIface->PAL_SetAGC(frameType, gain);
+    return(palIface->MPAL_SetAGC(mode, gain));
 }
 
 uint8_t PAL_GetCCA(uint16_t pch, uint8_t *pState)
 {
     PAL_INTERFACE *palIface = lPAL_GetInterface(pch);
-    return palIface->PAL_GetCCA(pState);
+    return(palIface->MPAL_GetCCA(pState));
 }
 
 uint8_t PAL_GetChannel(uint16_t *pPch, uint16_t channelReference)
 {
     PAL_INTERFACE *palIface = lPAL_GetInterface(channelReference);
-    return palIface->PAL_GetChannel(pPch);
+    return(palIface->MPAL_GetChannel(pPch));
 }
 
 uint8_t PAL_SetChannel(uint16_t pch)
 {
     PAL_INTERFACE *palIface = lPAL_GetInterface(pch);
-    return palIface->PAL_SetChannel(pch);
+    return(palIface->MPAL_SetChannel(pch));
 }
 
 void PAL_ProgramChannelSwitch(uint16_t pch, uint32_t timeSync, uint8_t timeMode)
 {
     PAL_INTERFACE *palIface = lPAL_GetInterface(pch);
-    palIface->PAL_ProgramChannelSwitch(timeSync, pch, timeMode);
+    palIface->MPAL_ProgramChannelSwitch(timeSync, pch, timeMode);
 }
 
 uint8_t PAL_GetConfiguration(uint16_t pch, uint16_t id, void *val, uint16_t length)
 {
     PAL_INTERFACE *palIface = lPAL_GetInterface(pch);
 
-    if (id == PAL_ID_PHY_SNIFFER_EN)
+    if(id == (uint16_t)PAL_ID_PHY_SNIFFER_EN)
     {
 <#if PRIME_PAL_PHY_SNIFFER == true>
         *(uint8_t *)val = palData.snifferEnabled;
 <#else>
         *(uint8_t *)val = 0;
 </#if>
-        return(PAL_CFG_SUCCESS);        
+        return (uint8_t)PAL_CFG_SUCCESS;
     }
 
-    return palIface->PAL_GetConfiguration(id, val, length);
+    return(palIface->MPAL_GetConfiguration(id, val, length));
 }
 
 uint8_t PAL_SetConfiguration(uint16_t pch, uint16_t id, void *val, uint16_t length)
 {
     PAL_INTERFACE *palIface = lPAL_GetInterface(pch);
 
-    if (id == PAL_ID_PHY_SNIFFER_EN)
+    if (id == (uint16_t)PAL_ID_PHY_SNIFFER_EN)
     {
 <#if PRIME_PAL_PHY_SNIFFER == true>
         palData.snifferEnabled = *(uint8_t *)val;
 <#else>
-        palData.snifferEnabled = 0;
+        palData.snifferEnabled = 0U;
 </#if>
-        return(PAL_CFG_SUCCESS);        
+        return (uint8_t)PAL_CFG_SUCCESS;
     }
 
-    return palIface->PAL_SetConfiguration(id, val, length);
+    return(palIface->MPAL_SetConfiguration(id, val, length));
 }
 
-uint16_t PAL_GetSignalCapture(uint16_t pch, uint8_t *noiseCapture, PAL_FRAME frameType, 
+uint16_t PAL_GetSignalCapture(uint16_t pch, uint8_t *noiseCapture, PAL_FRAME frameType,
                               uint32_t timeStart, uint32_t duration)
 {
     PAL_INTERFACE *palIface = lPAL_GetInterface(pch);
-    return palIface->PAL_GetSignalCapture(noiseCapture, frameType, timeStart, duration);
+    return(palIface->MPAL_GetSignalCapture(noiseCapture, frameType, timeStart, duration));
 }
 
 uint8_t PAL_GetMsgDuration(uint16_t pch, uint16_t length, PAL_SCHEME scheme, PAL_FRAME frameType, uint32_t *duration)
 {
     PAL_INTERFACE *palIface = lPAL_GetInterface(pch);
-    return palIface->PAL_GetMsgDuration(length, scheme, frameType, duration);
+    return(palIface->MPAL_GetMsgDuration(length, scheme, frameType, duration));
 }
 
 bool PAL_CheckMinimumQuality(uint16_t pch, uint8_t reference, uint8_t modulation)
 {
     PAL_INTERFACE *palIface = lPAL_GetInterface(pch);
-    return palIface->PAL_CheckMinimumQuality(reference, modulation);
+    return(palIface->MPAL_CheckMinimumQuality(reference, modulation));
 }
 
 uint8_t PAL_GetLessRobustModulation(uint16_t pch, uint8_t mod1, uint8_t mod2)
 {
     PAL_INTERFACE *palIface = lPAL_GetInterface(pch);
-    return palIface->PAL_GetLessRobustModulation(mod1, mod2);
+    return(palIface->MPAL_GetLessRobustModulation(mod1, mod2));
 }

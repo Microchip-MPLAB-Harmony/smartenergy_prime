@@ -9,7 +9,7 @@
     Physical layer for the PRIME serial interface.
 
   Description:
-    This module handles the serial transmission and reception of PRIME messages 
+    This module handles the serial transmission and reception of PRIME messages
     at the physical
 *******************************************************************************/
 //DOM-IGNORE-BEGIN
@@ -70,8 +70,8 @@
 // *****************************************************************************
 // Section: Data Types
 // *****************************************************************************
-// ***************************************************************************** 
-typedef struct 
+// *****************************************************************************
+typedef struct
 {
     uint16_t len;
     uint8_t dataBuf[DRV_PHY_SERIAL_MAX_PPDU_SIZE];
@@ -107,18 +107,18 @@ static SRV_USI_HANDLE sPhySerialUsiHandler;
 // Section: File Scope Functions
 // *****************************************************************************
 // *****************************************************************************
-void lDRV_PHY_SERIAL_RxFrame(uint8_t *rxMsg, size_t len) 
+void lDRV_PHY_SERIAL_RxFrame(uint8_t *rxMsg, size_t len)
 {
-    if(!sPhySerialMsgRecv[sInputMsgRcvIndex].len) 
+    if(!sPhySerialMsgRecv[sInputMsgRcvIndex].len)
     {
-        memcpy(sPhySerialMsgRecv[sInputMsgRcvIndex].dataBuf, rxMsg, len);
+        (void)memcpy(sPhySerialMsgRecv[sInputMsgRcvIndex].dataBuf, rxMsg, len);
         sPhySerialMsgRecv[sInputMsgRcvIndex].len = len;
 
-        if(++sInputMsgRcvIndex == DRV_PHY_SERIAL_MSG_RCV_MAX_NUM) 
+        if(++sInputMsgRcvIndex == DRV_PHY_SERIAL_MSG_RCV_MAX_NUM)
         {
             sInputMsgRcvIndex = 0;
         }
-    }    
+    }
 }
 
 // *****************************************************************************
@@ -152,7 +152,7 @@ SYS_MODULE_OBJ DRV_PHY_SERIAL_Initialize(const SYS_MODULE_INDEX index,
 
     sInputMsgRcvIndex = 0;
     sOutputMsgRcvIndex = 0;
-    for(loopIndex = 0; loopIndex < DRV_PHY_SERIAL_MSG_RCV_MAX_NUM; loopIndex++) 
+    for(loopIndex = 0; loopIndex < DRV_PHY_SERIAL_MSG_RCV_MAX_NUM; loopIndex++)
     {
         sPhySerialMsgRecv[loopIndex].len = 0;
     }
@@ -165,7 +165,7 @@ SYS_MODULE_OBJ DRV_PHY_SERIAL_Initialize(const SYS_MODULE_INDEX index,
         /* Register Handler */
         SRV_USI_CallbackRegister(sPhySerialUsiHandler, SRV_USI_PROT_ID_PHY_SERIAL_PRIME, lDRV_PHY_SERIAL_RxFrame);
     }
-    
+
     return (SYS_MODULE_OBJ)DRV_PHY_SERIAL_INDEX;
 }
 
@@ -179,22 +179,22 @@ void DRV_PHY_SERIAL_Deinitialize(SYS_MODULE_OBJ object)
     sPhySerialUsiHandler = SRV_USI_HANDLE_INVALID;
 }
 
-void DRV_PHY_SERIAL_SetCallbacks(DRV_PHY_SERIAL_CALLBACKS *phySerCBs) 
+void DRV_PHY_SERIAL_SetCallbacks(DRV_PHY_SERIAL_CALLBACKS *phySerCBs)
 {
     sPhySerialCallbacks.dataReception = phySerCBs->dataReception;
     sPhySerialCallbacks.dataConfirm = phySerCBs->dataConfirm;
 }
 
-uint8_t DRV_PHY_SERIAL_DataRequestTransmission(DRV_PHY_SERIAL_MSG_REQUEST_DATA *txMsg) 
+uint8_t DRV_PHY_SERIAL_DataRequestTransmission(DRV_PHY_SERIAL_MSG_REQUEST_DATA *txMsg)
 {
     size_t txDataCnt=0;
 
-    memcpy(sPhyTxBuffer, txMsg->dataBuf, txMsg->dataLen);
+    (void)memcpy(sPhyTxBuffer, txMsg->dataBuf, txMsg->dataLen);
 
     /* Send through USI */
     if(sPhySerialUsiHandler != SRV_USI_HANDLE_INVALID)
-    {       
-        txDataCnt = SRV_USI_Send_Message(sPhySerialUsiHandler, SRV_USI_PROT_ID_PHY_SERIAL_PRIME, sPhyTxBuffer, txMsg->dataLen);       
+    {
+        txDataCnt = SRV_USI_Send_Message(sPhySerialUsiHandler, SRV_USI_PROT_ID_PHY_SERIAL_PRIME, sPhyTxBuffer, txMsg->dataLen);
     }
     else
     {/* return from here */
@@ -202,13 +202,13 @@ uint8_t DRV_PHY_SERIAL_DataRequestTransmission(DRV_PHY_SERIAL_MSG_REQUEST_DATA *
     }
 
     /* Generate Phy Data Confirm Callback */
-    if(sPhySerialCallbacks.dataConfirm != NULL) 
+    if(sPhySerialCallbacks.dataConfirm != NULL)
     {
         uint32_t currentTime;
 
         currentTime = SRV_TIME_MANAGEMENT_GetTimeUS();
 
-        if(txDataCnt > 0) 
+        if(txDataCnt > 0)
         {
             sPhySerialTXConfirmData.result = DRV_PHY_SERIAL_TX_RESULT_SUCCESS;
         }
@@ -232,10 +232,10 @@ uint8_t DRV_PHY_SERIAL_DataRequestTransmission(DRV_PHY_SERIAL_MSG_REQUEST_DATA *
 
 void DRV_PHY_SERIAL_Tasks(void)
 {
-    while(sPhySerialMsgRecv[sOutputMsgRcvIndex].len) 
+    while(sPhySerialMsgRecv[sOutputMsgRcvIndex].len)
     {
         /* Generate Phy Data Indication Callback */
-        if( sPhySerialCallbacks.dataReception != NULL) 
+        if( sPhySerialCallbacks.dataReception != NULL)
         {
             uint32_t currentTime;
             currentTime = SRV_TIME_MANAGEMENT_GetTimeUS();
@@ -263,12 +263,12 @@ void DRV_PHY_SERIAL_Tasks(void)
             sPhySerialRxMsg.qt = 255;
             sPhySerialRxMsg.snrEx = 0;
 
-    
+
             sPhySerialCallbacks.dataReception(&sPhySerialRxMsg);
         }
 
         sPhySerialMsgRecv[sOutputMsgRcvIndex].len = 0;
-        if(++sOutputMsgRcvIndex == DRV_PHY_SERIAL_MSG_RCV_MAX_NUM) 
+        if(++sOutputMsgRcvIndex == DRV_PHY_SERIAL_MSG_RCV_MAX_NUM)
         {
             sOutputMsgRcvIndex = 0;
         }

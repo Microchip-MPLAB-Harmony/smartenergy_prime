@@ -9,7 +9,7 @@
     Physical Abstraction Layer (PAL) SERIAL header file.
 
   Description:
-    This module provides the interface between the PRIME MAC layer and the 
+    This module provides the interface between the PRIME MAC layer and the
     SERIAL physical layer.
 *******************************************************************************/
 
@@ -58,6 +58,7 @@
 
 #endif
 // DOM-IGNORE-END
+extern const PAL_INTERFACE PAL_SERIAL_Interface;
 
 SYS_MODULE_OBJ PAL_SERIAL_Initialize(void);
 SYS_STATUS PAL_SERIAL_Status(void);

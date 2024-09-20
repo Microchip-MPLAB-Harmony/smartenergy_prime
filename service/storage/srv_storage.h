@@ -69,12 +69,12 @@ Microchip or any third party.
 // *****************************************************************************
 
 /* PRIME versions */
-#define PRIME_VERSION_1_3           1
-#define PRIME_VERSION_1_4           2    
+#define PRIME_VERSION_1_3           1U
+#define PRIME_VERSION_1_4           2U
 
 /* PRIME mode */
-#define PRIME_MODE_BN               1
-#define PRIME_MODE_SN               2
+#define PRIME_MODE_BN               1U
+#define PRIME_MODE_SN               2U
 
 // *****************************************************************************
 // *****************************************************************************
@@ -116,8 +116,8 @@ typedef enum
     be kept in non-volatile storage.
 
   Description:
-    This data type defines the structure and key to define the MAC configuration 
-    information used by the PRIME stack that needs to be kept in non-volatile 
+    This data type defines the structure and key to define the MAC configuration
+    information used by the PRIME stack that needs to be kept in non-volatile
     storage.
 
   Remarks:
@@ -139,8 +139,8 @@ typedef struct {
     be kept in non-volatile storage.
 
   Description:
-    This data type defines the structure and key to define the PHY configuration 
-    information used by the PRIME stack that needs to be kept in non-volatile 
+    This data type defines the structure and key to define the PHY configuration
+    information used by the PRIME stack that needs to be kept in non-volatile
     storage.
 
   Remarks:
@@ -161,20 +161,20 @@ typedef struct {
 /* Base Node configuration information
 
   Summary:
-    Structure and key to define the Base Node configuration information that 
+    Structure and key to define the Base Node configuration information that
     needs to be kept in non-volatile storage.
 
   Description:
-    This data type defines the structure and key to define the Base Node 
-    configuration information used by the PRIME stack that needs to be kept in 
+    This data type defines the structure and key to define the Base Node
+    configuration information used by the PRIME stack that needs to be kept in
     non-volatile storage.
 
   Remarks:
     None
 */
 
-#define SRV_STORAGE_BN_INFO_CONFIG_KEY_13    0xAA55
-#define SRV_STORAGE_BN_INFO_CONFIG_KEY_14    0xAA66
+#define SRV_STORAGE_BN_INFO_CFG_KEY_13    0xAA55
+#define SRV_STORAGE_BN_INFO_CFG_KEY_14    0xAA66
 
 typedef struct {
 	uint16_t cfgKey;
@@ -190,12 +190,12 @@ typedef struct {
 /* PRIME board configuration information
 
   Summary:
-    Structure and key to define the PRIME board configuration information that 
+    Structure and key to define the PRIME board configuration information that
     needs to be kept in non-volatile storage.
 
   Description:
-    This data type defines the structure and key to define the PRIME board 
-    configuration information used by the PRIME stack as well as the user 
+    This data type defines the structure and key to define the PRIME board
+    configuration information used by the PRIME stack as well as the user
     application that needs to be kept in non-volatile storage.
     PRIME version indicates the PRIME version protocol (PRIME_VERSION_1_3 or
     PRIME_VERSION_1_4).
@@ -205,7 +205,7 @@ typedef struct {
     None
 */
 
-#define SRV_STORAGE_PRIME_MODE_INFO_CONFIG_KEY    0xA55A
+#define SRV_STORAGE_PRIME_MODE_INFO_CFG_KEY    0xA55A
 
 typedef struct {
 	uint16_t cfgKey;
@@ -213,16 +213,17 @@ typedef struct {
 	uint8_t boardMode;
 } SRV_STORAGE_PRIME_MODE_INFO_CONFIG;
 
+
 // *****************************************************************************
 /* Security configuration information
 
   Summary:
-    Structure and key to define the security configuration information that 
+    Structure and key to define the security configuration information that
     needs to be kept in non-volatile storage.
 
   Description:
-    This data type defines the structure and key to define the security 
-    configuration information used by the PRIME stack that needs to be kept in 
+    This data type defines the structure and key to define the security
+    configuration information used by the PRIME stack that needs to be kept in
     non-volatile storage.
 
   Remarks:
@@ -240,11 +241,11 @@ typedef struct {
 /* Boot configuration information
 
   Summary:
-    Structure and key to define the boot configuration information that needs to 
+    Structure and key to define the boot configuration information that needs to
     be kept in non-volatile storage.
 
   Description:
-    This data type defines the structure and key to define the boot configuration 
+    This data type defines the structure and key to define the boot configuration
     information used by the Firmware Upgrade service and the PRIME Bootloader
     application that needs to be kept in non-volatile storage.
 

@@ -117,6 +117,7 @@ def getRamMemoryDescription():
 def setFwStackLinkerParams(primeMode, primeProject, primeVersion):
     ramStartAddressHex, ramSizeHex = getRamMemoryDescription()
 
+    rom_length = ""
     if (primeMode == "SN"):
         # Service Node
         if (primeProject == "application project"):
@@ -132,7 +133,7 @@ def setFwStackLinkerParams(primeMode, primeProject, primeVersion):
                 romLength = PRIME_FW_STACK_14_SIZE_HEX
             else:
                 romLength = PRIME_FW_STACK_13_SIZE_HEX
-            
+
             rom_length  = "ROM_LENGTH=" + romLength
         else:
             # SN: Monolithic project
@@ -150,7 +151,7 @@ def setFwStackLinkerParams(primeMode, primeProject, primeVersion):
         ramParams = (ram_origin + ";" + ram_length + ";" + rom_length)
     else:
         ramParams = (ram_origin + ";" + ram_length)
-        
+
     pPrimeXc32LdPrepMacroSym.setValue(ramParams)
 
 def createGroupServices():
@@ -164,10 +165,10 @@ def createGroupServices():
 
     primeServicesRootGroup = ["primeFirmwareUpgrade"]
     Database.activateComponents(primeServicesRootGroup)
-        
+
     # Debug traces enabled
     setVal("srvLogReport", "ENABLE_TRACES", True)
-    
+
     # Set default FU region (SN)
     Database.sendMessage("primeFirmwareUpgrade", "CONF_FU_PRIME", {"Node": "SN"})
 
@@ -193,7 +194,7 @@ def primeAddBnFiles():
     pPrime13SnLibFile.setEnabled(False)
     pPrime14BnMLibFile.setEnabled(False)
     pPrime14SnLibFile.setEnabled(False)
-    
+
     processor = Variables.get("__PROCESSOR")
 
     # BN library
@@ -288,7 +289,7 @@ def primeAddSnFiles():
 
 def primeUpdateFiles(primeStackComponent):
     addPALFUComponents = False
-    
+
     if (primeConfigMode.getValue() == "SN"):
         # Add files for SN
         primeAddSnFiles()
@@ -311,8 +312,8 @@ def primeUpdateFiles(primeStackComponent):
         Database.deactivateComponents(["primePal"])
         primeStackComponent.setDependencyEnabled("primePal_dep", False)
         primeStackComponent.setDependencyEnabled("primeFu_dep", False)
-    
-        
+
+
 def primeShowSprofUsiInstance(symbol, event):
     symbol.setVisible(event["value"])
 
@@ -344,7 +345,7 @@ def primeShowSNAppConfiguration(primeVersion):
     primeSNPHYAddress.setVisible(True)
     primeSNPFWStack14Address.setVisible(True)
     primeSNPFWStack13Address.setVisible(True)
-    
+
     primeSNAppSize.setVisible(True)
     primeSNPHYSize.setVisible(True)
     primeSNPFWStack14Size.setVisible(True)
@@ -572,7 +573,7 @@ def primeUpdateConfiguration(symbol, event):
 
     # Set Application Start Address
     Database.sendMessage("core", "APP_START_ADDRESS", {"start_address":startAddress})
-    
+
     # Set linker properties
     setFwStackLinkerParams(primeMode, primeProject, primeVersion)
 
@@ -594,7 +595,7 @@ def instantiateComponent(primeStackConfigComponent):
     Database.activateComponents(["primePal"], "PRIME STACK")
     primeStackConfigComponent.setDependencyEnabled("primePal_dep", True)
     primeStackConfigComponent.setDependencyEnabled("primeFu_dep", True)
-    
+
     # Configure PRIME Stack
     primeStackConfig = primeStackConfigComponent.createMenuSymbol("PRIME_Stack_Configuration", None)
     primeStackConfig.setLabel("PRIME Stack Configuration")
@@ -609,7 +610,7 @@ def instantiateComponent(primeStackConfigComponent):
     primeConfigMode.setDescription("Select the PRIME mode: base or service node")
     primeConfigMode.setVisible(True)
     primeConfigMode.setDefaultValue("SN")
-    
+
     # Select type of project
     global primeConfigProject
     primeProjectOptions = ["application project", "bin project", "monolithic project"]
@@ -881,8 +882,8 @@ def instantiateComponent(primeStackConfigComponent):
 
     # Set Application Start Address (calculates rom length as the remaining part of the memory from the start address)
     Database.sendMessage("core", "APP_START_ADDRESS", {"start_address":(hex(int(memStartAddressHex, 0) + int(PRIME_USER_APP_OFFSET_HEX, 0)))})
-    
-    # Set linker script values 
+
+    # Set linker script values
     ramStartAddressHex, ramSizeHex = getRamMemoryDescription()
     ram_origin = "RAM_ORIGIN=" + ramStartAddressHex
     ram_length = "RAM_LENGTH=" + hex(int(ramSizeHex, 0) - int(PRIME_FW_STACK_RAM_SIZE, 0))
@@ -896,7 +897,7 @@ def instantiateComponent(primeStackConfigComponent):
     ############################################################################
 
     configName = Variables.get("__CONFIGURATION_NAME")
-    
+
     ##### PRIME API
     global pPrimeHeaderFile
     pPrimeHeaderFile = primeStackConfigComponent.createFileSymbol("PRIME_HEADER", None)
@@ -906,7 +907,7 @@ def instantiateComponent(primeStackConfigComponent):
     pPrimeHeaderFile.setProjectPath("config/" + configName + "/stack/prime")
     pPrimeHeaderFile.setType("HEADER")
     pPrimeHeaderFile.setEnabled(False)
-    
+
     global pPrimeSourceFile
     pPrimeSourceFile = primeStackConfigComponent.createFileSymbol("PRIME_SOURCE", None)
     pPrimeSourceFile.setSourcePath("prime/src/prime_stack.c.ftl")
@@ -916,7 +917,7 @@ def instantiateComponent(primeStackConfigComponent):
     pPrimeSourceFile.setType("SOURCE")
     pPrimeSourceFile.setEnabled(False)
     pPrimeSourceFile.setMarkup(True)
-    
+
     global pPrimeLocalHeaderFile
     pPrimeLocalHeaderFile = primeStackConfigComponent.createFileSymbol("PRIME_LOCAL_HEADER", None)
     pPrimeLocalHeaderFile.setSourcePath("prime/src/prime_stack_local.h")
@@ -1131,7 +1132,7 @@ def instantiateComponent(primeStackConfigComponent):
     pPrime14SnLibFile.setEnabled(False)
 
     ##### PRIME STACK TEMPLATES
-    
+
     primeStackSystemConfigFile = primeStackConfigComponent.createFileSymbol("PRIME_STACK_CONFIGURATION", None)
     primeStackSystemConfigFile.setType("STRING")
     primeStackSystemConfigFile.setOutputName("core.LIST_SYSTEM_CONFIG_H_MIDDLEWARE_CONFIGURATION")
@@ -1143,13 +1144,13 @@ def instantiateComponent(primeStackConfigComponent):
     primeStackSystemDefFile.setOutputName("core.LIST_SYSTEM_DEFINITIONS_H_INCLUDES")
     primeStackSystemDefFile.setSourcePath("prime/templates/system/definitions.h.ftl")
     primeStackSystemDefFile.setMarkup(True)
-    
+
     primeStackSystemDefObjFile = primeStackConfigComponent.createFileSymbol("PRIME_STACK_DEF_OBJ", None)
     primeStackSystemDefObjFile.setType("STRING")
     primeStackSystemDefObjFile.setOutputName("core.LIST_SYSTEM_DEFINITIONS_H_OBJECTS")
     primeStackSystemDefObjFile.setSourcePath("prime/templates/system/definitions_objects.h.ftl")
     primeStackSystemDefObjFile.setMarkup(True)
-    
+
     primeStackSystemInitDataFile = primeStackConfigComponent.createFileSymbol("PRIME_STACK_INIT_DATA", None)
     primeStackSystemInitDataFile.setType("STRING")
     primeStackSystemInitDataFile.setOutputName("core.LIST_SYSTEM_INIT_C_LIBRARY_INITIALIZATION_DATA")

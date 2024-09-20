@@ -65,12 +65,6 @@ Microchip or any third party.
 #define FREQ_HOP_RF_SEQUENCE               {${PRIME_PAL_RF_FREQ_HOPPING_RANGE_VALUES?string}}
 #define FREQ_HOP_RF_BCN_SEQUENCE           {${PRIME_PAL_RF_FREQ_HOPPING_BCN_RANGE_VALUES?string}}
 </#if>
-
-<#if PRIME_PAL_PHY_SNIFFER == true>
-#define PAL_SNIFFER_DATA_MAX_SIZE           512
-typedef void (*PAL_USI_SNIFFER_CB)(uint8_t *pData, uint16_t length);
-
-</#if>
 // *****************************************************************************
 /* RF PAL Module Status
 

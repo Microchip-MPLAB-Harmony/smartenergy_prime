@@ -12,7 +12,7 @@
 
   Description:
     The Reset Handler service provides a simple interface to trigger system
-    resets and to manage and store reset causes.This file contains the source 
+    resets and to manage and store reset causes.This file contains the source
     code for the implementation of this service.
 *******************************************************************************/
 
@@ -82,7 +82,7 @@ static void lSRV_RESET_HANDLER_StoreResetInfo(SRV_RESET_HANDLER_RESET_CAUSE rese
     ++numResets;
 
     /* Store reset information */
-    resetInfo = (numResets << 16) + (uint8_t)resetType;
+    resetInfo = ((uint32_t)(numResets) << 16) + (uint32_t)(resetType);
 <#if (prime_config)??>
 <#if (prime_config.PRIME_MODE == "SN") || (prime_config.PRIME_MODE == "BN" && prime_config.BN_SLAVE_EN == true)>
     SUPC_GPBRWrite(GPBR_REGS_5, resetInfo);
@@ -92,6 +92,16 @@ static void lSRV_RESET_HANDLER_StoreResetInfo(SRV_RESET_HANDLER_RESET_CAUSE rese
 </#if>
 }
 
+
+    /* MISRA C-2012 deviation block start */
+    /* MISRA C-2012 Rule 11.3 deviated once. Deviation record ID - H3_MISRAC_2012_R_11_3_DR_1 */
+<#if core.COVERITY_SUPPRESS_DEVIATION?? && core.COVERITY_SUPPRESS_DEVIATION>
+    <#if core.COMPILER_CHOICE == "XC32">
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wunknown-pragmas"
+    </#if>
+    #pragma coverity compliance block deviate "MISRA C-2012 Rule 5.8" "H3_MISRAC_2012_R_5_8_DR_1"
+</#if>
 void HardFault_Handler(void)
 {
     __asm volatile(
@@ -153,6 +163,14 @@ void WDT_Handler(void)
         "B DumpStack    \n");
 }
 </#if>
+
+<#if core.COVERITY_SUPPRESS_DEVIATION?? && core.COVERITY_SUPPRESS_DEVIATION>
+    #pragma coverity compliance end_block "MISRA C-2012 Rule 5.8"
+    <#if core.COMPILER_CHOICE == "XC32">
+    #pragma GCC diagnostic pop
+    </#if>
+</#if>
+    /* MISRA C-2012 deviation block end */
 
 volatile uint32_t saved_r0;
 volatile uint32_t saved_r1;
@@ -225,34 +243,34 @@ void DumpStack(uint32_t stack[])
     SRV_RESET_HANDLER_RESET_CAUSE resetType;
 
     /* Check forced hard fault */
-    if ((saved_hfsr & (1 << 30)) != 0) 
+    if ((saved_hfsr & (1UL << 30)) != 0U)
     {
         resetType = RESET_HANDLER_HARD_FAULT_RESET;
 
         /* Check usage error */
-        if((saved_cfsr & 0xFFFF0000) != 0) 
+        if((saved_cfsr & 0xFFFF0000U) != 0U)
         {
             resetType = RESET_HANDLER_USAGE_FAULT_RESET;
         }
 
         /* Check bus fault error */
-        if((saved_cfsr & 0xFF00) != 0) 
+        if((saved_cfsr & 0xFF00U) != 0U)
         {
             resetType = RESET_HANDLER_BUS_FAULT_RESET;
         }
 
         /* Check memory management error */
-        if((saved_cfsr & 0xFF) != 0) 
+        if((saved_cfsr & 0xFFU) != 0U)
         {
             resetType = RESET_HANDLER_MEM_MANAGE_RESET;
         }
     /* Check bus fault on a vector table */
-    } 
-    else if ((saved_hfsr & (1 << 1)) != 0) 
+    }
+    else if ((saved_hfsr & (1U << 1)) != 0U)
     {
         resetType = RESET_HANDLER_VECTOR_FAULT_RESET;
-    } 
-    else 
+    }
+    else
     {
         resetType = RESET_HANDLER_WATCHDOG_RESET;
     }
@@ -271,13 +289,15 @@ void DumpStack(uint32_t stack[])
 void SRV_RESET_HANDLER_Initialize(void)
 {
 <#if RESET_HANDLING_EN == true>
+    RSTC_RESET_CAUSE resetTypeAux;
     SRV_RESET_HANDLER_RESET_CAUSE resetType;
 
     /* Read reset type */
-    resetType = (SRV_RESET_HANDLER_RESET_CAUSE)(RSTC_ResetCauseGet() >> RSTC_SR_RSTTYP_Pos);
+    resetTypeAux = RSTC_ResetCauseGet() >> RSTC_SR_RSTTYP_Pos;
+    resetType = (SRV_RESET_HANDLER_RESET_CAUSE)(resetTypeAux);
 
     /* If it is a software reset, it is from one of these handlers */
-    if ((resetType != RESET_HANDLER_SOFTWARE_RESET) && (resetType != RESET_HANDLER_GENERAL_RESET)) 
+    if ((resetType != RESET_HANDLER_SOFTWARE_RESET) && (resetType != RESET_HANDLER_GENERAL_RESET))
     {
         /* Store reset information for other reset types */
         lSRV_RESET_HANDLER_StoreResetInfo(resetType);
@@ -293,7 +313,7 @@ void SRV_RESET_HANDLER_RestartSystem(SRV_RESET_HANDLER_RESET_CAUSE resetType)
 <#else>
     (void)resetType;
 </#if>
-    
+
     /* Trigger software reset */
     RSTC_Reset(RSTC_PROCESSOR_RESET);
 }

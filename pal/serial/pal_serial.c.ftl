@@ -69,25 +69,25 @@ static bool lPAL_SERIAL_RM_CheckMinimumQuality(PAL_SCHEME reference, PAL_SCHEME 
  ******************************************************************************/
 const PAL_INTERFACE PAL_SERIAL_Interface =
 {
-    .PAL_GetSNR = PAL_SERIAL_GetSNR,
-    .PAL_GetZCT = PAL_SERIAL_GetZCT,
-    .PAL_GetTimer = PAL_SERIAL_GetTimer,
-    .PAL_GetTimerExtended = PAL_SERIAL_GetTimerExtended,
-    .PAL_GetCD = PAL_SERIAL_GetCD,
-    .PAL_GetNL = PAL_SERIAL_GetNL,
-    .PAL_GetAGC = PAL_SERIAL_GetAGC,
-    .PAL_SetAGC = PAL_SERIAL_SetAGC,
-    .PAL_GetCCA = PAL_SERIAL_GetCCA,
-    .PAL_GetChannel = PAL_SERIAL_GetChannel,
-    .PAL_SetChannel = PAL_SERIAL_SetChannel,
-    .PAL_DataRequest = PAL_SERIAL_DataRequest,
-    .PAL_ProgramChannelSwitch = PAL_SERIAL_ProgramChannelSwitch,
-    .PAL_GetConfiguration = PAL_SERIAL_GetConfiguration,
-    .PAL_SetConfiguration = PAL_SERIAL_SetConfiguration,
-    .PAL_GetSignalCapture = PAL_SERIAL_GetSignalCapture,
-    .PAL_GetMsgDuration = PAL_SERIAL_GetMsgDuration,
-    .PAL_CheckMinimumQuality = lPAL_SERIAL_RM_CheckMinimumQuality,
-    .PAL_GetLessRobustModulation = lPAL_SERIAL_RM_GetLessRobustModulation,
+    .MPAL_GetSNR = PAL_SERIAL_GetSNR,
+    .MPAL_GetZCT = PAL_SERIAL_GetZCT,
+    .MPAL_GetTimer = PAL_SERIAL_GetTimer,
+    .MPAL_GetTimerExtended = PAL_SERIAL_GetTimerExtended,
+    .MPAL_GetCD = PAL_SERIAL_GetCD,
+    .MPAL_GetNL = PAL_SERIAL_GetNL,
+    .MPAL_GetAGC = PAL_SERIAL_GetAGC,
+    .MPAL_SetAGC = PAL_SERIAL_SetAGC,
+    .MPAL_GetCCA = PAL_SERIAL_GetCCA,
+    .MPAL_GetChannel = PAL_SERIAL_GetChannel,
+    .MPAL_SetChannel = PAL_SERIAL_SetChannel,
+    .MPAL_DataRequest = PAL_SERIAL_DataRequest,
+    .MPAL_ProgramChannelSwitch = PAL_SERIAL_ProgramChannelSwitch,
+    .MPAL_GetConfiguration = PAL_SERIAL_GetConfiguration,
+    .MPAL_SetConfiguration = PAL_SERIAL_SetConfiguration,
+    .MPAL_GetSignalCapture = PAL_SERIAL_GetSignalCapture,
+    .MPAL_GetMsgDuration = PAL_SERIAL_GetMsgDuration,
+    .MPAL_CheckMinimumQuality = lPAL_SERIAL_RM_CheckMinimumQuality,
+    .MPAL_GetLessRobustModulation = lPAL_SERIAL_RM_GetLessRobustModulation,
 };
 
 // *****************************************************************************
@@ -107,7 +107,7 @@ static uint8_t lPAL_SERIAL_RM_GetLessRobustModulation(PAL_SCHEME mod1, PAL_SCHEM
     (void)mod1;
     (void)mod2;
 
-    return PAL_CFG_INVALID_INPUT;
+    return((uint8_t)(PAL_CFG_INVALID_INPUT));
 }
 
 static bool lPAL_SERIAL_RM_CheckMinimumQuality(PAL_SCHEME reference, PAL_SCHEME modulation)
@@ -140,7 +140,7 @@ static void lPAL_SERIAL_SERIAL_DataCfmCb(DRV_PHY_SERIAL_MSG_CONFIRM_DATA *pCfmDa
     }
 
 <#if PRIME_PAL_PHY_SNIFFER == true>
-    if (palSerialData.snifferCallback)
+    if ((palSerialData.snifferCallback) != NULL)
     {
         size_t dataLength;
 
@@ -180,7 +180,7 @@ static void lPAL_SERIAL_SERIAL_DataIndCb(DRV_PHY_SERIAL_MSG_RX_DATA *pRxData)
     }
 
 <#if PRIME_PAL_PHY_SNIFFER == true>
-    if (palSerialData.snifferCallback)
+    if ((palSerialData.snifferCallback) != NULL)
     {
         size_t length;
 
@@ -216,7 +216,7 @@ SYS_MODULE_OBJ PAL_SERIAL_Initialize(void)
     drvPhySerialInitData.serialPhyHandlers.dataConfirm = lPAL_SERIAL_SERIAL_DataCfmCb;
     drvPhySerialInitData.serialPhyHandlers.dataReception = lPAL_SERIAL_SERIAL_DataIndCb;
 
-    if (DRV_PHY_SERIAL_Initialize(DRV_PHY_SERIAL_INDEX, 
+    if (DRV_PHY_SERIAL_Initialize(DRV_PHY_SERIAL_INDEX,
             (const SYS_MODULE_INIT *)&drvPhySerialInitData) != SYS_MODULE_OBJ_INVALID)
     {
         palSerialData.status = PAL_SERIAL_STATUS_ERROR;
@@ -289,14 +289,14 @@ uint8_t PAL_SERIAL_GetTimer(uint32_t *pTimer)
 {
     *pTimer = SRV_TIME_MANAGEMENT_GetTimeUS();
 
-    return PAL_CFG_SUCCESS;
+    return (uint8_t)PAL_CFG_SUCCESS;
 }
 
 uint8_t PAL_SERIAL_GetTimerExtended(uint64_t *pTimeExtended)
 {
     *pTimeExtended = SRV_TIME_MANAGEMENT_GetTimeUS64();
 
-    return PAL_CFG_SUCCESS;
+    return (uint8_t)PAL_CFG_SUCCESS;
 }
 
 uint8_t PAL_SERIAL_GetCD(uint8_t *pCD, uint8_t *pRSSI, uint32_t *pTime, uint8_t *pHeader)
@@ -306,14 +306,14 @@ uint8_t PAL_SERIAL_GetCD(uint8_t *pCD, uint8_t *pRSSI, uint32_t *pTime, uint8_t 
     *pTime = 0;
     *pHeader = 0;
 
-    return PAL_CFG_INVALID_INPUT;
+    return((uint8_t)(PAL_CFG_INVALID_INPUT));
 }
 
 uint8_t PAL_SERIAL_GetZCT(uint32_t *pZcTime)
 {
     *pZcTime = 0;
 
-    return PAL_CFG_INVALID_INPUT;
+    return((uint8_t)(PAL_CFG_INVALID_INPUT));
 }
 
 uint8_t PAL_SERIAL_GetAGC(uint8_t *pMode, uint8_t *pGain)
@@ -321,7 +321,7 @@ uint8_t PAL_SERIAL_GetAGC(uint8_t *pMode, uint8_t *pGain)
     *pMode = 0;
     *pGain = 0;
 
-    return PAL_CFG_INVALID_INPUT;
+    return((uint8_t)(PAL_CFG_INVALID_INPUT));
 }
 
 uint8_t PAL_SERIAL_SetAGC(uint8_t mode, uint8_t gain)
@@ -329,35 +329,35 @@ uint8_t PAL_SERIAL_SetAGC(uint8_t mode, uint8_t gain)
     (void)(mode);
     (void)(gain);
 
-    return PAL_CFG_INVALID_INPUT;
+    return((uint8_t)(PAL_CFG_INVALID_INPUT));
 }
 
 uint8_t PAL_SERIAL_GetCCA(uint8_t *channelState)
 {
     *channelState = 0;
 
-    return PAL_CFG_INVALID_INPUT;
+    return((uint8_t)(PAL_CFG_INVALID_INPUT));
 }
 
 uint8_t PAL_SERIAL_GetNL(uint8_t *pNoise)
 {
     *pNoise = 0;
 
-    return PAL_CFG_INVALID_INPUT;
+    return((uint8_t)(AL_CFG_INVALID_INPUT));
 }
 
 uint8_t PAL_SERIAL_GetChannel(uint16_t *pPch)
 {
     *pPch = 0xFFFF;
 
-    return PAL_CFG_INVALID_INPUT;
+    return((uint8_t)(PAL_CFG_INVALID_INPUT));
 }
 
 uint8_t PAL_SERIAL_SetChannel(uint16_t pch)
 {
     (void)pch;
 
-    return PAL_CFG_INVALID_INPUT;
+    return((uint8_t)(PAL_CFG_INVALID_INPUT));
 }
 
 uint8_t PAL_SERIAL_GetConfiguration(uint16_t id, void *pValue, uint16_t length)
@@ -367,7 +367,7 @@ uint8_t PAL_SERIAL_GetConfiguration(uint16_t id, void *pValue, uint16_t length)
     (void)length;
 
     /* Check identifier */
-    switch (id) 
+    switch (id)
     {
         case PAL_ID_INFO_VERSION:
             serialID = PAL_SERIAL_ID_INFO_VERSION;
@@ -378,12 +378,12 @@ uint8_t PAL_SERIAL_GetConfiguration(uint16_t id, void *pValue, uint16_t length)
             break;
 
         default:
-            return PAL_CFG_INVALID_INPUT;
+            return((uint8_t)(PAL_CFG_INVALID_INPUT));
     }
 
     *(uint16_t *)pValue = serialID;
 
-    return PAL_CFG_SUCCESS;
+    return((uint8_t)PAL_CFG_SUCCESS);
 }
 
 uint8_t PAL_SERIAL_SetConfiguration(uint16_t id, void *pValue, uint16_t length)
@@ -392,7 +392,7 @@ uint8_t PAL_SERIAL_SetConfiguration(uint16_t id, void *pValue, uint16_t length)
     (void)pValue;
     (void)length;
 
-    return PAL_CFG_INVALID_INPUT;
+    return((uint8_t)(PAL_CFG_INVALID_INPUT));
 }
 
 uint8_t PAL_SERIAL_GetSNR(uint8_t *pSnr, uint8_t qt)
@@ -400,7 +400,7 @@ uint8_t PAL_SERIAL_GetSNR(uint8_t *pSnr, uint8_t qt)
     *pSnr = 0;
     (void)qt;
 
-    return PAL_CFG_INVALID_INPUT;
+    return((uint8_t)(PAL_CFG_INVALID_INPUT));
 }
 
 uint16_t PAL_SERIAL_GetSignalCapture(uint8_t *pData, uint8_t frameType, uint32_t timeStart, uint32_t duration)
@@ -410,7 +410,7 @@ uint16_t PAL_SERIAL_GetSignalCapture(uint8_t *pData, uint8_t frameType, uint32_t
     (void)timeStart;
     (void)duration;
 
-    return PAL_CFG_INVALID_INPUT;
+    return((uint16_t)(PAL_CFG_INVALID_INPUT));
 }
 
 uint8_t PAL_SERIAL_GetMsgDuration(uint16_t length, PAL_SCHEME scheme, uint8_t frameType, uint32_t *pDuration)
@@ -420,7 +420,7 @@ uint8_t PAL_SERIAL_GetMsgDuration(uint16_t length, PAL_SCHEME scheme, uint8_t fr
     (void)scheme;
     (void)frameType;
 
-    return PAL_CFG_INVALID_INPUT;
+    return((uint8_t)(PAL_CFG_INVALID_INPUT));
 }
 
 <#if PRIME_PAL_PHY_SNIFFER == true>
