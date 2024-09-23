@@ -97,8 +97,9 @@ typedef enum
 typedef struct
 {
     uint8_t *pData;
+    uint8_t buffId;
     DRV_RF215_TX_HANDLE txHandle;
-} PAL_RF_TX_HANDLERS_DATA;
+} PAL_RF_TX_DATA;
 
 // *****************************************************************************
 /* PAL RF Data
@@ -126,7 +127,7 @@ typedef struct
     
     DRV_RF215_TX_REQUEST_OBJ txReqObj[DRV_RF215_TX_BUFFERS_NUMBER];
 
-    PAL_RF_TX_HANDLERS_DATA txHandleData[DRV_RF215_TX_BUFFERS_NUMBER];
+    PAL_RF_TX_DATA txData[DRV_RF215_TX_BUFFERS_NUMBER];
 
     uint16_t currentChannel;
 
