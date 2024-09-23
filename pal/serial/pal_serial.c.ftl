@@ -250,7 +250,7 @@ uint8_t PAL_SERIAL_DataRequest(PAL_MSG_REQUEST_DATA *pMessageData)
 
     if (palSerialData.status != PAL_SERIAL_STATUS_READY)
     {
-        return PAL_CFG_INVALID_INPUT;
+        return ((uint8_t)PAL_TX_RESULT_PHY_ERROR);
     }
 
     phyTxData.dataBuf = pMessageData->pData;
@@ -261,7 +261,7 @@ uint8_t PAL_SERIAL_DataRequest(PAL_MSG_REQUEST_DATA *pMessageData)
 
     if (DRV_PHY_SERIAL_DataRequestTransmission(&phyTxData) != DRV_PHY_SERIAL_TX_RESULT_PROCESS)
     {
-        return PAL_CFG_INVALID_INPUT;
+        return ((uint8_t)PAL_TX_RESULT_PHY_ERROR);
     }
 
 <#if PRIME_PAL_PHY_SNIFFER == true>
@@ -269,7 +269,7 @@ uint8_t PAL_SERIAL_DataRequest(PAL_MSG_REQUEST_DATA *pMessageData)
 
 </#if>
 
-    return PAL_CFG_SUCCESS;
+    return ((uint8_t)PAL_TX_RESULT_PROCESS);
 }
 
 void PAL_SERIAL_ProgramChannelSwitch(uint32_t timeSync, uint16_t pch, uint8_t timeMode)

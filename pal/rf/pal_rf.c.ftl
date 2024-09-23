@@ -471,7 +471,7 @@ uint8_t PAL_RF_DataRequest(PAL_MSG_REQUEST_DATA *pMessageData)
 
     if (palRfData.status != PAL_RF_STATUS_READY)
     {
-        return PAL_TX_RESULT_PHY_ERROR;
+        return ((uint8_t)PAL_TX_RESULT_PHY_ERROR);
     }
 
     if (pMessageData->timeMode == PAL_TX_MODE_CANCEL)
@@ -481,7 +481,7 @@ uint8_t PAL_RF_DataRequest(PAL_MSG_REQUEST_DATA *pMessageData)
             DRV_RF215_TxCancel(palRfData.drvRfPhyHandle, rfPhyTxReqHandle);
         }
 
-        return PAL_TX_RESULT_PROCESS;
+        return ((uint8_t)PAL_TX_RESULT_PROCESS);
     }
 
 <#if PRIME_PAL_RF_FREQ_HOPPING == true>
@@ -526,12 +526,12 @@ uint8_t PAL_RF_DataRequest(PAL_MSG_REQUEST_DATA *pMessageData)
         palRfCfmData.pCfmObj.ppduDurationCount = 0;
         palRfCfmData.buffId = pMessageData->buffId;
         
-        return PAL_TX_RESULT_PROCESS;
+        return ((uint8_t)PAL_TX_RESULT_PROCESS);
     }
     
     if (txResult != RF215_TX_SUCCESS)
     {
-        return PAL_TX_RESULT_PHY_ERROR;
+        return ((uint8_t)PAL_TX_RESULT_PHY_ERROR);
     }
     
     /* Message accepted */
@@ -544,7 +544,7 @@ uint8_t PAL_RF_DataRequest(PAL_MSG_REQUEST_DATA *pMessageData)
     }
 </#if>
     
-    return PAL_TX_RESULT_PROCESS;
+    return ((uint8_t)PAL_TX_RESULT_PROCESS);
 }
 
 void PAL_RF_ProgramChannelSwitch(uint32_t timeSync, uint16_t pch, uint8_t timeMode)
