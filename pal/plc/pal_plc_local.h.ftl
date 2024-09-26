@@ -48,6 +48,7 @@ Microchip or any third party.
 
 #include <stdbool.h>
 #include <stdint.h>
+#include "system/time/sys_time.h"
 #include "pal_types.h"
 #include "driver/driver_common.h"
 #include "driver/plc/phy/drv_plc_phy_comm.h"
