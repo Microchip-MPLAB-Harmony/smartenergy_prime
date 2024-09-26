@@ -272,10 +272,12 @@ __STATIC_INLINE void lPAL_PLC_TimerSyncInitialize(void)
         palPlcData.syncTimerRelFreq = 1UL << 24;
 
         /* Program first interrupt after 50 ms (5 us deviation with 100 PPM) */
-        if (SRV_TIME_MANAGEMENT_CallbackRegisterUS(lPAL_PLC_SysTimeCB, 0, 
-                palPlcData.syncDelay, SYS_TIME_SINGLE) != SYS_TIME_HANDLE_INVALID)
+        palPlcData.syncDelay = 50000;
+        SYS_TIME_TimerDestroy(palPlcData.syncHandle);
+        palPlcData.syncHandle = SRV_TIME_MANAGEMENT_CallbackRegisterUS(
+                lPAL_PLC_SysTimeCB, 0, palPlcData.syncDelay, SYS_TIME_SINGLE);
+        if (palPlcData.syncHandle != SYS_TIME_HANDLE_INVALID)
         {
-            palPlcData.syncDelay = 50000;
             palPlcData.syncUpdate = false;
         }
         else
@@ -336,8 +338,9 @@ __STATIC_INLINE void lPAL_PLC_TimerSyncUpdate(void)
         }
 
         /* Program next interrupt */
-        if (SRV_TIME_MANAGEMENT_CallbackRegisterUS(lPAL_PLC_SysTimeCB, 0, 
-                palPlcData.syncDelay, SYS_TIME_SINGLE) != SYS_TIME_HANDLE_INVALID)
+        palPlcData.syncHandle = SRV_TIME_MANAGEMENT_CallbackRegisterUS(
+                lPAL_PLC_SysTimeCB, 0, palPlcData.syncDelay, SYS_TIME_SINGLE);
+        if (palPlcData.syncHandle != SYS_TIME_HANDLE_INVALID)
         {
             palPlcData.syncUpdate = false;
         }
@@ -658,6 +661,7 @@ SYS_MODULE_OBJ PAL_PLC_Initialize(void)
     palPlcData.errorInfo = 0;
     palPlcData.palAttenuation = 0;
     palPlcData.syncEnable = false;
+    palPlcData.syncHandle = SYS_TIME_HANDLE_INVALID;
 
     /* Read Default Channel */
     palPlcData.channel = SRV_PCOUP_GetDefaultChannel();

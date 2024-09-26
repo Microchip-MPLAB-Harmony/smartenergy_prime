@@ -162,6 +162,8 @@ typedef struct
 
     uint32_t syncDelay;
 
+    SYS_TIME_HANDLE syncHandle;
+
     uint32_t hiTimerRef;
 
     uint32_t previousTimerRef;
