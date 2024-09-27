@@ -459,6 +459,7 @@ static void lPAL_PLC_PLC_DataCfmCb(DRV_PLC_PHY_TRANSMISSION_CFM_OBJ *pCfmObj, ui
         PAL_MSG_CONFIRM_DATA dataCfm;
 
         dataCfm.txTime = lPAL_PLC_GetHostTime(pCfmObj->timeIni);
+        pCfmObj->timeIni = dataCfm.txTime;  /* For sniffer */
         dataCfm.rmsCalc = (uint16_t)pCfmObj->rmsCalc;
         dataCfm.pch = lPAL_PLC_GetPCH(palPlcData.channel);
         dataCfm.frameType = (uint8_t)pCfmObj->frameType;
@@ -527,6 +528,7 @@ static void lPAL_PLC_PLC_DataIndCb(DRV_PLC_PHY_RECEPTION_OBJ *pIndObj, uintptr_t
     /* Fill dataInd */
     dataInd.pData = pIndObj->pReceivedData;
     dataInd.rxTime = lPAL_PLC_GetHostTime(pIndObj->timeIni);
+    pIndObj->timeIni = dataInd.rxTime;   /* For sniffer */
     dataInd.dataLength = pIndObj->dataLength;
     dataInd.pch = lPAL_PLC_GetPCH(palPlcData.channel);
     PAL_PLC_RM_GetRobustModulation(pIndObj, &dataInd.estimatedBitrate, &dataInd.lessRobustMod, dataInd.pch);

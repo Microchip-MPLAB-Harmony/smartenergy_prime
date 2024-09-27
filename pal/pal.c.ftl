@@ -352,27 +352,103 @@ SYS_STATUS PAL_Status(SYS_MODULE_OBJ object)
     }
 
 <#if PRIME_PAL_PLC_EN == true>
-    if (PAL_PLC_Status() != SYS_STATUS_READY)
-    {
-        return SYS_STATUS_BUSY;
-    }
-
+    SYS_STATUS plcStatus = PAL_PLC_Status();
 </#if>
 <#if PRIME_PAL_RF_EN == true>
-    if (PAL_RF_Status() != SYS_STATUS_READY)
-    {
-        return SYS_STATUS_BUSY;
-    }
-
+    SYS_STATUS rfStatus = PAL_RF_Status();
 </#if>
 <#if PRIME_PAL_SERIAL_EN == true>
-    if (PAL_SERIAL_Status() != SYS_STATUS_READY)
+    SYS_STATUS serialStatus = PAL_SERIAL_Status();
+</#if>
+
+<#if (PRIME_PAL_PLC_EN == true) && (PRIME_PAL_RF_EN == false) && (PRIME_PAL_SERIAL_EN == false)>
+    if ((plcStatus != SYS_STATUS_READY) || (plcStatus != SYS_STATUS_ERROR))
     {
         return SYS_STATUS_BUSY;
     }
-
+    
+    return plcStatus;
 </#if>
-    return SYS_STATUS_READY;
+<#if (PRIME_PAL_PLC_EN == false) && (PRIME_PAL_RF_EN == true) && (PRIME_PAL_SERIAL_EN == false)>
+    if ((rfStatus != SYS_STATUS_READY) || (rfStatus != SYS_STATUS_ERROR))
+    {
+        return SYS_STATUS_BUSY;
+    }
+    
+    return rfStatus;
+</#if>
+<#if (PRIME_PAL_PLC_EN == false) &&(PRIME_PAL_RF_EN == false) && (PRIME_PAL_SERIAL_EN == true)>
+    if ((serialStatus != SYS_STATUS_READY) || (serialStatus != SYS_STATUS_ERROR))
+    {
+        return SYS_STATUS_BUSY;
+    }
+    
+    return serialStatus;
+</#if>
+<#if (PRIME_PAL_PLC_EN == true) && (PRIME_PAL_RF_EN == true) && (PRIME_PAL_SERIAL_EN == false)>
+    if (((plcStatus == SYS_STATUS_READY) && (rfStatus == SYS_STATUS_READY)) ||
+        ((plcStatus == SYS_STATUS_READY) && (rfStatus == SYS_STATUS_ERROR)) ||
+        ((plcStatus == SYS_STATUS_ERROR) && (rfStatus == SYS_STATUS_READY)))
+    {
+        return SYS_STATUS_READY;
+    }
+    
+    if ((plcStatus == SYS_STATUS_ERROR) && (rfStatus == SYS_STATUS_ERROR))
+    {
+        return SYS_STATUS_ERROR;
+    }
+    
+    return SYS_STATUS_BUSY;
+</#if>
+<#if (PRIME_PAL_PLC_EN == true) && (PRIME_PAL_RF_EN == false) && (PRIME_PAL_SERIAL_EN == true)>
+    if (((plcStatus == SYS_STATUS_READY) && (serialStatus == SYS_STATUS_READY)) ||
+        ((plcStatus == SYS_STATUS_READY) && (serialStatus == SYS_STATUS_ERROR)) ||
+        ((plcStatus == SYS_STATUS_ERROR) && (serialStatus == SYS_STATUS_READY)))
+    {
+        return SYS_STATUS_READY;
+    }
+    
+    if ((plcStatus == SYS_STATUS_ERROR) && (serialStatus == SYS_STATUS_ERROR))
+    {
+        return SYS_STATUS_ERROR;
+    }
+    
+    return SYS_STATUS_BUSY;
+</#if>
+<#if (PRIME_PAL_PLC_EN == false) && (PRIME_PAL_RF_EN == true) && (PRIME_PAL_SERIAL_EN == true)>
+    if (((rfStatus == SYS_STATUS_READY) && (serialStatus == SYS_STATUS_READY)) ||
+        ((rfStatus == SYS_STATUS_READY) && (serialStatus == SYS_STATUS_ERROR)) ||
+        ((rfStatus == SYS_STATUS_ERROR) && (serialStatus == SYS_STATUS_READY)))
+    {
+        return SYS_STATUS_READY;
+    }
+    
+    if ((rfStatus == SYS_STATUS_ERROR) && (serialStatus == SYS_STATUS_ERROR))
+    {
+        return SYS_STATUS_ERROR;
+    }
+    
+    return SYS_STATUS_BUSY;
+</#if>
+<#if (PRIME_PAL_PLC_EN == true) && (PRIME_PAL_RF_EN == true) && (PRIME_PAL_SERIAL_EN == true)>
+    if (((plcStatus == SYS_STATUS_READY) && (rfStatus == SYS_STATUS_READY) && (serialStatus == SYS_STATUS_READY)) ||
+        ((plcStatus == SYS_STATUS_READY) && (rfStatus == SYS_STATUS_ERROR) && (serialStatus == SYS_STATUS_READY)) ||
+        ((plcStatus == SYS_STATUS_READY) && (rfStatus == SYS_STATUS_READY) && (serialStatus == SYS_STATUS_ERROR)) ||
+        ((plcStatus == SYS_STATUS_ERROR) && (rfStatus == SYS_STATUS_READY) && (serialStatus == SYS_STATUS_READY)))
+        ((plcStatus == SYS_STATUS_READY) && (rfStatus == SYS_STATUS_ERROR) && (serialStatus == SYS_STATUS_ERROR)) ||
+        ((plcStatus == SYS_STATUS_ERROR) && (rfStatus == SYS_STATUS_READY) && (serialStatus == SYS_STATUS_ERROR)) ||
+        ((plcStatus == SYS_STATUS_ERROR) && (rfStatus == SYS_STATUS_ERROR) && (serialStatus == SYS_STATUS_READY)))
+    {
+        return SYS_STATUS_READY;
+    }
+    
+    if ((plcStatus == SYS_STATUS_ERROR) && (rfStatus == SYS_STATUS_ERROR) && (serialStatus == SYS_STATUS_ERROR))
+    {
+        return SYS_STATUS_ERROR;
+    }
+    
+    return SYS_STATUS_BUSY;
+</#if>
 }
 
 void PAL_CallbackRegister(PAL_CALLBACKS *pCallbacks)
