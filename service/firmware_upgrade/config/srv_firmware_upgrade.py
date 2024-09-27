@@ -78,6 +78,16 @@ def instantiateComponent(primeFirmwareUpgradeComponent):
     srvFUHeaderFile.setMarkup(False)
     srvFUHeaderFile.setOverwrite(True)
     srvFUHeaderFile.setEnabled(True)
+
+    srvFUHeaderLocalFile = primeFirmwareUpgradeComponent.createFileSymbol("SRV_FU_HEADER_LOCAL", None)
+    srvFUHeaderLocalFile.setSourcePath("service/firmware_upgrade/srv_firmware_upgrade_local.h")
+    srvFUHeaderLocalFile.setOutputName("srv_firmware_upgrade_local.h")
+    srvFUHeaderLocalFile.setDestPath("service/firmware_upgrade")
+    srvFUHeaderLocalFile.setProjectPath("config/" + configName + "/service/firmware_upgrade/")
+    srvFUHeaderLocalFile.setType("HEADER")
+    srvFUHeaderLocalFile.setMarkup(False)
+    srvFUHeaderLocalFile.setOverwrite(True)
+    srvFUHeaderLocalFile.setEnabled(True)
     
     #### FreeMaker System Files ######################################################
 

@@ -207,6 +207,20 @@ typedef void (*SRV_FU_IMAGE_VERIFY_CB)(SRV_FU_VERIFY_RESULT verifyResult);
 */
 typedef void (*SRV_FU_RESULT_CB)(SRV_FU_RESULT fuResult);
 
+typedef enum {
+  SRV_FU_MEM_TRANSFER_OK,
+  SRV_FU_MEM_TRANSFER_ERROR,
+} SRV_FU_MEM_TRANSFER_RESULT;
+
+typedef enum {
+  SRV_FU_MEM_TRANSFER_CMD_ERASE,
+  SRV_FU_MEM_TRANSFER_CMD_READ,
+  SRV_FU_MEM_TRANSFER_CMD_WRITE,
+  SRV_FU_MEM_TRANSFER_CMD_BAD,
+} SRV_FU_MEM_TRANSFER_CMD;
+
+typedef void (*SRV_FU_MEM_TRANSFER_CB)(SRV_FU_MEM_TRANSFER_CMD command, SRV_FU_MEM_TRANSFER_RESULT result);
+
 // *****************************************************************************
 /* Traffic versions
 
@@ -225,7 +239,7 @@ typedef enum {
 } SRV_FU_TRAFFIC_VERSION;
 
 // *****************************************************************************
-/* Swap callback
+/* Swap version callback
 
   Summary:
     Callback function pointer to trigger a swap of PRIME stack versions.
@@ -236,7 +250,8 @@ typedef enum {
   Remarks:
     None.
 */
-typedef void (*SRV_FU_SWAP_CB)(SRV_FU_TRAFFIC_VERSION trafficVersion);
+typedef void (*SRV_FU_VERSION_SWAP_CB)(SRV_FU_TRAFFIC_VERSION trafficVersion);
+
 
 // *****************************************************************************
 // *****************************************************************************
@@ -460,6 +475,40 @@ void SRV_FU_RegisterCallbackFuResult(SRV_FU_RESULT_CB callback);
     This function is called by the PRIME stack.
 */
 void SRV_FU_End(SRV_FU_RESULT fuResult);
+
+// ****************************************************************************
+/* Function:
+   bool SRV_FU_SwapFirmware(void)
+
+  Summary:
+    Swaps the firmware. 
+
+  Description:
+    This function is used to swap the firmare, if needed, and update data for
+    the bootloader.
+
+  Precondition:
+    The SRV_FU_Initialize function should have been called before calling this 
+    function.
+
+  Parameters:
+    None.
+
+  Returns:
+    True if firmware must be swapped. Otherwise, false.
+
+  Example:
+    <code>
+    if (SRV_FU_SwapFirmware() == true)
+    {
+        // Invoke bootloader 
+    }
+    </code>
+
+  Remarks:
+    This function is called by the application.
+*/
+bool SRV_FU_SwapFirmware(void);
 
 // ****************************************************************************
 /* Function:
@@ -777,15 +826,15 @@ uint16_t SRV_FU_GetBitmap(uint8_t *bitmap, uint32_t *numRxPages);
 
 // ****************************************************************************
 /* Function:
-    void SRV_FU_RegisterCallbackSwap(SRV_FU_SWAP_CB callback)
+    void SRV_FU_RegisterCallbackSwapVersion(SRV_FU_VERSION_SWAP_CB callback)
 
   Summary:
     Registers a function to be called back when the PRIME stack requests to 
-    trigger a firmware version swap.
+    trigger a PRIME stack version swap.
 
   Description:
     This function allows the application to register a function to be called 
-    back when the PRIME stack requests to trigger a firmware version swap.
+    back when the PRIME stack requests to trigger a PRIME stack version swap.
 
   Precondition:
     None.
@@ -807,18 +856,18 @@ uint16_t SRV_FU_GetBitmap(uint8_t *bitmap, uint32_t *numRxPages);
     {
         SRV_FU_Initialize();
 
-        SRV_FU_RegisterCallbackSwap(_swap);
+        SRV_FU_RegisterCallbackSwapVersion(_swap);
     }
     </code>
 
   Remarks:
     This function is called by the application.
 */
-void SRV_FU_RegisterCallbackSwap(SRV_FU_SWAP_CB callback);
+void SRV_FU_RegisterCallbackSwapVersion(SRV_FU_VERSION_SWAP_CB callback);
 
 // ****************************************************************************
 /* Function:
-   void SRV_FU_Swap(SRV_FU_TRAFFIC_VERSION trafficVersion)
+   void SRV_FU_SwapVersion(SRV_FU_TRAFFIC_VERSION trafficVersion)
 
   Summary:
     Requests to swap the PRIME stack version.
@@ -837,12 +886,12 @@ void SRV_FU_RegisterCallbackSwap(SRV_FU_SWAP_CB callback);
 
   Example:
     <code>
-    SRV_FU_Swap(SRV_FU_TRAFFIC_VERSION_PRIME_1_3);
+    SRV_FU_SwapVersion(SRV_FU_TRAFFIC_VERSION_PRIME_1_3);
     </code>
 
   Remarks:
     This function is called by the PRIME stack.
 */
-void SRV_FU_Swap(SRV_FU_TRAFFIC_VERSION trafficVersion);
+void SRV_FU_SwapVersion(SRV_FU_TRAFFIC_VERSION trafficVersion);
 
 #endif // SRV_FIRMWARE_UPGRADE_H
