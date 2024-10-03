@@ -268,6 +268,7 @@ Microchip or any third party.
 #include "device.h"
 
 #include "driver/memory/drv_memory.h"
+#include "service/pcrc/srv_pcrc.h"
 
 // *****************************************************************************
 // *****************************************************************************
@@ -313,6 +314,17 @@ static CACHE_ALIGN uint8_t pBuffInput[MAX_BUFFER_READ_SIZE];
 
 static CACHE_ALIGN SRV_FU_MEM_INFO memInfo;
 
+static SRV_FU_INFO fuData;
+
+static SRV_FU_CRC_STATE crcState;
+
+static uint32_t crcReadAddress;
+
+static uint32_t crcSize;
+
+static uint32_t crcRemainSize;
+
+static uint32_t calculatedCrc;
 
 // *****************************************************************************
 // *****************************************************************************
@@ -351,7 +363,16 @@ void lSRV_FU_TransferHandler
     }
     else if (commandHandle == mInfo->readHandle) 
     {
-        transferCmd = SRV_FU_MEM_TRANSFER_CMD_READ;
+        if (memInfo.state == SRV_FU_CALCULATE_CRC_BLOCK)
+        {
+            /* Calculating CRC.... no callback*/
+            crcState = SRC_FU_CRC_CALCULATING;
+            return;
+        }
+        else
+        {
+            transferCmd = SRV_FU_MEM_TRANSFER_CMD_READ;
+        }
     }
     else if (commandHandle == mInfo->writeHandle)
     {
@@ -417,6 +438,9 @@ void lSRV_FU_EraseFuRegion(void)
 // Section: Reset Handler Service Interface Implementation
 // *****************************************************************************
 // *****************************************************************************
+//void SRV_FU_ConfigRegions(SRV_FU_REGION_CGF *fuRegion);
+// bool SRV_FU_SwapFirmware(void);
+// void SRV_FU_VerifyImage(void);
 
 void SRV_FU_Initialize(void)
 {
@@ -560,6 +584,68 @@ void SRV_FU_Tasks(void)
             break;
 		}
 
+        case SRV_FU_CALCULATE_CRC_BLOCK:
+        {
+            if (crcState == SRC_FU_CRC_CALCULATING)
+            {
+                calculatedCrc = SRV_PCRC_GetValue(pBuffInput, crcSize, PCRC_HT_FU, PCRC_CRC32,
+                                     calculatedCrc);
+
+                if (crcRemainSize > 0)
+                {
+                    uint32_t blockStart, nBlock;
+                    uint32_t bytesPagesRead;
+
+                    crcState = SRV_FU_CRC_WAIT_READ_BLOCK;
+
+                    if (crcRemainSize < MAX_BUFFER_READ_SIZE)
+                    {
+                        crcSize = crcRemainSize;
+                    }
+                    else
+                    {
+                        crcSize = MAX_BUFFER_READ_SIZE;
+                    }
+                    
+                    blockStart = crcReadAddress / memInfo.readPageSize;
+                    nBlock = crcSize / memInfo.readPageSize;
+
+                    bytesPagesRead = nBlock * memInfo.readPageSize;
+                    /* Aling CRC size with the readPageSize */
+                    if (crcSize > bytesPagesRead)
+                    {
+                        if (((nBlock + 1) * memInfo.readPageSize) <= MAX_BUFFER_READ_SIZE)
+                        {
+                            nBlock++;
+                        }
+                        else
+                        {
+                            /* Cannot read everything, we reduced the size of the Crc calculated
+                            this time */
+                            crcSize = bytesPagesRead;
+                        }
+                    }
+
+                    DRV_MEMORY_AsyncRead(memInfo.memoryHandle, &memInfo.readHandle, pBuffInput, blockStart, nBlock);
+                    
+                    crcReadAddress += crcSize;
+                    crcRemainSize -= crcSize;
+                }
+                else
+                {
+                    /* check pointer function */
+                    if (SRV_FU_CrcCallback) {
+                        SRV_FU_CrcCallback(calculatedCrc);
+                    }
+
+                    crcState = SRV_FU_CRC_ILDE;
+                    memInfo.state = SRV_FU_MEM_STATE_CMD_WAIT;
+                }
+            }
+            
+            break;
+        }
+        
         case SRV_FU_MEM_STATE_XFER_WAIT:
         case SRV_FU_MEM_STATE_SUCCESS:
         case SRV_FU_MEM_STATE_WRITE_WAIT_END:
@@ -622,174 +708,242 @@ void SRV_FU_DataWrite(uint32_t address, uint8_t *buffer, uint16_t size)
 }
 
 
-// void SRV_FU_CfgRead(void *dst, uint16_t size)
-// {
-// 	uint32_t bufferValue[4];
-// 	uint32_t *pointerBuffer;
+void SRV_FU_CfgRead(void *dst, uint16_t size)
+{
+	uint32_t bufferValue[4];
+	uint32_t *pointerBuffer;
 
-// 	pointerBuffer = (uint32_t *)bufferValue;
-// 	*pointerBuffer++ = SUPC_GPBRead(GPBR_REGS_0);
-// 	*pointerBuffer++ = SUPC_GPBRead(GPBR_REGS_1);
-// 	*pointerBuffer++ = SUPC_GPBRead(GPBR_REGS_2);
-// 	*pointerBuffer = SUPC_GPBRead(GPBR_REGS_3);
-// 	memcpy(dst, (uint8_t *)bufferValue, size);
+	pointerBuffer = (uint32_t *)bufferValue;
+	*pointerBuffer++ = SUPC_GPBRRead(GPBR_REGS_0);
+	*pointerBuffer++ = SUPC_GPBRRead(GPBR_REGS_1);
+	*pointerBuffer++ = SUPC_GPBRRead(GPBR_REGS_2);
+	*pointerBuffer = SUPC_GPBRRead(GPBR_REGS_3);
+	memcpy(dst, (uint8_t *)bufferValue, size);
 
-// }
+}
 
-// uint8_t SRV_FU_CfgWrite(void *src, uint16_t size)
-// {
-// 	uint32_t bufferValue[4];
-// 	uint32_t *pointerBuffer;
+void SRV_FU_CfgWrite(void *src, uint16_t size)
+{
+	uint32_t bufferValue[4];
+	uint32_t *pointerBuffer;
 
-// 	memcpy((uint8_t *)bufferValue, src, size);
+	memcpy((uint8_t *)bufferValue, src, size);
 
-// 	pointerBuffer = (uint32_t *)bufferValue;
-// 	SUPC_GPBRWrite(GPBR_REGS_0, *pointerBuffer++);
-// 	SUPC_GPBRWrite(GPBR_REGS_1, *pointerBuffer++);
-// 	SUPC_GPBRWrite(GPBR_REGS_2, *pointerBuffer++);
-// 	SUPC_GPBRWrite(GPBR_REGS_3, *pointerBuffer);
+	pointerBuffer = (uint32_t *)bufferValue;
+	SUPC_GPBRWrite(GPBR_REGS_0, *pointerBuffer++);
+	SUPC_GPBRWrite(GPBR_REGS_1, *pointerBuffer++);
+	SUPC_GPBRWrite(GPBR_REGS_2, *pointerBuffer++);
+	SUPC_GPBRWrite(GPBR_REGS_3, *pointerBuffer);
+}
 
-// 	return 1;
-// }
+/**
+ * \brief Start the FU process by initializing and unlocking the memory
+ *
+ * \param x_fu_info    FU information data
+ *
+ */
+void SRV_FU_Start(SRV_FU_INFO *fuInfo)
+{
+	fuData.imageSize = fuInfo->imageSize;
+	fuData.pageSize = fuInfo->pageSize;
+	fuData.signAlgorithm = SRV_FU_SIGNATURE_ALGO_NO_SIGNATURE;
+	fuData.signLength = 0;
+#ifdef HAL_FU_ENABLE_SIGNATURE
+	fuData.signAlgorithm = fuInfo->signAlgorithm;
+	fuData.signLength = fuInfo->signLength;
+#endif
 
-// /**
-//  * \brief Start the FU process by initializing and unlocking the memory
-//  *
-//  * \param x_fu_info    FU information data
-//  *
-//  */
-// void SRV_FU_Start(hal_fu_info_t *x_fu_info)
-// {
-// 	x_fu_data.image_size = x_fu_info->image_size;
-// 	x_fu_data.page_size = x_fu_info->page_size;
-// 	x_fu_data.sign_algorithm = HAL_FU_NO_SIGNATURE;
-// 	x_fu_data.sign_length = 0;
-// #ifdef HAL_FU_ENABLE_SIGNATURE
-// 	x_fu_data.sign_algorithm = x_fu_info->sign_algorithm;
-// 	x_fu_data.sign_length = x_fu_info->sign_length;
-// #endif
+	/* erase internal flash pages */
+	lSRV_FU_EraseFuRegion();
 
-// 	/* Get image region for FW */
-// 	suc_region_to_fu = 0;
-// 	spx_fu_region_cfg[0].in_use = true;
+	/* Set CRC status */
+	crcState = SRV_FU_CRC_ILDE;
 
-// 	/* erase internal flash pages */
-// 	lSRV_FU_EraseFuRegion();
+#ifdef PRIME_NUM_REGIONS
+	// /* Reset prime app to FU */
+	// suc_app_to_fu = PRIME_INVALID_APP;
 
-// 	/* Set CRC status */
-// 	suc_crc_state = FU_CRC_STATE_IDLE;
+	// /* Clear boot configuration */
+	// x_boot_info_cfg_t x_boot_cfg;
+	// hal_get_config_info(CONFIG_TYPE_BOOT_INFO, sizeof(x_boot_cfg), &x_boot_cfg);
+	// x_boot_cfg.ul_img_size = 0;
+	// x_boot_cfg.ul_orig_addr = 0;
+	// x_boot_cfg.ul_dest_addr = 0;
+	// x_boot_cfg.uc_pages_counter = 0;
+	// x_boot_cfg.uc_boot_state = 0;
+	// hal_set_config_info(CONFIG_TYPE_BOOT_INFO, sizeof(x_boot_cfg), &x_boot_cfg);
+	// /* Reset image identifier */
+	// gpbr_write(GPBR4, (uint32_t)suc_app_to_fu);
+#endif
 
-// 	/* Set addres to FU */
-// 	sul_fw_mem_address = spx_fu_region_cfg[suc_region_to_fu].ul_address;
+	return;
+}
 
-// #ifdef PRIME_NUM_REGIONS
-// 	/* Reset prime app to FU */
-// 	suc_app_to_fu = PRIME_INVALID_APP;
+/**
+ * \brief Finish the FU process and execute the new firmware
+ *
+ * \param uc_hal_res     Result of the FU process
+ *
+ */
+void SRV_FU_End(SRV_FU_RESULT fuResult)
+{
+	SRV_FU_RESULT result;
 
-// 	/* Clear boot configuration */
-// 	x_boot_info_cfg_t x_boot_cfg;
-// 	hal_get_config_info(CONFIG_TYPE_BOOT_INFO, sizeof(x_boot_cfg), &x_boot_cfg);
-// 	x_boot_cfg.ul_img_size = 0;
-// 	x_boot_cfg.ul_orig_addr = 0;
-// 	x_boot_cfg.ul_dest_addr = 0;
-// 	x_boot_cfg.uc_pages_counter = 0;
-// 	x_boot_cfg.uc_boot_state = 0;
-// 	hal_set_config_info(CONFIG_TYPE_BOOT_INFO, sizeof(x_boot_cfg), &x_boot_cfg);
-// 	/* Reset image identifier */
-// 	gpbr_write(GPBR4, (uint32_t)suc_app_to_fu);
-// #endif
+	/* check callback is initialized */
+	if (!SRV_FU_ResultCallback) {
+		return;
+	}
 
-// 	return;
-// }
+	switch (fuResult)
+    {
+	    case SRV_FU_RESULT_SUCCESS:
+            result = SRV_FU_RESULT_SUCCESS;
+            SRV_FU_ResultCallback(result);
+            break;
 
-// /**
-//  * \brief Finish the FU process and execute the new firmware
-//  *
-//  * \param uc_hal_res     Result of the FU process
-//  *
-//  */
-// void SRV_FU_End(hal_fu_result_t uc_hal_res)
-// {
-// 	hal_fu_result_t uc_res;
+    	case SRV_FU_RESULT_CRC_ERROR:
+            result = SRV_FU_RESULT_CRC_ERROR;
+            SRV_FU_ResultCallback(result);
+            break;
 
-// 	/* check callback is initialized */
-// 	if (!_fu_result_cb_function) {
-// 		return;
-// 	}
+    	case SRV_FU_RESULT_FW_REVERT:
+            result = SRV_FU_RESULT_FW_REVERT;
+            SRV_FU_ResultCallback(result);
+            break;
 
-// 	switch (uc_hal_res) {
-// 	case HAL_FU_SUCCESS:
-// 		uc_res = HAL_FU_SUCCESS;
-// 		_fu_result_cb_function(&uc_res);
-// 		break;
+    	case SRV_FU_RESULT_FW_CONFIRM:
+            result = SRV_FU_RESULT_FW_CONFIRM;
+            SRV_FU_ResultCallback(result);
+            break;
 
-// 	case HAL_FU_CRC_ERROR:
-// 		uc_res = HAL_FU_CRC_ERROR;
-// 		_fu_result_cb_function(&uc_res);
-// 		break;
+    	default:
+	    	break;
+	}
+}
 
-// 	case HAL_FU_FW_REVERT:
-// 		uc_res = HAL_FU_FW_REVERT;
-// 		_fu_result_cb_function(&uc_res);
-// 		break;
+/**
+ * \brief Execute the old firmware
+ *
+ */
+void SRV_FU_Revert(void)
+{
+	SRV_FU_RESULT result;
 
-// 	case HAL_FU_FW_CONFIRM:
-// 		uc_res = HAL_FU_FW_CONFIRM;
-// 		_fu_result_cb_function(&uc_res);
-// 		break;
+	result = SRV_FU_RESULT_FW_REVERT;
+	SRV_FU_ResultCallback(result);
+}
 
-// 	default:
-// 		break;
-// 	}
-// }
+/**
+ * \brief Calculate the CRC of the new firmware
+ *
+ */
+void SRV_FU_CalculateCrc(void)
+{
+	uint32_t blockStart, nBlock;
+    uint32_t bytesPagesRead;
 
-// /**
-//  * \brief Execute the old firmware
-//  *
-//  */
-// void SRV_FU_Revert(void)
-// {
-// 	hal_fu_result_t uc_res;
+	if (crcState != SRV_FU_CRC_ILDE) {
+		return;
+	}
 
-// 	uc_res = HAL_FU_FW_REVERT;
-// 	_fu_result_cb_function(&uc_res);
-// }
+	crcState = SRV_FU_CRC_WAIT_READ_BLOCK;
 
-// /**
-//  * \brief Calculate the CRC of the new firmware
-//  *
-//  */
-// void SRV_FU_CrcCalculate(void)
-// {
-// 	uint32_t pul_flash;
-// 	uint32_t ul_crc;
+	crcReadAddress = memInfo.iniFuRegion;
+    crcRemainSize = fuData.imageSize;
 
-// 	if (suc_crc_state == FU_CRC_STATE_CALCULATING) {
-// 		return;
-// 	}
+	if (crcRemainSize < MAX_BUFFER_READ_SIZE)
+    {
+        crcSize = crcRemainSize;
+    }
+    else
+    {
+        crcSize = MAX_BUFFER_READ_SIZE;
+    }
+    
+    blockStart = crcReadAddress / memInfo.readPageSize;
+	nBlock = crcSize / memInfo.readPageSize;
 
-// 	suc_crc_state = FU_CRC_STATE_CALCULATING;
+    bytesPagesRead = nBlock * memInfo.readPageSize;
+    /* Aling CRC size with the readPageSize */
+    if (crcSize > bytesPagesRead)
+    {
+        if (((nBlock + 1) * memInfo.readPageSize) <= MAX_BUFFER_READ_SIZE)
+        {
+            nBlock++;
+        }
+        else
+        {
+            /* Cannot read everything, we reduced the size of the Crc calculated
+            this time */
+            crcSize = bytesPagesRead;
+        }
+    }
 
-// 	pul_flash = spx_fu_region_cfg[suc_region_to_fu].ul_address;
-// 	ul_crc = hal_pcrc_calc_fu((uint8_t *)pul_flash, x_fu_data.image_size, 0);
-// 	/* check pointer function */
-// 	if (_crc_cb_function) {
-// 		_crc_cb_function(ul_crc);
-// 	}
+	DRV_MEMORY_AsyncRead(memInfo.memoryHandle, &memInfo.readHandle, pBuffInput, blockStart, nBlock);
+	
+	crcReadAddress += crcSize;
+    crcRemainSize -= crcSize;
 
-// 	suc_crc_state = FU_CRC_STATE_IDLE;
-// }
+    memInfo.state = SRV_FU_CALCULATE_CRC_BLOCK;
+    
+    /* CRC Initial */
+    calculatedCrc = 0;
+}
 
-// /**
-//  * \brief Finish the FU process and execute the new firmware
-//  *
-//  * \param p_handler   CRC callback function pointer
-//  *
-//  */
-// void SRV_FU_CrcSetCallback(void (*p_handler)(uint32_t ul_crc))
-// {
-// 	_crc_cb_function = p_handler;
-// }
+/**
+ *
+ */
+void SRV_FU_RegisterCallbackCrc(SRV_FU_CRC_CB callback)
+{
+	SRV_FU_CrcCallback = callback;
+}
+
+/**
+ */
+void SRV_FU_RegisterCallbackVerify(SRV_FU_IMAGE_VERIFY_CB callback)
+{
+	SRV_FU_ImageVerifyCallback = callback;
+}
+
+/**
+ */
+void SRV_FU_RegisterCallbackFuResult(SRV_FU_RESULT_CB callback)
+{
+	SRV_FU_ResultCallback = callback;
+
+}
+
+/**
+ */
+uint16_t SRV_FU_GetBitmap(uint8_t *bitmap, uint32_t *numRxPages)
+{
+	(void)bitmap;
+	(void)numRxPages;
+
+	return 0;
+}
+
+/**
+ */
+void SRV_FU_SwapVersion(SRV_FU_TRAFFIC_VERSION trafficVersion)
+{
+	/* check callback is initialized */
+	if (SRV_FU_SwapCallback) {
+		SRV_FU_SwapCallback(trafficVersion);
+	}
+}
+
+/**
+ */
+void SRV_FU_RegisterCallbackSwapVersion(SRV_FU_VERSION_SWAP_CB callback)
+{
+	SRV_FU_SwapCallback = callback;
+}
+
+
+
+
+
 
 // /**
 //  * \brief Check the signature of the new firmware and the validity of the received binary file
@@ -899,46 +1053,6 @@ void SRV_FU_DataWrite(uint32_t address, uint8_t *buffer, uint16_t size)
 // }
 
 // #endif /* HAL_FU_ENABLE_SIGNATURE */
-
-// /**
-//  * \brief Set handler to signature result callback
-//  *
-//  * \param p_handler   Signature callback function pointer
-//  *
-//  */
-// void SRV_FU_SignatureImageCheckSetCallback(void (*p_handler)(hal_fu_verif_result_t uc_result))
-// {
-// 	_signature_image_cb_function = p_handler;
-// }
-
-// /**
-//  * \brief Set handler to Firmware upgrade result callback
-//  *
-//  * \param p_handler      FU result callback function pointer
-//  *
-//  */
-// void SRV_FU_SetCallback(void (*p_handler)(hal_fu_result_t *uc_result))
-// {
-// 	_fu_result_cb_function = p_handler;
-
-// }
-
-// /**
-//  * \brief Get bitmap with the information about the status of each page.
-//  *
-//  * \param puc_bitmap             Pointer to bitmap information
-//  * \param pus_num_rcv_pages      Pointer to number of pages received
-//  *
-//  * \return Size of bitmap. (Maximum value 1024 bytes). In case to return 0,
-//  * the buffer will be initialized internally.
-//  */
-// uint16_t SRV_FU_GetBitmap(uint8_t *puc_bitmap, uint32_t *pus_num_rcv_pages)
-// {
-// 	UNUSED(puc_bitmap);
-// 	UNUSED(pus_num_rcv_pages);
-
-// 	return 0;
-// }
 
 // /**
 //  * \brief Configure FU PRIME regions

@@ -90,6 +90,9 @@ typedef enum
     /* Erase Flash */
     SRV_FU_MEM_STATE_ERASE_FLASH,
 
+   /* Calculate CRC */
+    SRV_FU_CALCULATE_CRC_BLOCK,
+       
     /* Wait for transfer to complete */
     SRV_FU_MEM_STATE_XFER_WAIT,
 
@@ -151,6 +154,13 @@ typedef struct
 } SRV_FU_MEM_INFO;
 
 
+
+typedef enum
+{
+  SRV_FU_CRC_ILDE,
+  SRV_FU_CRC_WAIT_READ_BLOCK,
+  SRC_FU_CRC_CALCULATING
+} SRV_FU_CRC_STATE;
 
 #endif // #ifndef PAL_LOCAL_H
 /*******************************************************************************

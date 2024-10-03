@@ -76,4 +76,5 @@ def loadModule():
     primeFUCompoment = Module.CreateComponent("primeFirwmareUpgrade", "Firmware Upgrade", "/SmartEnergy/Services", "service/firmware_upgrade/config/srv_firmware_upgrade.py")
     primeFUCompoment.setDisplayType("PRIME Service")
     primeFUCompoment.addMultiDependency("Memory_dep", "DRV_MEDIA", "DRV_MEDIA", True)
+    primeFUCompoment.addDependency("srv_usi_CRC_dep", "PCRC", "PCRC", True, True)
     primeFUCompoment.addCapability("Firmware Upgrade", "Firmware Upgrade", True) 
