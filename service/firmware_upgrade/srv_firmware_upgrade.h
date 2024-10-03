@@ -894,4 +894,6 @@ void SRV_FU_RegisterCallbackSwapVersion(SRV_FU_VERSION_SWAP_CB callback);
 */
 void SRV_FU_SwapVersion(SRV_FU_TRAFFIC_VERSION trafficVersion);
 
+void SRV_FU_RegisterCallbackMemTransfer(SRV_FU_MEM_TRANSFER_CB callback);
+
 #endif // SRV_FIRMWARE_UPGRADE_H
