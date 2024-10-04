@@ -267,7 +267,6 @@ Microchip or any third party.
 #include "srv_firmware_upgrade_local.h"
 #include "device.h"
 
-#include "driver/memory/drv_memory.h"
 #include "service/pcrc/srv_pcrc.h"
 
 // *****************************************************************************
@@ -588,7 +587,7 @@ void SRV_FU_Tasks(void)
         {
             if (crcState == SRC_FU_CRC_CALCULATING)
             {
-                calculatedCrc = SRV_PCRC_GetValue(pBuffInput, crcSize, PCRC_HT_FU, PCRC_CRC32,
+                calculatedCrc = SRV_PCRC_GetValue(pBuffInput, crcSize, PCRC_HT_GENERIC, PCRC_CRC32,
                                      calculatedCrc);
 
                 if (crcRemainSize > 0)

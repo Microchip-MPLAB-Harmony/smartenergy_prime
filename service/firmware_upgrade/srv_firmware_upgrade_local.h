@@ -41,6 +41,7 @@ Microchip or any third party.
 #define SRV_FIRMWARE_UPGRADE_LOCAL_H
 
 
+#include "driver/memory/drv_memory.h"
 #include "system/system_media.h"
 
 // *****************************************************************************
