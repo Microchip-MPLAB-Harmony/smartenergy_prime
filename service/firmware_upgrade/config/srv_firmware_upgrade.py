@@ -91,17 +91,25 @@ def instantiateComponent(primeFirmwareUpgradeComponent):
     
     #### FreeMaker System Files ######################################################
 
-    srvFUSystemDefFile = primeFirmwareUpgradeComponent.createFileSymbol("SRV_RESET_HANDLER_SYSTEM_DEF", None)
+    srvFUSystemDefFile = primeFirmwareUpgradeComponent.createFileSymbol("SRV_FU_SYSTEM_DEF", None)
     srvFUSystemDefFile.setType("STRING")
     srvFUSystemDefFile.setOutputName("core.LIST_SYSTEM_DEFINITIONS_H_INCLUDES")
     srvFUSystemDefFile.setSourcePath("service/firmware_upgrade/templates/system/system_definitions.h.ftl")
     srvFUSystemDefFile.setMarkup(True)
 
-    srvFUSystemInitFile = primeFirmwareUpgradeComponent.createFileSymbol("SRV_RESET_HANDLER_SYSTEM_INIT", None)
+    srvFUSystemInitFile = primeFirmwareUpgradeComponent.createFileSymbol("SRV_FU_SYSTEM_INIT", None)
     srvFUSystemInitFile.setType("STRING")
     srvFUSystemInitFile.setOutputName("core.LIST_SYSTEM_INIT_C_SYS_INITIALIZE_DRIVERS")
     srvFUSystemInitFile.setSourcePath("service/firmware_upgrade/templates/system/system_initialize.c.ftl")
     srvFUSystemInitFile.setMarkup(True)
+
+    srvFUSystemTasksFile = primeFirmwareUpgradeComponent.createFileSymbol("SRV_FU_SYSTEM_TASK", None)
+    srvFUSystemTasksFile.setType("STRING")
+    srvFUSystemTasksFile.setOutputName("core.LIST_SYSTEM_TASKS_C_CALL_LIB_TASKS")
+    srvFUSystemTasksFile.setSourcePath("service/firmware_upgrade/templates/system/system_tasks.c.ftl")
+    srvFUSystemTasksFile.setMarkup(True)
+
+
 
 def onAttachmentConnected(source, target):
     localComponent = source["component"]
