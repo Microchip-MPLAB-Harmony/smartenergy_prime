@@ -362,7 +362,7 @@ SYS_STATUS PAL_Status(SYS_MODULE_OBJ object)
 </#if>
 
 <#if (PRIME_PAL_PLC_EN == true) && (PRIME_PAL_RF_EN == false) && (PRIME_PAL_SERIAL_EN == false)>
-    if ((plcStatus != SYS_STATUS_READY) || (plcStatus != SYS_STATUS_ERROR))
+    if ((plcStatus != SYS_STATUS_READY) && (plcStatus != SYS_STATUS_ERROR))
     {
         return SYS_STATUS_BUSY;
     }
@@ -370,7 +370,7 @@ SYS_STATUS PAL_Status(SYS_MODULE_OBJ object)
     return plcStatus;
 </#if>
 <#if (PRIME_PAL_PLC_EN == false) && (PRIME_PAL_RF_EN == true) && (PRIME_PAL_SERIAL_EN == false)>
-    if ((rfStatus != SYS_STATUS_READY) || (rfStatus != SYS_STATUS_ERROR))
+    if ((rfStatus != SYS_STATUS_READY) && (rfStatus != SYS_STATUS_ERROR))
     {
         return SYS_STATUS_BUSY;
     }
@@ -378,7 +378,7 @@ SYS_STATUS PAL_Status(SYS_MODULE_OBJ object)
     return rfStatus;
 </#if>
 <#if (PRIME_PAL_PLC_EN == false) &&(PRIME_PAL_RF_EN == false) && (PRIME_PAL_SERIAL_EN == true)>
-    if ((serialStatus != SYS_STATUS_READY) || (serialStatus != SYS_STATUS_ERROR))
+    if ((serialStatus != SYS_STATUS_READY) && (serialStatus != SYS_STATUS_ERROR))
     {
         return SYS_STATUS_BUSY;
     }

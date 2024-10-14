@@ -354,7 +354,7 @@ __STATIC_INLINE void lPAL_PLC_TimerSyncUpdate(void)
 <#if srvLogReport.ENABLE_TRACES == true>        
         SRV_LOG_REPORT_Message_With_Code(SRV_LOG_REPORT_ERROR, 
                 (SRV_LOG_REPORT_CODE)PAL_PLC_TIMER_SYNC_ERROR,
-                "PRIME_PAL_PLC: PLC timer syncronization error\r\n");
+                "PRIME_PAL_PLC: PLC timer synchronization error\r\n");
 </#if>
         lPAL_PLC_TimerSyncInitialize();
     }
