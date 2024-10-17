@@ -54,6 +54,11 @@ global primeSNPFWStack13Size
 global primeFUComment
 global primeBNFUComment
 
+global primeSNAppMetaData
+global primeSNPFWStack14MetaData
+global primeSNSNPHYMetaData
+global primeSNPFWStack13MetaData
+
 # Files
 global pPrimeHalWrapperHeaderFile
 global pPrimeHalWrapperSourceFile
@@ -83,12 +88,16 @@ global pPrimeXc32LdPrepMacroSym
 
 PRIME_USER_APP_OFFSET_HEX = "0x10000"
 PRIME_USER_APP_SIZE_HEX = "0x40000"
+PRIME_USER_APP_ID = "APPBIN"
 PRIME_FW_STACK_14_OFFSET_HEX = "0x90000"
 PRIME_FW_STACK_14_SIZE_HEX = "0x22000"
+PRIME_FW_STACK_14_ID = "MAC14BIN"
 PRIME_PHY_OFFSET_HEX = "0xB8000"
 PRIME_PHY_SIZE_HEX = "0x18000"
+PRIME_PHY_ID = "PHYBIN"
 PRIME_FW_STACK_13_OFFSET_HEX = "0xD0000"
 PRIME_FW_STACK_13_SIZE_HEX = "0x20000"
+PRIME_FW_STACK_13_ID = "MAC13BIN"
 
 PRIME_FW_STACK_RAM_SIZE = "0x0000B000"  # TBD !!!!!
 
@@ -141,6 +150,9 @@ def createGroupServices():
         for component in primeServices:
             primeServicesGroup.addComponent(component)
         Database.activateComponents(primeServices, "PRIME SERVICES")
+
+    primeServicesRootGroup = ["primeFirwmareUpgrade"]
+    Database.activateComponents(primeServicesRootGroup)
         
     # Debug traces enabled
     setVal("srvLogReport", "ENABLE_TRACES", True)
@@ -313,6 +325,11 @@ def primeShowSNAppConfiguration(primeVersion):
     primeSNPFWStack14Size.setVisible(True)
     primeSNPFWStack13Size.setVisible(True)
 
+    primeSNAppMetaData.setVisible(True)
+    primeSNPFWStack14MetaData.setVisible(True)
+    primeSNSNPHYMetaData.setVisible(True)
+    primeSNPFWStack13MetaData.setVisible(True)
+
     # Hide SN Application options
     primeConfigBnSlaveEn.setVisible(False)
     primeConfigBnSlaveEn.setValue(False)
@@ -359,6 +376,11 @@ def primeShowSNBinConfiguration(primeVersion):
 
     primeSNAppSize.setVisible(False)
     primeSNPHYSize.setVisible(False)
+
+    primeSNAppMetaData.setVisible(False)
+    primeSNPFWStack14MetaData.setVisible(False)
+    primeSNSNPHYMetaData.setVisible(False)
+    primeSNPFWStack13MetaData.setVisible(False)
 
     if (primeVersion == "1.4"):
         # SN - v1.4
@@ -408,6 +430,11 @@ def primeShowBNConfiguration(primeVersion):
     primeSNPHYSize.setVisible(False)
     primeSNPFWStack14Size.setVisible(False)
     primeSNPFWStack13Size.setVisible(False)
+
+    primeSNAppMetaData.setVisible(False)
+    primeSNPFWStack14MetaData.setVisible(False)
+    primeSNSNPHYMetaData.setVisible(False)
+    primeSNPFWStack13MetaData.setVisible(False)
 
     if (primeVersion == "1.4"):
         # BN - v1.4
@@ -524,6 +551,13 @@ def instantiateComponent(primeStackConfigComponent):
     primeSNAppSize.setVisible(True)
     primeSNAppSize.setDefaultValue(PRIME_USER_APP_SIZE_HEX)
 
+    global primeSNAppMetaData
+    primeSNAppMetaData = primeStackConfigComponent.createStringSymbol("PRIME_SN_APP_METADATA", primeStackConfig)
+    primeSNAppMetaData.setLabel("User Application ID")
+    primeSNAppMetaData.setDescription("PRIME SN User Application Metadata")
+    primeSNAppMetaData.setVisible(True)
+    primeSNAppMetaData.setDefaultValue(PRIME_USER_APP_ID)
+
     global primeSNPFWStack14Address
     primeSNPFWStack14Address = primeStackConfigComponent.createStringSymbol("PRIME_SN_FWSTACK14_ADDRESS", primeStackConfig)
     primeSNPFWStack14Address.setLabel("FW Stack v1.4 Address")
@@ -538,6 +572,13 @@ def instantiateComponent(primeStackConfigComponent):
     primeSNPFWStack14Size.setDescription("PRIME SN FW Stack v1.4 size in bytes")
     primeSNPFWStack14Size.setVisible(True)
     primeSNPFWStack14Size.setDefaultValue(PRIME_FW_STACK_14_SIZE_HEX)
+
+    global primeSNPFWStack14MetaData
+    primeSNPFWStack14MetaData = primeStackConfigComponent.createStringSymbol("PRIME_SN_FWSTACK14_METADATA", primeStackConfig)
+    primeSNPFWStack14MetaData.setLabel("FW Stack v1.4 ID")
+    primeSNPFWStack14MetaData.setDescription("FW Stack v1.4 Metadata")
+    primeSNPFWStack14MetaData.setVisible(True)
+    primeSNPFWStack14MetaData.setDefaultValue(PRIME_FW_STACK_14_ID)
 
     global primeSNPHYAddress
     primeSNPHYAddress = primeStackConfigComponent.createStringSymbol("PRIME_SN_PHY_ADDRESS", primeStackConfig)
@@ -554,6 +595,13 @@ def instantiateComponent(primeStackConfigComponent):
     primeSNPHYSize.setVisible(True)
     primeSNPHYSize.setDefaultValue(PRIME_PHY_SIZE_HEX)
 
+    global primeSNSNPHYMetaData
+    primeSNSNPHYMetaData = primeStackConfigComponent.createStringSymbol("PRIME_SN_PHY_METADATA", primeStackConfig)
+    primeSNSNPHYMetaData.setLabel("PHY Layer ID")
+    primeSNSNPHYMetaData.setDescription("PHY Layer Metadata")
+    primeSNSNPHYMetaData.setVisible(True)
+    primeSNSNPHYMetaData.setDefaultValue(PRIME_PHY_ID)
+
     global primeSNPFWStack13Address
     primeSNPFWStack13Address = primeStackConfigComponent.createStringSymbol("PRIME_SN_FWSTACK13_ADDRESS", primeStackConfig)
     primeSNPFWStack13Address.setLabel("FW Stack v1.3 Address")
@@ -568,6 +616,13 @@ def instantiateComponent(primeStackConfigComponent):
     primeSNPFWStack13Size.setDescription("PRIME SN FW Stack v1.3 size in bytes")
     primeSNPFWStack13Size.setVisible(True)
     primeSNPFWStack13Size.setDefaultValue(PRIME_FW_STACK_13_SIZE_HEX)
+
+    global primeSNPFWStack13MetaData
+    primeSNPFWStack13MetaData = primeStackConfigComponent.createStringSymbol("PRIME_SN_FWSTACK13_METADATA", primeStackConfig)
+    primeSNPFWStack13MetaData.setLabel("FW Stack v1.3 ID")
+    primeSNPFWStack13MetaData.setDescription("PRIME SN FW Stack v1.3 Metadata")
+    primeSNPFWStack13MetaData.setVisible(True)
+    primeSNPFWStack13MetaData.setDefaultValue(PRIME_FW_STACK_13_ID)
 
     # The FW Image address is configured by PRIME FU Service
     global primeFUComment
