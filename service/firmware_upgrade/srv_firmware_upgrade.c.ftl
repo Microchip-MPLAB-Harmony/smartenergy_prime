@@ -314,14 +314,12 @@ void SRV_FU_Initialize(void)
 	SRV_FU_ResultCallback = NULL;
 	SRV_FU_SwapCallback = NULL;
     SRV_FU_MemTransferCallback = NULL;
-
 	
     memInfo.iniFuRegion = PRIME_FU_MEM_OFFSET;
     memInfo.sizeFuRegion = PRIME_FU_MEM_SIZE;
 
 	memInfo.state = SRV_FU_MEM_STATE_OPEN_DRIVER;
 }
-
 
 void SRV_FU_Tasks(void)
 {
@@ -538,7 +536,6 @@ void SRV_FU_DataRead(uint32_t address, uint8_t *buffer, uint16_t size)
 	memInfo.state = SRV_FU_MEM_STATE_READ_MEMORY;
 }
 
-
 void SRV_FU_DataWrite(uint32_t address, uint8_t *buffer, uint16_t size)
 {
 
@@ -575,7 +572,6 @@ void SRV_FU_DataWrite(uint32_t address, uint8_t *buffer, uint16_t size)
 
     memInfo.state = SRV_FU_MEM_STATE_WRITE_ONE_BLOCK;
 }
-
 
 void SRV_FU_CfgRead(void *dst, uint16_t size)
 {
