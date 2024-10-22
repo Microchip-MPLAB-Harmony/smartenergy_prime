@@ -14,9 +14,8 @@ MPLAB® Harmony 3 is an extension of the MPLAB® ecosystem for creating embedded
 This repository contains the MPLAB® Harmony 3 Smart Energy PRIME API and libraries. 
 
 - [Release Notes](./release_notes.md)
-- [MPLAB® Harmony License](mplab_harmony_license.md)
-- [MPLAB® Harmony 3 PRIME Wiki](https://github.com/Microchip-MPLAB-Harmony/smartenergy_prime/wiki)
-- [MPLAB® Harmony 3 PRIME API Help](https://microchip-mplab-harmony.github.io/smartenergy_prime)
+- [MPLAB® Harmony License](Microchip_SLA001.md)
+- [MPLAB® Harmony 3 PRIME API Help]
 
 # Contents Summary
 
@@ -25,11 +24,11 @@ This repository contains the MPLAB® Harmony 3 Smart Energy PRIME API and librar
 | config     | PRIME module configuration file                           |
 | docs       | PRIME library help documentation                          |
 | prime      | API and files for PRIME library                           |
-
+| pal        | Physical Abstraction layers from PRIME to PLC and RF modules |
 
 ____
 
-[![License](https://img.shields.io/badge/license-Harmony%20license-orange.svg)](https://github.com/Microchip-MPLAB-Harmony/smartenergy_prime/blob/master/mplab_harmony_license.md)
+[![License](https://img.shields.io/badge/license-Harmony%20license-orange.svg)](https://github.com/Microchip-MPLAB-Harmony/smartenergy_prime/blob/master/Microchip_SLA001.md)
 [![Latest release](https://img.shields.io/github/release/Microchip-MPLAB-Harmony/smartenergy_prime.svg)](https://github.com/Microchip-MPLAB-Harmony/smartenergy_prime/releases/latest)
 [![Latest release date](https://img.shields.io/github/release-date/Microchip-MPLAB-Harmony/smartenergy_prime.svg)](https://github.com/Microchip-MPLAB-Harmony/smartenergy_prime/releases/latest)
 [![Commit activity](https://img.shields.io/github/commit-activity/y/Microchip-MPLAB-Harmony/smartenergy_prime.svg)](https://github.com/Microchip-MPLAB-Harmony/smartenergy_prime/graphs/commit-activity)
