@@ -148,7 +148,10 @@ static void lPAL_SERIAL_SERIAL_DataCfmCb(DRV_PHY_SERIAL_MSG_CONFIRM_DATA *pCfmDa
 
         dataLength = SRV_PSNIFFER_SerialCfmMessage(palSerialData.snifferData, (void *)pCfmData);
 
-        palSerialData.snifferCallback(palSerialData.snifferData, dataLength);
+        if (dataLength != 0U)
+        {
+            palSerialData.snifferCallback(palSerialData.snifferData, dataLength);
+        }
     }
 
 </#if>
@@ -185,7 +188,10 @@ static void lPAL_SERIAL_SERIAL_DataIndCb(DRV_PHY_SERIAL_MSG_RX_DATA *pRxData)
 
         length = SRV_PSNIFFER_SerialRxMessage(palSerialData.snifferData, (void *)pRxData);
 
-        palSerialData.snifferCallback(palSerialData.snifferData, length);
+        if (length != 0U)
+        {
+            palSerialData.snifferCallback(palSerialData.snifferData, length);
+        }
     }
 
 </#if>
