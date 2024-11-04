@@ -49,6 +49,9 @@ Microchip or any third party.
 
 #include <string.h>
 
+#include "configuration.h"
+#include "definitions.h"
+
 #include "srv_firmware_upgrade.h"
 #include "srv_firmware_upgrade_local.h"
 
@@ -64,16 +67,14 @@ Microchip or any third party.
 /* 
 Changes to get from MCC
 */
-#define PRIME_FU_MEM_DRV
-#define PRIME_FU_MEM_INSTANCE
-#define PRIME_FU_MEM_OFFSET     0x0000
-#define PRIME_FU_MEM_SIZE       0x80000
+#define PRIME_FU_MEM_DRV        "${PRIME_FU_MEM_DRV?string}"
+#define PRIME_FU_MEM_INSTANCE   ${PRIME_FU_MEM_INSTANCE?string}
+#define PRIME_FU_MEM_OFFSET     ${PRIME_FU_MEM_OFFSET?string}
+#define PRIME_FU_MEM_SIZE       ${PRIME_FU_MEM_SIZE?string}
 
-#define MEMORY_WRITE_SIZE       0x100
-#define MAX_BUFFER_READ_SIZE    0x100
+#define MEMORY_WRITE_SIZE       ${PRIME_FU_BUFFER_WRITE_SIZE?string}
+#define MAX_BUFFER_READ_SIZE    ${PRIME_FU_BUFFER_READ_SIZE?string}
     
-#define PRIME_METADATA_SIZE     16
-
 /* Define app number */
 #define PRIME_INVALID_APP                 0
 #define PRIME_MAC13_APP                   1
@@ -84,14 +85,16 @@ Changes to get from MCC
 <#if (prime_config)??>
 <#if ((prime_config.PRIME_MODE == "SN") && (prime_config.PRIME_PROJECT == "application project"))>
 
-#define PRIME_APP_FLASH_LOCATION     ${PRIME_SN_APP_ADDRESS?string}
-#define PRIME_APP_SIZE               ${PRIME_SN_APP_SIZE?string}
-#define PRIME_MAC13_FLASH_LOCATION   ${PRIME_SN_FWSTACK13_ADDRESS?string}
-#define PRIME_MAC13_SIZE             ${PRIME_SN_FWSTACK13_SIZE?string}
-#define PRIME_MAC14_FLASH_LOCATION   ${PRIME_SN_FWSTACK14_ADDRESS?string}
-#define PRIME_MAC14_SIZE             ${PRIME_SN_FWSTACK14_SIZE?string}
-#define PRIME_PHY_FLASH_LOCATION     ${PRIME_SN_PHY_ADDRESS?string}
-#define PRIME_PHY_SIZE               ${PRIME_SN_PHY_SIZE?string}
+#define PRIME_APP_FLASH_LOCATION     ${prime_config.PRIME_SN_APP_ADDRESS?string}
+#define PRIME_APP_SIZE               ${prime_config.PRIME_SN_APP_SIZE?string}
+#define PRIME_MAC13_FLASH_LOCATION   ${prime_config.PRIME_SN_FWSTACK13_ADDRESS?string}
+#define PRIME_MAC13_SIZE             ${prime_config.PRIME_SN_FWSTACK13_SIZE?string}
+#define PRIME_MAC14_FLASH_LOCATION   ${prime_config.PRIME_SN_FWSTACK14_ADDRESS?string}
+#define PRIME_MAC14_SIZE             ${prime_config.PRIME_SN_FWSTACK14_SIZE?string}
+#define PRIME_PHY_FLASH_LOCATION     ${prime_config.PRIME_SN_PHY_ADDRESS?string}
+#define PRIME_PHY_SIZE               ${prime_config.PRIME_SN_PHY_SIZE?string}
+#define PRIME_METADATA_SIZE          ${prime_config.PRIME_METADATA_SIZE?string}
+
 
 </#if>
 </#if>
@@ -192,13 +195,13 @@ static bool lSRV_FU_CheckMetadata(void)
 	appToFu = PRIME_INVALID_APP;
     
     /* Check image identifier */
-	if (memcmp(imageId, PRIME_SN_FWSTACK13_METADATA, sizeof(PRIME_SN_FWSTACK13_METADATA)))
+	if (memcmp(imageId, "${prime_config.PRIME_SN_FWSTACK13_METADATA?string}", sizeof("${prime_config.PRIME_SN_FWSTACK13_METADATA?string}")))
     {
-	    if (memcmp(imageId, PRIME_SN_FWSTACK14_METADATA, sizeof(PRIME_SN_FWSTACK14_METADATA)))
+	    if (memcmp(imageId, "${prime_config.PRIME_SN_FWSTACK14_METADATA?string}", sizeof("${prime_config.PRIME_SN_FWSTACK14_METADATA?string}")))
         {
-			if (memcmp(imageId, PRIME_SN_PHY_METADATA, sizeof(PRIME_SN_PHY_METADATA)))
+			if (memcmp(imageId, "${prime_config.PRIME_SN_PHY_METADATA?string}", sizeof("${prime_config.PRIME_SN_PHY_METADATA?string}")))
             {
-				if (memcmp(imageId, PRIME_SN_APP_METADATA, sizeof(PRIME_SN_APP_METADATA)))
+				if (memcmp(imageId, "${prime_config.PRIME_SN_APP_METADATA?string}", sizeof("${prime_config.PRIME_SN_APP_METADATA?string}")))
                 {
 				    return false;
 				}
@@ -567,8 +570,8 @@ void SRV_FU_DataWrite(uint32_t address, uint8_t *buffer, uint16_t size)
 <#if (prime_config)??>
 <#if ((prime_config.PRIME_MODE == "SN") && (prime_config.PRIME_PROJECT == "application project"))>
     lSRV_FU_StoreMetadata(address, size);
-<#endif>
-<#endif>
+</#if>
+</#if>
 
     memInfo.state = SRV_FU_MEM_STATE_WRITE_ONE_BLOCK;
 }
@@ -621,7 +624,8 @@ void SRV_FU_End(SRV_FU_RESULT fuResult)
 	SRV_FU_RESULT result;
 
 	/* check callback is initialized */
-	if (!SRV_FU_ResultCallback) {
+	if (!SRV_FU_ResultCallback)
+    {
 		return;
 	}
 
@@ -665,7 +669,8 @@ void SRV_FU_CalculateCrc(void)
 	uint32_t blockStart, nBlock;
     uint32_t bytesPagesRead;
 
-	if (crcState != SRV_FU_CRC_ILDE) {
+	if (crcState != SRV_FU_CRC_ILDE)
+    {
 		return;
 	}
 
@@ -740,7 +745,8 @@ uint16_t SRV_FU_GetBitmap(uint8_t *bitmap, uint32_t *numRxPages)
 void SRV_FU_SwapVersion(SRV_FU_TRAFFIC_VERSION trafficVersion)
 {
 	/* check callback is initialized */
-	if (SRV_FU_SwapCallback) {
+	if (SRV_FU_SwapCallback)
+    {
 		SRV_FU_SwapCallback(trafficVersion);
 	}
 }
@@ -766,42 +772,45 @@ bool SRV_FU_SwapFirmware(void)
 	SRV_STORAGE_PRIME_MODE_INFO_CONFIG boardInfo;
 
 	SRV_STORAGE_GetConfigInfo(SRV_STORAGE_TYPE_MODE_PRIME, sizeof(boardInfo), (void *)&boardInfo);
-	if (boardInfo.primeVersion == PRIME_1_3) {
+	if (boardInfo.primeVersion == PRIME_VERSION_1_3)
+    {
 		/* Verify if this is a right image */
-		if (lSRV_FU_VerifyImage() == false) {
+		if (lSRV_FU_CheckMetadata() == false)
+        {
 			/* Trigger reset, needed in FU 1.3 */
 			return 1;
 		}
 	}
 
 	/* Check which app must be swapped */
-	switch (appToFu) {
-	case PRIME_MAC13_APP:
-		destAddress = PRIME_MAC13_FLASH_LOCATION;
-		destSize = PRIME_MAC13_SIZE;
-		break;
-	case PRIME_MAC14_APP:
-		destAddress = PRIME_MAC14_FLASH_LOCATION;
-		destSize = PRIME_MAC14_SIZE;
-		break;
-	case PRIME_PHY_APP:
-		destAddress = PRIME_PHY_FLASH_LOCATION;
-		destSize = PRIME_PHY_SIZE;
-		break;
-	case PRIME_MAIN_APP:
-		destAddress = PRIME_APP_FLASH_LOCATION;
-		destSize = PRIME_APP_SIZE;
-		break;
-	case PRIME_INVALID_APP:
-	default:
-		return 0;
+	switch (appToFu) 
+    {
+        case PRIME_MAC13_APP:
+            destAddress = PRIME_MAC13_FLASH_LOCATION;
+            destSize = PRIME_MAC13_SIZE;
+            break;
+        case PRIME_MAC14_APP:
+            destAddress = PRIME_MAC14_FLASH_LOCATION;
+            destSize = PRIME_MAC14_SIZE;
+            break;
+        case PRIME_PHY_APP:
+            destAddress = PRIME_PHY_FLASH_LOCATION;
+            destSize = PRIME_PHY_SIZE;
+            break;
+        case PRIME_MAIN_APP:
+            destAddress = PRIME_APP_FLASH_LOCATION;
+            destSize = PRIME_APP_SIZE;
+            break;
+        case PRIME_INVALID_APP:
+        default:
+            return 0;
 	}
 
 	/* Update boot configuration */
 	SRV_STORAGE_BOOT_CONFIG bootConfig;
 
 	SRV_STORAGE_GetConfigInfo(SRV_STORAGE_TYPE_BOOT_INFO, sizeof(bootConfig), &bootConfig);
-	bootConfig.origAddr = spx_fu_region_cfg[suc_region_to_fu].ul_address;
+	bootConfig.origAddr = DRV_MEMORY_AddressGet(memInfo.memoryHandle) + PRIME_FU_MEM_OFFSET;
 	bootConfig.destAddr = destAddress;
 	bootConfig.imgSize = destSize;
 	
@@ -816,16 +825,20 @@ bool SRV_FU_SwapFirmware(void)
 void SRV_FU_VerifyImage(void)
 {
 	/* check pointer function */
-	if (!SRV_FU_ImageVerifyCallback) {
+	if (!SRV_FU_ImageVerifyCallback)
+    {
 		return;
 	}
 
 <#if (prime_config)??>
 <#if ((prime_config.PRIME_MODE == "SN") && (prime_config.PRIME_PROJECT == "application project"))>
 	/* Verify if this is a right image */
-	if (lSRV_FU_CheckMetadata())) {
+	if (lSRV_FU_CheckMetadata())
+    {
 		SRV_FU_ImageVerifyCallback(SRV_FU_RESULT_SUCCESS);
-	} else {
+	}
+    else
+    {
 		SRV_FU_ImageVerifyCallback(SRV_FU_RESULT_IMAGE_ERROR);
 	}
 </#if>

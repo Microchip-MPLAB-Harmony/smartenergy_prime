@@ -58,6 +58,7 @@ global primeSNAppMetaData
 global primeSNPFWStack14MetaData
 global primeSNSNPHYMetaData
 global primeSNPFWStack13MetaData
+global primeSNFWMetadataSize
 
 # Files
 global pPrimeHalWrapperHeaderFile
@@ -98,6 +99,7 @@ PRIME_PHY_ID = "PHYBIN"
 PRIME_FW_STACK_13_OFFSET_HEX = "0xD0000"
 PRIME_FW_STACK_13_SIZE_HEX = "0x20000"
 PRIME_FW_STACK_13_ID = "MAC13BIN"
+PRIME_METADATA_SIZE = "16"
 
 PRIME_FW_STACK_RAM_SIZE = "0x0000B000"  # TBD !!!!!
 
@@ -329,6 +331,7 @@ def primeShowSNAppConfiguration(primeVersion):
     primeSNPFWStack14MetaData.setVisible(True)
     primeSNSNPHYMetaData.setVisible(True)
     primeSNPFWStack13MetaData.setVisible(True)
+    primeSNSNPHYMetaData.setVisible(True)
 
     # Hide SN Application options
     primeConfigBnSlaveEn.setVisible(False)
@@ -381,6 +384,7 @@ def primeShowSNBinConfiguration(primeVersion):
     primeSNPFWStack14MetaData.setVisible(False)
     primeSNSNPHYMetaData.setVisible(False)
     primeSNPFWStack13MetaData.setVisible(False)
+    primeSNSNPHYMetaData.setVisible(False)
 
     if (primeVersion == "1.4"):
         # SN - v1.4
@@ -435,6 +439,7 @@ def primeShowBNConfiguration(primeVersion):
     primeSNPFWStack14MetaData.setVisible(False)
     primeSNSNPHYMetaData.setVisible(False)
     primeSNPFWStack13MetaData.setVisible(False)
+    primeSNSNPHYMetaData.setVisible(False)
 
     if (primeVersion == "1.4"):
         # BN - v1.4
@@ -623,6 +628,14 @@ def instantiateComponent(primeStackConfigComponent):
     primeSNPFWStack13MetaData.setDescription("PRIME SN FW Stack v1.3 Metadata")
     primeSNPFWStack13MetaData.setVisible(True)
     primeSNPFWStack13MetaData.setDefaultValue(PRIME_FW_STACK_13_ID)
+
+    global primeSNFWMetadataSize
+    primeSNFWMetadataSize = primeStackConfigComponent.createStringSymbol("PRIME_METADATA_SIZE", primeStackConfig)
+    primeSNFWMetadataSize.setLabel("Metada Size")
+    primeSNFWMetadataSize.setDescription("Bytes size Metadata")
+    primeSNFWMetadataSize.setVisible(True)
+    primeSNFWMetadataSize.setDefaultValue(PRIME_METADATA_SIZE)
+
 
     # The FW Image address is configured by PRIME FU Service
     global primeFUComment

@@ -21,6 +21,9 @@ source software license terms, no license or other rights, whether express or
 implied, are granted under any patent or other intellectual property rights of
 Microchip or any third party.
 """
+PRIME_FU_BUFFER_WRITE_SIZE = 0x100
+PRIME_FU_BUFFER_READ_SIZE = 0x100
+
 prime_fu_helpkeyword = "prime_fu_configuration"
 
 def instantiateComponent(primeFirmwareUpgradeComponent):
@@ -52,6 +55,26 @@ def instantiateComponent(primeFirmwareUpgradeComponent):
     primeFUMemSize.setVisible(True)
     primeFUMemSize.setEnabled(True)
     primeFUMemSize.setHelp(prime_fu_helpkeyword)
+
+    primeFUBufferWriteSize = primeFirmwareUpgradeComponent.createIntegerSymbol("PRIME_FU_BUFFER_WRITE_SIZE", None)
+    primeFUBufferWriteSize.setLabel("Buffer to write in flash")
+    primeFUBufferWriteSize.setVisible(True)
+    primeFUBufferWriteSize.setDefaultValue(PRIME_FU_BUFFER_WRITE_SIZE)
+    primeFUBufferWriteSize.setEnabled(True)
+    primeFUBufferWriteSize.setDescription("Should be equal or bigger than the block write size")
+    primeFUBufferWriteSize.setHelp(prime_fu_helpkeyword)
+
+    primeFUBufferReadSize = primeFirmwareUpgradeComponent.createIntegerSymbol("PRIME_FU_MEMORY_READ_SIZE", None)
+    primeFUBufferReadSize.setLabel("Buffer to read in flash")
+    primeFUBufferReadSize.setVisible(True)
+    primeFUBufferReadSize.setDefaultValue(PRIME_FU_BUFFER_READ_SIZE)
+    primeFUBufferReadSize.setEnabled(True)
+    primeFUBufferReadSize.setDescription("Should be equal or bigger than the block write size")
+    primeFUBufferReadSize.setHelp(prime_fu_helpkeyword)
+
+
+#define MAX_BUFFER_READ_SIZE    0x100
+
    
     ############################################################################
     #### Code Generation ####
