@@ -129,24 +129,6 @@ typedef enum {
 } SRV_FU_VERIFY_RESULT;
 
 // *****************************************************************************
-/* Firmware upgrade regions
-
- Summary:
-    Data structure with the configuration of the firmware upgrade region.
-
- Description:
-    This structure contains the parameters for the configuration of the firmware 
-    upgrade region.
-
- Remarks:
-    None.
-*/
-typedef struct {
-	uint32_t address;
-	uint32_t size;
-} SRV_FU_REGION_CGF;
-
-// *****************************************************************************
 /* Firmware upgrade information
 
  Summary:
@@ -207,11 +189,35 @@ typedef void (*SRV_FU_IMAGE_VERIFY_CB)(SRV_FU_VERIFY_RESULT verifyResult);
 */
 typedef void (*SRV_FU_RESULT_CB)(SRV_FU_RESULT fuResult);
 
+// *****************************************************************************
+/* Memory transaction result information
+
+ Summary:
+    An Enum with the posible results of a memory transactions.
+
+ Description:
+    This enumeration contains the result values of a memory transaction.
+
+ Remarks:
+    None.
+*/
 typedef enum {
   SRV_FU_MEM_TRANSFER_OK,
   SRV_FU_MEM_TRANSFER_ERROR,
 } SRV_FU_MEM_TRANSFER_RESULT;
 
+// *****************************************************************************
+/* Memory transaction information
+
+ Summary:
+    An enumeration with the posible types of a memory transactions.
+
+ Description:
+    This enumeration contains the types of a memory transaction.
+
+ Remarks:
+    None.
+*/
 typedef enum {
   SRV_FU_MEM_TRANSFER_CMD_ERASE,
   SRV_FU_MEM_TRANSFER_CMD_READ,
@@ -219,6 +225,18 @@ typedef enum {
   SRV_FU_MEM_TRANSFER_CMD_BAD,
 } SRV_FU_MEM_TRANSFER_CMD;
 
+// *****************************************************************************
+/* End memory transaction upgrade callback
+
+  Summary:
+    Callback function pointer to get the result of a memory transaction.
+
+  Description:
+    This callback is used to get the result of a memory transaction.
+
+  Remarks:
+    None.
+*/
 typedef void (*SRV_FU_MEM_TRANSFER_CB)(SRV_FU_MEM_TRANSFER_CMD command, SRV_FU_MEM_TRANSFER_RESULT result);
 
 // *****************************************************************************
@@ -327,42 +345,6 @@ void SRV_FU_Initialize(void);
     It is called by the system's tasks routine (SYS_Tasks).
 */
 void SRV_FU_Tasks(void);
-
-// ****************************************************************************
-/* Function:
-    void SRV_FU_ConfigRegions(SRV_FU_REGION_CGF *fuRegion)
-
-  Summary:
-    Configures the region for the firmware upgrade. 
-
-  Description:
-    This function is used to configure the region where the received image will 
-    be stored during the firmware upgrade.
-
-  Precondition:
-    The SRV_FU_Initialize function should have been called before calling this 
-    function.
-
-  Parameters:
-    fuRegion    - Pointer to the firmware upgrade region configuration
-
-  Returns:
-    None
-
-  Example:
-    <code>
-    SRV_FU_REGION_CGF fuRegion;
-    
-    fuRegion.address = 0x1000;
-    fuRegion.size = 0x200
-    
-    SRV_FU_ConfigRegions(&fuRegion);    
-    </code>
-
-  Remarks:
-    This function is called by the application.
-*/
-void SRV_FU_ConfigRegions(SRV_FU_REGION_CGF *fuRegion);
 
 // ****************************************************************************
 /* Function:
@@ -758,6 +740,48 @@ void SRV_FU_RegisterCallbackVerify(SRV_FU_IMAGE_VERIFY_CB callback);
 
 // ****************************************************************************
 /* Function:
+  void SRV_FU_RegisterCallbackMemTransfer(SRV_FU_MEM_TRANSFER_CB callback);
+
+  Summary:
+    Registers a function to be called back when a memory operation finishes.
+
+  Description:
+    This function allows the PRIME stack to register a function to be called 
+    back when when a memory operation finishes.
+
+  Precondition:
+    The SRV_FU_Initialize function should have been called before calling this
+    function.
+
+  Parameters:
+    callback       - Pointer to the callback function
+
+  Returns:
+    None.
+
+  Example:
+    <code>
+    
+    void _endMemoryTransaction(SRV_FU_MEM_TRANSFER_CMD command, SRV_FU_MEM_TRANSFER_RESULT result)
+    {
+        ...
+    }
+
+    void main(void)
+    {
+        SRV_FU_Initialize();
+
+        SRV_FU_RegisterCallbackMemTransfer(_endMemoryTransaction);
+    }
+    </code>
+
+  Remarks:
+    This function is called by the PRIME stack.
+*/
+void SRV_FU_RegisterCallbackMemTransfer(SRV_FU_MEM_TRANSFER_CB callback);
+
+// ****************************************************************************
+/* Function:
    void SRV_FU_VerifyImage(void)
 
   Summary:
@@ -893,7 +917,5 @@ void SRV_FU_RegisterCallbackSwapVersion(SRV_FU_VERSION_SWAP_CB callback);
     This function is called by the PRIME stack.
 */
 void SRV_FU_SwapVersion(SRV_FU_TRAFFIC_VERSION trafficVersion);
-
-void SRV_FU_RegisterCallbackMemTransfer(SRV_FU_MEM_TRANSFER_CB callback);
 
 #endif // SRV_FIRMWARE_UPGRADE_H
