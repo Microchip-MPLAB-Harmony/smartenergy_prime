@@ -72,10 +72,6 @@ def instantiateComponent(primeFirmwareUpgradeComponent):
     primeFUBufferReadSize.setDescription("Should be equal or bigger than the block write size")
     primeFUBufferReadSize.setHelp(prime_fu_helpkeyword)
 
-
-#define MAX_BUFFER_READ_SIZE    0x100
-
-   
     ############################################################################
     #### Code Generation ####
     ############################################################################

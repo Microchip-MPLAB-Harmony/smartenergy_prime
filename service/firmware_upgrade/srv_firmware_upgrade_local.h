@@ -6,10 +6,11 @@
     srv_firmware_upgrade_local.h
 
   Summary:
-    -
+    PRIME Firmware Upgrade Service Interface Local Header File.
 
   Description:
-    -
+    PRIME Firmware Upgrade Service Interface Local Header File.
+
 *******************************************************************************/
 
 //DOM-IGNORE-BEGIN
@@ -41,20 +42,22 @@ Microchip or any third party.
 #define SRV_FIRMWARE_UPGRADE_LOCAL_H
 
 
-#include "driver/memory/drv_memory.h"
-#include "system/system_media.h"
-
-// *****************************************************************************
-// *****************************************************************************
-// Section: File includes
-// *****************************************************************************
-// *****************************************************************************
-
 // *****************************************************************************
 // *****************************************************************************
 // Section: Included Files
 // *****************************************************************************
 // *****************************************************************************
+
+#include "driver/memory/drv_memory.h"
+#include "system/system_media.h"
+
+// DOM-IGNORE-BEGIN
+#ifdef __cplusplus  // Provide C++ Compatibility
+
+    extern "C" {
+
+#endif
+// DOM-IGNORE-END
 
 // *****************************************************************************
 // *****************************************************************************
@@ -63,13 +66,13 @@ Microchip or any third party.
 // *****************************************************************************
 
 // *****************************************************************************
-/* Application states
+/* Firmware Upgrade Memory States
 
   Summary:
-    Application states enumeration
+    Firmware Upgrade Memory States enumeration
 
   Description:
-    This enumeration defines the valid application states.  These states
+    This enumeration defines the valid Firmware Upgrade Memory states. These states
     determine the behavior of the application at various times.
 */
 
@@ -81,8 +84,10 @@ typedef enum
     /* Get the geometry details */
     SRV_FU_MEM_STATE_GEOMETRY_GET,
 
-    /* Write to Memory */
+    /* Write one block to Memory */
     SRV_FU_MEM_STATE_WRITE_ONE_BLOCK,
+    
+    /* Wait end of writing one block to Memory */
     SRV_FU_MEM_STATE_WRITE_WAIT_END,
    
     /* Read From Memory */
@@ -91,7 +96,7 @@ typedef enum
     /* Erase Flash */
     SRV_FU_MEM_STATE_ERASE_FLASH,
 
-   /* Calculate CRC */
+    /* Calculate CRC */
     SRV_FU_CALCULATE_CRC_BLOCK,
        
     /* Wait for transfer to complete */
@@ -103,30 +108,30 @@ typedef enum
     /* Wait for commands */
     SRV_FU_MEM_STATE_CMD_WAIT,
 
-    /* An app error has occurred */
+    /* An error in memory operation happened */
     SRV_FU_MEM_STATE_ERROR,
 
-    /* BAD Configuration of the module */
+    /* Attached memory cannot be initialized */
     SRV_FU_MEM_UNITIALIZED
 
 } SRV_FU_MEM_STATES;
 
 // *****************************************************************************
-/* Application Data
+/* Memory information Data
 
   Summary:
-    Holds application data
+    Holds the relevant memory information
 
   Description:
-    This structure holds the application's data.
+    This structure holds the relevant memory information
 
   Remarks:
-    Application strings and buffers are be defined outside this structure.
+    -
  */
 
 typedef struct
 {
-    /* Application's current state */
+    /* Memory transactions's current state */
     SRV_FU_MEM_STATES state;
 
     /* Driver Handle */
@@ -137,7 +142,8 @@ typedef struct
     DRV_MEMORY_COMMAND_HANDLE writeHandle;
     DRV_MEMORY_COMMAND_HANDLE readHandle;
 
-    uint32_t iniFuRegion;
+    uint32_t startAdressFuRegion;
+
     uint32_t sizeFuRegion;
 
     uint32_t eraseBlockStart;
@@ -148,7 +154,7 @@ typedef struct
     uint32_t writeSize;
     uint32_t bytesWritten;
 
-    uint32_t recoverAddress;
+    uint32_t retrieveAddress;
     
     uint32_t readPageSize;
 
@@ -156,14 +162,36 @@ typedef struct
 
 
 
+// *****************************************************************************
+/* CRC calculation states
+
+  Summary:
+    CRC calculation states
+
+  Description:
+    States of the CRC calculation
+
+  Remarks:
+    -
+ */
+
 typedef enum
 {
-  SRV_FU_CRC_ILDE,
+  SRV_FU_CRC_IDLE,
   SRV_FU_CRC_WAIT_READ_BLOCK,
   SRC_FU_CRC_CALCULATING
 } SRV_FU_CRC_STATE;
 
-#endif // #ifndef PAL_LOCAL_H
+
+// DOM-IGNORE-BEGIN
+#ifdef __cplusplus  // Provide C++ Compatibility
+
+    }
+
+#endif
+// DOM-IGNORE-END
+
+#endif // #ifndef SRV_FIRMWARE_UPGRADE_LOCAL_H
 /*******************************************************************************
  End of File
 */

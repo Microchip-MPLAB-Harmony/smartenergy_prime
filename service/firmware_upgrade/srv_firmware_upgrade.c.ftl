@@ -8,12 +8,12 @@
     srv_firmware_upgrade.c
 
   Summary:
-    PRIME Firmware Upgrade Service Interface Header File.
+    PRIME Firmware Upgrade Service Interface Source File.
 
   Description:
     The Firmware Upgrade service provides the handling of the firmare upgrade 
-    and version swap for PRIME. This file provides the interface definition for 
-    this service.
+    and version swap for PRIME. This file contains the source code for the
+    implementation of this service.
 *******************************************************************************/
 
 ///DOM-IGNORE-BEGIN
@@ -64,9 +64,6 @@ Microchip or any third party.
 // *****************************************************************************
 // *****************************************************************************
 
-/* 
-Changes to get from MCC
-*/
 #define PRIME_FU_MEM_DRV        "${PRIME_FU_MEM_DRV?string}"
 #define PRIME_FU_MEM_INSTANCE   ${PRIME_FU_MEM_INSTANCE?string}
 #define PRIME_FU_MEM_OFFSET     ${PRIME_FU_MEM_OFFSET?string}
@@ -75,13 +72,6 @@ Changes to get from MCC
 #define MEMORY_WRITE_SIZE       ${PRIME_FU_BUFFER_WRITE_SIZE?string}
 #define MAX_BUFFER_READ_SIZE    ${PRIME_FU_BUFFER_READ_SIZE?string}
     
-/* Define app number */
-#define PRIME_INVALID_APP                 0
-#define PRIME_MAC13_APP                   1
-#define PRIME_MAC14_APP                   2
-#define PRIME_PHY_APP                     3
-#define PRIME_MAIN_APP                    4
-
 <#if (prime_config)??>
 <#if ((prime_config.PRIME_MODE == "SN") && (prime_config.PRIME_PROJECT == "application project"))>
 
@@ -95,6 +85,20 @@ Changes to get from MCC
 #define PRIME_PHY_SIZE               ${prime_config.PRIME_SN_PHY_SIZE?string}
 #define PRIME_METADATA_SIZE          ${prime_config.PRIME_METADATA_SIZE?string}
 
+#define STR_PRIME_MAC13_APP          "${prime_config.PRIME_SN_FWSTACK13_METADATA?string}"
+#define STR_PRIME_MAC14_APP          "${prime_config.PRIME_SN_FWSTACK14_METADATA?string}"
+#define STR_PRIME_PHY_APP            "${prime_config.PRIME_SN_PHY_METADATA?string}"
+#define STR_PRIME_SN_APP             "${prime_config.PRIME_SN_APP_METADATA?string}"
+
+/* Define application number */
+typedef enum
+{
+    PRIME_INVALID_APP,
+    PRIME_MAC13_APP,
+    PRIME_MAC14_APP,
+    PRIME_PHY_APP,
+    PRIME_MAIN_APP
+} SRV_FU_PRIME_APP_TYPE;
 
 </#if>
 </#if>
@@ -112,7 +116,7 @@ static SRV_FU_RESULT_CB SRV_FU_ResultCallback;
 static SRV_FU_VERSION_SWAP_CB SRV_FU_SwapCallback;
 static SRV_FU_MEM_TRANSFER_CB SRV_FU_MemTransferCallback;
 
-SYS_MEDIA_GEOMETRY *nvmGeometry = NULL;
+static SYS_MEDIA_GEOMETRY *nvmGeometry = NULL;
 
 /* NVM Data buffer */
 static CACHE_ALIGN uint8_t pMemWrite[MEMORY_WRITE_SIZE];
@@ -136,9 +140,9 @@ static uint32_t calculatedCrc;
 
 <#if (prime_config)??>
 <#if ((prime_config.PRIME_MODE == "SN") && (prime_config.PRIME_PROJECT == "application project"))>
-static uint8_t imageId[PRIME_METADATA_SIZE];
+static uint8_t imageMetadata[PRIME_METADATA_SIZE];
 
-static uint8_t appToFu;
+static SRV_FU_PRIME_APP_TYPE appToFu;
 </#if>
 </#if>
 
@@ -157,7 +161,7 @@ static void lSRV_FU_StoreMetadata(uint32_t address, uint32_t size)
 
     iniMetadata = fuData.imageSize - fuData.signLength;
 
-    /* Check if the segment to write is in metadata Zone*/
+    /* Check if the segment to write is in metadata zone*/
     if (((address + size) < iniMetadata) || (address > (iniMetadata + PRIME_METADATA_SIZE)))
     {
         return;
@@ -188,7 +192,7 @@ static void lSRV_FU_StoreMetadata(uint32_t address, uint32_t size)
         sizeToCopy = size - offsetSegment;
     }
 
-    memcpy(&imageId[offsetMetadata], &pBuffInput[offsetSegment], sizeToCopy);
+    memcpy(&imageMetadata[offsetMetadata], &pBuffInput[offsetSegment], sizeToCopy);
 }
 
 static bool lSRV_FU_CheckMetadata(void)
@@ -196,13 +200,13 @@ static bool lSRV_FU_CheckMetadata(void)
 	appToFu = PRIME_INVALID_APP;
     
     /* Check image identifier */
-	if (memcmp(imageId, "${prime_config.PRIME_SN_FWSTACK13_METADATA?string}", sizeof("${prime_config.PRIME_SN_FWSTACK13_METADATA?string}")))
+	if (memcmp(imageMetadata, STR_PRIME_MAC13_APP, sizeof(STR_PRIME_MAC13_APP)))
     {
-	    if (memcmp(imageId, "${prime_config.PRIME_SN_FWSTACK14_METADATA?string}", sizeof("${prime_config.PRIME_SN_FWSTACK14_METADATA?string}")))
+	    if (memcmp(imageMetadata, STR_PRIME_MAC14_APP, sizeof(STR_PRIME_MAC14_APP)))
         {
-			if (memcmp(imageId, "${prime_config.PRIME_SN_PHY_METADATA?string}", sizeof("${prime_config.PRIME_SN_PHY_METADATA?string}")))
+			if (memcmp(imageMetadata, STR_PRIME_PHY_APP, sizeof(STR_PRIME_PHY_APP)))
             {
-				if (memcmp(imageId, "${prime_config.PRIME_SN_APP_METADATA?string}", sizeof("${prime_config.PRIME_SN_APP_METADATA?string}")))
+				if (memcmp(imageMetadata, STR_PRIME_SN_APP, sizeof(STR_PRIME_SN_APP)))
                 {
 				    return false;
 				}
@@ -225,6 +229,8 @@ static bool lSRV_FU_CheckMetadata(void)
     {
 		appToFu = PRIME_MAC13_APP;
 	}
+
+    // TBD: check vendor and model
 
     return true;
 }
@@ -300,7 +306,8 @@ static void lSRV_FU_TransferHandler
 void lSRV_FU_EraseFuRegion(void)
 {
     
-    DRV_MEMORY_AsyncErase(memInfo.memoryHandle, &memInfo.eraseHandle, memInfo.eraseBlockStart, memInfo.numFuRegionEraseBlocks);
+    DRV_MEMORY_AsyncErase(memInfo.memoryHandle, &memInfo.eraseHandle, 
+        memInfo.eraseBlockStart, memInfo.numFuRegionEraseBlocks);
 
 	memInfo.state = SRV_FU_MEM_STATE_ERASE_FLASH;
 }
@@ -319,7 +326,7 @@ void SRV_FU_Initialize(void)
 	SRV_FU_SwapCallback = NULL;
     SRV_FU_MemTransferCallback = NULL;
 	
-    memInfo.iniFuRegion = PRIME_FU_MEM_OFFSET;
+    memInfo.startAdressFuRegion = PRIME_FU_MEM_OFFSET;
     memInfo.sizeFuRegion = PRIME_FU_MEM_SIZE;
 
 	memInfo.state = SRV_FU_MEM_STATE_OPEN_DRIVER;
@@ -328,7 +335,7 @@ void SRV_FU_Initialize(void)
 void SRV_FU_Tasks(void)
 {
 
-   /* Check the application's current state. */
+   /* Check the Firmware upgrade's current state. */
     switch ( memInfo.state )
     {
         case SRV_FU_MEM_STATE_OPEN_DRIVER:
@@ -354,7 +361,7 @@ void SRV_FU_Tasks(void)
                 break;
             }
 
-			memInfo.eraseBlockStart = (memInfo.iniFuRegion / nvmGeometry->geometryTable[SYS_MEDIA_GEOMETRY_TABLE_ERASE_ENTRY].blockSize);
+			memInfo.eraseBlockStart = (memInfo.startAdressFuRegion / nvmGeometry->geometryTable[SYS_MEDIA_GEOMETRY_TABLE_ERASE_ENTRY].blockSize);
 
             memInfo.numFuRegionEraseBlocks = (memInfo.sizeFuRegion / nvmGeometry->geometryTable[SYS_MEDIA_GEOMETRY_TABLE_ERASE_ENTRY].blockSize);
 
@@ -413,8 +420,8 @@ void SRV_FU_Tasks(void)
             }
             
             block = memInfo.writeAddress / memInfo.writePageSize;
-            memInfo.recoverAddress = block * memInfo.writePageSize;
-            offset = memInfo.writeAddress - memInfo.recoverAddress;
+            memInfo.retrieveAddress = block * memInfo.writePageSize;
+            offset = memInfo.writeAddress - memInfo.retrieveAddress;
 
             if ((memInfo.writePageSize - offset) < memInfo.writeSize)
             {
@@ -500,12 +507,12 @@ void SRV_FU_Tasks(void)
                 }
                 else
                 {
-                    /* check pointer function */
-                    if (SRV_FU_CrcCallback) {
+                    /* Check pointer function */
+                    if (SRV_FU_CrcCallback != NULL) {
                         SRV_FU_CrcCallback(calculatedCrc);
                     }
 
-                    crcState = SRV_FU_CRC_ILDE;
+                    crcState = SRV_FU_CRC_IDLE;
                     memInfo.state = SRV_FU_MEM_STATE_CMD_WAIT;
                 }
             }
@@ -530,7 +537,7 @@ void SRV_FU_DataRead(uint32_t address, uint8_t *buffer, uint16_t size)
 	uint32_t readAddress;
 	uint32_t blockStart, nBlock;
 
-	readAddress = memInfo.iniFuRegion + address;
+	readAddress = memInfo.startAdressFuRegion + address;
 
 	blockStart = readAddress / memInfo.readPageSize;
 	nBlock = size / memInfo.readPageSize;
@@ -562,7 +569,7 @@ void SRV_FU_DataWrite(uint32_t address, uint8_t *buffer, uint16_t size)
         return;
     }
 
-    memInfo.writeAddress = memInfo.iniFuRegion + address;
+    memInfo.writeAddress = memInfo.startAdressFuRegion + address;
     memInfo.writeSize = size;
     memInfo.bytesWritten = 0;
 
@@ -612,20 +619,18 @@ void SRV_FU_Start(SRV_FU_INFO *fuInfo)
 	fuData.signAlgorithm = SRV_FU_SIGNATURE_ALGO_NO_SIGNATURE;
 	fuData.signLength = 0;
 
-	/* erase internal flash pages */
+	/* Erase internal flash pages */
 	lSRV_FU_EraseFuRegion();
 
 	/* Set CRC status */
-	crcState = SRV_FU_CRC_ILDE;
+	crcState = SRV_FU_CRC_IDLE;
 	return;
 }
 
 void SRV_FU_End(SRV_FU_RESULT fuResult)
 {
-	SRV_FU_RESULT result;
-
-	/* check callback is initialized */
-	if (!SRV_FU_ResultCallback)
+	/* Check callback is initialized */
+	if (SRV_FU_ResultCallback == NULL)
     {
 		return;
 	}
@@ -633,23 +638,10 @@ void SRV_FU_End(SRV_FU_RESULT fuResult)
 	switch (fuResult)
     {
 	    case SRV_FU_RESULT_SUCCESS:
-            result = SRV_FU_RESULT_SUCCESS;
-            SRV_FU_ResultCallback(result);
-            break;
-
     	case SRV_FU_RESULT_CRC_ERROR:
-            result = SRV_FU_RESULT_CRC_ERROR;
-            SRV_FU_ResultCallback(result);
-            break;
-
     	case SRV_FU_RESULT_FW_REVERT:
-            result = SRV_FU_RESULT_FW_REVERT;
-            SRV_FU_ResultCallback(result);
-            break;
-
     	case SRV_FU_RESULT_FW_CONFIRM:
-            result = SRV_FU_RESULT_FW_CONFIRM;
-            SRV_FU_ResultCallback(result);
+            SRV_FU_ResultCallback(fuResult);
             break;
 
     	default:
@@ -657,27 +649,19 @@ void SRV_FU_End(SRV_FU_RESULT fuResult)
 	}
 }
 
-void SRV_FU_Revert(void)
-{
-	SRV_FU_RESULT result;
-
-	result = SRV_FU_RESULT_FW_REVERT;
-	SRV_FU_ResultCallback(result);
-}
-
 void SRV_FU_CalculateCrc(void)
 {
 	uint32_t blockStart, nBlock;
     uint32_t bytesPagesRead;
 
-	if (crcState != SRV_FU_CRC_ILDE)
+	if (crcState != SRV_FU_CRC_IDLE)
     {
 		return;
 	}
 
 	crcState = SRV_FU_CRC_WAIT_READ_BLOCK;
 
-	crcReadAddress = memInfo.iniFuRegion;
+	crcReadAddress = memInfo.startAdressFuRegion;
     crcRemainSize = fuData.imageSize;
 
 	if (crcRemainSize < MAX_BUFFER_READ_SIZE)
@@ -745,8 +729,8 @@ uint16_t SRV_FU_GetBitmap(uint8_t *bitmap, uint32_t *numRxPages)
 
 void SRV_FU_SwapVersion(SRV_FU_TRAFFIC_VERSION trafficVersion)
 {
-	/* check callback is initialized */
-	if (SRV_FU_SwapCallback)
+	/* Check callback is initialized */
+	if (SRV_FU_SwapCallback != NULL)
     {
 		SRV_FU_SwapCallback(trafficVersion);
 	}
@@ -779,7 +763,7 @@ bool SRV_FU_SwapFirmware(void)
 		if (lSRV_FU_CheckMetadata() == false)
         {
 			/* Trigger reset, needed in FU 1.3 */
-			return 1;
+			return true;
 		}
 	}
 
@@ -804,7 +788,7 @@ bool SRV_FU_SwapFirmware(void)
             break;
         case PRIME_INVALID_APP:
         default:
-            return 0;
+            return false;
 	}
 
 	/* Update boot configuration */
@@ -818,15 +802,15 @@ bool SRV_FU_SwapFirmware(void)
     /* Store the new boot configuration */
 	SRV_STORAGE_SetConfigInfo(SRV_STORAGE_TYPE_BOOT_INFO, sizeof(bootConfig), &bootConfig);
 
-	return 1;
+	return true;
 }
 </#if>
 </#if>
 
 void SRV_FU_VerifyImage(void)
 {
-	/* check pointer function */
-	if (!SRV_FU_ImageVerifyCallback)
+	/* Check pointer function */
+	if (SRV_FU_ImageVerifyCallback == NULL)
     {
 		return;
 	}
@@ -834,7 +818,10 @@ void SRV_FU_VerifyImage(void)
 <#if (prime_config)??>
 <#if ((prime_config.PRIME_MODE == "SN") && (prime_config.PRIME_PROJECT == "application project"))>
 	/* Verify if this is a right image */
-	if (lSRV_FU_CheckMetadata())
+
+    // TBD: Signature checking
+    
+	if (lSRV_FU_CheckMetadata() == true)
     {
 		SRV_FU_ImageVerifyCallback(SRV_FU_RESULT_SUCCESS);
 	}

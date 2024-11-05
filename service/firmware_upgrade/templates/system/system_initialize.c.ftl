@@ -1,3 +1,4 @@
-/* Initialize Firmware Upgrade */
-SRV_FU_Initialize();
+
+    /* Initialize Firmware Upgrade */
+    SRV_FU_Initialize();
 

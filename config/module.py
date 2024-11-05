@@ -73,7 +73,7 @@ def loadModule():
     primeTimeManagementComponent.addCapability("Time Management", "Time Management", True) 
 
     ## PRIME Firmware Upgrade
-    primeFUCompoment = Module.CreateComponent("primeFirwmareUpgrade", "Firmware Upgrade", "/SmartEnergy/Services", "service/firmware_upgrade/config/srv_firmware_upgrade.py")
+    primeFUCompoment = Module.CreateComponent("primeFirmwareUpgrade", "Firmware Upgrade", "/SmartEnergy/Services", "service/firmware_upgrade/config/srv_firmware_upgrade.py")
     primeFUCompoment.setDisplayType("PRIME Service")
     primeFUCompoment.addMultiDependency("Memory_dep", "DRV_MEDIA", "DRV_MEDIA", True)
     primeFUCompoment.addDependency("srv_usi_CRC_dep", "PCRC", "PCRC", True, True)

@@ -193,10 +193,10 @@ typedef void (*SRV_FU_RESULT_CB)(SRV_FU_RESULT fuResult);
 /* Memory transaction result information
 
  Summary:
-    An Enum with the posible results of a memory transactions.
+    Possible results of a memmory transaction.
 
  Description:
-    This enumeration contains the result values of a memory transaction.
+    Possible results of a memmory transaction.
 
  Remarks:
     None.
@@ -207,13 +207,13 @@ typedef enum {
 } SRV_FU_MEM_TRANSFER_RESULT;
 
 // *****************************************************************************
-/* Memory transaction information
+/* Memory transaction result callback
 
  Summary:
-    An enumeration with the posible types of a memory transactions.
+    Possible commands for a memory transaction.
 
  Description:
-    This enumeration contains the types of a memory transaction.
+    This enumeration contains the commands for a memory transaction.
 
  Remarks:
     None.
@@ -237,7 +237,8 @@ typedef enum {
   Remarks:
     None.
 */
-typedef void (*SRV_FU_MEM_TRANSFER_CB)(SRV_FU_MEM_TRANSFER_CMD command, SRV_FU_MEM_TRANSFER_RESULT result);
+typedef void (*SRV_FU_MEM_TRANSFER_CB)
+    (SRV_FU_MEM_TRANSFER_CMD command, SRV_FU_MEM_TRANSFER_RESULT result);
 
 // *****************************************************************************
 /* Traffic versions
@@ -466,7 +467,7 @@ void SRV_FU_End(SRV_FU_RESULT fuResult);
     Swaps the firmware. 
 
   Description:
-    This function is used to swap the firmare, if needed, and update data for
+    This function is used to swap the firmware, if needed, and update data for
     the bootloader.
 
   Precondition:
@@ -701,16 +702,16 @@ void SRV_FU_CalculateCrc(void);
     void SRV_FU_RegisterCallbackVerify(SRV_FU_IMAGE_VERIFY_CB callback)
 
   Summary:
-    Registers a function to be called back when the received image has been 
-    verified.
+    Registers a function to be called back when the received image 
+    has been verified.
 
   Description:
-    This function allows the PRIME stack to register a function to be called 
-    back when the received image has been verified.
+    This routine allows the PRIME stack to register a function to be 
+    called back when the received image has been verified.
 
   Precondition:
-    The SRV_FU_Initialize function should have been called before calling this
-    function.
+    The SRV_FU_Initialize function should have been called before
+    calling this function.
 
   Parameters:
     callback       - Pointer to the callback function
@@ -762,7 +763,8 @@ void SRV_FU_RegisterCallbackVerify(SRV_FU_IMAGE_VERIFY_CB callback);
   Example:
     <code>
     
-    void _endMemoryTransaction(SRV_FU_MEM_TRANSFER_CMD command, SRV_FU_MEM_TRANSFER_RESULT result)
+    void _endMemoryTransaction(SRV_FU_MEM_TRANSFER_CMD command,
+                   SRV_FU_MEM_TRANSFER_RESULT result)
     {
         ...
     }
@@ -857,7 +859,7 @@ uint16_t SRV_FU_GetBitmap(uint8_t *bitmap, uint32_t *numRxPages);
     trigger a PRIME stack version swap.
 
   Description:
-    This function allows the application to register a function to be called 
+    This routine allows the application to register a function to be called 
     back when the PRIME stack requests to trigger a PRIME stack version swap.
 
   Precondition:
@@ -917,5 +919,13 @@ void SRV_FU_RegisterCallbackSwapVersion(SRV_FU_VERSION_SWAP_CB callback);
     This function is called by the PRIME stack.
 */
 void SRV_FU_SwapVersion(SRV_FU_TRAFFIC_VERSION trafficVersion);
+
+// DOM-IGNORE-BEGIN
+#ifdef __cplusplus  // Provide C++ Compatibility
+
+    }
+
+#endif
+// DOM-IGNORE-END
 
 #endif // SRV_FIRMWARE_UPGRADE_H
