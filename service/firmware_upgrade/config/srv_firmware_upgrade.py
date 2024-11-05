@@ -64,7 +64,7 @@ def instantiateComponent(primeFirmwareUpgradeComponent):
     primeFUBufferWriteSize.setDescription("Should be equal or bigger than the block write size")
     primeFUBufferWriteSize.setHelp(prime_fu_helpkeyword)
 
-    primeFUBufferReadSize = primeFirmwareUpgradeComponent.createIntegerSymbol("PRIME_FU_MEMORY_READ_SIZE", None)
+    primeFUBufferReadSize = primeFirmwareUpgradeComponent.createIntegerSymbol("PRIME_FU_BUFFER_READ_SIZE", None)
     primeFUBufferReadSize.setLabel("Buffer to read in flash")
     primeFUBufferReadSize.setVisible(True)
     primeFUBufferReadSize.setDefaultValue(PRIME_FU_BUFFER_READ_SIZE)

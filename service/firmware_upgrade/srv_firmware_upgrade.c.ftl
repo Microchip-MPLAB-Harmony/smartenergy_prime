@@ -133,10 +133,11 @@ static uint32_t crcRemainSize;
 
 static uint32_t calculatedCrc;
 
-static uint8_t imageId[PRIME_METADATA_SIZE];
 
 <#if (prime_config)??>
 <#if ((prime_config.PRIME_MODE == "SN") && (prime_config.PRIME_PROJECT == "application project"))>
+static uint8_t imageId[PRIME_METADATA_SIZE];
+
 static uint8_t appToFu;
 </#if>
 </#if>
