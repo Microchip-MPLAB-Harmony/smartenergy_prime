@@ -207,7 +207,7 @@ typedef enum {
 } SRV_FU_MEM_TRANSFER_RESULT;
 
 // *****************************************************************************
-/* Memory transaction commands callback
+/* Memory transaction commands
 
  Summary:
     Possible commands for a memory transaction.
