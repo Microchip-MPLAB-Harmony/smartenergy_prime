@@ -24,6 +24,11 @@ Microchip or any third party.
 PRIME_FU_BUFFER_WRITE_SIZE = 0x100
 PRIME_FU_BUFFER_READ_SIZE = 0x100
 
+PRIME_FU_MAX_SIZE_SN = "0x40000"
+PRIME_FU_OFFSET_SN = "0x50000"
+PRIME_FU_MAX_SIZE_BN = "0x60000"
+PRIME_FU_OFFSET_BN = "0x40000"
+
 prime_fu_helpkeyword = "prime_fu_configuration"
 
 def instantiateComponent(primeFirmwareUpgradeComponent):
@@ -44,17 +49,30 @@ def instantiateComponent(primeFirmwareUpgradeComponent):
     primeFUMemInstance.setVisible(True)
     primeFUMemInstance.setHelp(prime_fu_helpkeyword)
 
-    primeFUMemOffset = primeFirmwareUpgradeComponent.createIntegerSymbol("PRIME_FU_MEM_OFFSET", None)
-    primeFUMemOffset.setLabel("Firmware Upgrade Memory Offset")
+    primeFUMemOffset = primeFirmwareUpgradeComponent.createStringSymbol("PRIME_FU_MEM_OFFSET", None)
+    primeFUMemOffset.setLabel("Firmware Upgrade Region Offset")
     primeFUMemOffset.setVisible(True)
     primeFUMemOffset.setEnabled(True)
+    primeFUMemOffset.setDescription("Offset from the beginning of the chosen memory of the Firmware upgrade region")
     primeFUMemOffset.setHelp(prime_fu_helpkeyword)
 
-    primeFUMemSize = primeFirmwareUpgradeComponent.createIntegerSymbol("PRIME_FU_MEM_SIZE", None)
-    primeFUMemSize.setLabel("Firmware Upgrade Memory Size")
+    primeFUMemSize = primeFirmwareUpgradeComponent.createStringSymbol("PRIME_FU_MEM_SIZE", None)
+    primeFUMemSize.setLabel("Firmware Upgrade Region Size")
     primeFUMemSize.setVisible(True)
     primeFUMemSize.setEnabled(True)
+    primeFUMemSize.setDescription("Hexadecimal value in bytes of the Firmware upgrade region")
     primeFUMemSize.setHelp(prime_fu_helpkeyword)
+
+    # Get default values for FU Zones
+    if Database.getComponentByID("prime_config") != None:
+        prime_mode = Database.getSymbolValue("prime_config", "PRIME_MODE")
+
+        if prime_mode == "BN":
+            primeFUMemSize.setDefaultValue(PRIME_FU_MAX_SIZE_BN)
+            primeFUMemOffset.setDefaultValue(PRIME_FU_OFFSET_BN)
+        elif Database.getSymbolValue("prime_config", "PRIME_PROJECT") == "application project":
+            primeFUMemSize.setDefaultValue(PRIME_FU_MAX_SIZE_SN)
+            primeFUMemOffset.setDefaultValue(PRIME_FU_OFFSET_SN)
 
     primeFUBufferWriteSize = primeFirmwareUpgradeComponent.createIntegerSymbol("PRIME_FU_BUFFER_WRITE_SIZE", None)
     primeFUBufferWriteSize.setLabel("Buffer to write in flash")

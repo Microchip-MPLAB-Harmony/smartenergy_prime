@@ -93,7 +93,7 @@ Microchip or any third party.
 /* Define application number */
 typedef enum
 {
-    PRIME_INVALID_APP,
+    PRIME_INVALID_APP = 0,
     PRIME_MAC13_APP,
     PRIME_MAC14_APP,
     PRIME_PHY_APP,
@@ -133,7 +133,7 @@ static uint32_t crcReadAddress;
 
 static uint32_t crcSize;
 
-static uint32_t crcRemainSize;
+static uint32_t crcRemainingSize;
 
 static uint32_t calculatedCrc;
 
@@ -357,7 +357,7 @@ void SRV_FU_Tasks(void)
 
             if (nvmGeometry == NULL)
             {
-                memInfo.state = SRV_FU_MEM_UNITIALIZED;
+                memInfo.state = SRV_FU_MEM_UNINITIALIZED;
                 break;
             }
 
@@ -465,16 +465,16 @@ void SRV_FU_Tasks(void)
                 calculatedCrc = SRV_PCRC_GetValue(pBuffInput, crcSize, PCRC_HT_GENERIC, PCRC_CRC32,
                                      calculatedCrc);
 
-                if (crcRemainSize > 0)
+                if (crcRemainingSize > 0)
                 {
                     uint32_t blockStart, nBlock;
                     uint32_t bytesPagesRead;
 
                     crcState = SRV_FU_CRC_WAIT_READ_BLOCK;
 
-                    if (crcRemainSize < MAX_BUFFER_READ_SIZE)
+                    if (crcRemainingSize < MAX_BUFFER_READ_SIZE)
                     {
-                        crcSize = crcRemainSize;
+                        crcSize = crcRemainingSize;
                     }
                     else
                     {
@@ -503,7 +503,7 @@ void SRV_FU_Tasks(void)
                     DRV_MEMORY_AsyncRead(memInfo.memoryHandle, &memInfo.readHandle, pBuffInput, blockStart, nBlock);
                     
                     crcReadAddress += crcSize;
-                    crcRemainSize -= crcSize;
+                    crcRemainingSize -= crcSize;
                 }
                 else
                 {
@@ -524,7 +524,7 @@ void SRV_FU_Tasks(void)
         case SRV_FU_MEM_STATE_SUCCESS:
         case SRV_FU_MEM_STATE_WRITE_WAIT_END:
         case SRV_FU_MEM_STATE_CMD_WAIT:
-        case SRV_FU_MEM_UNITIALIZED:
+        case SRV_FU_MEM_UNINITIALIZED:
         default:
         {
             break;
@@ -662,11 +662,11 @@ void SRV_FU_CalculateCrc(void)
 	crcState = SRV_FU_CRC_WAIT_READ_BLOCK;
 
 	crcReadAddress = memInfo.startAdressFuRegion;
-    crcRemainSize = fuData.imageSize;
+    crcRemainingSize = fuData.imageSize;
 
-	if (crcRemainSize < MAX_BUFFER_READ_SIZE)
+	if (crcRemainingSize < MAX_BUFFER_READ_SIZE)
     {
-        crcSize = crcRemainSize;
+        crcSize = crcRemainingSize;
     }
     else
     {
@@ -695,7 +695,7 @@ void SRV_FU_CalculateCrc(void)
 	DRV_MEMORY_AsyncRead(memInfo.memoryHandle, &memInfo.readHandle, pBuffInput, blockStart, nBlock);
 	
 	crcReadAddress += crcSize;
-    crcRemainSize -= crcSize;
+    crcRemainingSize -= crcSize;
 
     memInfo.state = SRV_FU_CALCULATE_CRC_BLOCK;
     

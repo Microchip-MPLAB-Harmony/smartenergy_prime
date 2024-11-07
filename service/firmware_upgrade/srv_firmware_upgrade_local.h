@@ -112,7 +112,7 @@ typedef enum
     SRV_FU_MEM_STATE_ERROR,
 
     /* Attached memory cannot be initialized */
-    SRV_FU_MEM_UNITIALIZED
+    SRV_FU_MEM_UNINITIALIZED
 
 } SRV_FU_MEM_STATES;
 
