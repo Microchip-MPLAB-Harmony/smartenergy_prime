@@ -727,7 +727,7 @@ uint16_t SRV_FU_GetBitmap(uint8_t *bitmap, uint32_t *numRxPages)
 	return 0;
 }
 
-void SRV_FU_SwapVersion(SRV_FU_TRAFFIC_VERSION trafficVersion)
+void SRV_FU_RequestSwapVersion(SRV_FU_TRAFFIC_VERSION trafficVersion)
 {
 	/* Check callback is initialized */
 	if (SRV_FU_SwapCallback != NULL)
