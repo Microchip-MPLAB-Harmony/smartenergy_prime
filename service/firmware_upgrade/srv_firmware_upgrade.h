@@ -905,7 +905,7 @@ void SRV_FU_RegisterCallbackSwapVersion(SRV_FU_VERSION_SWAP_CB callback);
     None.
 
   Parameters:
-    None.
+    trafficVersion  - Type of traffic PRIME 1.3 or 1.4 detectected
 
   Returns:
     None
