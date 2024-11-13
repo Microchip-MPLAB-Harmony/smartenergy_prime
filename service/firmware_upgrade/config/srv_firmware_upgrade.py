@@ -49,6 +49,7 @@ def instantiateComponent(primeFirmwareUpgradeComponent):
     primeFUMemInstance.setVisible(True)
     primeFUMemInstance.setHelp(prime_fu_helpkeyword)
 
+    global primeFUMemOffset
     primeFUMemOffset = primeFirmwareUpgradeComponent.createStringSymbol("PRIME_FU_MEM_OFFSET", None)
     primeFUMemOffset.setLabel("Firmware Upgrade Region Offset")
     primeFUMemOffset.setVisible(True)
@@ -56,6 +57,7 @@ def instantiateComponent(primeFirmwareUpgradeComponent):
     primeFUMemOffset.setDescription("Offset from the beginning of the chosen memory of the Firmware upgrade region")
     primeFUMemOffset.setHelp(prime_fu_helpkeyword)
 
+    global primeFUMemSize
     primeFUMemSize = primeFirmwareUpgradeComponent.createStringSymbol("PRIME_FU_MEM_SIZE", None)
     primeFUMemSize.setLabel("Firmware Upgrade Region Size")
     primeFUMemSize.setVisible(True)
@@ -63,16 +65,18 @@ def instantiateComponent(primeFirmwareUpgradeComponent):
     primeFUMemSize.setDescription("Hexadecimal value in bytes of the Firmware upgrade region")
     primeFUMemSize.setHelp(prime_fu_helpkeyword)
 
-    # Get default values for FU Zones
+    # Get default values for FU regions
     if Database.getComponentByID("prime_config") != None:
         prime_mode = Database.getSymbolValue("prime_config", "PRIME_MODE")
-
         if prime_mode == "BN":
             primeFUMemSize.setDefaultValue(PRIME_FU_MAX_SIZE_BN)
             primeFUMemOffset.setDefaultValue(PRIME_FU_OFFSET_BN)
         elif Database.getSymbolValue("prime_config", "PRIME_PROJECT") == "application project":
             primeFUMemSize.setDefaultValue(PRIME_FU_MAX_SIZE_SN)
             primeFUMemOffset.setDefaultValue(PRIME_FU_OFFSET_SN)
+    else:
+        primeFUMemSize.setDefaultValue(PRIME_FU_MAX_SIZE_SN)
+        primeFUMemOffset.setDefaultValue(PRIME_FU_OFFSET_SN)
 
     primeFUBufferWriteSize = primeFirmwareUpgradeComponent.createIntegerSymbol("PRIME_FU_BUFFER_WRITE_SIZE", None)
     primeFUBufferWriteSize.setLabel("Buffer to write in flash")
@@ -181,19 +185,23 @@ def onAttachmentDisconnected(source, target):
 #### Business Logic ####
 ################################################################################
 
-#Set symbols of other components
-def setVal(component, symbol, value):
-    triggerDict = {"Component":component,"Id":symbol, "Value":value}
-    if(Database.sendMessage(component, "SET_SYMBOL", triggerDict) == None):
-        print("Set Symbol Failure" + component + ":" + symbol + ":" + str(value))
-        return False
-    else:
-        return True
-
 #Handle messages from other components
 def handleMessage(messageID, args):
+    global primeFUMemOffset
+    global primeFUMemSize
     retDict= {}
-    if (messageID == "SET_SYMBOL"):
+    
+    if messageID == "CONF_FU_PRIME":
+        retDict = {"Return": "Success"}
+        prime_mode = args["Node"]
+        if prime_mode == "BN":
+            primeFUMemSize.setValue(PRIME_FU_MAX_SIZE_BN)
+            primeFUMemOffset.setValue(PRIME_FU_OFFSET_BN)
+        elif prime_mode == "SN":
+            primeFUMemSize.setValue(PRIME_FU_MAX_SIZE_SN)
+            primeFUMemOffset.setValue(PRIME_FU_OFFSET_SN)
+        
+    elif (messageID == "SET_SYMBOL"):
         print("handleMessage: Set Symbol in PRIME Stack")
         retDict= {"Return": "Success"}
         Database.setSymbolValue(args["Component"], args["Id"], args["Value"])
