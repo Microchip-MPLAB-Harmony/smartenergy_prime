@@ -116,9 +116,7 @@ def getRamMemoryDescription():
 
     return (0, 0)
 
-def setFwStackRamParams(primeMode, primeProject):
-    global pPrimeXc32LdPrepMacroSym
-
+def setFwStackLinkerParams(primeMode, primeProject, primeVersion):
     ramStartAddressHex, ramSizeHex = getRamMemoryDescription()
 
     if (primeMode == "SN"):
@@ -127,10 +125,17 @@ def setFwStackRamParams(primeMode, primeProject):
             # Service Node App
             ramOrigin = ramStartAddressHex
             ramLength = hex(int(ramSizeHex, 0) - int(PRIME_FW_STACK_RAM_SIZE, 0))
+            romLength = PRIME_USER_APP_SIZE_HEX
         else:
             # FW Stack App
             ramOrigin = hex(int(ramStartAddressHex, 0) + int(ramSizeHex, 0) - int(PRIME_FW_STACK_RAM_SIZE, 0))
             ramLength = PRIME_FW_STACK_RAM_SIZE
+            if (primeVersion == "1.4"):
+                romLength = PRIME_FW_STACK_14_SIZE_HEX
+            else:
+                romLength = PRIME_FW_STACK_13_SIZE_HEX
+            
+            rom_length  = "ROM_LENGTH=" + romLength
     else:
         # Base Node App
         ramOrigin = ramStartAddressHex
@@ -139,11 +144,14 @@ def setFwStackRamParams(primeMode, primeProject):
     ram_origin  = "RAM_ORIGIN=" + ramOrigin
     ram_length  = "RAM_LENGTH=" + ramLength
 
-    ramParams = (ram_origin + ";" + ram_length)
+    if (primeMode == "SN"):
+        ramParams = (ram_origin + ";" + ram_length + ";" + rom_length)
+    else:
+        ramParams = (ram_origin + ";" + ram_length)
+        
     pPrimeXc32LdPrepMacroSym.setValue(ramParams)
 
 def createGroupServices():
-    global primeServicesGroup
     primeServicesGroup = Database.findGroup("PRIME SERVICES")
     if (primeServicesGroup == None):
         primeServicesGroup = Database.createGroup("PRIME STACK", "PRIME SERVICES")
@@ -314,23 +322,23 @@ def primeShowSNAppConfiguration(primeVersion):
     primeMngpConfig.setVisible(True)
     primeConfigMngpSprof.setVisible(True)
     primeConfigSprofUsiPort.setVisible(True)
+    primeFUComment.setVisible(True)
 
     primeSNAppAddress.setVisible(True)
-    primeFUComment.setVisible(True)
     primeSNPHYAddress.setVisible(True)
     primeSNPFWStack14Address.setVisible(True)
     primeSNPFWStack13Address.setVisible(True)
-
+    
     primeSNAppSize.setVisible(True)
     primeSNPHYSize.setVisible(True)
     primeSNPFWStack14Size.setVisible(True)
     primeSNPFWStack13Size.setVisible(True)
+    primeSNFWMetadataSize.setVisible(True)
 
     primeSNAppMetaData.setVisible(True)
+    primeSNPHYMetaData.setVisible(True)
     primeSNFWStack14MetaData.setVisible(True)
-    primeSNPHYMetaData.setVisible(True)
     primeSNFWStack13MetaData.setVisible(True)
-    primeSNPHYMetaData.setVisible(True)
 
     # Hide SN Application options
     primeConfigBnSlaveEn.setVisible(False)
@@ -371,37 +379,33 @@ def primeShowSNBinConfiguration(primeVersion):
     primeMngpConfig.setVisible(False)
     primeConfigMngpSprof.setVisible(False)
     primeConfigSprofUsiPort.setVisible(False)
+    primeFUComment.setVisible(False)
 
     primeSNAppAddress.setVisible(False)
-    primeFUComment.setVisible(False)
     primeSNPHYAddress.setVisible(False)
+    primeSNPFWStack14Address.setVisible(False)
+    primeSNPFWStack13Address.setVisible(False)
 
     primeSNAppSize.setVisible(False)
     primeSNPHYSize.setVisible(False)
+    primeSNPFWStack14Size.setVisible(False)
+    primeSNPFWStack13Size.setVisible(False)
+    primeSNFWMetadataSize.setVisible(False)
 
     primeSNAppMetaData.setVisible(False)
+    primeSNPHYMetaData.setVisible(False)
     primeSNFWStack14MetaData.setVisible(False)
-    primeSNPHYMetaData.setVisible(False)
     primeSNFWStack13MetaData.setVisible(False)
-    primeSNPHYMetaData.setVisible(False)
 
     if (primeVersion == "1.4"):
         # SN - v1.4
         primeConfigSecProfile.setReadOnly(False)
         primeConfigFWVersion.setValue("HS14.01.01")
-        primeSNPFWStack14Address.setVisible(False)
-        primeSNPFWStack14Size.setVisible(False)
-        primeSNPFWStack13Address.setVisible(False)
-        primeSNPFWStack13Size.setVisible(False)
     else:
         # SN - v1.3.6
         primeConfigSecProfile.setValue(0)
         primeConfigSecProfile.setReadOnly(True)
         primeConfigFWVersion.setValue("S13.01.01")
-        primeSNPFWStack14Address.setVisible(False)
-        primeSNPFWStack14Size.setVisible(False)
-        primeSNPFWStack13Address.setVisible(True)
-        primeSNPFWStack13Size.setVisible(True)
 
 def primeShowBNConfiguration(primeVersion):
     # Valid options
@@ -433,12 +437,12 @@ def primeShowBNConfiguration(primeVersion):
     primeSNPHYSize.setVisible(False)
     primeSNPFWStack14Size.setVisible(False)
     primeSNPFWStack13Size.setVisible(False)
+    primeSNFWMetadataSize.setVisible(False)
 
     primeSNAppMetaData.setVisible(False)
     primeSNFWStack14MetaData.setVisible(False)
     primeSNPHYMetaData.setVisible(False)
     primeSNFWStack13MetaData.setVisible(False)
-    primeSNPHYMetaData.setVisible(False)
 
     if (primeVersion == "1.4"):
         # BN - v1.4
@@ -490,10 +494,11 @@ def primeUpdateConfiguration(symbol, event):
     localComponent = symbol.getComponent()
     primeUpdateFiles(localComponent)
 
-    # Set RAM linker properties
-    setFwStackRamParams(primeMode, primeProject)
     # Set Application Start Address
     Database.sendMessage("core", "APP_START_ADDRESS", {"start_address":startAddress})
+    
+    # Set linker properties
+    setFwStackLinkerParams(primeMode, primeProject, primeVersion)
 
 def instantiateComponent(primeStackConfigComponent):
     Log.writeInfoMessage("Loading Stack Configurator for PRIME")
@@ -797,15 +802,18 @@ def instantiateComponent(primeStackConfigComponent):
     pPrimeXc32LdPrepMacroSym = primeStackConfigComponent.createSettingSymbol("PRIME_XC32_LINKER_PREPROC_MACROS", None)
     pPrimeXc32LdPrepMacroSym.setCategory("C32-LD")
     pPrimeXc32LdPrepMacroSym.setKey("preprocessor-macros")
+
+    # Set Application Start Address (calculates rom length as the remaining part of the memory from the start address)
+    Database.sendMessage("core", "APP_START_ADDRESS", {"start_address":(hex(int(memStartAddressHex, 0) + int(PRIME_USER_APP_OFFSET_HEX, 0)))})
+    
+    # Set linker script values 
     ramStartAddressHex, ramSizeHex = getRamMemoryDescription()
-    ram_origin  = "RAM_ORIGIN=" + ramStartAddressHex
-    ram_length  = "RAM_LENGTH=" + hex(int(ramSizeHex, 0) - int(PRIME_FW_STACK_RAM_SIZE, 0))
-    ramParams = (ram_origin + ";" + ram_length)
+    ram_origin = "RAM_ORIGIN=" + ramStartAddressHex
+    ram_length = "RAM_LENGTH=" + hex(int(ramSizeHex, 0) - int(PRIME_FW_STACK_RAM_SIZE, 0))
+    rom_length = "ROM_LENGTH=" + PRIME_USER_APP_SIZE_HEX
+    ramParams = (ram_origin + ";" + ram_length + ";" + rom_length)
     pPrimeXc32LdPrepMacroSym.setValue(ramParams)
     pPrimeXc32LdPrepMacroSym.setAppend(True, ";=")
-
-    # Set Application Start Address
-    Database.sendMessage("core", "APP_START_ADDRESS", {"start_address":(hex(int(memStartAddressHex, 0) + int(PRIME_USER_APP_OFFSET_HEX, 0)))})
 
     ############################################################################
     #### Code Generation ####
@@ -1107,6 +1115,8 @@ def destroyComponent(primeStackConfigComponent):
     memStartAddressHex, memSizeHex = getFlashMemoryDescription()
     Database.sendMessage("core", "APP_START_ADDRESS", {"start_address":memStartAddressHex})
 
+    primeServicesRootGroup = ["primeFirmwareUpgrade"]
+    Database.deactivateComponents(primeServicesRootGroup)
     Database.deactivateComponents(["prime_config"])
 
 ################################################################################
