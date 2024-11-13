@@ -99,6 +99,10 @@ PRIME_FW_STACK_13_OFFSET_HEX = "0xD0000"
 PRIME_FW_STACK_13_SIZE_HEX = "0x20000"
 PRIME_FW_STACK_13_ID = "MAC13BIN"
 PRIME_METADATA_SIZE = "16"
+PRIME_FU_REGION_SIZE_SN = "0x40000"
+PRIME_FU_REGION_OFFSET_SN = "0x50000"
+PRIME_FU_REGION_SIZE_BN = "0x60000"
+PRIME_FU_REGION_OFFSET_BN = "0x40000"
 
 PRIME_FW_STACK_RAM_SIZE = "0x0000B000"  # TBD !!!!!
 
@@ -165,6 +169,10 @@ def createGroupServices():
         
     # Debug traces enabled
     setVal("srvLogReport", "ENABLE_TRACES", True)
+    
+    # Set default FU region (SN)
+    setVal("primeFirmwareUpgrade", "PRIME_FU_MEM_SIZE", PRIME_FU_REGION_SIZE_SN)
+    setVal("primeFirmwareUpgrade", "PRIME_FU_MEM_OFFSET", PRIME_FU_REGION_OFFSET_SN)
 
 def primeAddBnFiles():
     # BN API files
@@ -473,6 +481,9 @@ def primeUpdateConfiguration(symbol, event):
             phyStartAddress = int(primeSNPHYAddress.getValue(), 0)
             phySize = int(primeSNPHYSize.getValue(), 0)
             Database.sendMessage("drvPlcPhy", "SET_STATIC_ADDRESSING", {"enable":True, "address":phyStartAddress, "size":phySize})
+            # Set FU region
+            setVal("primeFirmwareUpgrade", "PRIME_FU_MEM_SIZE", PRIME_FU_REGION_SIZE_SN)
+            setVal("primeFirmwareUpgrade", "PRIME_FU_MEM_OFFSET", PRIME_FU_REGION_OFFSET_SN)
         else:
             # SN - Bin project
             primeShowSNBinConfiguration(primeVersion)
@@ -489,6 +500,9 @@ def primeUpdateConfiguration(symbol, event):
         startAddress = memStartAddressHex
         # Disable PLC Phy driver static addressing
         Database.sendMessage("drvPlcPhy", "SET_STATIC_ADDRESSING", {"enable":False, "address":0, "size":0})
+        # Set default FU region
+        setVal("primeFirmwareUpgrade", "PRIME_FU_MEM_SIZE", PRIME_FU_REGION_SIZE_BN)
+        setVal("primeFirmwareUpgrade", "PRIME_FU_MEM_OFFSET", PRIME_FU_REGION_OFFSET_BN)
 
     # Add files
     localComponent = symbol.getComponent()

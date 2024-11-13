@@ -176,4 +176,27 @@ def onAttachmentDisconnected(source, target):
         primeFUMemDrv.clearValue()
         primeFUMemInstance = localComponent.getSymbolByID("PRIME_FU_MEM_INSTANCE")
         primeFUMemInstance.clearValue()
+        
+################################################################################
+#### Business Logic ####
+################################################################################
 
+#Set symbols of other components
+def setVal(component, symbol, value):
+    triggerDict = {"Component":component,"Id":symbol, "Value":value}
+    if(Database.sendMessage(component, "SET_SYMBOL", triggerDict) == None):
+        print("Set Symbol Failure" + component + ":" + symbol + ":" + str(value))
+        return False
+    else:
+        return True
+
+#Handle messages from other components
+def handleMessage(messageID, args):
+    retDict= {}
+    if (messageID == "SET_SYMBOL"):
+        print("handleMessage: Set Symbol in PRIME Stack")
+        retDict= {"Return": "Success"}
+        Database.setSymbolValue(args["Component"], args["Id"], args["Value"])
+    else:
+        retDict= {"Return": "UnImplemented Command"}
+    return retDict

@@ -47,7 +47,7 @@ def loadModule():
     primeStackConfigComponent.setDisplayType("PRIME Stack")
     primeStackConfigComponent.addDependency("primePal_dep", "PRIME_PAL", True, True)
     primeStackConfigComponent.addDependency("primeUSI_dep", "USI", True, True)
-    primeStackConfigComponent.addDependency("primeFu_dep", "Firmware Upgrade", True, True)
+    primeStackConfigComponent.addDependency("primeFu_dep", "FMW Upgrade", True, True)
     primeStackConfigComponent.addCapability("primeStackCapability", "PRIME Stack", True)
 
     ###########  PRIME Service Configurations  ###########
@@ -77,4 +77,4 @@ def loadModule():
     primeFUCompoment.setDisplayType("PRIME Service")
     primeFUCompoment.addMultiDependency("Memory_dep", "DRV_MEDIA", "DRV_MEDIA", True)
     primeFUCompoment.addDependency("srv_usi_CRC_dep", "PCRC", "PCRC", True, True)
-    primeFUCompoment.addCapability("Firmware Upgrade", "Firmware Upgrade", True) 
+    primeFUCompoment.addCapability("FMW Upgrade", "FMW Upgrade", True) 
