@@ -575,7 +575,7 @@ uint8_t PAL_GetAGC(uint16_t pch, uint8_t *mode, uint8_t *gain);
   Example:
     <code>
     uint8_t result=PAL_CFG_SUCCESS;
-    PAL_FRAME frameType=0;
+    PAL_FRAME mode=0;
     uint8_t gain=0;
     uint16_t pch=1;
 
@@ -832,7 +832,7 @@ uint8_t PAL_SetConfiguration(uint16_t pch, uint16_t id, void *val,
     uint16_t PAL_GetSignalCapture(
         uint16_t pch,
         uint8_t *noiseCapture,
-        PAL_FRAME frameType,
+        PAL_FRAME mode,
         uint32_t timeStart,
         uint32_t duration)
 
