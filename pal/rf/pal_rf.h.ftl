@@ -73,7 +73,7 @@ void PAL_RF_ProgramChannelSwitch(uint32_t timeSync, uint16_t pch, uint8_t timeMo
 uint8_t PAL_RF_GetSNR(uint8_t *pSnr, uint8_t qt);
 uint8_t PAL_RF_GetZCT(uint32_t *pZcTime);
 uint8_t PAL_RF_GetTimer(uint32_t *pTimer);
-uint8_t PAL_RF_GetTimerExtended(uint64_t *pTimeExtended);
+uint8_t PAL_RF_GetTimerExtended(uint64_t *pTimerExtended);
 uint8_t PAL_RF_GetCD(uint8_t *pCD, uint8_t *pRSSI, uint32_t *pTime, uint8_t *pHeader);
 uint8_t PAL_RF_GetNL(uint8_t *pNoise);
 uint8_t PAL_RF_GetAGC(uint8_t *pMode, uint8_t *pGain);

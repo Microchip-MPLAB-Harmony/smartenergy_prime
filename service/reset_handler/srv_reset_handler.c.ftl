@@ -93,8 +93,8 @@ static void lSRV_RESET_HANDLER_StoreResetInfo(SRV_RESET_HANDLER_RESET_CAUSE rese
 }
 
 
-    /* MISRA C-2012 deviation block start */
-    /* MISRA C-2012 Rule 11.3 deviated once. Deviation record ID - H3_MISRAC_2012_R_11_3_DR_1 */
+/* MISRA C-2012 deviation block start */
+/* MISRA C-2012 Rule 5.8 deviated 6 times. Deviation record ID - H3_MISRAC_2012_R_5_8_DR_1 */
 <#if core.COVERITY_SUPPRESS_DEVIATION?? && core.COVERITY_SUPPRESS_DEVIATION>
     <#if core.COMPILER_CHOICE == "XC32">
     #pragma GCC diagnostic push
@@ -170,7 +170,7 @@ void WDT_Handler(void)
     #pragma GCC diagnostic pop
     </#if>
 </#if>
-    /* MISRA C-2012 deviation block end */
+/* MISRA C-2012 deviation block end */
 
 volatile uint32_t saved_r0;
 volatile uint32_t saved_r1;

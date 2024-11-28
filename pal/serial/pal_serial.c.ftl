@@ -292,9 +292,9 @@ uint8_t PAL_SERIAL_GetTimer(uint32_t *pTimer)
     return (uint8_t)PAL_CFG_SUCCESS;
 }
 
-uint8_t PAL_SERIAL_GetTimerExtended(uint64_t *pTimeExtended)
+uint8_t PAL_SERIAL_GetTimerExtended(uint64_t *pTimerExtended)
 {
-    *pTimeExtended = SRV_TIME_MANAGEMENT_GetTimeUS64();
+    *pTimerExtended = SRV_TIME_MANAGEMENT_GetTimeUS64();
 
     return (uint8_t)PAL_CFG_SUCCESS;
 }
@@ -403,7 +403,7 @@ uint8_t PAL_SERIAL_GetSNR(uint8_t *pSnr, uint8_t qt)
     return((uint8_t)(PAL_CFG_INVALID_INPUT));
 }
 
-uint16_t PAL_SERIAL_GetSignalCapture(uint8_t *pData, uint8_t frameType, uint32_t timeStart, uint32_t duration)
+uint16_t PAL_SERIAL_GetSignalCapture(uint8_t *pData, PAL_FRAME frameType, uint32_t timeStart, uint32_t duration)
 {
     *pData = 0;
     (void)frameType;
@@ -413,7 +413,7 @@ uint16_t PAL_SERIAL_GetSignalCapture(uint8_t *pData, uint8_t frameType, uint32_t
     return((uint16_t)(PAL_CFG_INVALID_INPUT));
 }
 
-uint8_t PAL_SERIAL_GetMsgDuration(uint16_t length, PAL_SCHEME scheme, uint8_t frameType, uint32_t *pDuration)
+uint8_t PAL_SERIAL_GetMsgDuration(uint16_t length, PAL_SCHEME scheme, PAL_FRAME frameType, uint32_t *pDuration)
 {
     *pDuration = 0;
     (void)length;

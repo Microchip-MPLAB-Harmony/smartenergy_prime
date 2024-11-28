@@ -354,9 +354,9 @@ uint8_t PRIME_HAL_WRP_PAL_GetTimerExtended(uint16_t pch, uint64_t *timer)
 }
 
 uint8_t PRIME_HAL_WRP_PAL_GetCD(uint16_t pch, uint8_t *cd, uint8_t *rssi,
-    uint32_t *time_prime, uint8_t *header)
+    uint32_t *timePrime, uint8_t *header)
 {
-    return pPrimeHalApi->hal_pal_get_cd(pch, cd, rssi, time_prime, header);
+    return pPrimeHalApi->hal_pal_get_cd(pch, cd, rssi, timePrime, header);
 }
 
 uint8_t PRIME_HAL_WRP_PAL_GetNL(uint16_t pch, uint8_t *noise)
@@ -408,16 +408,16 @@ uint8_t PRIME_HAL_WRP_PAL_SetConfiguration(uint16_t pch, uint16_t id, void *val,
 }
 
 uint16_t PRIME_HAL_WRP_PAL_GetSignalCapture(uint16_t pch, uint8_t *noiseCapture,
-    uint8_t mode, uint32_t timeStart, uint32_t duration)
+    PAL_FRAME frameType, uint32_t timeStart, uint32_t duration)
 {
-    return pPrimeHalApi->hal_pal_get_signal_capture(pch, noiseCapture, mode,
+    return pPrimeHalApi->hal_pal_get_signal_capture(pch, noiseCapture, frameType,
         timeStart, duration);
 }
 
 uint8_t PRIME_HAL_WRP_PAL_GetMsgDuration(uint16_t pch, uint16_t length,
-    PAL_SCHEME scheme, uint8_t mode, uint32_t *duration)
+    PAL_SCHEME scheme, PAL_FRAME frameType, uint32_t *duration)
 {
-    return pPrimeHalApi->hal_pal_get_msg_duration(pch, length, scheme, mode,
+    return pPrimeHalApi->hal_pal_get_msg_duration(pch, length, scheme, frameType,
         duration);
 }
 

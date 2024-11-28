@@ -83,8 +83,8 @@ void PRIME_API_GetPrime14API(const PRIME_API **pPrimeApi)
 // *****************************************************************************
 // *****************************************************************************
 
-    /* MISRA C-2012 deviation block start */
-    /* MISRA C-2012 Rule 21.1 deviated once. Deviation record ID - H3_MISRAC_2012_R_21_1_DR_1 */
+/* MISRA C-2012 deviation block start */
+/* MISRA C-2012 Rule 21.1 deviated once. Deviation record ID - H3_MISRAC_2012_R_21_1_DR_1 */
 <#if core.COVERITY_SUPPRESS_DEVIATION?? && core.COVERITY_SUPPRESS_DEVIATION>
     <#if core.COMPILER_CHOICE == "XC32">
     #pragma GCC diagnostic push
@@ -101,7 +101,7 @@ void PRIME_API_GetPrime14API(const PRIME_API **pPrimeApi)
     #pragma GCC diagnostic pop
     </#if>
 </#if>
-    /* MISRA C-2012 deviation block end */
+/* MISRA C-2012 deviation block end */
 
 /* Security profile for PRIME 1.4 */
 #define MAC_SECURITY_PROFILE     ${MAC_SECURITY_PROFILE}
@@ -253,8 +253,8 @@ static void lPRIME_API_SetPrimeVersion(MAC_VERSION_INFO *macInfo)
         copyLen = sizeInfo;
     }
 
-    /* MISRA C-2012 deviation block start */
-    /* MISRA C-2012 Rule 7.4 deviated once. Deviation record ID - H3_MISRAC_2012_R_7_4_DR_1 */
+/* MISRA C-2012 deviation block start */
+/* MISRA C-2012 Rule 7.4 deviated once. Deviation record ID - H3_MISRAC_2012_R_7_4_DR_1 */
 <#if core.COVERITY_SUPPRESS_DEVIATION?? && core.COVERITY_SUPPRESS_DEVIATION>
     <#if core.COMPILER_CHOICE == "XC32">
     #pragma GCC diagnostic push
@@ -269,7 +269,7 @@ static void lPRIME_API_SetPrimeVersion(MAC_VERSION_INFO *macInfo)
     #pragma GCC diagnostic pop
     </#if>
 </#if>
-    /* MISRA C-2012 deviation block end */
+/* MISRA C-2012 deviation block end */
 
     macInfo->pibModel = PRIME_PIB_MODEL;
 
@@ -282,8 +282,8 @@ static void lPRIME_API_SetPrimeVersion(MAC_VERSION_INFO *macInfo)
         copyLen = sizeInfo;
     }
 
-    /* MISRA C-2012 deviation block start */
-    /* MISRA C-2012 Rule 7.4 deviated once. Deviation record ID - H3_MISRAC_2012_R_7_4_DR_1 */
+/* MISRA C-2012 deviation block start */
+/* MISRA C-2012 Rule 7.4 deviated once. Deviation record ID - H3_MISRAC_2012_R_7_4_DR_1 */
 <#if core.COVERITY_SUPPRESS_DEVIATION?? && core.COVERITY_SUPPRESS_DEVIATION>
     <#if core.COMPILER_CHOICE == "XC32">
     #pragma GCC diagnostic push
@@ -298,7 +298,7 @@ static void lPRIME_API_SetPrimeVersion(MAC_VERSION_INFO *macInfo)
     #pragma GCC diagnostic pop
     </#if>
 </#if>
-    /* MISRA C-2012 deviation block end */
+/* MISRA C-2012 deviation block end */
 
     macInfo->pibVendor = PRIME_PIB_VENDOR;
 
@@ -311,8 +311,8 @@ static void lPRIME_API_SetPrimeVersion(MAC_VERSION_INFO *macInfo)
         copyLen = sizeInfo;
     }
 
-    /* MISRA C-2012 deviation block start */
-    /* MISRA C-2012 Rule 7.4 deviated once. Deviation record ID - H3_MISRAC_2012_R_7_4_DR_1 */
+/* MISRA C-2012 deviation block start */
+/* MISRA C-2012 Rule 7.4 deviated once. Deviation record ID - H3_MISRAC_2012_R_7_4_DR_1 */
 <#if core.COVERITY_SUPPRESS_DEVIATION?? && core.COVERITY_SUPPRESS_DEVIATION>
     <#if core.COMPILER_CHOICE == "XC32">
     #pragma GCC diagnostic push
@@ -327,7 +327,7 @@ static void lPRIME_API_SetPrimeVersion(MAC_VERSION_INFO *macInfo)
     #pragma GCC diagnostic pop
     </#if>
 </#if>
-    /* MISRA C-2012 deviation block end */
+/* MISRA C-2012 deviation block end */
 
 }
 
@@ -398,8 +398,8 @@ void PRIME_API_Tasks(void)
 
             break;
 
-    /* MISRA C-2012 deviation block start */
-    /* MISRA C-2012 Rule 16.4 deviated once. Deviation record ID - H3_MISRAC_2012_R_16_4_DR_1 */
+/* MISRA C-2012 deviation block start */
+/* MISRA C-2012 Rule 16.4 deviated once. Deviation record ID - H3_MISRAC_2012_R_16_4_DR_1 */
 <#if core.COVERITY_SUPPRESS_DEVIATION?? && core.COVERITY_SUPPRESS_DEVIATION>
     <#if core.COMPILER_CHOICE == "XC32">
     #pragma GCC diagnostic push
@@ -415,7 +415,7 @@ void PRIME_API_Tasks(void)
     #pragma GCC diagnostic pop
     </#if>
 </#if>
-    /* MISRA C-2012 deviation block end */
+/* MISRA C-2012 deviation block end */
     }
 
 }

@@ -483,7 +483,7 @@ void SRV_FU_End(SRV_FU_RESULT fuResult);
     <code>
     if (SRV_FU_SwapFirmware() == true)
     {
-        Invoke bootloader
+        ... Invoke bootloader
     }
     </code>
 

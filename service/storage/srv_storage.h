@@ -124,7 +124,7 @@ typedef enum
     None
 */
 
-#define SRV_STORAGE_MAC_CONFIG_KEY      0xAA55
+#define SRV_STORAGE_MAC_CFG_KEY      0xAA55
 
 typedef struct {
 	uint16_t cfgKey;
@@ -230,7 +230,7 @@ typedef struct {
     None
 */
 
-#define SRV_STORAGE_SEC_CONFIG_KEY      0x5AA5
+#define SRV_STORAGE_SEC_CFG_KEY      0x5AA5
 
 typedef struct {
 	uint16_t cfgKey;
@@ -253,7 +253,7 @@ typedef struct {
     None
 */
 
-#define SRV_STORAGE_BOOT_CONFIG_KEY     0x55AA55AA
+#define SRV_STORAGE_BOOT_CFG_KEY     0x55AA55AA
 
 typedef struct {
 	uint32_t cfgKey;

@@ -291,7 +291,7 @@ __STATIC_INLINE void lPAL_PLC_TimerSyncInitialize(void)
 __STATIC_INLINE void lPAL_PLC_TimerSyncUpdate(void)
 {
     uint32_t timeHost;
-    static uint32_t timePlc; /* Defined as static to comply with  misra_c_2012_rule_18_6 in lPAL_PLC_TimerSyncRead(&timePlc) */
+    uint32_t timePlc = 0;
     uint32_t delayHost;
     uint32_t delayPlc;
     uint32_t syncTimerRelFreq;
@@ -375,8 +375,8 @@ static uint32_t lPAL_PLC_GetHostTime(uint32_t timePlc)
     /* Convert PLC delay to Host delay (frequency deviation) */
     delayAux = delayPlc * (int64_t)palPlcData.syncTimerRelFreq;
 
-    /* MISRA C-2012 deviation block start */
-    /* MISRA C-2012 Rule 10.1 deviated once. Deviation record ID - H3_MISRAC_2012_R_10_1_DR_1 */
+/* MISRA C-2012 deviation block start */
+/* MISRA C-2012 Rule 10.1 deviated once. Deviation record ID - H3_MISRAC_2012_R_10_1_DR_1 */
 <#if core.COVERITY_SUPPRESS_DEVIATION?? && core.COVERITY_SUPPRESS_DEVIATION>
     <#if core.COMPILER_CHOICE == "XC32">
     #pragma GCC diagnostic push
@@ -391,7 +391,7 @@ static uint32_t lPAL_PLC_GetHostTime(uint32_t timePlc)
     #pragma GCC diagnostic pop
     </#if>
 </#if>
-    /* MISRA C-2012 deviation block end */
+/* MISRA C-2012 deviation block end */
 
     /* Compute Host time */
     timeHost = (int64_t)palPlcData.timeRefHost + delayHost;
@@ -408,8 +408,8 @@ static uint32_t lPAL_PLC_GetPlcTime(uint32_t timeHost)
     /* Compute Host delay time since last synchronization */
     delayHost = (int64_t)(timeHost) - (int64_t)(palPlcData.timeRefHost);
 
-    /* MISRA C-2012 deviation block start */
-    /* MISRA C-2012 Rule 10.1 deviated once. Deviation record ID - H3_MISRAC_2012_R_10_1_DR_1 */
+/* MISRA C-2012 deviation block start */
+/* MISRA C-2012 Rule 10.1 deviated twice. Deviation record ID - H3_MISRAC_2012_R_10_1_DR_1 */
 <#if core.COVERITY_SUPPRESS_DEVIATION?? && core.COVERITY_SUPPRESS_DEVIATION>
     <#if core.COMPILER_CHOICE == "XC32">
     #pragma GCC diagnostic push
@@ -417,6 +417,7 @@ static uint32_t lPAL_PLC_GetPlcTime(uint32_t timeHost)
     </#if>
     #pragma coverity compliance block deviate "MISRA C-2012 Rule 10.1" "H3_MISRAC_2012_R_10_1_DR_1"
 </#if>
+/* Convert Host delay to PLC delay (frequency deviation) */
     delayPlc = delayHost << 24;
     delayPlc = DIV_ROUND(delayPlc, (int64_t)(palPlcData.syncTimerRelFreq));
 <#if core.COVERITY_SUPPRESS_DEVIATION?? && core.COVERITY_SUPPRESS_DEVIATION>
@@ -425,7 +426,7 @@ static uint32_t lPAL_PLC_GetPlcTime(uint32_t timeHost)
     #pragma GCC diagnostic pop
     </#if>
 </#if>
-    /* MISRA C-2012 deviation block end */
+/* MISRA C-2012 deviation block end */
 
     /* Compute PLC time */
     timePlc = (int64_t)(palPlcData.timeRefPlc) + delayPlc;
@@ -713,8 +714,8 @@ SYS_MODULE_OBJ PAL_PLC_Initialize(void)
     if (palPlcData.drvPhyStatus == SYS_STATUS_UNINITIALIZED)
     {
         /* Initialize PLC Driver Instance */
-        /* MISRA C-2012 deviation block start */
-    /* MISRA C-2012 Rule 11.3 deviated twice. Deviation record ID - H3_MISRAC_2012_R_11_3_DR_1 */
+    /* MISRA C-2012 deviation block start */
+/* MISRA C-2012 Rule 11.3 deviated twice. Deviation record ID - H3_MISRAC_2012_R_11_3_DR_1 */
 <#if core.COVERITY_SUPPRESS_DEVIATION?? && core.COVERITY_SUPPRESS_DEVIATION>
     <#if core.COMPILER_CHOICE == "XC32">
     #pragma GCC diagnostic push
@@ -949,9 +950,9 @@ uint8_t PAL_PLC_GetTimer(uint32_t *pTimer)
     return (uint8_t)PAL_CFG_SUCCESS;
 }
 
-uint8_t PAL_PLC_GetTimerExtended(uint64_t *pTimeExtended)
+uint8_t PAL_PLC_GetTimerExtended(uint64_t *pTimerExtended)
 {
-    *pTimeExtended = SRV_TIME_MANAGEMENT_GetTimeUS64();
+    *pTimerExtended = SRV_TIME_MANAGEMENT_GetTimeUS64();
 
     return (uint8_t)PAL_CFG_SUCCESS;
 }
@@ -1124,10 +1125,12 @@ uint8_t PAL_PLC_GetConfiguration(uint16_t id, void *pValue, uint16_t length)
 
         case PAL_ID_ZC_PERIOD:
             plcID = PLC_ID_ZC_PERIOD;
+            askPhy = true;
             break;
 
         case PAL_ID_HOST_VERSION:
             plcID = PLC_ID_HOST_VERSION_ID;
+            askPhy = true;
             break;
 
         case PAL_ID_CFG_MAX_TXRX_NUM_CHANNELS:

@@ -80,8 +80,8 @@ static PRIME_API_INIT primeApiInit;
 SYS_MODULE_OBJ PRIME_Initialize(const SYS_MODULE_INDEX index,
     const SYS_MODULE_INIT * init)
 {
-    /* MISRA C-2012 deviation block start */
-    /* MISRA C-2012 Rule 11.3 deviated once. Deviation record ID - H3_MISRAC_2012_R_11_3_DR_1 */
+/* MISRA C-2012 deviation block start */
+/* MISRA C-2012 Rule 11.3 deviated once. Deviation record ID - H3_MISRAC_2012_R_11_3_DR_1 */
 <#if core.COVERITY_SUPPRESS_DEVIATION?? && core.COVERITY_SUPPRESS_DEVIATION>
     <#if core.COMPILER_CHOICE == "XC32">
     #pragma GCC diagnostic push
@@ -96,7 +96,7 @@ SYS_MODULE_OBJ PRIME_Initialize(const SYS_MODULE_INDEX index,
     #pragma GCC diagnostic pop
     </#if>
 </#if>
-    /* MISRA C-2012 deviation block end */
+/* MISRA C-2012 deviation block end */
 
     /* Validate the request */
     if (index >= PRIME_INSTANCES_NUMBER)
@@ -187,8 +187,8 @@ void PRIME_Tasks(SYS_MODULE_OBJ object)
 void PRIME_Restart(uint32_t *primePtr)
 {
     /* Set PRIME API pointer */
-    /* MISRA C-2012 deviation block start */
-    /* MISRA C-2012 Rule 11.3 deviated once. Deviation record ID - H3_MISRAC_2012_R_11_3_DR_1 */
+/* MISRA C-2012 deviation block start */
+/* MISRA C-2012 Rule 11.3 deviated once. Deviation record ID - H3_MISRAC_2012_R_11_3_DR_1 */
 <#if core.COVERITY_SUPPRESS_DEVIATION?? && core.COVERITY_SUPPRESS_DEVIATION>
     <#if core.COMPILER_CHOICE == "XC32">
     #pragma GCC diagnostic push
@@ -203,7 +203,7 @@ void PRIME_Restart(uint32_t *primePtr)
     #pragma GCC diagnostic pop
     </#if>
 </#if>
-    /* MISRA C-2012 deviation block end */
+/* MISRA C-2012 deviation block end */
 
     if (primeObj.status == PRIME_STATUS_RUNNING)
     {

@@ -575,7 +575,7 @@ uint8_t PAL_GetAGC(uint16_t pch, uint8_t *mode, uint8_t *gain);
   Example:
     <code>
     uint8_t result=PAL_CFG_SUCCESS;
-    PAL_FRAME mode=0;
+    uint8_t mode=0;
     uint8_t gain=0;
     uint16_t pch=1;
 
@@ -627,7 +627,7 @@ uint8_t PAL_GetCCA(uint16_t pch, uint8_t *pState);
 
 // ****************************************************************************
 /* Function:
-    uint8_t PAL_GetChannel(uint16_t *pch, uint16_t channelReference)
+    uint8_t PAL_GetChannel(uint16_t *pPch, uint16_t channelReference)
 
   Summary:
     Get the band (PLC) or the pch (RF).
@@ -832,7 +832,7 @@ uint8_t PAL_SetConfiguration(uint16_t pch, uint16_t id, void *val,
     uint16_t PAL_GetSignalCapture(
         uint16_t pch,
         uint8_t *noiseCapture,
-        PAL_FRAME mode,
+        PAL_FRAME frameType,
         uint32_t timeStart,
         uint32_t duration)
 
@@ -849,7 +849,7 @@ uint8_t PAL_SetConfiguration(uint16_t pch, uint16_t id, void *val,
   Parameters:
     pch             Physical channel
     noiseCapture    Pointer to destination buffer to store data
-    frameType       Capture mode
+    frameType       Frame Type
     timeStart       Start time in us based on PL360 timer reference
     duration        Duration time in us
 
@@ -865,7 +865,7 @@ uint8_t PAL_SetConfiguration(uint16_t pch, uint16_t id, void *val,
     PAL_FRAME frameType = PAL_MODE_TYPE_B;
     uint8_t pch = 1;
 
-    noiseSize = PAL_GetSignalCapture(pch, &noiseCapture, mode, timeStart, duration);
+    noiseSize = PAL_GetSignalCapture(pch, &noiseCapture, frameType, timeStart, duration);
     </code>
 
   Remarks:

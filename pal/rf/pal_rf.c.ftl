@@ -566,9 +566,9 @@ uint8_t PAL_RF_GetTimer(uint32_t *pTimer)
     return (uint8_t)PAL_CFG_SUCCESS;
 }
 
-uint8_t PAL_RF_GetTimerExtended(uint64_t *pTimeExtended)
+uint8_t PAL_RF_GetTimerExtended(uint64_t *pTimerExtended)
 {
-    *pTimeExtended = SRV_TIME_MANAGEMENT_GetTimeUS64();
+    *pTimerExtended = SRV_TIME_MANAGEMENT_GetTimeUS64();
 
     return (uint8_t)PAL_CFG_SUCCESS;
 }
@@ -682,6 +682,7 @@ uint8_t PAL_RF_GetConfiguration(uint16_t id, void *pValue, uint16_t length)
     {
         case PAL_ID_INFO_VERSION:
             drvRfId = RF215_PIB_FW_VERSION;
+            askPhy = true;
             break;
 
         case PAL_ID_CFG_TXRX_CHANNEL:
@@ -911,22 +912,6 @@ uint8_t PAL_RF_SetConfiguration(uint16_t id, void *pValue, uint16_t length)
         case PAL_ID_PHY_SUN_FSK_SFD:
         case PAL_ID_PHY_FSK_SCRAMBLE_PSDU:
             /* Read only */
-            result = PAL_CFG_INVALID_INPUT;
-            break;
-
-        case PAL_ID_CONTINUOUS_TX_EN:
-        case PAL_ID_ZC_PERIOD:
-        case PAL_ID_HOST_VERSION:
-        case PAL_ID_CFG_MAX_TXRX_NUM_CHANNELS:
-        case PAL_ID_CFG_ATTENUATION:
-        case PAL_ID_CFG_TXRX_DOUBLE_CHANNEL_LIST:
-        case PAL_ID_PHY_SNIFFER_EN:
-        case PAL_ID_CFG_AUTODETECT_BRANCH:
-        case PAL_ID_CFG_IMPEDANCE:
-        case PAL_ID_CFG_TXRX_CHANNEL_LIST:
-        case PAL_ID_NETWORK_DETECTION:
-        case PAL_ID_REMAINING_FRAME_DURATION:
-            /* These values shouldn't be processed in pal_rf.c */
             result = PAL_CFG_INVALID_INPUT;
             break;
 

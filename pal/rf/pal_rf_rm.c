@@ -173,20 +173,6 @@ void PAL_RF_RM_GetRobustModulation(void *indObj, uint16_t *pBitRate,
             }
             break;
 
-        case 0:
-            if (pIndObj->rssiDBm >= PAL_RF_RM_THRESHOLD_FSK_FEC_OFF)
-            {
-                bestScheme = PAL_SCHEME_RF_FSK_FEC_OFF;
-            }
-            else if (pIndObj->rssiDBm >= PAL_RF_RM_THRESHOLD_FSK_FEC_ON)
-            {
-                bestScheme = PAL_SCHEME_RF_FSK_FEC_ON;
-            }
-            else{
-                /* No change needed */
-            }
-            break;
-
         default:
             if (pIndObj->rssiDBm >= PAL_RF_RM_THRESHOLD_FSK_FEC_OFF)
             {

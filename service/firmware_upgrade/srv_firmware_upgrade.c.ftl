@@ -527,8 +527,8 @@ void SRV_FU_Tasks(void)
         case SRV_FU_MEM_STATE_WRITE_WAIT_END:
         case SRV_FU_MEM_STATE_CMD_WAIT:
         case SRV_FU_MEM_UNINITIALIZED:
-    /* MISRA C-2012 deviation block start */
-    /* MISRA C-2012 Rule 16.4 deviated once. Deviation record ID - H3_MISRAC_2012_R_16_4_DR_1 */
+/* MISRA C-2012 deviation block start */
+/* MISRA C-2012 Rule 16.4 deviated once. Deviation record ID - H3_MISRAC_2012_R_16_4_DR_1 */
 <#if core.COVERITY_SUPPRESS_DEVIATION?? && core.COVERITY_SUPPRESS_DEVIATION>
     <#if core.COMPILER_CHOICE == "XC32">
     #pragma GCC diagnostic push
@@ -544,7 +544,7 @@ void SRV_FU_Tasks(void)
     #pragma GCC diagnostic pop
     </#if>
 </#if>
-    /* MISRA C-2012 deviation block end */
+/* MISRA C-2012 deviation block end */
 	}
 }
 
@@ -659,8 +659,8 @@ void SRV_FU_End(SRV_FU_RESULT fuResult)
     	case SRV_FU_RESULT_FW_CONFIRM:
             SRV_FU_ResultCallback(fuResult);
             break;
-    /* MISRA C-2012 deviation block start */
-    /* MISRA C-2012 Rule 16.4 deviated once. Deviation record ID - H3_MISRAC_2012_R_16_4_DR_1 */
+/* MISRA C-2012 deviation block start */
+/* MISRA C-2012 Rule 16.4 deviated once. Deviation record ID - H3_MISRAC_2012_R_16_4_DR_1 */
 <#if core.COVERITY_SUPPRESS_DEVIATION?? && core.COVERITY_SUPPRESS_DEVIATION>
     <#if core.COMPILER_CHOICE == "XC32">
     #pragma GCC diagnostic push
@@ -676,7 +676,7 @@ void SRV_FU_End(SRV_FU_RESULT fuResult)
     #pragma GCC diagnostic pop
     </#if>
 </#if>
-    /* MISRA C-2012 deviation block end */
+/* MISRA C-2012 deviation block end */
 	}
 }
 

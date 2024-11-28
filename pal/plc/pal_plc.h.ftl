@@ -71,7 +71,7 @@ void PAL_PLC_ProgramChannelSwitch(uint32_t timeSync, uint16_t pch, uint8_t timeM
 uint8_t PAL_PLC_GetSNR(uint8_t *pSnr, uint8_t qt);
 uint8_t PAL_PLC_GetZCT(uint32_t *pZcTime);
 uint8_t PAL_PLC_GetTimer(uint32_t *pTimer);
-uint8_t PAL_PLC_GetTimerExtended(uint64_t *pTimeExtended);
+uint8_t PAL_PLC_GetTimerExtended(uint64_t *pTimerExtended);
 uint8_t PAL_PLC_GetCD(uint8_t *pCD, uint8_t *pRSSI, uint32_t *pTime, uint8_t *pHeader);
 uint8_t PAL_PLC_GetNL(uint8_t *pNoise);
 uint8_t PAL_PLC_GetAGC(uint8_t *pMode, uint8_t *pGain);
@@ -86,6 +86,7 @@ uint8_t PAL_PLC_GetMsgDuration(uint16_t length, PAL_SCHEME scheme, PAL_FRAME fra
 <#if PRIME_PAL_PHY_SNIFFER == true>
 void PAL_PLC_USISnifferCallbackRegister(SRV_USI_HANDLE usiHandler, PAL_USI_SNIFFER_CB callback);
 </#if>
+
 
 #ifdef __cplusplus
 }

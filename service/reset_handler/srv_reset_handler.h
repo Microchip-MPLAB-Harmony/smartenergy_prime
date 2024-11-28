@@ -61,6 +61,17 @@ Microchip or any third party.
 #endif
 // DOM-IGNORE-END
 
+extern volatile uint32_t saved_r0;
+extern volatile uint32_t saved_r1;
+extern volatile uint32_t saved_r2;
+extern volatile uint32_t saved_r3;
+extern volatile uint32_t saved_r12;
+extern volatile uint32_t saved_lr;
+extern volatile uint32_t saved_pc;
+extern volatile uint32_t saved_psr;
+extern volatile uint32_t saved_hfsr;
+extern volatile uint32_t saved_cfsr;
+
 // *****************************************************************************
 // *****************************************************************************
 // Section: Data Types
@@ -93,17 +104,6 @@ typedef enum {
 	RESET_HANDLER_HARD_FAULT_RESET    = 9,      /* Hard fault */
 	RESET_HANDLER_VECTOR_FAULT_RESET  = 10,     /* Vector fault */
 } SRV_RESET_HANDLER_RESET_CAUSE;
-
-extern volatile uint32_t saved_r0;
-extern volatile uint32_t saved_r1;
-extern volatile uint32_t saved_r2;
-extern volatile uint32_t saved_r3;
-extern volatile uint32_t saved_r12;
-extern volatile uint32_t saved_lr;
-extern volatile uint32_t saved_pc;
-extern volatile uint32_t saved_psr;
-extern volatile uint32_t saved_hfsr;
-extern volatile uint32_t saved_cfsr;
 
 // *****************************************************************************
 // *****************************************************************************

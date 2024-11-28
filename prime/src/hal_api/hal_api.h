@@ -1169,7 +1169,7 @@ typedef struct {
     HAL_PAL_PROGRAM_CHANNEL_SWITCH hal_pal_program_channel_switch;
     HAL_PAL_GET_CONFIGURATION hal_pal_get_configuration;
     HAL_PAL_SET_CONFIGURATION hal_pal_set_configuration;
-    HAL_PAL_GET_SIGNAL_CAPTURE hal_pal_get_signal_capture ;
+    HAL_PAL_GET_SIGNAL_CAPTURE hal_pal_get_signal_capture;
     HAL_PAL_GET_MSG_DURATION hal_pal_get_msg_duration;
     HAL_PAL_CHECK_MINIMUM_QUALITY hal_pal_check_minimum_quality;
     HAL_PAL_GET_LESS_ROBUST_MODULATION hal_pal_get_less_robust_modulation;

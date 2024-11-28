@@ -2244,7 +2244,7 @@ uint8_t PRIME_HAL_WRP_PAL_GetTimerExtended(uint16_t pch, uint64_t *timer);
         uint16_t pch,
         uint8_t *cd,
         uint8_t *rssi,
-        uint32_t *time_prime,
+        uint32_t *timePrime,
         uint8_t *header)
 
   Summary:
@@ -2260,7 +2260,7 @@ uint8_t PRIME_HAL_WRP_PAL_GetTimerExtended(uint16_t pch, uint64_t *timer);
     pch             Physical channel
     cd              Carrier detect signal output parameter
     rssi            Received signal strength indicator
-    time_prime      Current time in us
+    timePrime      Current time in us
     header          Header type
 
   Returns:
@@ -2283,7 +2283,7 @@ uint8_t PRIME_HAL_WRP_PAL_GetTimerExtended(uint16_t pch, uint64_t *timer);
     Not available for both PHY Serial and PHY RF.
     Related to PRIME PAL.
 */
-uint8_t PRIME_HAL_WRP_PAL_GetCD(uint16_t pch, uint8_t *cd, uint8_t *rssi, uint32_t *time_prime, uint8_t *header);
+uint8_t PRIME_HAL_WRP_PAL_GetCD(uint16_t pch, uint8_t *cd, uint8_t *rssi, uint32_t *timePrime, uint8_t *header);
 
 // ****************************************************************************
 /* Function:
@@ -2460,7 +2460,7 @@ uint8_t PRIME_HAL_WRP_PAL_GetCCA(uint16_t pch, uint8_t *pState);
     <code>
     uint8_t result=PAL_CFG_SUCCESS;
     uint16_t pch=0;
-    uint16_t channelRef=1; Select a reference in PLC channels
+    uint16_t channelRef=1;
 
     result = PRIME_HAL_WRP_PAL_GetChannel(&pch, channelRef);
     </code>
@@ -2494,7 +2494,7 @@ uint8_t PRIME_HAL_WRP_PAL_GetChannel(uint16_t *pPch, uint16_t channelReference);
   Example:
     <code>
     uint8_t result=PAL_CFG_SUCCESS;
-    uint16_t pch=1; This mask belongs to PLC channels
+    uint16_t pch=1;
 
     result = PRIME_HAL_WRP_PAL_SetChannel(pch);
     </code>
@@ -2633,7 +2633,7 @@ uint8_t PRIME_HAL_WRP_PAL_SetConfiguration(uint16_t pch, uint16_t id, void *val,
     uint16_t PRIME_HAL_WRP_PAL_GetSignalCapture(
         uint16_t pch,
         uint8_t *noiseCapture,
-        uint8_t mode,
+        PAL_FRAME frameType,
         uint32_t timeStart,
         uint32_t duration)
 
@@ -2649,7 +2649,7 @@ uint8_t PRIME_HAL_WRP_PAL_SetConfiguration(uint16_t pch, uint16_t id, void *val,
   Parameters:
     pch             Physical channel
     noiseCapture    Pointer to destination buffer to store data
-    mode            Capture mode
+    frameType       Frame Type
     timeStart       Start time in us based on PL360 timer reference
     duration        Duration time in us
 
@@ -2662,17 +2662,17 @@ uint8_t PRIME_HAL_WRP_PAL_SetConfiguration(uint16_t pch, uint16_t id, void *val,
     uint32_t duration = 5000;
     uint8_t noiseCapture[300];
     uint16_t noiseSize;
-    uint8_t mode = PAL_MODE_TYPE_B;
+    PAL_FRAME frameType = PAL_MODE_TYPE_B;
     uint8_t pch = 1;
 
-    noiseSize = PRIME_HAL_WRP_PAL_GetSignalCapture(pch, &noiseCapture, mode, timeStart, duration);
+    noiseSize = PRIME_HAL_WRP_PAL_GetSignalCapture(pch, &noiseCapture, PAL_FRAME frameType, timeStart, duration);
     </code>
 
   Remarks:
     Only available for PHY PLC.
     Related to PRIME PAL.
 */
-uint16_t PRIME_HAL_WRP_PAL_GetSignalCapture(uint16_t pch, uint8_t *noiseCapture, uint8_t mode,
+uint16_t PRIME_HAL_WRP_PAL_GetSignalCapture(uint16_t pch, uint8_t *noiseCapture, PAL_FRAME,
                               uint32_t timeStart, uint32_t duration);
 // ****************************************************************************
 /* Function:
@@ -2696,8 +2696,7 @@ uint16_t PRIME_HAL_WRP_PAL_GetSignalCapture(uint16_t pch, uint8_t *noiseCapture,
     pch             Physical channel used
     msgLen          Message length
     scheme          Modulation scheme of message
-    mode            Indicates if the message to transmit is type A, type B or
-                    type BC
+    frameType       Indicates if the frame type A, type B or type BC
     duration        Pointer to message duration in us (output)
 
   Returns:
@@ -2710,10 +2709,10 @@ uint16_t PRIME_HAL_WRP_PAL_GetSignalCapture(uint16_t pch, uint8_t *noiseCapture,
     uint16_t pch = 16;
     uint16_t msgLen = 30;
     PAL_SCHEME scheme = PAL_PLC_DBPSK_R;
-    uint8_t mode = PAL_MODE_TYPE_B;
+    PAL_FRAME frameType = PAL_MODE_TYPE_B;
     uint8_t result=PAL_CFG_SUCCESS;
 
-    result = PRIME_HAL_WRP_PAL_GetMsgDuration(pch, msgLen, scheme, mode, &duration);
+    result = PRIME_HAL_WRP_PAL_GetMsgDuration(pch, msgLen, scheme, frameType, &duration);
     </code>
 
   Remarks:
@@ -2721,7 +2720,7 @@ uint16_t PRIME_HAL_WRP_PAL_GetSignalCapture(uint16_t pch, uint8_t *noiseCapture,
     Related to PRIME PAL.
 */
 uint8_t PRIME_HAL_WRP_PAL_GetMsgDuration(uint16_t pch, uint16_t length,
-    PAL_SCHEME scheme, uint8_t mode, uint32_t *duration);
+    PAL_SCHEME scheme, PAL_FRAME frameType, uint32_t *duration);
 
 // ****************************************************************************
 /* Function:
