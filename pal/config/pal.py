@@ -297,6 +297,13 @@ def instantiateComponent(primePalComponent):
     primePalHdrLocalFile.setProjectPath("config/" + configName + "/stack/pal")
     primePalHdrLocalFile.setType("SOURCE")
     primePalHdrLocalFile.setMarkup(True)
+    
+    primePalTypesFile = primePalComponent.createFileSymbol("PRIME_PAL_TYPES", None)
+    primePalTypesFile.setSourcePath("pal/pal_types.h")
+    primePalTypesFile.setOutputName("pal_types.h")
+    primePalTypesFile.setDestPath("stack/pal")
+    primePalTypesFile.setProjectPath("config/" + configName + "/stack/pal")
+    primePalTypesFile.setType("HEADER")
 
     ##### PRIME PAL PLC
     global primePalPlcSrcFile
@@ -421,14 +428,6 @@ def instantiateComponent(primePalComponent):
     primePalSerialLocalHdrFile.setType("SOURCE")
     primePalSerialLocalHdrFile.setEnabled(False)
     primePalSerialLocalHdrFile.setMarkup(True)
-
-    primePalTypesFile = primePalComponent.createFileSymbol("PRIME_PAL_TYPES", None)
-    primePalTypesFile.setSourcePath("pal/pal_types.h")
-    primePalTypesFile.setOutputName("pal_types.h")
-    primePalTypesFile.setDestPath("stack/pal")
-    primePalTypesFile.setProjectPath("config/" + configName + "/stack/pal")
-    primePalTypesFile.setType("HEADER")
-
     
 #### FreeMaker System Files ######################################################
 

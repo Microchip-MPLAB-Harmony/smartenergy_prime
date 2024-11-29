@@ -1,4 +1,4 @@
-<#if (PRIME_MODE == "BN") || (PRIME_MODE == "SN" && PRIME_PROJECT == "application project")>
+<#if (PRIME_MODE == "BN") || (PRIME_MODE == "SN" && PRIME_PROJECT != "bin project")>
 #include "stack/prime/prime_stack.h"
 </#if>
 
@@ -7,17 +7,17 @@
 #include "stack/prime/prime_api/prime_api.h"
 #include "stack/prime/prime_api/prime_api_defs.h"
 #include "stack/prime/prime_api/prime_api_types.h"
-<#if (PRIME_MODE == "BN") || (PRIME_MODE == "SN" && PRIME_PROJECT == "bin project")>
+<#if (PRIME_MODE == "BN") || (PRIME_MODE == "SN" && PRIME_PROJECT != "application project")>
 #include "stack/prime/prime_api/prime_hal_wrapper.h"
 </#if>
 
-<#if (PRIME_MODE == "BN") || (PRIME_MODE == "SN" && PRIME_PROJECT == "bin project")>
+<#if (PRIME_MODE == "BN") || (PRIME_MODE == "SN" && PRIME_PROJECT != "application project")>
 #include "stack/prime/mac/mac.h"
 </#if>
 #include "stack/prime/mac/mac_defs.h"
 #include "stack/prime/mac/mac_pib.h"
 
-<#if (PRIME_MODE == "BN") || (PRIME_MODE == "SN" && PRIME_PROJECT == "bin project")>
+<#if (PRIME_MODE == "BN") || (PRIME_MODE == "SN" && PRIME_PROJECT != "application project")>
 #include "stack/prime/mngp/mngp.h"
 </#if>
 <#if PRIME_MODE == "BN" && BN_SLAVE_EN == false>
@@ -31,7 +31,7 @@
 #include "stack/prime/conv/sscs/iec_4_32/cl_432.h"
 #include "stack/prime/conv/sscs/iec_4_32/cl_432_api.h"
 </#if>
-<#if PRIME_MODE == "SN" && PRIME_PROJECT == "bin project">
+<#if PRIME_MODE == "SN" && PRIME_PROJECT != "application project">
 #include "stack/prime/conv/sscs/null/cl_null.h"
 #include "stack/prime/conv/sscs/iec_4_32/cl_432.h"
 </#if>

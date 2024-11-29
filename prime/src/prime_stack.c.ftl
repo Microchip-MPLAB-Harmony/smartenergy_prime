@@ -95,7 +95,7 @@ SYS_MODULE_OBJ PRIME_Initialize(const SYS_MODULE_INDEX index,
     primeApiInit.mngPlaneUsiPort = primeInit->mngPlaneUsiPort;
     primeApiInit.halApi = (HAL_API *)&primeHalAPI;
     
-<#if PRIME_MODE == "BN">
+<#if PRIME_MODE == "BN" || (PRIME_MODE == "SN" && PRIME_PROJECT == "monolithic project")>
     /* Get PRIME API pointer */
     PRIME_API_GetPrimeAPI(&primeObj.primeApi);
 </#if>

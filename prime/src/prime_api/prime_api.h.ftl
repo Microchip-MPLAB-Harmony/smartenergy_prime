@@ -233,7 +233,7 @@ void PRIME_API_Tasks(void);
 SYS_STATUS PRIME_API_Status(void);
 </#if>
 
-<#if PRIME_MODE == "BN">
+<#if PRIME_MODE == "BN" || (PRIME_MODE == "SN" && PRIME_PROJECT == "monolithic project")>
 void PRIME_API_GetPrimeAPI(PRIME_API **pPrimeApi);
 </#if>
 

@@ -71,8 +71,6 @@ global pClNullApiHeaderFile
 global pCl432HeaderFile
 global pCl432ApiHeaderFile
 global pHalApiSourceFile
-global pPalTypesFile
-global pPalHeaderFile
 global pPrimeHeaderFile
 global pPrimeSourceFile
 global pPrimeLocalHeaderFile
@@ -122,12 +120,12 @@ def setFwStackLinkerParams(primeMode, primeProject, primeVersion):
     if (primeMode == "SN"):
         # Service Node
         if (primeProject == "application project"):
-            # Service Node App
+            # SN - Application project
             ramOrigin = ramStartAddressHex
             ramLength = hex(int(ramSizeHex, 0) - int(PRIME_FW_STACK_RAM_SIZE, 0))
             romLength = PRIME_USER_APP_SIZE_HEX
-        else:
-            # FW Stack App
+        elif (primeProject == "bin project"):
+            # SN - Bin project
             ramOrigin = hex(int(ramStartAddressHex, 0) + int(ramSizeHex, 0) - int(PRIME_FW_STACK_RAM_SIZE, 0))
             ramLength = PRIME_FW_STACK_RAM_SIZE
             if (primeVersion == "1.4"):
@@ -136,6 +134,10 @@ def setFwStackLinkerParams(primeMode, primeProject, primeVersion):
                 romLength = PRIME_FW_STACK_13_SIZE_HEX
             
             rom_length  = "ROM_LENGTH=" + romLength
+        else:
+            # SN: Monolithic project
+            ramOrigin = ramStartAddressHex
+            ramLength = ramSizeHex
     else:
         # Base Node App
         ramOrigin = ramStartAddressHex
@@ -144,7 +146,7 @@ def setFwStackLinkerParams(primeMode, primeProject, primeVersion):
     ram_origin  = "RAM_ORIGIN=" + ramOrigin
     ram_length  = "RAM_LENGTH=" + ramLength
 
-    if (primeMode == "SN"):
+    if ((primeMode == "SN") and (primeProject != "monolithic project")):
         ramParams = (ram_origin + ";" + ram_length + ";" + rom_length)
     else:
         ramParams = (ram_origin + ";" + ram_length)
@@ -155,7 +157,8 @@ def createGroupServices():
     primeServicesGroup = Database.findGroup("PRIME SERVICES")
     if (primeServicesGroup == None):
         primeServicesGroup = Database.createGroup("PRIME STACK", "PRIME SERVICES")
-        primeServices = ["srvRandom", "srvQueue", "srvLogReport", "srv_pcrc", "srvSecurity", "primeStorage", "primeUserPib", "primeResetHandler", "primeTimeManagement"]
+        # TBD security service: primeServices = ["srvRandom", "srvQueue", "srvLogReport", "srv_pcrc", "srvSecurity", "primeStorage", "primeUserPib", "primeResetHandler", "primeTimeManagement"]
+        primeServices = ["srvRandom", "srvQueue", "srvLogReport", "srv_pcrc", "primeStorage", "primeUserPib", "primeResetHandler", "primeTimeManagement"]
         for component in primeServices:
             primeServicesGroup.addComponent(component)
         Database.activateComponents(primeServices, "PRIME SERVICES")
@@ -185,8 +188,6 @@ def primeAddBnFiles():
     pCl432HeaderFile.setEnabled(True)
     pCl432ApiHeaderFile.setEnabled(True)
     pHalApiSourceFile.setEnabled(True)
-    pPalTypesFile.setEnabled(False)
-    pPalHeaderFile.setEnabled(False)
 
     # No libraries by default
     pPrime13BnLibFile.setEnabled(False)
@@ -239,8 +240,6 @@ def primeAddSnFiles():
         pCl432HeaderFile.setEnabled(True)
         pCl432ApiHeaderFile.setEnabled(True)
         pHalApiSourceFile.setEnabled(False)
-        pPalTypesFile.setEnabled(True)
-        pPalHeaderFile.setEnabled(True)
 
         # SN library
         if (primeConfigVersion.getValue() == "1.3.6"):
@@ -250,28 +249,43 @@ def primeAddSnFiles():
         else:
             # Unknown option: no library by default
             pass
-    elif (primeConfigProject.getValue() == "application project"):
+    else:
         # SN API files in application
         pPrimeHeaderFile.setEnabled(True)
         pPrimeSourceFile.setEnabled(True)
         pPrimeLocalHeaderFile.setEnabled(True)
-        pPrimeHalWrapperHeaderFile.setEnabled(False)
-        pPrimeHalWrapperSourceFile.setEnabled(False)
-        pMacHeaderFile.setEnabled(False)
-        pMngpHeaderFile.setEnabled(False)
-        pClNullHeaderFile.setEnabled(False)
-        pClNullApiHeaderFile.setEnabled(False)
-        pCl432HeaderFile.setEnabled(False)
-        pCl432ApiHeaderFile.setEnabled(False)
         pHalApiSourceFile.setEnabled(True)
-        pPalTypesFile.setEnabled(False)
-        pPalHeaderFile.setEnabled(False)
 
-        # No library in SN application
-        pass
-    else:
-        # Unknown option: no library by default
-        pass
+        if (primeConfigProject.getValue() == "monolithic project"):
+            # SN API files in monolithic application
+            pPrimeHalWrapperHeaderFile.setEnabled(True)
+            pPrimeHalWrapperSourceFile.setEnabled(True)
+            pMacHeaderFile.setEnabled(True)
+            pMngpHeaderFile.setEnabled(True)
+            pClNullHeaderFile.setEnabled(True)
+            pClNullApiHeaderFile.setEnabled(True)
+            pCl432HeaderFile.setEnabled(True)
+            pCl432ApiHeaderFile.setEnabled(True)
+        
+            # SN library
+            if (primeConfigVersion.getValue() == "1.3.6"):
+                pPrime13SnLibFile.setEnabled(True)
+            elif (primeConfigVersion.getValue() == "1.4"):
+                pPrime14SnLibFile.setEnabled(True)
+            else:
+                # Unknown option: no library by default
+                pass
+        else:
+            # SN API files in separated application
+            pPrimeHalWrapperHeaderFile.setEnabled(False)
+            pPrimeHalWrapperSourceFile.setEnabled(False)
+            pMacHeaderFile.setEnabled(False)
+            pMngpHeaderFile.setEnabled(False)
+            pClNullHeaderFile.setEnabled(False)
+            pClNullApiHeaderFile.setEnabled(False)
+            pCl432HeaderFile.setEnabled(False)
+            pCl432ApiHeaderFile.setEnabled(False)
+            # No library in SN separated application
 
 def primeUpdateFiles(primeStackComponent):
     addPALFUComponents = False
@@ -279,7 +293,7 @@ def primeUpdateFiles(primeStackComponent):
     if (primeConfigMode.getValue() == "SN"):
         # Add files for SN
         primeAddSnFiles()
-        if (primeConfigProject.getValue() == "application project"):
+        if (primeConfigProject.getValue() != "bin project"):
             addPALFUComponents = True
 
     elif (primeConfigMode.getValue() == "BN"):
@@ -361,9 +375,9 @@ def primeShowSNAppConfiguration(primeVersion):
         primeConfigFWVersion.setValue("S13.01.01")
 
 def primeShowSNBinConfiguration(primeVersion):
-    # Valid options
-    primeConfigProject.setVisible(True)
+    # Valid options    
     primeConfigMode.setVisible(True)
+    primeConfigProject.setVisible(True)
     primeConfigVersion.setVisible(True)
     primeConfigFWVendor.setVisible(True)
     primeConfigFWModel.setVisible(True)
@@ -410,6 +424,55 @@ def primeShowSNBinConfiguration(primeVersion):
         primeConfigSecProfile.setReadOnly(True)
         primeConfigFWVersion.setValue("S13.01.01")
 
+def primeShowSNMonoConfiguration (primeVersion):
+    # Valid options
+    primeConfigMode.setVisible(True)
+    primeConfigProject.setVisible(True)
+    primeConfigVersion.setVisible(True)
+    primeConfigFWVendor.setVisible(True)
+    primeConfigFWModel.setVisible(True)
+    primeConfigFWVersion.setVisible(True)
+    primeConfigPIBVendor.setVisible(True)
+    primeConfigPIBModel.setVisible(True)
+    primeMacConfig.setVisible(True)
+    primeMngpConfig.setVisible(True)
+    primeConfigMngpSprof.setVisible(True)
+    primeConfigSprofUsiPort.setVisible(True)
+    primeConfigSecProfile.setVisible(True)
+    primeFUComment.setVisible(True)
+
+    primeSNAppAddress.setVisible(False)
+    primeSNPHYAddress.setVisible(False)
+    primeSNPFWStack14Address.setVisible(False)
+    primeSNPFWStack13Address.setVisible(False)
+    
+    primeSNAppSize.setVisible(False)
+    primeSNPHYSize.setVisible(False)
+    primeSNPFWStack14Size.setVisible(False)
+    primeSNPFWStack13Size.setVisible(False)
+    primeSNFWMetadataSize.setVisible(False)
+
+    primeSNAppMetaData.setVisible(False)
+    primeSNPHYMetaData.setVisible(False)
+    primeSNFWStack14MetaData.setVisible(False)
+    primeSNFWStack13MetaData.setVisible(False)
+
+    # Hide SN Application options
+    primeConfigComment.setVisible(False)
+    primeConfigBnSlaveEn.setVisible(False)
+    primeConfigBnSlaveEn.setValue(False)
+    primeConfigMaxNumNodes.setVisible(False)
+
+    if (primeVersion == "1.4"):
+        # SN - v1.4
+        primeConfigSecProfile.setReadOnly(False)
+        primeConfigFWVersion.setValue("HS14.01.01")
+    else:
+        # SN - v1.3.6
+        primeConfigSecProfile.setValue(0)
+        primeConfigSecProfile.setReadOnly(True)
+        primeConfigFWVersion.setValue("S13.01.01")
+
 def primeShowBNConfiguration(primeVersion):
     # Valid options
     primeConfigMode.setVisible(True)
@@ -430,18 +493,15 @@ def primeShowBNConfiguration(primeVersion):
     # Hide BN options
     primeConfigProject.setVisible(False)
     primeConfigComment.setVisible(False)
-
     primeSNAppAddress.setVisible(False)
     primeSNPHYAddress.setVisible(False)
     primeSNPFWStack14Address.setVisible(False)
     primeSNPFWStack13Address.setVisible(False)
-
     primeSNAppSize.setVisible(False)
     primeSNPHYSize.setVisible(False)
     primeSNPFWStack14Size.setVisible(False)
     primeSNPFWStack13Size.setVisible(False)
     primeSNFWMetadataSize.setVisible(False)
-
     primeSNAppMetaData.setVisible(False)
     primeSNFWStack14MetaData.setVisible(False)
     primeSNPHYMetaData.setVisible(False)
@@ -478,7 +538,7 @@ def primeUpdateConfiguration(symbol, event):
             Database.sendMessage("drvPlcPhy", "SET_STATIC_ADDRESSING", {"enable":True, "address":phyStartAddress, "size":phySize})
             # Set FU region
             Database.sendMessage("primeFirmwareUpgrade", "CONF_FU_PRIME", {"Node": "SN"})
-        else:
+        elif (primeProject == "bin project"):
             # SN - Bin project
             primeShowSNBinConfiguration(primeVersion)
             # Start address
@@ -486,6 +546,16 @@ def primeUpdateConfiguration(symbol, event):
                 startAddress = primeSNPFWStack14Address.getValue()
             else:
                 startAddress = primeSNPFWStack13Address.getValue()
+        else:
+            # Monolithic application
+            primeShowSNMonoConfiguration(primeVersion)
+            # Start address
+            memStartAddressHex, memSizeHex = getFlashMemoryDescription()
+            startAddress = memStartAddressHex
+            # Disable PLC Phy driver static addressing
+            Database.sendMessage("drvPlcPhy", "SET_STATIC_ADDRESSING", {"enable":False, "address":0, "size":0})
+            # Set FU region (like a BN)
+            Database.sendMessage("primeFirmwareUpgrade", "CONF_FU_PRIME", {"Node": "BN"})
     else:
         # Base Node
         primeShowBNConfiguration(primeVersion)
@@ -543,13 +613,14 @@ def instantiateComponent(primeStackConfigComponent):
     
     # Select type of project
     global primeConfigProject
-    primeProjectOptions = ["application project", "bin project"]
+    primeProjectOptions = ["application project", "bin project", "monolithic project"]
     primeConfigProject = primeStackConfigComponent.createComboSymbol("PRIME_PROJECT", primeStackConfig, primeProjectOptions)
     primeConfigProject.setLabel("Type of PRIME project for separated applications")
-    primeConfigProject.setDescription("Select the type of PRIME project for separated applications")
+    primeConfigProject.setDescription("Select the type of PRIME project: separated applications or monolithic")
     primeConfigProject.setVisible(True)
     primeConfigProject.setDefaultValue("application project")
 
+    # FU addresses, sizes and metadata
     memStartAddressHex, memSizeHex = getFlashMemoryDescription()
 
     global primeSNAppAddress
@@ -646,7 +717,6 @@ def instantiateComponent(primeStackConfigComponent):
     primeSNFWMetadataSize.setDescription("Metadata size in bytes")
     primeSNFWMetadataSize.setVisible(True)
     primeSNFWMetadataSize.setDefaultValue(PRIME_METADATA_SIZE)
-
 
     # The FW Image address is configured by PRIME FU Service
     global primeFUComment
@@ -1031,24 +1101,6 @@ def instantiateComponent(primeStackConfigComponent):
     pHalApiSourceFile.setProjectPath("config/" + configName + "/stack/prime/hal_api")
     pHalApiSourceFile.setType("SOURCE")
     pHalApiSourceFile.setEnabled(True)
-
-    global pPalTypesFile
-    pPalTypesFile = primeStackConfigComponent.createFileSymbol("PAL_TYPES", None)
-    pPalTypesFile.setSourcePath("pal/pal_types.h")
-    pPalTypesFile.setOutputName("pal_types.h")
-    pPalTypesFile.setDestPath("stack/pal")
-    pPalTypesFile.setProjectPath("config/" + configName + "/stack/pal")
-    pPalTypesFile.setType("HEADER")
-    pPalTypesFile.setEnabled(False)
-
-    global pPalHeaderFile
-    pPalHeaderFile = primeStackConfigComponent.createFileSymbol("PAL_HEADER", None)
-    pPalHeaderFile.setSourcePath("pal/pal.h")
-    pPalHeaderFile.setOutputName("pal.h")
-    pPalHeaderFile.setDestPath("stack/pal")
-    pPalHeaderFile.setProjectPath("config/" + configName + "/stack/pal")
-    pPalHeaderFile.setType("HEADER")
-    pPalHeaderFile.setEnabled(False)
 
     ##### PRIME LIBRARIES
     global pPrime13BnLibFile

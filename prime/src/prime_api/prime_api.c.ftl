@@ -342,7 +342,7 @@ SYS_STATUS PRIME_API_Status(void)
     return status;
 }
 
-  <#if PRIME_MODE == "BN">
+  <#if PRIME_MODE == "BN" || (PRIME_MODE == "SN" && PRIME_PROJECT == "monolithic project")>
 void PRIME_API_GetPrimeAPI(PRIME_API **pPrimeApi)
 {
     *pPrimeApi = (PRIME_API *)&PRIME_API_Interface;
