@@ -157,8 +157,7 @@ def createGroupServices():
     primeServicesGroup = Database.findGroup("PRIME SERVICES")
     if (primeServicesGroup == None):
         primeServicesGroup = Database.createGroup("PRIME STACK", "PRIME SERVICES")
-        # TBD security service: primeServices = ["srvRandom", "srvQueue", "srvLogReport", "srv_pcrc", "srvSecurity", "primeStorage", "primeUserPib", "primeResetHandler", "primeTimeManagement"]
-        primeServices = ["srvRandom", "srvQueue", "srvLogReport", "srv_pcrc", "primeStorage", "primeUserPib", "primeResetHandler", "primeTimeManagement"]
+        primeServices = ["srvRandom", "srvQueue", "srvLogReport", "srv_pcrc", "srvSecurity", "primeStorage", "primeUserPib", "primeResetHandler", "primeTimeManagement"]
         for component in primeServices:
             primeServicesGroup.addComponent(component)
         Database.activateComponents(primeServices, "PRIME SERVICES")
