@@ -15,4 +15,4 @@ package:
       version: "v3.14.0"
     - name: "crypto"
       type: "package"
-      version: "v4.0.0-E1"
+      version: "v4.0.0-E3"
