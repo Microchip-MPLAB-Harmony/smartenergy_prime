@@ -47,10 +47,17 @@ def instantiateComponent(primeFirmwareUpgradeComponent):
     primeFUMemInstance.setVisible(False)
     primeFUMemInstance.setHelp(prime_fu_helpkeyword)
 
-    global primeFUMemCommentAddress
     primeFUMemCommentAddress = primeFirmwareUpgradeComponent.createCommentSymbol("PRIME_FU_MEM_COMMENT_ADDRESS", None)
     primeFUMemCommentAddress.setLabel("*** PRIME FU start address must be configured in the memory ***")
     primeFUMemCommentAddress.setVisible(True)
+
+    primeFUMemSNCommentAddress = primeFirmwareUpgradeComponent.createCommentSymbol("PRIME_FU_MEM_SN_COMMENT_ADDRESS", primeFUMemCommentAddress)
+    primeFUMemSNCommentAddress.setLabel("Service Node: PIC32CX MT start address suggested in SEFC0: 0x1050000")
+    primeFUMemSNCommentAddress.setVisible(True)
+
+    primeFUMemBNCommentAddress = primeFirmwareUpgradeComponent.createCommentSymbol("PRIME_FU_MEM_BN_COMMENT_ADDRESS", primeFUMemCommentAddress)
+    primeFUMemBNCommentAddress.setLabel("Base Node: PIC32CX MT start address suggested in SEFC0: 0x1090000")
+    primeFUMemBNCommentAddress.setVisible(True)
 
     global primeFUMemSize
     primeFUMemSize = primeFirmwareUpgradeComponent.createStringSymbol("PRIME_FU_MEM_SIZE", None)
@@ -60,7 +67,6 @@ def instantiateComponent(primeFirmwareUpgradeComponent):
     primeFUMemSize.setDescription("Hexadecimal value in bytes of the Firmware upgrade region")
     primeFUMemSize.setHelp(prime_fu_helpkeyword)
 
-    global primeFUMemCommentSize
     primeFUMemCommentSize = primeFirmwareUpgradeComponent.createCommentSymbol("PRIME_FU_MEM_COMMENT_SIZE", None)
     primeFUMemCommentSize.setLabel("*** PRIME FU size must be equal to the size of the memory ***")
     primeFUMemCommentSize.setVisible(True)
