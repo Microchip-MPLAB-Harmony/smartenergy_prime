@@ -56,7 +56,7 @@ def instantiateComponent(primeFirmwareUpgradeComponent):
     primeFUMemSNCommentAddress.setVisible(True)
 
     primeFUMemBNCommentAddress = primeFirmwareUpgradeComponent.createCommentSymbol("PRIME_FU_MEM_BN_COMMENT_ADDRESS", primeFUMemCommentAddress)
-    primeFUMemBNCommentAddress.setLabel("Base Node: PIC32CX MT start address suggested in SEFC0: 0x1090000")
+    primeFUMemBNCommentAddress.setLabel("Base Node: PIC32CX MT start address suggested in SEFC0: 0x10A0000")
     primeFUMemBNCommentAddress.setVisible(True)
 
     global primeFUMemSize
