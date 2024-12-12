@@ -25,9 +25,7 @@ PRIME_FU_BUFFER_WRITE_SIZE = 0x100
 PRIME_FU_BUFFER_READ_SIZE = 0x100
 
 PRIME_FU_MAX_SIZE_SN = "0x40000"
-PRIME_FU_OFFSET_SN = "0x50000"
 PRIME_FU_MAX_SIZE_BN = "0x60000"
-PRIME_FU_OFFSET_BN = "0x40000"
 
 prime_fu_helpkeyword = "prime_fu_configuration"
 
@@ -39,23 +37,20 @@ def instantiateComponent(primeFirmwareUpgradeComponent):
     primeFUMemDrv = primeFirmwareUpgradeComponent.createStringSymbol("PRIME_FU_MEM_DRV", None)
     primeFUMemDrv.setLabel("Driver Type")
     primeFUMemDrv.setDefaultValue("")
-    primeFUMemDrv.setVisible(True)
+    primeFUMemDrv.setVisible(False)
     primeFUMemDrv.setReadOnly(True)
     primeFUMemDrv.setHelp(prime_fu_helpkeyword)
     
     primeFUMemInstance = primeFirmwareUpgradeComponent.createIntegerSymbol("PRIME_FU_MEM_INSTANCE", None)
     primeFUMemInstance.setLabel("Memory Instance")
     primeFUMemDrv.setReadOnly(True)
-    primeFUMemInstance.setVisible(True)
+    primeFUMemInstance.setVisible(False)
     primeFUMemInstance.setHelp(prime_fu_helpkeyword)
 
-    global primeFUMemOffset
-    primeFUMemOffset = primeFirmwareUpgradeComponent.createStringSymbol("PRIME_FU_MEM_OFFSET", None)
-    primeFUMemOffset.setLabel("Firmware Upgrade Region Offset")
-    primeFUMemOffset.setVisible(True)
-    primeFUMemOffset.setEnabled(True)
-    primeFUMemOffset.setDescription("Offset from the beginning of the chosen memory of the Firmware upgrade region")
-    primeFUMemOffset.setHelp(prime_fu_helpkeyword)
+    global primeFUMemCommentAddress
+    primeFUMemCommentAddress = primeFirmwareUpgradeComponent.createCommentSymbol("PRIME_FU_MEM_COMMENT_ADDRESS", None)
+    primeFUMemCommentAddress.setLabel("*** PRIME FU start address must be configured in the memory ***")
+    primeFUMemCommentAddress.setVisible(True)
 
     global primeFUMemSize
     primeFUMemSize = primeFirmwareUpgradeComponent.createStringSymbol("PRIME_FU_MEM_SIZE", None)
@@ -65,18 +60,20 @@ def instantiateComponent(primeFirmwareUpgradeComponent):
     primeFUMemSize.setDescription("Hexadecimal value in bytes of the Firmware upgrade region")
     primeFUMemSize.setHelp(prime_fu_helpkeyword)
 
+    global primeFUMemCommentSize
+    primeFUMemCommentSize = primeFirmwareUpgradeComponent.createCommentSymbol("PRIME_FU_MEM_COMMENT_SIZE", None)
+    primeFUMemCommentSize.setLabel("*** PRIME FU size must be equal to the size of the memory ***")
+    primeFUMemCommentSize.setVisible(True)
+
     # Get default values for FU regions
     if Database.getComponentByID("prime_config") != None:
         prime_mode = Database.getSymbolValue("prime_config", "PRIME_MODE")
         if prime_mode == "BN":
             primeFUMemSize.setDefaultValue(PRIME_FU_MAX_SIZE_BN)
-            primeFUMemOffset.setDefaultValue(PRIME_FU_OFFSET_BN)
         elif Database.getSymbolValue("prime_config", "PRIME_PROJECT") == "application project":
             primeFUMemSize.setDefaultValue(PRIME_FU_MAX_SIZE_SN)
-            primeFUMemOffset.setDefaultValue(PRIME_FU_OFFSET_SN)
     else:
         primeFUMemSize.setDefaultValue(PRIME_FU_MAX_SIZE_SN)
-        primeFUMemOffset.setDefaultValue(PRIME_FU_OFFSET_SN)
 
     primeFUBufferWriteSize = primeFirmwareUpgradeComponent.createIntegerSymbol("PRIME_FU_BUFFER_WRITE_SIZE", None)
     primeFUBufferWriteSize.setLabel("Buffer to write in flash")
@@ -196,10 +193,8 @@ def handleMessage(messageID, args):
         prime_mode = args["Node"]
         if prime_mode == "BN":
             primeFUMemSize.setValue(PRIME_FU_MAX_SIZE_BN)
-            primeFUMemOffset.setValue(PRIME_FU_OFFSET_BN)
         elif prime_mode == "SN":
             primeFUMemSize.setValue(PRIME_FU_MAX_SIZE_SN)
-            primeFUMemOffset.setValue(PRIME_FU_OFFSET_SN)
         
     elif (messageID == "SET_SYMBOL"):
         print("handleMessage: Set Symbol in PRIME Stack")
