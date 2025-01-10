@@ -76,7 +76,7 @@ global pPrimeSourceFile
 global pPrimeLocalHeaderFile
 
 # Libraries
-global pPrime13BnLibFile
+global pPrime13BnMLibFile
 global pPrime13SnLibFile
 global pPrime14BnMLibFile
 global pPrime14SnLibFile
@@ -190,7 +190,7 @@ def primeAddBnFiles():
     pHalApiSourceFile.setEnabled(True)
 
     # No libraries by default
-    pPrime13BnLibFile.setEnabled(False)
+    pPrime13BnMLibFile.setEnabled(False)
     pPrime13SnLibFile.setEnabled(False)
     pPrime14BnMLibFile.setEnabled(False)
     pPrime14SnLibFile.setEnabled(False)
@@ -204,7 +204,7 @@ def primeAddBnFiles():
             pBmngApiHeaderFile.setEnabled(False)
             pBmngDefsHeaderFile.setEnabled(False)
         else:
-            pPrime13BnLibFile.setEnabled(True)
+            pPrime13BnMLibFile.setEnabled(True)
     elif (primeConfigVersion.getValue() == "1.4"):
         if ("PIC32CX" in processor) and ("MT" in processor):
             pPrime14BnMLibFile.setEnabled(True)
@@ -221,7 +221,7 @@ def primeAddSnFiles():
     pBmngDefsHeaderFile.setEnabled(False)
 
     # No libraries by default
-    pPrime13BnLibFile.setEnabled(False)
+    pPrime13BnMLibFile.setEnabled(False)
     pPrime13SnLibFile.setEnabled(False)
     pPrime14BnMLibFile.setEnabled(False)
     pPrime14SnLibFile.setEnabled(False)
@@ -1103,12 +1103,12 @@ def instantiateComponent(primeStackConfigComponent):
     pHalApiSourceFile.setEnabled(True)
 
     ##### PRIME LIBRARIES
-    global pPrime13BnLibFile
-    pPrime13BnLibFile = primeStackConfigComponent.createLibrarySymbol("PRIME_1_3_BN_LIBRARY", None)
-    pPrime13BnLibFile.setSourcePath("prime/libs/prime13_lib_bn.a")
-    pPrime13BnLibFile.setOutputName("prime13_lib_bn.a")
-    pPrime13BnLibFile.setDestPath("stack/prime/libs")
-    pPrime13BnLibFile.setEnabled(False)
+    global pPrime13BnMLibFile
+    pPrime13BnMLibFile = primeStackConfigComponent.createLibrarySymbol("PRIME_1_3_BN_M_LIBRARY", None)
+    pPrime13BnMLibFile.setSourcePath("prime/libs/prime13_lib_bn_m.a")
+    pPrime13BnMLibFile.setOutputName("prime13_lib_bn_m.a")
+    pPrime13BnMLibFile.setDestPath("stack/prime/libs")
+    pPrime13BnMLibFile.setEnabled(False)
 
     global pPrime13SnLibFile
     pPrime13SnLibFile = primeStackConfigComponent.createLibrarySymbol("PRIME_1_3_SN_LIBRARY", None)
