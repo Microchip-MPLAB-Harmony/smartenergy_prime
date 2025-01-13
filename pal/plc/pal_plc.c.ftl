@@ -140,7 +140,7 @@ const PAL_INTERFACE PAL_PLC_Interface =
 // *****************************************************************************
 extern DRV_PLC_PHY_INIT drvPlcPhyInitData;
 
-static uint32_t timePlc = 0;
+static uint32_t timePlcSync = 0;
 
 static PAL_PLC_DATA palPlcData = {0};
 
@@ -299,11 +299,11 @@ __STATIC_INLINE void lPAL_PLC_TimerSyncUpdate(void)
     uint64_t delayAux;
 
     /* Get current Host and PLC timers */
-    timeHost = lPAL_PLC_TimerSyncRead(&timePlc);
+    timeHost = lPAL_PLC_TimerSyncRead(&timePlcSync);
 
     /* Compute delays from references (last read) */
     delayHost = timeHost - palPlcData.timeRefHost;
-    delayPlc = timePlc - palPlcData.timeRefPlc;
+    delayPlc = timePlcSync - palPlcData.timeRefPlc;
 
     /* Compute relative frequency F_host/F_plc [uQ1.24] */
     delayAux = DIV_ROUND((uint64_t)delayHost << 24, (uint64_t)(delayPlc));
@@ -315,7 +315,7 @@ __STATIC_INLINE void lPAL_PLC_TimerSyncUpdate(void)
         /* Update relative frequency and references */
         palPlcData.syncTimerRelFreq = syncTimerRelFreq;
         palPlcData.timeRefHost = timeHost;
-        palPlcData.timeRefPlc = timePlc;
+        palPlcData.timeRefPlc = timePlcSync;
 
         switch (palPlcData.syncDelay)
         {
