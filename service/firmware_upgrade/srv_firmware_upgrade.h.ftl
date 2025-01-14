@@ -458,6 +458,8 @@ void SRV_FU_RegisterCallbackFuResult(SRV_FU_RESULT_CB callback);
 */
 void SRV_FU_End(SRV_FU_RESULT fuResult);
 
+<#if (prime_config)??>
+<#if ((prime_config.PRIME_MODE == "SN") && (prime_config.PRIME_PROJECT == "application project"))>
 // ****************************************************************************
 /* Function:
    bool SRV_FU_SwapFirmware(void)
@@ -491,6 +493,8 @@ void SRV_FU_End(SRV_FU_RESULT fuResult);
     This function is called by the application.
 */
 bool SRV_FU_SwapFirmware(void);
+</#if>
+</#if>
 
 // ****************************************************************************
 /* Function:

@@ -114,12 +114,12 @@ def instantiateComponent(primeFirmwareUpgradeComponent):
     srvFUSourceFile.setEnabled(True)
 
     srvFUHeaderFile = primeFirmwareUpgradeComponent.createFileSymbol("SRV_FU_HEADER", None)
-    srvFUHeaderFile.setSourcePath("service/firmware_upgrade/srv_firmware_upgrade.h")
+    srvFUHeaderFile.setSourcePath("service/firmware_upgrade/srv_firmware_upgrade.h.ftl")
     srvFUHeaderFile.setOutputName("srv_firmware_upgrade.h")
     srvFUHeaderFile.setDestPath("service/firmware_upgrade")
     srvFUHeaderFile.setProjectPath("config/" + configName + "/service/firmware_upgrade/")
     srvFUHeaderFile.setType("HEADER")
-    srvFUHeaderFile.setMarkup(False)
+    srvFUHeaderFile.setMarkup(True)
     srvFUHeaderFile.setOverwrite(True)
     srvFUHeaderFile.setEnabled(True)
 
