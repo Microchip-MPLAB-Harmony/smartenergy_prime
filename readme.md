@@ -1,7 +1,7 @@
 ﻿![Microchip logo](https://raw.githubusercontent.com/wiki/Microchip-MPLAB-Harmony/Microchip-MPLAB-Harmony.github.io/images/microchip_logo.png)
 ![Harmony logo small](https://raw.githubusercontent.com/wiki/Microchip-MPLAB-Harmony/Microchip-MPLAB-Harmony.github.io/images/microchip_mplab_harmony_logo_small.png)
 
-# MPLAB® Harmony 3 Smart Energy PRIME
+# MPLAB® Harmony 3 Smart Energy PRIME Stack
 
 MPLAB® Harmony 3 is an extension of the MPLAB® ecosystem for creating embedded firmware solutions for Microchip 32-bit SAM and PIC® microcontroller and microprocessor devices.  Refer to the following links for more information.
 
@@ -11,24 +11,26 @@ MPLAB® Harmony 3 is an extension of the MPLAB® ecosystem for creating embedded
 - [Microchip MPLAB® Harmony](https://www.microchip.com/mplab/mplab-harmony)
 - [Microchip MPLAB® Harmony Pages](https://microchip-mplab-harmony.github.io/)
 
-This repository contains the MPLAB® Harmony 3 Smart Energy PRIME API and libraries. 
+This repository contains the MPLAB® Harmony 3 Smart Energy PRIME Stack implementation. 
+Refer to the following links for release notes, training materials, and interface reference information.
 
 - [Release Notes](./release_notes.md)
 - [MPLAB® Harmony License](Microchip_SLA001.md)
-- [MPLAB® Harmony 3 PRIME API Help]
+- [MPLAB® Harmony 3 PRIME API Help] (TBD)
 
 # Contents Summary
 
 | Folder     | Description                                               |
 | ---        | ---                                                       |
 | config     | PRIME module configuration file                           |
-| docs       | PRIME library help documentation                          |
-| prime      | API and files for PRIME library                           |
-| pal        | Physical Abstraction layers from PRIME to PLC and RF modules |
+| driver     | Specific drivers for PRIME Stack                          |
+| pal        | PRIME Physical Abstraction layers                         | 
+| prime      | API and files for PRIME Library                           |
+| service    | Specific services for PRIME                               |
 
 ____
 
-[![License](https://img.shields.io/badge/license-Harmony%20license-orange.svg)](https://github.com/Microchip-MPLAB-Harmony/smartenergy_prime/blob/master/Microchip_SLA001.md)
+[![License](https://img.shields.io/badge/license-Harmony%20license-orange.svg)](https://github.com/Microchip-MPLAB-Harmony/smartenergy_prime/blob/master/mplab_harmony_license.md)
 [![Latest release](https://img.shields.io/github/release/Microchip-MPLAB-Harmony/smartenergy_prime.svg)](https://github.com/Microchip-MPLAB-Harmony/smartenergy_prime/releases/latest)
 [![Latest release date](https://img.shields.io/github/release-date/Microchip-MPLAB-Harmony/smartenergy_prime.svg)](https://github.com/Microchip-MPLAB-Harmony/smartenergy_prime/releases/latest)
 [![Commit activity](https://img.shields.io/github/commit-activity/y/Microchip-MPLAB-Harmony/smartenergy_prime.svg)](https://github.com/Microchip-MPLAB-Harmony/smartenergy_prime/graphs/commit-activity)
@@ -36,6 +38,8 @@ ____
 
 ____
 
+[![Developer Help](https://img.shields.io/badge/Youtube-Developer%20Help-red.svg)](https://www.youtube.com/MicrochipDeveloperHelp)
+[![Developer Help](https://img.shields.io/badge/XWiki-Developer%20Help-torquiose.svg)](https://developerhelp.microchip.com/xwiki/bin/view/software-tools/harmony/)
 [![Follow us on Youtube](https://img.shields.io/badge/Youtube-Follow%20us%20on%20Youtube-red.svg)](https://www.youtube.com/user/MicrochipTechnology)
 [![Follow us on LinkedIn](https://img.shields.io/badge/LinkedIn-Follow%20us%20on%20LinkedIn-blue.svg)](https://www.linkedin.com/company/microchip-technology)
 [![Follow us on Facebook](https://img.shields.io/badge/Facebook-Follow%20us%20on%20Facebook-blue.svg)](https://www.facebook.com/microchiptechnology/)
