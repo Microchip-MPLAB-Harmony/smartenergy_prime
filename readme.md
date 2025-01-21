@@ -30,9 +30,7 @@ Refer to the following links for release notes, training materials, and interfac
 
 ____
 
-[![License](https://img.shields.io/badge/license-Harmony%20license-orange.svg)](https://github.com/Microchip-MPLAB-Harmony/smartenergy_prime/blob/master/mplab_harmony_license.md)
-[![Latest release](https://img.shields.io/github/release/Microchip-MPLAB-Harmony/smartenergy_prime.svg)](https://github.com/Microchip-MPLAB-Harmony/smartenergy_prime/releases/latest)
-[![Latest release date](https://img.shields.io/github/release-date/Microchip-MPLAB-Harmony/smartenergy_prime.svg)](https://github.com/Microchip-MPLAB-Harmony/smartenergy_prime/releases/latest)
+[![License](https://img.shields.io/badge/license-Harmony%20license-orange.svg)](https://github.com/Microchip-MPLAB-Harmony/smartenergy_prime/blob/master/Microchip_SLA001.md)
 [![Commit activity](https://img.shields.io/github/commit-activity/y/Microchip-MPLAB-Harmony/smartenergy_prime.svg)](https://github.com/Microchip-MPLAB-Harmony/smartenergy_prime/graphs/commit-activity)
 [![Contributors](https://img.shields.io/github/contributors-anon/Microchip-MPLAB-Harmony/smartenergy_prime.svg)]()
 
