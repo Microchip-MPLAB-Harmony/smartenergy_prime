@@ -161,14 +161,12 @@ def freqHopUpdateRanges(symbol, event):
     if (rangeValues):
         channelList = freqHopGetChannelList(rangeValues)
         Database.setSymbolValue("primePal", "PRIME_PAL_RF_FREQ_HOPPING_RANGE_VALUES", channelList)
-        print("CHRIS dbg -> freqHopUpdateRanges: {}".format(channelList))
             
 def freqHopUpdateBcnRanges(symbol, event):
     rangeValues = event["value"]
     if (rangeValues):
         channelList = freqHopGetChannelList(rangeValues)
         Database.setSymbolValue("primePal", "PRIME_PAL_RF_FREQ_HOPPING_BCN_RANGE_VALUES", channelList)
-        print("CHRIS dbg -> freqHopUpdateBcnRanges: {}".format(channelList))
 
 def instantiateComponent(primePalComponent):
     Log.writeInfoMessage("Loading PAL for PRIME")
