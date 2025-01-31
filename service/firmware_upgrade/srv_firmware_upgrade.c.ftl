@@ -142,6 +142,10 @@ static uint32_t calculatedCrc;
 static uint8_t imageMetadata[PRIME_METADATA_SIZE];
 
 static SRV_FU_PRIME_APP_TYPE appToFu;
+
+static uint16_t imageVendor;
+
+static uint16_t imageModel;
 </#if>
 </#if>
 
@@ -152,6 +156,21 @@ static SRV_FU_PRIME_APP_TYPE appToFu;
 // *****************************************************************************
 <#if (prime_config)??>
 <#if ((prime_config.PRIME_MODE == "SN") && (prime_config.PRIME_PROJECT == "application project"))>
+static void lSRV_FU_StoreVendorModel(uint32_t address, uint32_t size)
+{
+    if ((address > 0U) || (size < 4U))
+    {
+        return;
+    }
+
+    imageVendor = ((uint16_t) pBuffInput[0]) << 8;
+    imageVendor |= pBuffInput[1];
+
+    imageModel = ((uint16_t) pBuffInput[2]) << 8;
+    imageModel |= pBuffInput[3];
+}
+
+
 static void lSRV_FU_StoreMetadata(uint32_t address, uint32_t size)
 {
     uint32_t iniMetadata;
@@ -194,7 +213,7 @@ static void lSRV_FU_StoreMetadata(uint32_t address, uint32_t size)
     (void)memcpy(&imageMetadata[offsetMetadata], &pBuffInput[offsetSegment], sizeToCopy);
 }
 
-static bool lSRV_FU_CheckMetadata(void)
+static bool lSRV_FU_CheckMetadataAndVendor(void)
 {
 	appToFu = PRIME_INVALID_APP;
 
@@ -229,7 +248,36 @@ static bool lSRV_FU_CheckMetadata(void)
 		appToFu = PRIME_MAC13_APP;
 	}
 
-    // TBD: check vendor and model
+    /* Check vendor and model if app is a binary */
+    if ((appToFu == PRIME_MAC13_APP) || (appToFu == PRIME_MAC14_APP))
+    {
+    	const PRIME_API *gPrimeApi;
+
+        SRV_STORAGE_PRIME_MODE_INFO_CONFIG boardInfo;
+
+	    if(!SRV_STORAGE_GetConfigInfo(SRV_STORAGE_TYPE_MODE_PRIME, (uint8_t)sizeof(boardInfo), (void *)&boardInfo))
+        {
+            return false;
+        }
+
+        /* Get PRIME API pointer */
+        switch (boardInfo.primeVersion)
+        {
+            case PRIME_VERSION_1_3:
+                PRIME_API_GetPrime13API(&gPrimeApi);
+                break;
+
+            case PRIME_VERSION_1_4:
+            default:
+                PRIME_API_GetPrime14API(&gPrimeApi);
+                break;
+        }
+
+        if ((gPrimeApi->vendor != imageVendor) || (gPrimeApi->model != imageModel))
+        {
+            return false;
+        }
+    }
 
     return true;
 }
@@ -594,6 +642,8 @@ void SRV_FU_DataWrite(uint32_t address, uint8_t *buffer, uint16_t size)
 <#if (prime_config)??>
 <#if ((prime_config.PRIME_MODE == "SN") && (prime_config.PRIME_PROJECT == "application project"))>
     lSRV_FU_StoreMetadata(address, size);
+
+    lSRV_FU_StoreVendorModel(address, size);
 </#if>
 </#if>
 
@@ -795,7 +845,7 @@ bool SRV_FU_SwapFirmware(void)
 	if (boardInfo.primeVersion == PRIME_VERSION_1_3)
     {
 		/* Verify if this is a right image */
-		if (lSRV_FU_CheckMetadata() == false)
+		if (lSRV_FU_CheckMetadataAndVendor() == false)
         {
 			/* Trigger reset, needed in FU 1.3 */
 			return true;
@@ -874,7 +924,7 @@ void SRV_FU_VerifyImage(void)
 
     // TBD: Signature checking
 
-	if (lSRV_FU_CheckMetadata() == true)
+	if (lSRV_FU_CheckMetadataAndVendor() == true)
     {
 		SRV_FU_ImageVerifyCallback(SRV_FU_RESULT_SUCCESS);
 	}
