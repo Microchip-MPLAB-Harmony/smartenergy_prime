@@ -107,7 +107,106 @@ typedef enum
 // *****************************************************************************
 
 <#if PRIME_MODE == "SN" && PRIME_PROJECT == "application project">
+// *****************************************************************************
+/* Function:
+    void PRIME_API_GetPrime13API(const PRIME_API **pPrimeApi)
+
+  Summary:
+    Gets the PRIME API location for PRIME Library v1.3.
+
+  Description:
+    This routine gets the PRIME API location for PRIME Library v1.3 in a dual
+    application.
+
+  Precondition:
+    None.
+
+  Parameters:
+    pPrimeApi  - Pointer to PRIME Library v1.3
+
+  Returns:
+    None.
+
+  Example:
+    <code>
+    const PRIME_API *gPrimeApi;
+    
+    SRV_STORAGE_PRIME_MODE_INFO_CONFIG boardInfo;
+    SRV_STORAGE_GetConfigInfo(SRV_STORAGE_TYPE_MODE_PRIME, (uint8_t)sizeof(boardInfo),
+                              (void *)&boardInfo);
+
+    switch (boardInfo.primeVersion)
+    {
+        case PRIME_VERSION_1_3:
+            PRIME_API_GetPrime13API(&gPrimeApi);
+            break;
+
+        case PRIME_VERSION_1_4:
+        default:
+            PRIME_API_GetPrime14API(&gPrimeApi);
+            break;
+    }
+    
+    if (gPrimeApi->Status() == SYS_STATUS_READY)
+    {
+        ...
+    }
+    </code>
+
+  Remarks:
+    None.
+*/
 void PRIME_API_GetPrime13API(const PRIME_API **pPrimeApi);
+
+// *****************************************************************************
+/* Function:
+    void PRIME_API_GetPrime14API(const PRIME_API **pPrimeApi)
+
+  Summary:
+    Gets the PRIME API location for PRIME Library v1.4.
+
+  Description:
+    This routine gets the PRIME API location for PRIME Library v1.4 in a dual
+    application.
+
+  Precondition:
+    None.
+
+  Parameters:
+    pPrimeApi  - Pointer to PRIME Library v1.4
+
+  Returns:
+    None.
+
+  Example:
+    <code>
+    const PRIME_API *gPrimeApi;
+    
+    SRV_STORAGE_PRIME_MODE_INFO_CONFIG boardInfo;
+    SRV_STORAGE_GetConfigInfo(SRV_STORAGE_TYPE_MODE_PRIME, (uint8_t)sizeof(boardInfo),
+                              (void *)&boardInfo);
+
+    switch (boardInfo.primeVersion)
+    {
+        case PRIME_VERSION_1_3:
+            PRIME_API_GetPrime13API(&gPrimeApi);
+            break;
+
+        case PRIME_VERSION_1_4:
+        default:
+            PRIME_API_GetPrime14API(&gPrimeApi);
+            break;
+    }
+    
+    if (gPrimeApi->Status() == SYS_STATUS_READY)
+    {
+        ...
+    }
+    </code>
+
+  Remarks:
+    None.
+*/
 void PRIME_API_GetPrime14API(const PRIME_API **pPrimeApi);
 <#else>
 // *****************************************************************************
@@ -149,8 +248,8 @@ void PRIME_API_GetPrime14API(const PRIME_API **pPrimeApi);
     </code>
 
   Remarks:
-    This routine is normally not called directly by an application. The
-    PRIME application must use the function located in the header table.
+    This routine is normally not called directly by an application. The PRIME 
+    application must use the function located in the PRIME API.
 */
 void PRIME_API_Initialize(PRIME_API_INIT *init, bool isRestart, 
                           uint8_t primeVersion);
@@ -185,9 +284,9 @@ void PRIME_API_Initialize(PRIME_API_INIT *init, bool isRestart,
     </code>
 
   Remarks:
-    This routine is normally not called directly by an application. The
-    PRIME application must use the function located in the header table
-    and call it periodically.
+    This routine is normally not called directly by an application. The PRIME 
+    application must use the function located in the PRIME API and call it 
+    periodically.
 */
 void PRIME_API_Tasks(void);
 
@@ -235,13 +334,47 @@ void PRIME_API_Tasks(void);
     </code>
 
   Remarks:
-    This routine is normally not called directly by an application. The
-    PRIME application must use the function located in the header table.
+    This routine is normally not called directly by an application. The PRIME 
+    application must use the function located in the PRIME API.
 */
 SYS_STATUS PRIME_API_Status(void);
 </#if>
 
 <#if PRIME_MODE == "BN" || (PRIME_MODE == "SN" && PRIME_PROJECT == "monolithic project")>
+// *****************************************************************************
+/* Function:
+    void PRIME_API_GetPrimeAPI(const PRIME_API **pPrimeApi)
+
+  Summary:
+    Gets the PRIME API location for PRIME Library.
+
+  Description:
+    This routine gets the PRIME API location for PRIME Library.
+
+  Precondition:
+    None.
+
+  Parameters:
+    pPrimeApi  - Pointer to PRIME Library
+
+  Returns:
+    None.
+
+  Example:
+    <code>
+    const PRIME_API *gPrimeApi;
+    
+    PRIME_API_GetPrime1PI(&gPrimeApi);
+   
+    if (gPrimeApi->Status() == SYS_STATUS_READY)
+    {
+        ...
+    }
+    </code>
+
+  Remarks:
+    None.
+*/
 void PRIME_API_GetPrimeAPI(const PRIME_API **pPrimeApi);
 </#if>
 
