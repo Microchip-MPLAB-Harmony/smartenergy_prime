@@ -68,7 +68,8 @@ Microchip or any third party.
     This routine initializes the PRIME 4-32 Convergence Sublayer.
 
   Precondition:
-    None.
+    The MAC_Initialize function should have been called before calling this 
+    function.
 
   Parameters:
     None.

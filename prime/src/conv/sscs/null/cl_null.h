@@ -68,7 +68,8 @@ Microchip or any third party.
     This routine initializes the PRIME Null Convergence Sublayer.
 
   Precondition:
-    None.
+    The MAC_Initialize function should have been called before calling this 
+    function.
 
   Parameters:
     None.

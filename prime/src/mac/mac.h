@@ -80,7 +80,7 @@ Microchip or any third party.
     This routine initializes the PRIME MAC layer.
 
   Precondition:
-    None.
+    The PRIME PAL status should be SYS_STATUS_READY before calling this function.
 
   Parameters:
     macInfo     - Pointer to the MAC version information

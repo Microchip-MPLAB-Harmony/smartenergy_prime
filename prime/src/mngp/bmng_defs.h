@@ -259,7 +259,7 @@ typedef enum {
     - enable: Enable (1) or disable (0) FU
 
   Remarks:
-    The command is acknowledged with the FUP ACK callback..
+    The command is acknowledged with the FUP ACK callback.
 */
 typedef void (*BMNG_FUP_START_FU_REQUEST)(uint8_t cmd, uint8_t enable);
 
