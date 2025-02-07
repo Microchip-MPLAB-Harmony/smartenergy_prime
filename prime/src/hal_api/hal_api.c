@@ -125,6 +125,7 @@ const HAL_API primeHalAPI = {
     PAL_Initialize,
     PAL_Tasks,
     PAL_Status,
+    PAL_Restart,
     PAL_CallbackRegister,
     PAL_DataRequest,
     PAL_GetSNR,

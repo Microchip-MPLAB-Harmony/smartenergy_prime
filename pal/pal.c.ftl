@@ -467,10 +467,58 @@ SYS_STATUS PAL_Status(SYS_MODULE_OBJ object)
 </#if>
 }
 
+void PAL_Restart(SYS_MODULE_OBJ object, uint8_t enablePAL)
+{
+    if (object != PRIME_PAL_INDEX)
+    {
+        return;
+    }
+    
+<#if PRIME_PAL_PLC_EN == true>
+    if ((enablePAL & PAL_PLC_EN) == 0U)
+    {
+        PAL_PLC_DataConfirmCallbackRegister(NULL);
+        PAL_PLC_DataIndicationCallbackRegister(NULL);
+
+  <#if PRIME_PAL_PHY_SNIFFER == true>
+        PAL_PLC_USISnifferCallbackRegister(palData.usiHandler, NULL);
+  </#if>
+    }
+</#if>
+
+<#if PRIME_PAL_RF_EN == true>
+    if ((enablePAL & PAL_RF_EN) == 0U)
+    {
+        PAL_RF_DataConfirmCallbackRegister(NULL);
+        PAL_RF_DataIndicationCallbackRegister(NULL);
+  <#if PRIME_PAL_RF_FREQ_HOPPING == true>
+        PAL_RF_ChannelSwitchCallbackRegister(NULL);
+  </#if>
+
+  <#if PRIME_PAL_PHY_SNIFFER == true>
+        PAL_RF_USISnifferCallbackRegister(palData.usiHandler, NULL);
+  </#if>
+    }
+</#if>
+
+<#if PRIME_PAL_SERIAL_EN == true>
+    if ((enablePAL & PAL_SERIAL_EN) == 0U)
+    {
+        PAL_SERIAL_DataConfirmCallbackRegister(NULL);
+        PAL_SERIAL_DataIndicationCallbackRegister(NULL);
+
+  <#if PRIME_PAL_PHY_SNIFFER == true>
+        PAL_SERIAL_USISnifferCallbackRegister(palData.usiHandler, NULL);
+  </#if>
+    }
+</#if>
+}
+
 void PAL_CallbackRegister(PAL_CALLBACKS *pCallbacks)
 {
     palData.dataConfirmCallback = pCallbacks->dataConfirm;
     palData.dataIndicationCallback = pCallbacks->dataIndication;
+    palData.channelSwitchCallback = pCallbacks->switchRfChannel;
 }
 
 uint8_t PAL_DataRequest(PAL_MSG_REQUEST_DATA *pData)
