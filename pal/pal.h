@@ -185,13 +185,13 @@ SYS_STATUS PAL_Status(SYS_MODULE_OBJ object);
 
 // *****************************************************************************
 /* Function:
-  void PAL_Restart(SYS_MODULE_OBJ object, uint8_t enablePAL)
+  void PAL_Enable(SYS_MODULE_OBJ object, uint8_t enablePAL)
 
   Summary:
-    Restart PAL with the indicated PAL submodules.
+    Enable PAL with the indicated PAL submodules.
 
   Description:
-    This routine restarts the PAL with the indicated PAL submodules.
+    This routine enables the PAL with the indicated PAL submodules.
 
   Precondition:
     PAL_Initialize routine must have been called before.
@@ -208,13 +208,13 @@ SYS_STATUS PAL_Status(SYS_MODULE_OBJ object);
     SYS_MODULE_OBJ sysObjPal;
     sysObjPal = PAL_Initialize(PRIME_PAL_INDEX);
 
-    PAL_Restart(sysObjPal, PAL_PLC_EN);
+    PAL_Enable(sysObjPal, PAL_PLC_EN);
     </code>
 
   Remarks:
     None.
 */
-void PAL_Restart(SYS_MODULE_OBJ object, uint8_t enablePAL);
+void PAL_Enable(SYS_MODULE_OBJ object, uint8_t enablePAL);
 
 // ****************************************************************************
 /* Function:
