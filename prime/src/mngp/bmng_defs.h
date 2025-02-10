@@ -666,6 +666,8 @@ typedef void (*BMNG_PPROF_RESET_REQUEST)(uint8_t cmd, uint8_t *eui48);
   Description:
     This data type contains the definition of the function pointer to reboot a
     node using the PRIME Profile.
+    - cmd: Command to acknowledge
+    - eui48: Pointer to the address of the node to be rebooted
 
   Remarks:
     The command is acknowledged with the PPROF ACK callback.
