@@ -795,7 +795,7 @@ typedef void (*BMNG_PPROF_GET_ZC_RESPONSE_CB)(uint8_t *eui48, uint8_t zcStatus,
     response.
 
   Description:
-    This callback is used for the PRIME Profile get the response to the zero
+    This callback is used for the PRIME Profile to get the response to the zero
     crossing difference between BN and SN.
     eui48       - Pointer to the MAC address of the node
     timeFreq    - Frequency
