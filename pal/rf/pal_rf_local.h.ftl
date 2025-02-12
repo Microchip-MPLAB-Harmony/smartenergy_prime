@@ -121,7 +121,7 @@ typedef struct
 
     PAL_RF_TX_DATA txData[DRV_RF215_TX_BUFFERS_NUMBER];
 
-    uint16_t currentChannel;
+    uint16_t currentPch;
 
     uint16_t rfChannelsNumber;
 
@@ -130,11 +130,14 @@ typedef struct
 
     uint16_t freqHopLengthBcnSequence;
 
+    uint16_t freqHopNextPch;
+
+    uint16_t freqHopCurrentPch;
+    
     uint8_t freqHopBitsSequence[RF_MAX_NUM_BYTES_CHANNELS];
 
     uint8_t freqHopBitsBcnSequence[RF_MAX_NUM_BYTES_CHANNELS];
 
-    uint8_t freqHopCurrentChannel;
 
 </#if>
 <#if PRIME_PAL_PHY_SNIFFER == true>
