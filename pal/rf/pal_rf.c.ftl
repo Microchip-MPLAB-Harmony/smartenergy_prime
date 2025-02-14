@@ -111,8 +111,8 @@ static PAL_RF_DATA palRfData = {0};
 static PAL_RF_CFM_DATA palRfCfmData = {0};
 
 <#if PRIME_PAL_RF_FREQ_HOPPING == true>
-static const uint8_t palRfFreqHopChannelsSeq[] = FREQ_HOP_RF_SEQUENCE;
-static const uint8_t palRfFreqHopChannelsBcnSeq[] = FREQ_HOP_RF_BCN_SEQUENCE;
+static const uint16_t palRfFreqHopChannelsSeq[] = FREQ_HOP_RF_SEQUENCE;
+static const uint16_t palRfFreqHopChannelsBcnSeq[] = FREQ_HOP_RF_BCN_SEQUENCE;
 
 </#if>
 // *****************************************************************************
@@ -182,8 +182,8 @@ static void lPAL_RF_FreqHopGetChannelSequence(void)
 {
     uint16_t index;
 
-    palRfData.freqHopLengthSequence = sizeof(palRfFreqHopChannelsSeq);
-    palRfData.freqHopLengthBcnSequence = sizeof(palRfFreqHopChannelsBcnSeq);
+    palRfData.freqHopLengthSequence = sizeof(palRfFreqHopChannelsSeq) / sizeof(uint16_t);
+    palRfData.freqHopLengthBcnSequence = sizeof(palRfFreqHopChannelsBcnSeq) / sizeof(uint16_t);
 
     for (index = 0; index < palRfData.freqHopLengthSequence; index++)
     {
@@ -250,7 +250,11 @@ static void lPAL_RF_DataCfmCb(DRV_RF215_TX_HANDLE txHandle,
     if (palRfData.rfCallbacks.dataConfirm != NULL)
     {
         dataCfm.txTime = SRV_TIME_MANAGEMENT_CountToUS(pCfmObj->timeIniCount);
-        dataCfm.pch = (uint16_t)(palRfData.currentPch | PRIME_PAL_RF_CHN_MASK);
+<#if PRIME_PAL_RF_FREQ_HOPPING == true>
+        dataCfm.pch = palRfData.freqHopCurrentPch;
+<#else>
+        dataCfm.pch = palRfData.currentPch;
+</#if>
         dataCfm.rmsCalc = 255;
         dataCfm.frameType = PAL_FRAME_TYPE_RF;
 
@@ -312,10 +316,15 @@ static void lPAL_RF_DataCfmCb(DRV_RF215_TX_HANDLE txHandle,
         (void)DRV_RF215_GetPib(palRfData.drvRfPhyHandle, RF215_PIB_PHY_TX_PAY_SYMBOLS,
                     &paySymbols);
 
+<#if PRIME_PAL_RF_FREQ_HOPPING == true>
+        pRfSnifferData = SRV_RSNIFFER_SerialCfmMessage(pCfmObj, txHandle,
+                         &palRfData.rfPhyConfig, paySymbols, palRfData.freqHopCurrentPch,
+                         &dataLength);
+ <#else>
         pRfSnifferData = SRV_RSNIFFER_SerialCfmMessage(pCfmObj, txHandle,
                          &palRfData.rfPhyConfig, paySymbols, palRfData.currentPch,
                          &dataLength);
-
+</#if>
         if (dataLength != 0U)
         {
             palRfData.snifferCallback(pRfSnifferData, dataLength);
@@ -339,7 +348,11 @@ static void lPAL_RF_DataIndCb(DRV_RF215_RX_INDICATION_OBJ* pIndObj, uintptr_t ct
         dataInd.pData = pIndObj->psdu;
         dataInd.rxTime = SRV_TIME_MANAGEMENT_CountToUS(pIndObj->timeIniCount);
         dataInd.dataLength = pIndObj->psduLen;
-        dataInd.pch = (uint16_t)(palRfData.currentPch | PRIME_PAL_RF_CHN_MASK);
+<#if PRIME_PAL_RF_FREQ_HOPPING == true>
+        dataInd.pch = palRfData.freqHopCurrentPch;
+<#else>
+        dataInd.pch = palRfData.currentPch;
+</#if>
         PAL_RF_RM_GetRobustModulation(pIndObj, &dataInd.estimatedBitrate, &dataInd.lessRobustMod, dataInd.pch);
         dataInd.rssi = pIndObj->rssiDBm;
         auxScheme = (uint8_t)(pIndObj->modScheme) + (uint8_t)(PAL_SCHEME_RF) + 1U;
@@ -504,7 +517,7 @@ uint8_t PAL_RF_DataRequest(PAL_MSG_REQUEST_DATA *pMessageData)
     }
 
 <#if PRIME_PAL_RF_FREQ_HOPPING == true>
-    txReqObj.channelNum = pMessageData->pch;
+    txReqObj.channelNum = (uint16_t)(pMessageData->pch & (~PRIME_PAL_RF_CHN_MASK));
 </#if>
     txReqObj.psdu = pMessageData->pData;
     txReqObj.psduLen = pMessageData->dataLength;
@@ -558,10 +571,11 @@ uint8_t PAL_RF_DataRequest(PAL_MSG_REQUEST_DATA *pMessageData)
 void PAL_RF_ProgramChannelSwitch(uint32_t timeSync, uint16_t pch, uint8_t timeMode)
 {
 <#if PRIME_PAL_RF_FREQ_HOPPING == true>
-    uint16_t channelNum = pch & PRIME_PAL_RF_FREQ_HOPPING_CHANNEL;
+    uint64_t timeCount = SRV_TIME_MANAGEMENT_USToCount(timeSync);
+    uint16_t channelNum = pch & (~PRIME_PAL_RF_CHN_MASK);
 
     palRfData.freqHopNextPch = pch;
-    DRV_RF215_SetChannelRequest(palRfData.drvRfPhyHandle, timeSync, channelNum, (DRV_RF215_TX_TIME_MODE)timeMode);
+    DRV_RF215_SetChannelRequest(palRfData.drvRfPhyHandle, timeCount, channelNum, (DRV_RF215_TX_TIME_MODE)timeMode);
 <#else>
     (void)timeSync;
     (void)pch;
@@ -637,21 +651,17 @@ uint8_t PAL_RF_GetChannel(uint16_t *pPch)
         return (uint8_t)PAL_CFG_INVALID_INPUT;
     }
 
-    *pPch = palRfData.currentPch | PRIME_PAL_RF_CHN_MASK;
+    *pPch = palRfData.currentPch;
 
     return (uint8_t)PAL_CFG_SUCCESS;
 }
 
 uint8_t PAL_RF_SetChannel(uint16_t pch)
 {
-    uint16_t channel;
-
     if (palRfData.status != PAL_RF_STATUS_READY)
     {
         return (uint8_t)PAL_CFG_INVALID_INPUT;
     }
-
-    channel = (uint16_t)(pch & (~PRIME_PAL_RF_CHN_MASK));
 
     if (pch == PRIME_PAL_RF_FREQ_HOPPING_CHANNEL)
     {
@@ -664,11 +674,15 @@ uint8_t PAL_RF_SetChannel(uint16_t pch)
     }
     else
     {
+        uint16_t channel;
+
+        channel = (uint16_t)(pch & (~PRIME_PAL_RF_CHN_MASK));
+
         /* Set in RF215 driver */
         if (DRV_RF215_SetPib(palRfData.drvRfPhyHandle,
             RF215_PIB_PHY_CHANNEL_NUM, &channel) == RF215_PIB_RESULT_SUCCESS)
         {
-            palRfData.currentPch = channel;
+            palRfData.currentPch = pch;
             return (uint8_t)PAL_CFG_SUCCESS;
         }
     }
