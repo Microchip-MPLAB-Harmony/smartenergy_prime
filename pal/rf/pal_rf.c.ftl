@@ -312,19 +312,19 @@ static void lPAL_RF_DataCfmCb(DRV_RF215_TX_HANDLE txHandle,
         uint8_t* pRfSnifferData=NULL;
         uint16_t paySymbols=0;
         size_t dataLength=0;
+<#if PRIME_PAL_RF_FREQ_HOPPING == true>
+        uint16_t channel = (uint16_t)(palRfData.freqHopCurrentPch & (~PRIME_PAL_RF_CHN_MASK));
+<#else>
+        uint16_t channel = (uint16_t)(palRfData.currentPch & (~PRIME_PAL_RF_CHN_MASK));
+</#if>
 
         (void)DRV_RF215_GetPib(palRfData.drvRfPhyHandle, RF215_PIB_PHY_TX_PAY_SYMBOLS,
                     &paySymbols);
 
-<#if PRIME_PAL_RF_FREQ_HOPPING == true>
         pRfSnifferData = SRV_RSNIFFER_SerialCfmMessage(pCfmObj, txHandle,
-                         &palRfData.rfPhyConfig, paySymbols, palRfData.freqHopCurrentPch,
+                         &palRfData.rfPhyConfig, paySymbols, channel,
                          &dataLength);
- <#else>
-        pRfSnifferData = SRV_RSNIFFER_SerialCfmMessage(pCfmObj, txHandle,
-                         &palRfData.rfPhyConfig, paySymbols, palRfData.currentPch,
-                         &dataLength);
-</#if>
+
         if (dataLength != 0U)
         {
             palRfData.snifferCallback(pRfSnifferData, dataLength);
@@ -371,18 +371,18 @@ static void lPAL_RF_DataIndCb(DRV_RF215_RX_INDICATION_OBJ* pIndObj, uintptr_t ct
         uint8_t* pRfSnifferData=NULL;
         uint16_t paySymbols=0;
         size_t dataLength=0;
+<#if PRIME_PAL_RF_FREQ_HOPPING == true>
+        uint16_t channel = (uint16_t)(palRfData.freqHopCurrentPch & (~PRIME_PAL_RF_CHN_MASK));
+<#else>
+        uint16_t channel = (uint16_t)(palRfData.currentPch & (~PRIME_PAL_RF_CHN_MASK));
+</#if>
 
         (void)DRV_RF215_GetPib(palRfData.drvRfPhyHandle, RF215_PIB_PHY_RX_PAY_SYMBOLS,
                     &paySymbols);
 
-<#if PRIME_PAL_RF_FREQ_HOPPING == true>
         pRfSnifferData = SRV_RSNIFFER_SerialRxMessage(pIndObj, &palRfData.rfPhyConfig,
-                    paySymbols, palRfData.freqHopCurrentPch, &dataLength);
-<#else>
-        pRfSnifferData = SRV_RSNIFFER_SerialRxMessage(pIndObj, &palRfData.rfPhyConfig,
-                    paySymbols, palRfData.currentPch, &dataLength);
+                    paySymbols, channel, &dataLength);
 
-</#if>
         if (dataLength != 0U)
         {
             palRfData.snifferCallback(pRfSnifferData, dataLength);
