@@ -349,11 +349,23 @@ void PAL_Enable(SYS_MODULE_OBJ object, uint8_t enablePAL)
 <#if PRIME_PAL_PLC_EN == true>
     if ((enablePAL & PAL_PLC_EN) == 0U)
     {
+        /* Remove callbacks */
         PAL_PLC_DataConfirmCallbackRegister(NULL);
         PAL_PLC_DataIndicationCallbackRegister(NULL);
 
   <#if PRIME_PAL_PHY_SNIFFER == true>
         PAL_PLC_USISnifferCallbackRegister(palData.usiHandler, NULL);
+  </#if>
+    } 
+    else 
+    {
+        /* Register callacks */
+        PAL_PLC_DataConfirmCallbackRegister(lPAL_PlcDataConfirmCallback);
+        PAL_PLC_DataIndicationCallbackRegister(lPAL_PlcDataIndicationCallback);
+
+  <#if PRIME_PAL_PHY_SNIFFER == true>
+        /* Register PLC PHY Sniffer callback */
+        PAL_PLC_USISnifferCallbackRegister(palData.usiHandler, lPAL_PhySnifferCallback);
   </#if>
     }
 </#if>
@@ -361,6 +373,7 @@ void PAL_Enable(SYS_MODULE_OBJ object, uint8_t enablePAL)
 <#if PRIME_PAL_RF_EN == true>
     if ((enablePAL & PAL_RF_EN) == 0U)
     {
+        /* Remove callbacks */
         PAL_RF_DataConfirmCallbackRegister(NULL);
         PAL_RF_DataIndicationCallbackRegister(NULL);
   <#if PRIME_PAL_RF_FREQ_HOPPING == true>
@@ -371,16 +384,42 @@ void PAL_Enable(SYS_MODULE_OBJ object, uint8_t enablePAL)
         PAL_RF_USISnifferCallbackRegister(palData.usiHandler, NULL);
   </#if>
     }
+    else 
+    {
+        /* Register callacks */
+        PAL_RF_DataConfirmCallbackRegister(lPAL_RfDataConfirmCallback);
+        PAL_RF_DataIndicationCallbackRegister(lPAL_RfDataIndicationCallback);
+  <#if PRIME_PAL_RF_FREQ_HOPPING == true>
+        PAL_RF_ChannelSwitchCallbackRegister(lPAL_RfCHannelSwitchCallback);
+  </#if>
+
+  <#if PRIME_PAL_PHY_SNIFFER == true>
+        /* Register RF PHY Sniffer callback */
+        PAL_RF_USISnifferCallbackRegister(palData.usiHandler, lPAL_PhySnifferCallback);
+  </#if>
+    }
 </#if>
 
 <#if PRIME_PAL_SERIAL_EN == true>
     if ((enablePAL & PAL_SERIAL_EN) == 0U)
     {
+        /* Remove callbacks */
         PAL_SERIAL_DataConfirmCallbackRegister(NULL);
         PAL_SERIAL_DataIndicationCallbackRegister(NULL);
 
   <#if PRIME_PAL_PHY_SNIFFER == true>
         PAL_SERIAL_USISnifferCallbackRegister(palData.usiHandler, NULL);
+  </#if>
+    }
+    else
+    {
+        /* Register callacks */
+        PAL_SERIAL_DataConfirmCallbackRegister(lPAL_SerialDataConfirmCallback);
+        PAL_SERIAL_DataIndicationCallbackRegister(lPAL_SerialDataIndicationCallback);
+
+  <#if PRIME_PAL_PHY_SNIFFER == true>
+        /* Register RF PHY Sniffer callback */
+        PAL_SERIAL_USISnifferCallbackRegister(palData.usiHandler, lPAL_PhySnifferCallback);
   </#if>
     }
 </#if>
