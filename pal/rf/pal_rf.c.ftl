@@ -348,11 +348,7 @@ static void lPAL_RF_DataIndCb(DRV_RF215_RX_INDICATION_OBJ* pIndObj, uintptr_t ct
         dataInd.pData = pIndObj->psdu;
         dataInd.rxTime = SRV_TIME_MANAGEMENT_CountToUS(pIndObj->timeIniCount);
         dataInd.dataLength = pIndObj->psduLen;
-<#if PRIME_PAL_RF_FREQ_HOPPING == true>
-        dataInd.pch = palRfData.freqHopCurrentPch;
-<#else>
         dataInd.pch = palRfData.currentPch;
-</#if>
         PAL_RF_RM_GetRobustModulation(pIndObj, &dataInd.estimatedBitrate, &dataInd.lessRobustMod, dataInd.pch);
         dataInd.rssi = pIndObj->rssiDBm;
         auxScheme = (uint8_t)(pIndObj->modScheme) + (uint8_t)(PAL_SCHEME_RF) + 1U;
@@ -656,14 +652,14 @@ uint8_t PAL_RF_GetChannel(uint16_t *pPch)
     return (uint8_t)PAL_CFG_SUCCESS;
 }
 
-uint8_t PAL_RF_SetChannel(uint16_t pch)
+uint8_t PAL_RF_SetChannel(uint16_t channel)
 {
     if (palRfData.status != PAL_RF_STATUS_READY)
     {
         return (uint8_t)PAL_CFG_INVALID_INPUT;
     }
 
-    if (pch == PRIME_PAL_RF_FREQ_HOPPING_CHANNEL)
+    if (channel == PRIME_PAL_RF_FREQ_HOPPING_CHANNEL)
     {
 <#if PRIME_PAL_RF_FREQ_HOPPING == true>
         palRfData.currentPch = PRIME_PAL_RF_FREQ_HOPPING_CHANNEL;
@@ -674,14 +670,15 @@ uint8_t PAL_RF_SetChannel(uint16_t pch)
     }
     else
     {
-        uint16_t channel;
-
-        channel = (uint16_t)(pch & (~PRIME_PAL_RF_CHN_MASK));
-
         /* Set in RF215 driver */
         if (DRV_RF215_SetPib(palRfData.drvRfPhyHandle,
             RF215_PIB_PHY_CHANNEL_NUM, &channel) == RF215_PIB_RESULT_SUCCESS)
         {
+
+            uint16_t pch;
+
+            pch = channel | PRIME_PAL_RF_CHN_MASK;
+
             palRfData.currentPch = pch;
             return (uint8_t)PAL_CFG_SUCCESS;
         }
@@ -881,8 +878,8 @@ uint8_t PAL_RF_SetConfiguration(uint16_t id, void *pValue, uint16_t length)
 
         case PAL_ID_CFG_TXRX_CHANNEL:
         {
-            uint16_t pch = (*(uint16_t *)pValue) | PRIME_PAL_RF_CHN_MASK;
-            result = (PAL_CFG_RESULT)PAL_RF_SetChannel(pch);
+            uint16_t channel = (*(uint16_t *)pValue);
+            result = (PAL_CFG_RESULT)PAL_RF_SetChannel(channel);
             break;
         }
 
