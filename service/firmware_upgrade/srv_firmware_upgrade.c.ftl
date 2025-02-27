@@ -361,6 +361,16 @@ static void lSRV_FU_EraseFuRegion(void)
 	memInfo.state = SRV_FU_MEM_STATE_ERASE_FLASH;
 }
 
+<#if (prime_config)??>
+<#if ((prime_config.PRIME_MODE == "SN") && (prime_config.PRIME_PROJECT == "application project"))>
+static void lSRV_FU_VerifySignature(void)
+{
+
+}
+</#if>
+</#if>
+
+
 // *****************************************************************************
 // *****************************************************************************
 // Section: Firmware Upgrade Service Interface Implementation
@@ -920,17 +930,14 @@ void SRV_FU_VerifyImage(void)
 
 <#if (prime_config)??>
 <#if ((prime_config.PRIME_MODE == "SN") && (prime_config.PRIME_PROJECT == "application project"))>
-	/* Verify if this is a right image */
-
-    // TBD: Signature checking
-
-	if (lSRV_FU_CheckMetadataAndVendor() == true)
+    if (lSRV_FU_CheckMetadataAndVendor() != true)
     {
-		SRV_FU_ImageVerifyCallback(SRV_FU_RESULT_SUCCESS);
+		/* Wrong Metadata and/or vendor */
+        SRV_FU_ImageVerifyCallback(SRV_FU_RESULT_IMAGE_ERROR);
 	}
     else
     {
-		SRV_FU_ImageVerifyCallback(SRV_FU_RESULT_IMAGE_ERROR);
+        lSRV_FU_VerifySignature();
 	}
 </#if>
 </#if>
