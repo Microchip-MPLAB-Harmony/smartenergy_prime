@@ -2556,7 +2556,12 @@ uint8_t PRIME_HAL_WRP_PAL_SetChannel(uint16_t pch);
 
 // ****************************************************************************
 /* Function:
-    void PRIME_HAL_WRP_PAL_ProgramChannelSwitch(uint32_t timeSync, uint16_t pch, uint8_t timeMode)
+    void PRIME_HAL_WRP_PAL_ProgramChannelSwitch
+    (
+        uint32_t timeSync, 
+        uint16_t pch, 
+        uint8_t timeMode
+    )
 
   Summary:
     Program a pch switch in the given time.
@@ -2588,7 +2593,8 @@ uint8_t PRIME_HAL_WRP_PAL_SetChannel(uint16_t pch);
     Only available for PHY RF.
     Related to PRIME PAL.
 */
-void PRIME_HAL_WRP_PAL_ProgramChannelSwitch(uint32_t timeSync, uint16_t pch, uint8_t timeMode);
+void PRIME_HAL_WRP_PAL_ProgramChannelSwitch(uint32_t timeSync, uint16_t pch, 
+    uint8_t timeMode);
 
 // ****************************************************************************
 /* Function:
