@@ -60,16 +60,16 @@ Microchip or any third party.
     uint64_t SRV_TIME_MANAGEMENT_GetTimeUS64(void)
 
   Summary:
-    The SRV_TIME_MANAGEMENT_GetTimeUS64 primitive gets the value of a counter
-    and converts it in a 64 bit variable in microseconds.
+    Gets the value of a counter and converts it to a 64 bit variable in 
+    microseconds.
 
   Description:
-    This primitive makes use of SYS_TIME service to get the value of the
+    This routine makes use of SYS_TIME service to get the value of the
     microseconds counter in order to be able to set timeouts and perform delays.
     This function returns the current value of such counter.
 
   Precondition:
-    SYS_TIME_Initialize primitive has to be called before.
+    SYS_TIME_Initialize routine has to be called before.
 
   Parameters:
     None.
@@ -98,16 +98,16 @@ uint64_t SRV_TIME_MANAGEMENT_GetTimeUS64(void);
     uint32_t SRV_TIME_MANAGEMENT_GetTimeUS(void)
 
   Summary:
-    The SRV_TIME_MANAGEMENT_GetTimeUS primitive gets the value of a counter
-    and converts it in a 32 bit variable in microseconds.
+    Gets the value of a counter and converts it to a 32 bit variable in 
+    microseconds.
 
   Description:
-    This primitive makes use of SYS_TIME service to get the value of the
+    This routine makes use of SYS_TIME service to get the value of the
     microseconds counter in order to be able to set timeouts and perform delays.
     This function returns the current value of such counter.
 
   Precondition:
-    SYS_TIME_Initialize primitive has to be called before.
+    SYS_TIME_Initialize routine has to be called before.
 
   Parameters:
     None.
@@ -136,15 +136,15 @@ uint32_t SRV_TIME_MANAGEMENT_GetTimeUS(void);
     uint64_t SRV_TIME_MANAGEMENT_USToCount(uint32_t timeUs)
 
   Summary:
-    The SRV_TIME_MANAGEMENT_USToCount primitive converts a given time in
-    microseconds and returns the equivalent value in cycles.
+    Converts a given time to microseconds and returns the equivalent value in 
+    cycles.
 
   Description:
-    This primitive makes use of SYS_TIME service to convert a value in
-    microseconds and returns a value in cyles.
+    This routine makes use of SYS_TIME service to convert a value in microseconds 
+    and returns a value in cyles.
 
   Precondition:
-    SYS_TIME_Initialize primitive has to be called before.
+    SYS_TIME_Initialize routine has to be called before.
 
   Parameters:
     timeUs - Time in microseconds
@@ -176,15 +176,15 @@ uint64_t SRV_TIME_MANAGEMENT_USToCount(uint32_t timeUs);
     uint32_t SRV_TIME_MANAGEMENT_CountToUS(uint64_t counter)
 
   Summary:
-    The SRV_TIME_MANAGEMENT_CountToUS primitive converts a given time in cycles
-    and returns the equivalent value in microseconds.
+    Converts a given time in cycles and returns the equivalent value in 
+    microseconds.
 
   Description:
-    This primitive makes use of SYS_TIME service to convert a value
-    in cycles and returns a value in microseconds.
+    This routine makes use of SYS_TIME service to convert a value in cycles and 
+    returns a value in microseconds.
 
   Precondition:
-    SYS_TIME_Initialize primitive has to be called before.
+    SYS_TIME_Initialize routine has to be called before.
 
   Parameters:
     counter - Cycles of the counter
@@ -213,17 +213,17 @@ uint32_t SRV_TIME_MANAGEMENT_CountToUS(uint64_t counter);
     SYS_TIME_HANDLE SRV_TIME_MANAGEMENT_CbRegisterUS ( SYS_TIME_CALLBACK callback,
                         uintptr_t context, uint32_t us, SYS_TIME_CALLBACK_TYPE type )
 
-   Summary:
-        Registers a function with the time system service to be called back when the
-        requested number of microseconds have expired (either once or repeatedly).
+  Summary:
+    Registers a function with the time system service to be called back when the
+    requested number of microseconds have expired (either once or repeatedly).
 
-   Description:
-        Creates a timer object and registers a function with it to be called back
-        when the requested delay (specified in microseconds) has completed.  The
-        caller must identify if the timer should call the function once or repeatedly
-        every time the given delay period expires.
+  Description:
+    This routne creates a timer object and registers a function with it to be 
+    called back when the requested delay (specified in microseconds) has completed.  
+    The caller must identify if the timer should call the function once or repeatedly
+    every time the given delay period expires.
 
-   Parameters:
+  Parameters:
     callback    - Pointer to the function to be called.
                   For single shot timers, the callback cannot be NULL.
                   For periodic timers, if the callback pointer is given as NULL,
@@ -243,11 +243,11 @@ uint32_t SRV_TIME_MANAGEMENT_CountToUS(uint64_t counter);
                   object is stopped or deleted.
 
 
-   Returns:
-        SYS_TIME_HANDLE - A valid timer object handle if the call succeeds.
-                      SYS_TIME_HANDLE_INVALID if it fails.
+  Returns:
+   SYS_TIME_HANDLE - A valid timer object handle if the call succeeds.
+   SYS_TIME_HANDLE_INVALID if it fails.
 
-   Example:
+  Example:
       Given a callback function implementation matching the following prototype:
       <code>
       void MyCallback ( uintptr_t context);
@@ -265,14 +265,14 @@ uint32_t SRV_TIME_MANAGEMENT_CountToUS(uint64_t counter);
       }
       </code>
 
-   Remarks:
-       Will give a callback after the requested number of microseconds or longer
-       have elapsed, depending on system performance. In tick-based mode, the requested
-       delay will be ceiled to the next timer tick. For example, if the
-       timer tick is set to 1 msec and the requested delay is 1500 usec, a
-       delay of 2 msec will be generated.
+  Remarks:
+    This service will give a callback after the requested number of microseconds or 
+    longer have elapsed, depending on system performance. In tick-based mode, the 
+    requested delay will be ceiled to the next timer tick. For example, if the timer 
+    tick is set to 1 msec and the requested delay is 1500 usec, a delay of 2 msec will 
+    be generated.
 
-       Delay values of 0 will return SYS_TIME_ERROR.
+    Delay values of 0 will return SYS_TIME_ERROR.
 */
 
 SYS_TIME_HANDLE SRV_TIME_MANAGEMENT_CbRegisterUS ( SYS_TIME_CALLBACK callback,
@@ -283,17 +283,17 @@ SYS_TIME_HANDLE SRV_TIME_MANAGEMENT_CbRegisterUS ( SYS_TIME_CALLBACK callback,
     SYS_TIME_HANDLE SRV_TIME_MANAGEMENT_CbRegisterMS ( SYS_TIME_CALLBACK callback,
                         uintptr_t context, uint32_t ms, SYS_TIME_CALLBACK_TYPE type )
 
-   Summary:
-        Registers a function with the time system service to be called back when the
-        requested number of microseconds have expired (either once or repeatedly).
+  Summary:
+    Registers a function with the time system service to be called back when the
+    requested number of microseconds have expired (either once or repeatedly).
 
-   Description:
-        Creates a timer object and registers a function with it to be called back
-        when the requested delay (specified in microseconds) has completed.  The
-        caller must identify if the timer should call the function once or repeatedly
-        every time the given delay period expires.
+  Description:
+    This routine creates a timer object and registers a function with it to be 
+    called back when the requested delay (specified in microseconds) has completed. 
+    The caller must identify if the timer should call the function once or repeatedly
+    every time the given delay period expires.
 
-   Parameters:
+  Parameters:
     callback    - Pointer to the function to be called.
                   For single shot timers, the callback cannot be NULL.
                   For periodic timers, if the callback pointer is given as NULL,
@@ -313,11 +313,11 @@ SYS_TIME_HANDLE SRV_TIME_MANAGEMENT_CbRegisterUS ( SYS_TIME_CALLBACK callback,
                   object is stopped or deleted.
 
 
-   Returns:
-        SYS_TIME_HANDLE - A valid timer object handle if the call succeeds.
-                      SYS_TIME_HANDLE_INVALID if it fails.
+  Returns:
+    SYS_TIME_HANDLE - A valid timer object handle if the call succeeds.
+    SYS_TIME_HANDLE_INVALID if it fails.
 
-   Example:
+  Example:
       Given a callback function implementation matching the following prototype:
       <code>
       void MyCallback ( uintptr_t context);
@@ -335,14 +335,14 @@ SYS_TIME_HANDLE SRV_TIME_MANAGEMENT_CbRegisterUS ( SYS_TIME_CALLBACK callback,
       }
       </code>
 
-   Remarks:
-       Will give a callback after the requested number of microseconds or longer
-       have elapsed, depending on system performance. In tick-based mode, the requested
-       delay will be ceiled to the next timer tick. For example, if the
-       timer tick is set to 1 msec and the requested delay is 1500 usec, a
-       delay of 2 msec will be generated.
+  Remarks:
+    This service will give a callback after the requested number of microseconds or 
+    longer have elapsed, depending on system performance. In tick-based mode, the 
+    requested delay will be ceiled to the next timer tick. For example, if the timer 
+    tick is set to 1 msec and the requested delay is 1500 usec, a delay of 2 msec will 
+    be generated.
 
-       Delay values of 0 will return SYS_TIME_ERROR.
+    Delay values of 0 will return SYS_TIME_ERROR.
 */
 
 SYS_TIME_HANDLE SRV_TIME_MANAGEMENT_CbRegisterMS ( SYS_TIME_CALLBACK callback,
