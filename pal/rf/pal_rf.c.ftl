@@ -652,14 +652,14 @@ uint8_t PAL_RF_GetChannel(uint16_t *pPch)
     return (uint8_t)PAL_CFG_SUCCESS;
 }
 
-uint8_t PAL_RF_SetChannel(uint16_t channel)
+uint8_t PAL_RF_SetChannel(uint16_t pch)
 {
     if (palRfData.status != PAL_RF_STATUS_READY)
     {
         return (uint8_t)PAL_CFG_INVALID_INPUT;
     }
 
-    if (channel == PRIME_PAL_RF_FREQ_HOPPING_CHANNEL)
+    if (pch == PRIME_PAL_RF_FREQ_HOPPING_CHANNEL)
     {
 <#if PRIME_PAL_RF_FREQ_HOPPING == true>
         palRfData.currentPch = PRIME_PAL_RF_FREQ_HOPPING_CHANNEL;
@@ -670,15 +670,14 @@ uint8_t PAL_RF_SetChannel(uint16_t channel)
     }
     else
     {
+        uint16_t channel;
+
+        channel = pch & (~PRIME_PAL_RF_CHN_MASK);
+
         /* Set in RF215 driver */
         if (DRV_RF215_SetPib(palRfData.drvRfPhyHandle,
             RF215_PIB_PHY_CHANNEL_NUM, &channel) == RF215_PIB_RESULT_SUCCESS)
         {
-
-            uint16_t pch;
-
-            pch = channel | PRIME_PAL_RF_CHN_MASK;
-
             palRfData.currentPch = pch;
             return (uint8_t)PAL_CFG_SUCCESS;
         }
@@ -707,7 +706,15 @@ uint8_t PAL_RF_GetConfiguration(uint16_t id, void *pValue, uint16_t length)
             break;
 
         case PAL_ID_CFG_TXRX_CHANNEL:
-            *(uint16_t *)pValue = palRfData.currentPch;
+            if (palRfData.currentPch == PRIME_PAL_RF_FREQ_HOPPING_CHANNEL)
+            {
+                *(uint16_t *)pValue = palRfData.currentPch;
+            }
+            else
+            {
+                *(uint16_t *)pValue = palRfData.currentPch & (~PRIME_PAL_RF_CHN_MASK);
+            }
+            
             result = PAL_CFG_SUCCESS;
             break;
 

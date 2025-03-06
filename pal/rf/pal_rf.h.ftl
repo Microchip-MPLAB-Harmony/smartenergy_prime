@@ -80,7 +80,7 @@ uint8_t PAL_RF_GetAGC(uint8_t *pMode, uint8_t *pGain);
 uint8_t PAL_RF_SetAGC(uint8_t mode, uint8_t gain);
 uint8_t PAL_RF_GetCCA(uint8_t *channelState);
 uint8_t PAL_RF_GetChannel(uint16_t *pPch);
-uint8_t PAL_RF_SetChannel(uint16_t channel);
+uint8_t PAL_RF_SetChannel(uint16_t pch);
 uint8_t PAL_RF_GetConfiguration(uint16_t id, void *pValue, uint16_t length);
 uint8_t PAL_RF_SetConfiguration(uint16_t id, void *pValue, uint16_t length);
 uint16_t PAL_RF_GetSignalCapture(uint8_t *pData, PAL_FRAME frameType, uint32_t timeStart, uint32_t duration);
