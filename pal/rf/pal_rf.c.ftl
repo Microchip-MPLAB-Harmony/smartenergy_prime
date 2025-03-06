@@ -885,8 +885,11 @@ uint8_t PAL_RF_SetConfiguration(uint16_t id, void *pValue, uint16_t length)
 
         case PAL_ID_CFG_TXRX_CHANNEL:
         {
-            uint16_t channel = (*(uint16_t *)pValue);
-            result = (PAL_CFG_RESULT)PAL_RF_SetChannel(channel);
+            uint16_t pch = (*(uint16_t *)pValue);
+            
+            pch |= PRIME_PAL_RF_CHN_MASK;
+
+            result = (PAL_CFG_RESULT)PAL_RF_SetChannel(pch);
             break;
         }
 
