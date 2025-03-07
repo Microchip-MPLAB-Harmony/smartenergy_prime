@@ -69,7 +69,7 @@ Microchip or any third party.
     This function returns the current value of such counter.
 
   Precondition:
-    SYS_TIME_Initialize routine has to be called before.
+    SYS_TIME_Initialize routine must have been called before.
 
   Parameters:
     None.
@@ -107,7 +107,7 @@ uint64_t SRV_TIME_MANAGEMENT_GetTimeUS64(void);
     This function returns the current value of such counter.
 
   Precondition:
-    SYS_TIME_Initialize routine has to be called before.
+    SYS_TIME_Initialize routine must have been called before.
 
   Parameters:
     None.
@@ -141,10 +141,10 @@ uint32_t SRV_TIME_MANAGEMENT_GetTimeUS(void);
 
   Description:
     This routine makes use of SYS_TIME service to convert a value in microseconds 
-    and returns a value in cyles.
+    and return a value in cyles.
 
   Precondition:
-    SYS_TIME_Initialize routine has to be called before.
+    SYS_TIME_Initialize routine must have been called before.
 
   Parameters:
     timeUs - Time in microseconds
@@ -181,10 +181,10 @@ uint64_t SRV_TIME_MANAGEMENT_USToCount(uint32_t timeUs);
 
   Description:
     This routine makes use of SYS_TIME service to convert a value in cycles and 
-    returns a value in microseconds.
+    return a value in microseconds.
 
   Precondition:
-    SYS_TIME_Initialize routine has to be called before.
+    SYS_TIME_Initialize routine must have been called before.
 
   Parameters:
     counter - Cycles of the counter
@@ -218,27 +218,24 @@ uint32_t SRV_TIME_MANAGEMENT_CountToUS(uint64_t counter);
     requested number of microseconds have expired (either once or repeatedly).
 
   Description:
-    This routne creates a timer object and registers a function with it to be 
-    called back when the requested delay (specified in microseconds) has completed.  
-    The caller must identify if the timer should call the function once or repeatedly
-    every time the given delay period expires.
+    This routine registers a function in SYS_TIME to be called back when the 
+    requested delay (specified in microseconds) has completed. The caller must 
+    identify if the timer should call the function once or repeatedly every 
+    time the given delay period expires.
+    
+  Precondition:
+    None.
 
   Parameters:
     callback    - Pointer to the function to be called.
-                  For single shot timers, the callback cannot be NULL.
-                  For periodic timers, if the callback pointer is given as NULL,
-                  no callback will occur, but SYS_TIME_TimerPeriodHasExpired can
-                  still be polled to determine if the period has expired for a
-                  periodic timer.
 
     context     - A client-defined value that is passed to the callback function.
 
     us          - Time period in microseconds.
 
     type        - Type of callback requested. If type is SYS_TIME_SINGLE, the
-                  Callback function will be called once when the time period expires.
-                  After the time period expires, the timer object will be freed.
-                  If type is SYS_TIME_PERIODIC Callback function will be called
+                  callback function will be called once when the time period expires.
+                  If type is SYS_TIME_PERIODIC, the callback function will be called
                   repeatedly, every time the time period expires until the timer
                   object is stopped or deleted.
 
@@ -248,22 +245,15 @@ uint32_t SRV_TIME_MANAGEMENT_CountToUS(uint64_t counter);
    SYS_TIME_HANDLE_INVALID if it fails.
 
   Example:
-      Given a callback function implementation matching the following prototype:
-      <code>
-      void MyCallback ( uintptr_t context);
-      </code>
-
-      The following example call will register it, requesting a 500 microsecond
-      periodic callback.
-      <code>
-
-      SYS_TIME_HANDLE handle = SRV_TIME_MANAGEMENT_CbRegisterUS(MyCallback, (uintptr_t)0,
+    <code>
+    void MyCallback ( uintptr_t context);
+     
+    SYS_TIME_HANDLE handle = SRV_TIME_MANAGEMENT_CbRegisterUS(MyCallback, (uintptr_t)0,
                 500, SYS_TIME_PERIODIC);
-      if (handle != SYS_TIME_HANDLE_INVALID)
-      {
+    if (handle != SYS_TIME_HANDLE_INVALID)
+    {
 
-      }
-      </code>
+    }
 
   Remarks:
     This service will give a callback after the requested number of microseconds or 
@@ -285,32 +275,29 @@ SYS_TIME_HANDLE SRV_TIME_MANAGEMENT_CbRegisterUS ( SYS_TIME_CALLBACK callback,
 
   Summary:
     Registers a function with the time system service to be called back when the
-    requested number of microseconds have expired (either once or repeatedly).
+    requested number of miliseconds have expired (either once or repeatedly).
 
   Description:
-    This routine creates a timer object and registers a function with it to be 
-    called back when the requested delay (specified in microseconds) has completed. 
-    The caller must identify if the timer should call the function once or repeatedly
-    every time the given delay period expires.
+    This routine registers a function in SYS_TIME to be called back when the 
+    requested delay (specified in miliseconds) has completed. The caller must 
+    identify if the timer should call the function once or repeatedly every 
+    time the given delay period expires.
+
+  Precondition:
+    None.
 
   Parameters:
     callback    - Pointer to the function to be called.
-                  For single shot timers, the callback cannot be NULL.
-                  For periodic timers, if the callback pointer is given as NULL,
-                  no callback will occur, but SYS_TIME_TimerPeriodHasExpired can
-                  still be polled to determine if the period has expired for a
-                  periodic timer.
 
     context     - A client-defined value that is passed to the callback function.
 
     ms          - Time period in miliseconds.
 
     type        - Type of callback requested. If type is SYS_TIME_SINGLE, the
-                  Callback function will be called once when the time period expires.
-                  After the time period expires, the timer object will be freed.
-                  If type is SYS_TIME_PERIODIC Callback function will be called
+                  callback function will be called once when the time period expires.
+                  If type is SYS_TIME_PERIODIC, the callback function will be called
                   repeatedly, every time the time period expires until the timer
-                  object is stopped or deleted.
+                  object is stopped or deleted.
 
 
   Returns:
@@ -318,22 +305,16 @@ SYS_TIME_HANDLE SRV_TIME_MANAGEMENT_CbRegisterUS ( SYS_TIME_CALLBACK callback,
     SYS_TIME_HANDLE_INVALID if it fails.
 
   Example:
-      Given a callback function implementation matching the following prototype:
-      <code>
-      void MyCallback ( uintptr_t context);
-      </code>
-
-      The following example call will register it, requesting a 1 second
-      periodic callback.
-      <code>
-
-      SYS_TIME_HANDLE handle = SRV_TIME_MANAGEMENT_CbRegisterMS(MyCallback, (uintptr_t)0,
+    <code>
+    void MyCallback ( uintptr_t context);
+      
+    SYS_TIME_HANDLE handle = SRV_TIME_MANAGEMENT_CbRegisterMS(MyCallback, (uintptr_t)0,
                 1000, SYS_TIME_PERIODIC);
-      if (handle != SYS_TIME_HANDLE_INVALID)
-      {
+    if (handle != SYS_TIME_HANDLE_INVALID)
+    {
 
-      }
-      </code>
+    }
+    </code>
 
   Remarks:
     This service will give a callback after the requested number of microseconds or 
