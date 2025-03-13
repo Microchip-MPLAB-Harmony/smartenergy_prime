@@ -142,8 +142,8 @@ typedef enum {
 */
 typedef struct {
 	uint32_t imageSize;
-    uint16_t signLength;
-    SRV_FU_SIGNATURE_ALGO signAlgorithm;
+  uint16_t signLength;
+  SRV_FU_SIGNATURE_ALGO signAlgorithm;
 	uint8_t pageSize;
 } SRV_FU_INFO;
 
@@ -493,6 +493,9 @@ void SRV_FU_End(SRV_FU_RESULT fuResult);
     This function is called by the application.
 */
 bool SRV_FU_SwapFirmware(void);
+
+
+void SRV_FU_SetEDCSAPublicKey(uint8_t *pubKey, uint16_t pubKeyLen);
 </#if>
 </#if>
 

@@ -57,6 +57,14 @@ Microchip or any third party.
 
 #include "service/pcrc/srv_pcrc.h"
 #include "service/storage/srv_storage.h"
+<#if (prime_config)??>
+<#if ((prime_config.PRIME_MODE == "SN") && (prime_config.PRIME_PROJECT == "application project"))>
+
+#include "crypto/common_crypto/crypto_common.h"
+#include "crypto/common_crypto/crypto_hash.h"
+#include "crypto/common_crypto/crypto_digsign.h"
+</#if>
+</#if>
 
 // *****************************************************************************
 // *****************************************************************************
@@ -99,6 +107,15 @@ typedef enum
     PRIME_MAIN_APP
 } SRV_FU_PRIME_APP_TYPE;
 
+
+/* Define Session Id for crypto */
+#define SESSION_ID              1
+
+/* Maximum size for the signature */
+#define PRIME_SIGNATURE_SIZE   128
+
+/* Size for a hash using SHA 256 */
+#define HASH_SIZE_SHA_256      32
 </#if>
 </#if>
 
@@ -146,6 +163,25 @@ static SRV_FU_PRIME_APP_TYPE appToFu;
 static uint16_t imageVendor;
 
 static uint16_t imageModel;
+
+static uint8_t imageSignature[PRIME_SIGNATURE_SIZE];
+
+static uint8_t hashDigest[HASH_SIZE_SHA_256];
+
+static st_Crypto_Hash_Sha_Ctx hashCtx;
+
+static SRV_FU_DSA_STATE dsaState;
+
+static uint8_t *EDSAPublicKey;
+
+static uint16_t EDSAPublicKeyLen;
+
+static uint32_t dsaReadAddress;
+
+static uint32_t dsaSize;
+
+static uint32_t dsaRemainingSize;
+
 </#if>
 </#if>
 
@@ -171,10 +207,10 @@ static void lSRV_FU_StoreVendorModel(uint32_t address, uint32_t size)
 }
 
 
-static void lSRV_FU_StoreMetadata(uint32_t address, uint32_t size)
+static void lSRV_FU_StoreImageInfo(uint32_t address, uint32_t size)
 {
-    uint32_t iniMetadata;
-    uint32_t offsetSegment, offsetMetadata;
+    uint32_t iniMetadata, iniSignature;
+    uint32_t offsetSegment, offsetMetadata, offsetSignature;
     uint32_t sizeToCopy;
 
     iniMetadata = fuData.imageSize - fuData.signLength - PRIME_METADATA_SIZE;
@@ -211,6 +247,47 @@ static void lSRV_FU_StoreMetadata(uint32_t address, uint32_t size)
     }
 
     (void)memcpy(&imageMetadata[offsetMetadata], &pBuffInput[offsetSegment], sizeToCopy);
+
+    /* There is needed less checkings because the signature is always in the last segment and 
+    after the metadata */
+    if (sizeToCopy < PRIME_METADATA_SIZE)
+    {
+        return;
+    }
+    /*  Check if the segment to write is in signature zone */
+    iniSignature = fuData.imageSize - fuData.signLength;
+
+    if ((address + size) < iniSignature)
+    {
+        return;
+    }
+
+    if (address < iniSignature)
+    {
+        offsetSegment = iniSignature - address;
+    }
+    else
+    {
+        offsetSegment = 0;
+    }
+
+    if (address > iniSignature)
+    {
+        offsetSignature = address - iniSignature;
+    }
+    else
+    {
+        offsetSignature = 0;
+    }
+
+    sizeToCopy = fuData.imageSize - offsetSignature;
+
+    if ((size - offsetSegment) < sizeToCopy)
+    {
+        sizeToCopy = size - offsetSegment;
+    }
+
+    (void)memcpy(&imageSignature[offsetSignature], &pBuffInput[offsetSegment], sizeToCopy);
 }
 
 static bool lSRV_FU_CheckMetadataAndVendor(void)
@@ -320,6 +397,12 @@ static void lSRV_FU_TransferHandler
             crcState = SRC_FU_CRC_CALCULATING;
             return;
         }
+        else if (memInfo.state == SRV_FU_VERIFY_SIGNATURE_BLOCK)
+        {
+            /* Calculating CRC.... no callback*/
+            dsaState = SRV_FU_DSA_CALCULATING;
+            return;
+        }
         else
         {
             memInfo.state = SRV_FU_MEM_STATE_CMD_WAIT;
@@ -363,9 +446,80 @@ static void lSRV_FU_EraseFuRegion(void)
 
 <#if (prime_config)??>
 <#if ((prime_config.PRIME_MODE == "SN") && (prime_config.PRIME_PROJECT == "application project"))>
-static void lSRV_FU_VerifySignature(void)
+static bool lSRV_FU_VerifySignature(void)
 {
+    crypto_Hash_Status_E stateCryptoHash;
+    
+    if (fuData.signAlgorithm == SRV_FU_SIGNATURE_ALGO_NO_SIGNATURE)
+    {
+        /* No need to check any signature */
+        return true;
+    } 
+    else if (fuData.signAlgorithm != SRV_FU_SIGNATURE_ALGO_ECDSA256_SHA256)
+    {
+        /* Only ECDSA256_SHA256 is supported */
+        return false;
+    } 
+    else if (dsaState != SRV_FU_DSA_IDLE)
+    {
+        /* There is no public key stored */
+        return false;
+    } 
+    
+    /* Start to verify the signature */
+    stateCryptoHash = Crypto_Hash_Sha_Init(&hashCtx, CRYPTO_HASH_SHA2_256, CRYPTO_HANDLER_HW_INTERNAL, SESSION_ID);
 
+    if (stateCryptoHash != CRYPTO_HASH_SUCCESS)
+    {
+        return false;
+    }
+    else
+    {
+        uint32_t blockStart, nBlock;
+        uint32_t bytesPagesRead;
+
+    	dsaState = SRV_FU_VERIFY_SIGNATURE_BLOCK;
+
+        dsaReadAddress = memInfo.startAdressFuRegion;
+        dsaRemainingSize = fuData.imageSize - fuData.signLength;
+
+        if (dsaRemainingSize < MAX_BUFFER_READ_SIZE)
+        {
+            dsaSize = dsaRemainingSize;
+        }
+        else
+        {
+            dsaSize = MAX_BUFFER_READ_SIZE;
+        }
+
+        blockStart = dsaReadAddress / memInfo.readPageSize;
+        nBlock = dsaSize / memInfo.readPageSize;
+
+        bytesPagesRead = nBlock * memInfo.readPageSize;
+        /* Aling CRC size with the readPageSize */
+        if (dsaSize > bytesPagesRead)
+        {
+            if (((nBlock + 1U) * memInfo.readPageSize) <= MAX_BUFFER_READ_SIZE)
+            {
+                nBlock++;
+            }
+            else
+            {
+                /* Cannot read everything, we reduced the size of the Crc calculated
+                this time */
+                dsaSize = bytesPagesRead;
+            }
+        }
+
+        DRV_MEMORY_AsyncRead(memInfo.memoryHandle, &memInfo.readHandle, pBuffInput, blockStart, nBlock);
+
+        dsaReadAddress += dsaSize;
+        dsaRemainingSize -= dsaSize;
+
+        memInfo.state = SRV_FU_VERIFY_SIGNATURE_BLOCK;
+
+        return true;
+    }
 }
 </#if>
 </#if>
@@ -389,6 +543,12 @@ void SRV_FU_Initialize(void)
     memInfo.sizeFuRegion = PRIME_FU_MEM_SIZE;
 
 	memInfo.state = SRV_FU_MEM_STATE_OPEN_DRIVER;
+
+<#if (prime_config)??>
+<#if ((prime_config.PRIME_MODE == "SN") && (prime_config.PRIME_PROJECT == "application project"))>
+    dsaState = SRV_FU_DSA_NON_PUBLIC_KEY; 
+</#if>
+</#if>
 }
 
 void SRV_FU_Tasks(void)
@@ -580,6 +740,111 @@ void SRV_FU_Tasks(void)
             break;
         }
 
+        case SRV_FU_VERIFY_SIGNATURE_BLOCK:
+<#if (prime_config)??>
+<#if ((prime_config.PRIME_MODE == "SN") && (prime_config.PRIME_PROJECT == "application project"))>
+        {
+            if (dsaState == SRV_FU_DSA_CALCULATING)
+            {
+                crypto_Hash_Status_E stateCryptoHash;
+
+                if (dsaRemainingSize > 0U)
+                {
+                    stateCryptoHash = Crypto_Hash_Sha_Update(&hashCtx, pBuffInput, dsaSize);
+                }
+                else
+                {
+                    stateCryptoHash = Crypto_Hash_Sha_Update(&hashCtx, pBuffInput, dsaSize);
+                    stateCryptoHash = Crypto_Hash_Sha_Final(&hashCtx, hashDigest);
+                }
+                
+                if (stateCryptoHash!= CRYPTO_HASH_SUCCESS)
+                {
+                    dsaState = SRV_FU_DSA_IDLE;
+                    memInfo.state = SRV_FU_MEM_STATE_CMD_WAIT;
+
+                    SRV_FU_ImageVerifyCallback(SRV_FU_VERIFY_RESULT_SIGNATURE_FAIL);
+
+                    break;
+                }
+
+                if (dsaRemainingSize > 0U)
+                {
+                    uint32_t blockStart, nBlock;
+                    uint32_t bytesPagesRead;
+
+                    dsaState = SRV_FU_DSA_WAIT_READ_BLOCK;
+
+                    if (dsaRemainingSize < MAX_BUFFER_READ_SIZE)
+                    {
+                        dsaSize = dsaRemainingSize;
+                    }
+                    else
+                    {
+                        dsaSize = MAX_BUFFER_READ_SIZE;
+                    }
+
+                    blockStart = dsaReadAddress / memInfo.readPageSize;
+                    nBlock = dsaSize / memInfo.readPageSize;
+
+                    bytesPagesRead = nBlock * memInfo.readPageSize;
+                    /* Aling CRC size with the readPageSize */
+                    if (dsaSize > bytesPagesRead)
+                    {
+                        if (((nBlock + 1U) * memInfo.readPageSize) <= MAX_BUFFER_READ_SIZE)
+                        {
+                            nBlock++;
+                        }
+                        else
+                        {
+                            /* Cannot read everything, we reduced the size of the Crc calculated
+                            this time */
+                            dsaSize = bytesPagesRead;
+                        }
+                    }
+
+                    DRV_MEMORY_AsyncRead(memInfo.memoryHandle, &memInfo.readHandle, pBuffInput, blockStart, nBlock);
+
+                    dsaReadAddress += dsaSize;
+                    dsaRemainingSize -= dsaSize;
+                }
+                else
+                {
+                    crypto_DigiSign_Status_E stateCryptoEDCSA;
+                    int8_t validDSA;
+
+                    /* Hash already done, do ECDSA256_SHA256 verification */
+                    stateCryptoEDCSA =Crypto_DigiSign_Ecdsa_Verify(CRYPTO_HANDLER_HW_INTERNAL,
+                                                                    hashDigest,
+                                                                    HASH_SIZE_SHA_256,
+                                                                    imageSignature,
+                                                                    fuData.signLength,
+                                                                    EDSAPublicKey,
+                                                                    EDSAPublicKeyLen,
+                                                                    &validDSA,
+                                                                    CRYPTO_ECC_CURVE_P256,
+                                                                    SESSION_ID);
+
+                    /* ECDSA256_SHA256 verification OK */
+                    if ((validDSA != 1) || (stateCryptoEDCSA != CRYPTO_DIGISIGN_SUCCESS))
+                    {
+                        SRV_FU_ImageVerifyCallback(SRV_FU_VERIFY_RESULT_SIGNATURE_FAIL);
+                    }
+                    else
+                    {
+                        SRV_FU_ImageVerifyCallback(SRV_FU_VERIFY_RESULT_SUCCESS);
+                    }
+
+                    dsaState = SRV_FU_DSA_IDLE;
+                    memInfo.state = SRV_FU_MEM_STATE_CMD_WAIT;
+                }
+            }
+
+            break;
+        }
+
+</#if>
+</#if>
         case SRV_FU_MEM_STATE_XFER_WAIT:
         case SRV_FU_MEM_STATE_SUCCESS:
         case SRV_FU_MEM_STATE_WRITE_WAIT_END:
@@ -651,7 +916,7 @@ void SRV_FU_DataWrite(uint32_t address, uint8_t *buffer, uint16_t size)
 
 <#if (prime_config)??>
 <#if ((prime_config.PRIME_MODE == "SN") && (prime_config.PRIME_PROJECT == "application project"))>
-    lSRV_FU_StoreMetadata(address, size);
+    lSRV_FU_StoreImageInfo(address, size);
 
     lSRV_FU_StoreVendorModel(address, size);
 </#if>
@@ -692,8 +957,8 @@ void SRV_FU_Start(SRV_FU_INFO *fuInfo)
 {
 	fuData.imageSize = fuInfo->imageSize;
 	fuData.pageSize = fuInfo->pageSize;
-	fuData.signAlgorithm = SRV_FU_SIGNATURE_ALGO_NO_SIGNATURE;
-	fuData.signLength = 0;
+	fuData.signAlgorithm = fuInfo->signAlgorithm;
+	fuData.signLength = fuInfo->signLength;
 
 	/* Erase internal flash pages */
 	lSRV_FU_EraseFuRegion();
@@ -917,6 +1182,15 @@ bool SRV_FU_SwapFirmware(void)
         }
     }
 }
+
+
+void SRV_FU_SetEDCSAPublicKey(uint8_t *pubKey, uint16_t pubKeyLen)
+{
+    EDSAPublicKey = pubKey;
+    EDSAPublicKeyLen = pubKeyLen;
+
+    dsaState = SRV_FU_DSA_IDLE;
+}
 </#if>
 </#if>
 
@@ -933,11 +1207,12 @@ void SRV_FU_VerifyImage(void)
     if (lSRV_FU_CheckMetadataAndVendor() != true)
     {
 		/* Wrong Metadata and/or vendor */
-        SRV_FU_ImageVerifyCallback(SRV_FU_RESULT_IMAGE_ERROR);
+        SRV_FU_ImageVerifyCallback(SRV_FU_VERIFY_RESULT_IMAGE_FAIL);
 	}
-    else
+    else if (lSRV_FU_VerifySignature() != true)
     {
-        lSRV_FU_VerifySignature();
+		/* Wrong signature */
+        SRV_FU_ImageVerifyCallback(SRV_FU_VERIFY_RESULT_SIGNATURE_FAIL);
 	}
 </#if>
 </#if>
