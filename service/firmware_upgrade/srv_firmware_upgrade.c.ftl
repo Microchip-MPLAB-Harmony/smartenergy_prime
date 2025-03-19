@@ -452,7 +452,11 @@ static bool lSRV_FU_VerifySignature(void)
     
     if (fuData.signAlgorithm == SRV_FU_SIGNATURE_ALGO_NO_SIGNATURE)
     {
-        /* No need to check any signature */
+        /* No need to check any signature, finish checking */
+        SRV_FU_ImageVerifyCallback(SRV_FU_VERIFY_RESULT_SUCCESS);
+        dsaState = SRV_FU_DSA_IDLE;
+        memInfo.state = SRV_FU_MEM_STATE_CMD_WAIT;
+
         return true;
     } 
     else if (fuData.signAlgorithm != SRV_FU_SIGNATURE_ALGO_ECDSA256_SHA256)
