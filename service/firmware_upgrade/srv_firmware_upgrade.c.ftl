@@ -328,7 +328,7 @@ static bool lSRV_FU_CheckMetadataAndVendor(void)
     /* Check vendor and model if app is a binary */
     if ((appToFu == PRIME_MAC13_APP) || (appToFu == PRIME_MAC14_APP))
     {
-    	const PRIME_API *gPrimeApi;
+    	const PRIME_API *gPrimeApiRef;
 
         SRV_STORAGE_PRIME_MODE_INFO_CONFIG boardInfo;
 
@@ -341,16 +341,16 @@ static bool lSRV_FU_CheckMetadataAndVendor(void)
         switch (boardInfo.primeVersion)
         {
             case PRIME_VERSION_1_3:
-                PRIME_API_GetPrime13API(&gPrimeApi);
+                PRIME_API_GetPrime13API(&gPrimeApiRef);
                 break;
 
             case PRIME_VERSION_1_4:
             default:
-                PRIME_API_GetPrime14API(&gPrimeApi);
+                PRIME_API_GetPrime14API(&gPrimeApiRef);
                 break;
         }
 
-        if ((gPrimeApi->vendor != imageVendor) || (gPrimeApi->model != imageModel))
+        if ((gPrimeApiRef->vendor != imageVendor) || (gPrimeApiRef->model != imageModel))
         {
             return false;
         }
@@ -397,12 +397,16 @@ static void lSRV_FU_TransferHandler
             crcState = SRC_FU_CRC_CALCULATING;
             return;
         }
-        else if (memInfo.state == SRV_FU_VERIFY_SIGNATURE_BLOCK)
+<#if (prime_config)??>
+<#if ((prime_config.PRIME_MODE == "SN") && (prime_config.PRIME_PROJECT == "application project"))>
+       else if (memInfo.state == SRV_FU_VERIFY_SIGNATURE_BLOCK)
         {
             /* Calculating CRC.... no callback*/
             dsaState = SRV_FU_DSA_CALCULATING;
             return;
         }
+</#if>
+</#if>
         else
         {
             memInfo.state = SRV_FU_MEM_STATE_CMD_WAIT;
@@ -459,12 +463,14 @@ static bool lSRV_FU_VerifySignature(void)
 
         return true;
     } 
-    else if (fuData.signAlgorithm != SRV_FU_SIGNATURE_ALGO_ECDSA256_SHA256)
+    
+    if (fuData.signAlgorithm != SRV_FU_SIGNATURE_ALGO_ECDSA256_SHA256)
     {
         /* Only ECDSA256_SHA256 is supported */
         return false;
     } 
-    else if (dsaState != SRV_FU_DSA_IDLE)
+    
+    if (dsaState != SRV_FU_DSA_IDLE)
     {
         /* There is no public key stored */
         return false;
@@ -482,7 +488,7 @@ static bool lSRV_FU_VerifySignature(void)
         uint32_t blockStart, nBlock;
         uint32_t bytesPagesRead;
 
-    	dsaState = SRV_FU_VERIFY_SIGNATURE_BLOCK;
+    	dsaState = SRV_FU_DSA_WAIT_READ_BLOCK;
 
         dsaReadAddress = memInfo.startAdressFuRegion;
         dsaRemainingSize = fuData.imageSize - fuData.signLength;
@@ -815,7 +821,7 @@ void SRV_FU_Tasks(void)
                 else
                 {
                     crypto_DigiSign_Status_E stateCryptoEDCSA;
-                    int8_t validDSA;
+                    int8_t validDSA = 0;
 
                     /* Hash already done, do ECDSA256_SHA256 verification */
                     stateCryptoEDCSA =Crypto_DigiSign_Ecdsa_Verify(CRYPTO_HANDLER_HW_INTERNAL,
@@ -1212,8 +1218,11 @@ void SRV_FU_VerifyImage(void)
     {
 		/* Wrong Metadata and/or vendor */
         SRV_FU_ImageVerifyCallback(SRV_FU_VERIFY_RESULT_IMAGE_FAIL);
+        
+        return;
 	}
-    else if (lSRV_FU_VerifySignature() != true)
+    
+    if (lSRV_FU_VerifySignature() != true)
     {
 		/* Wrong signature */
         SRV_FU_ImageVerifyCallback(SRV_FU_VERIFY_RESULT_SIGNATURE_FAIL);
