@@ -172,9 +172,9 @@ static st_Crypto_Hash_Sha_Ctx hashCtx;
 
 static SRV_FU_DSA_STATE dsaState;
 
-static uint8_t *EDSAPublicKey;
+static uint8_t *ECDSAPublicKey;
 
-static uint16_t EDSAPublicKeyLen;
+static uint32_t ECDSAPublicKeyLen;
 
 static uint32_t dsaReadAddress;
 
@@ -820,23 +820,23 @@ void SRV_FU_Tasks(void)
                 }
                 else
                 {
-                    crypto_DigiSign_Status_E stateCryptoEDCSA;
+                    crypto_DigiSign_Status_E stateCryptoECDSA;
                     int8_t validDSA = 0;
 
                     /* Hash already done, do ECDSA256_SHA256 verification */
-                    stateCryptoEDCSA =Crypto_DigiSign_Ecdsa_Verify(CRYPTO_HANDLER_HW_INTERNAL,
+                    stateCryptoECDSA =Crypto_DigiSign_Ecdsa_Verify(CRYPTO_HANDLER_HW_INTERNAL,
                                                                     hashDigest,
                                                                     HASH_SIZE_SHA_256,
                                                                     imageSignature,
                                                                     fuData.signLength,
-                                                                    EDSAPublicKey,
-                                                                    EDSAPublicKeyLen,
+                                                                    ECDSAPublicKey,
+                                                                    ECDSAPublicKeyLen,
                                                                     &validDSA,
                                                                     CRYPTO_ECC_CURVE_P256,
                                                                     SESSION_ID);
 
                     /* ECDSA256_SHA256 verification OK */
-                    if ((validDSA != 1) || (stateCryptoEDCSA != CRYPTO_DIGISIGN_SUCCESS))
+                    if ((validDSA != 1) || (stateCryptoECDSA != CRYPTO_DIGISIGN_SUCCESS))
                     {
                         SRV_FU_ImageVerifyCallback(SRV_FU_VERIFY_RESULT_SIGNATURE_FAIL);
                     }
@@ -1194,10 +1194,10 @@ bool SRV_FU_SwapFirmware(void)
 }
 
 
-void SRV_FU_SetEDCSAPublicKey(uint8_t *pubKey, uint16_t pubKeyLen)
+void SRV_FU_SetECDSAPublicKey(uint8_t *pubKey, uint32_t pubKeyLen)
 {
-    EDSAPublicKey = pubKey;
-    EDSAPublicKeyLen = pubKeyLen;
+    ECDSAPublicKey = pubKey;
+    ECDSAPublicKeyLen = pubKeyLen;
 
     dsaState = SRV_FU_DSA_IDLE;
 }

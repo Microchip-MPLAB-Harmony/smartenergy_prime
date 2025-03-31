@@ -142,7 +142,7 @@ typedef enum {
 */
 typedef struct {
 	uint32_t imageSize;
-  uint16_t signLength;
+  uint32_t signLength;
   SRV_FU_SIGNATURE_ALGO signAlgorithm;
 	uint8_t pageSize;
 } SRV_FU_INFO;
@@ -497,7 +497,7 @@ bool SRV_FU_SwapFirmware(void);
 
 // ****************************************************************************
 /* Function:
-   void SRV_FU_SetEDCSAPublicKey(uint8_t *pubKey, uint16_t pubKeyLen)
+   void SRV_FU_SetECDSAPublicKey(uint8_t *pubKey, uint32_t pubKeyLen)
 
   Summary:
     Pass to the Firmware Upgrade the public key to be used for the EDCSA-256
@@ -524,13 +524,13 @@ bool SRV_FU_SwapFirmware(void);
     uint8_t pubKey[LEN_PUBLIC_KEY];
     uint16_t pubKeyLen = LEN_PUBLIC_KEY;
 
-    SRV_FU_SetEDCSAPublicKey(pubKey, pubKeyLen);
+    SRV_FU_SetECDSAPublicKey(pubKey, pubKeyLen);
     </code>
 
   Remarks:
     This function is called by the application.
 */
-void SRV_FU_SetEDCSAPublicKey(uint8_t *pubKey, uint16_t pubKeyLen);
+void SRV_FU_SetECDSAPublicKey(uint8_t *pubKey, uint32_t pubKeyLen);
 </#if>
 </#if>
 
