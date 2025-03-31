@@ -663,7 +663,7 @@ void SRV_FU_Tasks(void)
             }
 
             (void)memset( pMemWrite, 0xff, memInfo.writePageSize);
-            (void)memcpy( &pMemWrite[offset], &pBuffInput[memInfo.bytesWritten] , memInfo.writeSize);
+            (void)memcpy( &pMemWrite[offset], &pBuffInput[memInfo.bytesWritten] , bytesToCopy);
 
             DRV_MEMORY_AsyncWrite(memInfo.memoryHandle, &memInfo.writeHandle, pMemWrite, block, 1);
 
