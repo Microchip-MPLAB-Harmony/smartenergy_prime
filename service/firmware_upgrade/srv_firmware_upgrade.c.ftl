@@ -107,15 +107,17 @@ typedef enum
     PRIME_MAIN_APP
 } SRV_FU_PRIME_APP_TYPE;
 
-
 /* Define Session Id for crypto */
-#define SESSION_ID              1
+#define SESSION_ID                    1
 
 /* Maximum size for the signature */
-#define PRIME_SIGNATURE_SIZE   128
+#define PRIME_SIGNATURE_SIZE          128
 
-/* Size for a hash using SHA 256 */
-#define HASH_SIZE_SHA_256      32
+/* Size for a hash using SHA 256 in bytes */
+#define HASH_SIZE_SHA_256             32
+
+/* Size for a signature ECDSA 256 in bytes */
+#define SIGNATURE_SIZE_ECDSA_256      64
 </#if>
 </#if>
 
@@ -450,6 +452,22 @@ static void lSRV_FU_EraseFuRegion(void)
 
 <#if (prime_config)??>
 <#if ((prime_config.PRIME_MODE == "SN") && (prime_config.PRIME_PROJECT == "application project"))>
+static void lSRV_FU_ConvertDerFormatSignature(void)
+{
+    uint8_t index;
+    
+    for (index = 0; index < 32; index++)
+    {
+        imageSignature[index] = imageSignature[4 + index];
+    }
+
+    for (index = 0; index < 32; index++)
+    {
+        imageSignature[32 + index] = imageSignature[38 + index];
+    }
+
+}
+
 static bool lSRV_FU_VerifySignature(void)
 {
     crypto_Hash_Status_E stateCryptoHash;
@@ -475,6 +493,11 @@ static bool lSRV_FU_VerifySignature(void)
         /* There is no public key stored */
         return false;
     } 
+    
+    /* Check if signature comes in DER format */
+    if (fuData.signLength == 70) {
+        lSRV_FU_ConvertDerFormatSignature();
+    }
     
     /* Start to verify the signature */
     stateCryptoHash = Crypto_Hash_Sha_Init(&hashCtx, CRYPTO_HASH_SHA2_256, CRYPTO_HANDLER_HW_INTERNAL, SESSION_ID);
@@ -828,7 +851,7 @@ void SRV_FU_Tasks(void)
                                                                     hashDigest,
                                                                     HASH_SIZE_SHA_256,
                                                                     imageSignature,
-                                                                    fuData.signLength,
+                                                                    SIGNATURE_SIZE_ECDSA_256,
                                                                     ECDSAPublicKey,
                                                                     ECDSAPublicKeyLen,
                                                                     &validDSA,
