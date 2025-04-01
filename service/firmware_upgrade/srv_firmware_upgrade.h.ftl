@@ -500,19 +500,19 @@ bool SRV_FU_SwapFirmware(void);
    void SRV_FU_SetECDSAPublicKey(uint8_t *pubKey, uint32_t pubKeyLen)
 
   Summary:
-    Pass to the Firmware Upgrade the public key to be used for the EDCSA-256
+    Set the Firmware Upgrade the public key to be used for the ECDSA-256
     signature.
 
   Description:
-    This function sets the public key to be used for the EDCSA-256 signature.
+    This function sets the public key to be used for the ECDSA-256 signature.
 
   Precondition:
     The SRV_FU_Initialize function should have been called before calling this
     function.
 
   Parameters:
-    pubKey      - Pointer to the buffer where the EDCSA-256 public key is stored
-    pubKeyLen   - length of the key
+    pubKey      - Pointer to the buffer where the ECDSA-256 public key is stored
+    pubKeyLen   - Length of the key
 
   Returns:
     None.

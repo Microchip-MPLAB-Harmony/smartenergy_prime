@@ -110,7 +110,7 @@ typedef enum
 /* Define Session Id for crypto */
 #define SESSION_ID                    1
 
-/* Maximum size for the signature */
+/* Maximum size of the signature */
 #define PRIME_SIGNATURE_SIZE          128
 
 /* Size for a hash using SHA 256 in bytes */
@@ -194,27 +194,22 @@ static uint32_t dsaRemainingSize;
 // *****************************************************************************
 <#if (prime_config)??>
 <#if ((prime_config.PRIME_MODE == "SN") && (prime_config.PRIME_PROJECT == "application project"))>
-static void lSRV_FU_StoreVendorModel(uint32_t address, uint32_t size)
-{
-    if ((address > 0U) || (size < 4U))
-    {
-        return;
-    }
-
-    imageVendor = ((uint16_t) pBuffInput[0]) << 8;
-    imageVendor |= pBuffInput[1];
-
-    imageModel = ((uint16_t) pBuffInput[2]) << 8;
-    imageModel |= pBuffInput[3];
-}
-
-
 static void lSRV_FU_StoreImageInfo(uint32_t address, uint32_t size)
 {
     uint32_t iniMetadata, iniSignature;
     uint32_t offsetSegment, offsetMetadata, offsetSignature;
     uint32_t sizeToCopy;
 
+    /* The first segment contains the Vendor and Model */
+    if (address == 0U)
+    {
+        imageVendor = ((uint16_t) pBuffInput[0]) << 8;
+        imageVendor |= pBuffInput[1];
+
+        imageModel = ((uint16_t) pBuffInput[2]) << 8;
+        imageModel |= pBuffInput[3];
+    }
+    
     iniMetadata = fuData.imageSize - fuData.signLength - PRIME_METADATA_SIZE;
 
     /* Check if the segment to write is in metadata zone*/
@@ -250,12 +245,13 @@ static void lSRV_FU_StoreImageInfo(uint32_t address, uint32_t size)
 
     (void)memcpy(&imageMetadata[offsetMetadata], &pBuffInput[offsetSegment], sizeToCopy);
 
-    /* There is needed less checkings because the signature is always in the last segment and 
+    /* Fewer checks are needed because the signature is always in the last segment and 
     after the metadata */
     if (sizeToCopy < PRIME_METADATA_SIZE)
     {
         return;
     }
+    
     /*  Check if the segment to write is in signature zone */
     iniSignature = fuData.imageSize - fuData.signLength;
 
@@ -292,7 +288,7 @@ static void lSRV_FU_StoreImageInfo(uint32_t address, uint32_t size)
     (void)memcpy(&imageSignature[offsetSignature], &pBuffInput[offsetSegment], sizeToCopy);
 }
 
-static bool lSRV_FU_CheckMetadataAndVendor(void)
+static bool lSRV_FU_CheckImageData(void)
 {
 	appToFu = PRIME_INVALID_APP;
 
@@ -334,7 +330,7 @@ static bool lSRV_FU_CheckMetadataAndVendor(void)
 
         SRV_STORAGE_PRIME_MODE_INFO_CONFIG boardInfo;
 
-	    if(!SRV_STORAGE_GetConfigInfo(SRV_STORAGE_TYPE_MODE_PRIME, (uint8_t)sizeof(boardInfo), (void *)&boardInfo))
+	    if(SRV_STORAGE_GetConfigInfo(SRV_STORAGE_TYPE_MODE_PRIME, (uint8_t)sizeof(boardInfo), (void *)&boardInfo) == false)
         {
             return false;
         }
@@ -403,7 +399,7 @@ static void lSRV_FU_TransferHandler
 <#if ((prime_config.PRIME_MODE == "SN") && (prime_config.PRIME_PROJECT == "application project"))>
        else if (memInfo.state == SRV_FU_VERIFY_SIGNATURE_BLOCK)
         {
-            /* Calculating CRC.... no callback*/
+            /* Calculating SHA.... no callback*/
             dsaState = SRV_FU_DSA_CALCULATING;
             return;
         }
@@ -490,7 +486,7 @@ static bool lSRV_FU_VerifySignature(void)
     
     if (dsaState != SRV_FU_DSA_IDLE)
     {
-        /* There is no public key stored */
+        /* DSA state machine not idle */
         return false;
     } 
     
@@ -529,7 +525,7 @@ static bool lSRV_FU_VerifySignature(void)
         nBlock = dsaSize / memInfo.readPageSize;
 
         bytesPagesRead = nBlock * memInfo.readPageSize;
-        /* Aling CRC size with the readPageSize */
+        /* Align SHA size with the readPageSize */
         if (dsaSize > bytesPagesRead)
         {
             if (((nBlock + 1U) * memInfo.readPageSize) <= MAX_BUFFER_READ_SIZE)
@@ -579,7 +575,7 @@ void SRV_FU_Initialize(void)
 
 <#if (prime_config)??>
 <#if ((prime_config.PRIME_MODE == "SN") && (prime_config.PRIME_PROJECT == "application project"))>
-    dsaState = SRV_FU_DSA_NON_PUBLIC_KEY; 
+    dsaState = SRV_FU_DSA_NO_PUBLIC_KEY; 
 </#if>
 </#if>
 }
@@ -738,7 +734,7 @@ void SRV_FU_Tasks(void)
                     nBlock = crcSize / memInfo.readPageSize;
 
                     bytesPagesRead = nBlock * memInfo.readPageSize;
-                    /* Aling CRC size with the readPageSize */
+                    /* Align CRC size with the readPageSize */
                     if (crcSize > bytesPagesRead)
                     {
                         if (((nBlock + 1U) * memInfo.readPageSize) <= MAX_BUFFER_READ_SIZE)
@@ -821,7 +817,7 @@ void SRV_FU_Tasks(void)
                     nBlock = dsaSize / memInfo.readPageSize;
 
                     bytesPagesRead = nBlock * memInfo.readPageSize;
-                    /* Aling CRC size with the readPageSize */
+                    /* Align SHA size with the readPageSize */
                     if (dsaSize > bytesPagesRead)
                     {
                         if (((nBlock + 1U) * memInfo.readPageSize) <= MAX_BUFFER_READ_SIZE)
@@ -847,7 +843,7 @@ void SRV_FU_Tasks(void)
                     int8_t validDSA = 0;
 
                     /* Hash already done, do ECDSA256_SHA256 verification */
-                    stateCryptoECDSA =Crypto_DigiSign_Ecdsa_Verify(CRYPTO_HANDLER_HW_INTERNAL,
+                    stateCryptoECDSA = Crypto_DigiSign_Ecdsa_Verify(CRYPTO_HANDLER_HW_INTERNAL,
                                                                     hashDigest,
                                                                     HASH_SIZE_SHA_256,
                                                                     imageSignature,
@@ -858,7 +854,7 @@ void SRV_FU_Tasks(void)
                                                                     CRYPTO_ECC_CURVE_P256,
                                                                     SESSION_ID);
 
-                    /* ECDSA256_SHA256 verification OK */
+                    /* Check verification result ECDSA256_SHA256 */
                     if ((validDSA != 1) || (stateCryptoECDSA != CRYPTO_DIGISIGN_SUCCESS))
                     {
                         SRV_FU_ImageVerifyCallback(SRV_FU_VERIFY_RESULT_SIGNATURE_FAIL);
@@ -950,8 +946,6 @@ void SRV_FU_DataWrite(uint32_t address, uint8_t *buffer, uint16_t size)
 <#if (prime_config)??>
 <#if ((prime_config.PRIME_MODE == "SN") && (prime_config.PRIME_PROJECT == "application project"))>
     lSRV_FU_StoreImageInfo(address, size);
-
-    lSRV_FU_StoreVendorModel(address, size);
 </#if>
 </#if>
 
@@ -1066,7 +1060,7 @@ void SRV_FU_CalculateCrc(void)
 	nBlock = crcSize / memInfo.readPageSize;
 
     bytesPagesRead = nBlock * memInfo.readPageSize;
-    /* Aling CRC size with the readPageSize */
+    /* Align CRC size with the readPageSize */
     if (crcSize > bytesPagesRead)
     {
         if (((nBlock + 1U) * memInfo.readPageSize) <= MAX_BUFFER_READ_SIZE)
@@ -1145,7 +1139,7 @@ bool SRV_FU_SwapFirmware(void)
     /* Check if the current stack is 1.3 */
 	SRV_STORAGE_PRIME_MODE_INFO_CONFIG boardInfo;
 
-	if(!SRV_STORAGE_GetConfigInfo(SRV_STORAGE_TYPE_MODE_PRIME, (uint8_t)sizeof(boardInfo), (void *)&boardInfo))
+	if(SRV_STORAGE_GetConfigInfo(SRV_STORAGE_TYPE_MODE_PRIME, (uint8_t)sizeof(boardInfo), (void *)&boardInfo) == false)
     {
         return false;
     }
@@ -1153,7 +1147,7 @@ bool SRV_FU_SwapFirmware(void)
 	if (boardInfo.primeVersion == PRIME_VERSION_1_3)
     {
 		/* Verify if this is a right image */
-		if (lSRV_FU_CheckMetadataAndVendor() == false)
+		if (lSRV_FU_CheckImageData() == false)
         {
 			/* Trigger reset, needed in FU 1.3 */
 			return true;
@@ -1237,9 +1231,9 @@ void SRV_FU_VerifyImage(void)
 
 <#if (prime_config)??>
 <#if ((prime_config.PRIME_MODE == "SN") && (prime_config.PRIME_PROJECT == "application project"))>
-    if (lSRV_FU_CheckMetadataAndVendor() != true)
+    if (lSRV_FU_CheckImageData() != true)
     {
-		/* Wrong Metadata and/or vendor */
+		/* Wrong Metadata, vendor or model */
         SRV_FU_ImageVerifyCallback(SRV_FU_VERIFY_RESULT_IMAGE_FAIL);
         
         return;
