@@ -588,7 +588,7 @@ void SRV_FU_Tasks(void)
     {
         case SRV_FU_MEM_STATE_OPEN_DRIVER:
         {
-            memInfo.memoryHandle = DRV_MEMORY_Open(DRV_MEMORY_INDEX_0, DRV_IO_INTENT_READWRITE);
+            memInfo.memoryHandle = DRV_MEMORY_Open(PRIME_FU_MEM_INSTANCE, DRV_IO_INTENT_READWRITE);
 
             if (DRV_HANDLE_INVALID != memInfo.memoryHandle)
             {
