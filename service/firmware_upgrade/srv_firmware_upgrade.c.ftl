@@ -452,14 +452,14 @@ static void lSRV_FU_ConvertDerFormatSignature(void)
 {
     uint8_t index;
     
-    for (index = 0; index < 32; index++)
+    for (index = 0UL; index < 32UL; index++)
     {
-        imageSignature[index] = imageSignature[4 + index];
+        imageSignature[index] = imageSignature[4UL + index];
     }
 
-    for (index = 0; index < 32; index++)
+    for (index = 0UL; index < 32UL; index++)
     {
-        imageSignature[32 + index] = imageSignature[38 + index];
+        imageSignature[32UL + index] = imageSignature[38UL + index];
     }
 
 }
@@ -491,7 +491,7 @@ static bool lSRV_FU_VerifySignature(void)
     } 
     
     /* Check if signature comes in DER format */
-    if (fuData.signLength == 70) {
+    if (fuData.signLength == 70UL) {
         lSRV_FU_ConvertDerFormatSignature();
     }
     
