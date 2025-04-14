@@ -396,7 +396,7 @@ static void lPAL_RF_ChannelSwitchCb(DRV_RF215_TX_RESULT result, uintptr_t contex
         palRfData.freqHopCurrentPch = palRfData.freqHopNextPch;
     }
     
-    if (palRfData.rfCallbacks.switchRfChannel == true)
+    if (palRfData.rfCallbacks.switchRfChannel != NULL)
     {
         palRfData.rfCallbacks.switchRfChannel(palRfData.freqHopCurrentPch);
     }
