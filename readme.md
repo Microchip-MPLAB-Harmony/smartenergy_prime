@@ -16,7 +16,16 @@ Refer to the following links for release notes, training materials, and interfac
 
 - [Release Notes](./release_notes.md)
 - [MPLAB® Harmony License](Microchip_SLA001.md)
-- [MPLAB® Harmony 3 PRIME API Help] (TBD)
+
+# Documentation
+
+Click [here](https://onlinedocs.microchip.com/v2/keyword-lookup?keyword=MPLA_Harmony_Smart_Energy_PRIME_Stack&redirect=true) to view the online documentation of Smart Energy PRIME Stack library repository.
+
+To view the documentation offline, follow these steps:
+
+- Download the publication as a zip file from [here](https://onlinedocs.microchip.com/download/GUID-1B8C2AA7-2A03-4372-B140-8708DC726F55?type=webhelp).
+- Extract the zip file into a folder.
+- Navigate to the folder and open **index.html** in a web browser of your choice.
 
 # Contents Summary
 

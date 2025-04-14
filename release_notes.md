@@ -3,6 +3,19 @@
 
 # Microchip MPLAB® Harmony 3 Release Notes
 
+## Harmony 3 Smart Energy PRIME v1.0.0
+
+### New Features
+
+- Firmware Upgrade PRIME Service now supports the ability to verify the signature of a downloaded Binary using an ECDSA-256 signature.
+- Verified the proper functioning of Frequency Hopping.
+- Verified the correct functioning of the legacy version PRIME 1.3.
+- Delivered the documentation for the Smart Energy PRIME Stack.
+
+### Known Issues
+
+There are no known errors.
+
 ## Harmony 3 Smart Energy PRIME v1.0.0-E1
 
 ### New Features
