@@ -128,12 +128,12 @@ typedef struct
 <#if PRIME_PAL_RF_FREQ_HOPPING == true>
     uint16_t freqHopLengthSequence;
 
-    uint16_t freqHopLengthBcnSequence;
-
     uint16_t freqHopNextPch;
 
     uint16_t freqHopCurrentPch;
     
+    uint8_t freqHopLengthBcnSequence;
+
     uint8_t freqHopBitsSequence[RF_MAX_NUM_BYTES_CHANNELS];
 
     uint8_t freqHopBitsBcnSequence[RF_MAX_NUM_BYTES_CHANNELS];

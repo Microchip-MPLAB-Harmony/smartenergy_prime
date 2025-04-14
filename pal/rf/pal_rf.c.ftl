@@ -188,8 +188,8 @@ static void lPAL_RF_FreqHopGetChannelSequence(void)
     for (index = 0; index < palRfData.freqHopLengthSequence; index++)
     {
         uint16_t channel = palRfFreqHopChannelsSeq[index];
-        uint8_t channelByte = channel / 8;
-        uint8_t channelBit = channel % 8;
+        uint8_t channelByte = channel / 8U;
+        uint8_t channelBit = channel % 8U;
 
         palRfData.freqHopBitsSequence[channelByte] |= (1U << channelBit);
     }
@@ -197,8 +197,8 @@ static void lPAL_RF_FreqHopGetChannelSequence(void)
     for (index = 0; index < palRfData.freqHopLengthBcnSequence; index++)
     {
         uint16_t channel = palRfFreqHopChannelsBcnSeq[index];
-        uint8_t channelByte = channel / 8;
-        uint8_t channelBit = channel % 8;
+        uint8_t channelByte = channel / 8U;
+        uint8_t channelBit = channel % 8U;
 
         palRfData.freqHopBitsBcnSequence[channelByte] |= (1U << channelBit);
     }
@@ -396,7 +396,7 @@ static void lPAL_RF_ChannelSwitchCb(DRV_RF215_TX_RESULT result, uintptr_t contex
         palRfData.freqHopCurrentPch = palRfData.freqHopNextPch;
     }
     
-    if (palRfData.rfCallbacks.switchRfChannel)
+    if (palRfData.rfCallbacks.switchRfChannel == true)
     {
         palRfData.rfCallbacks.switchRfChannel(palRfData.freqHopCurrentPch);
     }
@@ -568,7 +568,7 @@ void PAL_RF_ProgramChannelSwitch(uint32_t timeSync, uint16_t pch, uint8_t timeMo
 {
 <#if PRIME_PAL_RF_FREQ_HOPPING == true>
     uint64_t timeCount = SRV_TIME_MANAGEMENT_USToCount(timeSync);
-    uint16_t channelNum = pch & (~PRIME_PAL_RF_CHN_MASK);
+    uint16_t channelNum = pch & (~((uint16_t)(PRIME_PAL_RF_CHN_MASK)));
 
     palRfData.freqHopNextPch = pch;
     DRV_RF215_SetChannelRequest(palRfData.drvRfPhyHandle, timeCount, channelNum, (DRV_RF215_TX_TIME_MODE)timeMode);
@@ -750,12 +750,12 @@ uint8_t PAL_RF_GetConfiguration(uint16_t id, void *pValue, uint16_t length)
 
 <#if PRIME_PAL_RF_FREQ_HOPPING == true>
         case PAL_ID_RF_BITS_HOPPING_SEQUENCE:
-            (void)memcpy(pValue, &palRfData.freqHopBitsSequence, length);
+            (void)memcpy((uint8_t *)pValue, &palRfData.freqHopBitsSequence, length);
             result = PAL_CFG_SUCCESS;
             break;
 
         case PAL_ID_RF_BITS_BCN_HOPPING_SEQUENCE:
-            (void)memcpy(pValue, &palRfData.freqHopBitsBcnSequence, length);
+            (void)memcpy((uint8_t *)pValue, &palRfData.freqHopBitsBcnSequence, length);
             result = PAL_CFG_SUCCESS;
             break;
 
