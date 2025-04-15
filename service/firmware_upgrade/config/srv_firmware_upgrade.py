@@ -102,7 +102,7 @@ def instantiateComponent(primeFirmwareUpgradeComponent):
     ############################################################################
     configName = Variables.get("__CONFIGURATION_NAME")
 
-    # Firwmare upgrade files
+    # Firmware upgrade files
     srvFUSourceFile = primeFirmwareUpgradeComponent.createFileSymbol("SRV_FU_SOURCE", None)
     srvFUSourceFile.setSourcePath("service/firmware_upgrade/srv_firmware_upgrade.c.ftl")
     srvFUSourceFile.setOutputName("srv_firmware_upgrade.c")
