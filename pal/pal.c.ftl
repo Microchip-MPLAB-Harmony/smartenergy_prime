@@ -359,7 +359,7 @@ void PAL_Enable(SYS_MODULE_OBJ object, uint8_t enablePAL)
     }
     else
     {
-        /* Register callacks */
+        /* Register callbacks */
         PAL_PLC_DataConfirmCallbackRegister(lPAL_PlcDataConfirmCallback);
         PAL_PLC_DataIndicationCallbackRegister(lPAL_PlcDataIndicationCallback);
 
@@ -386,7 +386,7 @@ void PAL_Enable(SYS_MODULE_OBJ object, uint8_t enablePAL)
     }
     else
     {
-        /* Register callacks */
+        /* Register callbacks */
         PAL_RF_DataConfirmCallbackRegister(lPAL_RfDataConfirmCallback);
         PAL_RF_DataIndicationCallbackRegister(lPAL_RfDataIndicationCallback);
   <#if PRIME_PAL_RF_FREQ_HOPPING == true>
@@ -413,7 +413,7 @@ void PAL_Enable(SYS_MODULE_OBJ object, uint8_t enablePAL)
     }
     else
     {
-        /* Register callacks */
+        /* Register callbacks */
         PAL_SERIAL_DataConfirmCallbackRegister(lPAL_SerialDataConfirmCallback);
         PAL_SERIAL_DataIndicationCallbackRegister(lPAL_SerialDataIndicationCallback);
 
