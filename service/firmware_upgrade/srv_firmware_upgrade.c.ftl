@@ -843,7 +843,7 @@ void SRV_FU_Tasks(void)
                     int8_t validDSA = 0;
 
                     /* Hash already done, do ECDSA256_SHA256 verification */
-                    stateCryptoECDSA = Crypto_DigiSign_Ecdsa_Verify(CRYPTO_HANDLER_HW_INTERNAL,
+                    stateCryptoECDSA = Crypto_DigiSign_Ecdsa_Verify(CRYPTO_HANDLER_SW_WOLFCRYPT,
                                                                     hashDigest,
                                                                     HASH_SIZE_SHA_256,
                                                                     imageSignature,
