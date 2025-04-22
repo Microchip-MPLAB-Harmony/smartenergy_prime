@@ -188,8 +188,8 @@ static void lPAL_RF_FreqHopGetChannelSequence(void)
     for (index = 0; index < palRfData.freqHopLengthSequence; index++)
     {
         uint16_t channel = palRfFreqHopChannelsSeq[index];
-        uint8_t channelByte = channel / 8U;
-        uint8_t channelBit = channel % 8U;
+        uint8_t channelByte = (uint8_t)(channel / 8U);
+        uint8_t channelBit = (uint8_t)(channel % 8U);
 
         palRfData.freqHopBitsSequence[channelByte] |= (1U << channelBit);
     }
@@ -197,8 +197,8 @@ static void lPAL_RF_FreqHopGetChannelSequence(void)
     for (index = 0; index < palRfData.freqHopLengthBcnSequence; index++)
     {
         uint16_t channel = palRfFreqHopChannelsBcnSeq[index];
-        uint8_t channelByte = channel / 8U;
-        uint8_t channelBit = channel % 8U;
+        uint8_t channelByte = (uint8_t)(channel / 8U);
+        uint8_t channelBit = (uint8_t)(channel % 8U);
 
         palRfData.freqHopBitsBcnSequence[channelByte] |= (1U << channelBit);
     }
