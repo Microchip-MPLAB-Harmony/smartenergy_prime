@@ -98,7 +98,7 @@ PRIME_FW_STACK_13_SIZE_HEX = "0x20000"
 PRIME_FW_STACK_13_ID = "MAC13BIN"
 PRIME_METADATA_SIZE = "16"
 
-PRIME_FW_STACK_RAM_SIZE = "0x0000B000"  # TBD !!!!!
+PRIME_FW_STACK_RAM_SIZE = "0x0000B000"  
 
 def getFlashMemoryDescription():
     nodeIFLASH = ATDF.getNode("/avr-tools-device-file/devices/device/address-spaces/address-space/memory-segment@[type=\"flash\"]")
@@ -123,11 +123,11 @@ def setFwStackLinkerParams(primeMode, primeProject, primeVersion):
         if (primeProject == "application project"):
             # SN - Application project
             ramOrigin = ramStartAddressHex
-            ramLength = hex(int(ramSizeHex, 0) - int(PRIME_FW_STACK_RAM_SIZE, 0))
+            ramLength = hex(int(ramSizeHex, 0) - int(PRIME_FW_STACK_RAM_SIZE, 0) - 1)
             romLength = PRIME_USER_APP_SIZE_HEX
         elif (primeProject == "bin project"):
             # SN - Bin project
-            ramOrigin = hex(int(ramStartAddressHex, 0) + int(ramSizeHex, 0) - int(PRIME_FW_STACK_RAM_SIZE, 0))
+            ramOrigin = hex(int(ramStartAddressHex, 0) + int(ramSizeHex, 0) - int(PRIME_FW_STACK_RAM_SIZE, 0) - 1)
             ramLength = PRIME_FW_STACK_RAM_SIZE
             if (primeVersion == "1.4"):
                 romLength = PRIME_FW_STACK_14_SIZE_HEX
