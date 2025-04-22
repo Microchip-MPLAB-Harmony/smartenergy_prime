@@ -127,7 +127,7 @@ def setFwStackLinkerParams(primeMode, primeProject, primeVersion):
             romLength = PRIME_USER_APP_SIZE_HEX
         elif (primeProject == "bin project"):
             # SN - Bin project
-            ramOrigin = hex(int(ramStartAddressHex, 0) + int(ramSizeHex, 0) - int(PRIME_FW_STACK_RAM_SIZE, 0) - 1)
+            ramOrigin = hex(int(ramStartAddressHex, 0) + int(ramSizeHex, 0) - int(PRIME_FW_STACK_RAM_SIZE, 0))
             ramLength = PRIME_FW_STACK_RAM_SIZE
             if (primeVersion == "1.4"):
                 romLength = PRIME_FW_STACK_14_SIZE_HEX
