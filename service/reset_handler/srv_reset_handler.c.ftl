@@ -316,7 +316,7 @@ void SRV_RESET_HANDLER_RestartSystem(SRV_RESET_HANDLER_RESET_CAUSE resetType)
 
 <#if (drvMet)??>
     /* Stop Metrology and its peripherals before reset */
-    DRV_METROLOGY_Close();
+    (void) DRV_METROLOGY_Close();
 </#if>
 
     /* Trigger software reset */
