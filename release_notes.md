@@ -3,20 +3,35 @@
 
 # Microchip MPLAB® Harmony 3 Release Notes
 
-## Harmony 3 Smart Energy PRIME v1.0.0
+## Harmony 3 Smart Energy PRIME v1.1.0
 
 ### New Features
 
-- Firmware Upgrade PRIME Service now supports the ability to verify the signature of a downloaded Binary using an ECDSA-256 signature.
-- Verified the proper functioning of Frequency Hopping.
-- Verified the correct functioning of the legacy version PRIME 1.3.
-- Delivered the documentation for the Smart Energy PRIME Stack.
+- Added verification of signature in Firmware Upgrade service using ECDSA and SHA-256
+
+### Bug fixes
+
+- Tested PRIME 1.3.
+- Tested PRIME 1.4 with frequency hopping.
 
 ### Known Issues
 
-There are no known errors.
+- Crypo_v4 Repository v1.0.0-E3, used by the Firmware Upgrade service does not work properly with Digital Signing (ECDSA algorithm) executed by Hardware in PIC32CX MT platfforn, so it is configured by software.
 
-## Harmony 3 Smart Energy PRIME v1.0.0-E1
+### Development Tools
+
+- [MPLAB® X IDE v6.25](https://www.microchip.com/mplab/mplab-x-ide)
+- [MPLAB® XC32 C/C++ Compiler v4.60](https://www.microchip.com/mplab/compilers)
+- MPLAB® X IDE plug-ins:
+  - MPLAB® Code Configurator 5.5.2 or higher
+- PIC32CX-MT family (MCUs):
+  - PIC32CX-MT DFP 1.3.132 or higher
+
+### Notes
+
+- None.
+
+## Harmony 3 Smart Energy PRIME v1.1.0-E1
 
 ### New Features
 
@@ -41,3 +56,16 @@ Provided Modules are:
 - PRIME 1.4 Firwmare Upgrade cannot verify signature from a binary file.
 - PRIME 1.3 Not tested.
 - No documentation provided.
+
+## Harmony 3 Smart Energy PRIME v1.0.0
+
+### New Features
+
+- Firmware Upgrade PRIME Service now supports the ability to verify the signature of a downloaded Binary using an ECDSA-256 signature.
+- Verified the proper functioning of Frequency Hopping.
+- Verified the correct functioning of the legacy version PRIME 1.3.
+- Delivered the documentation for the Smart Energy PRIME Stack.
+
+### Known Issues
+
+There are no known errors.
