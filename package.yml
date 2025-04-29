@@ -9,7 +9,7 @@ package:
   dependencies:
     - name: "smartenergy"
       type: "package"
-      version: "SMS-4157-tasks-prelease"
+      version: "1.4.1"
     - name: "crypto_v4"
       type: "package"
       version: "v4.0.0-E3"
