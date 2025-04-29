@@ -19,7 +19,7 @@ Refer to the following links for release notes, training materials, and interfac
 
 # Documentation
 
-Click [here](https://onlinedocs.microchip.com/v2/keyword-lookup?keyword=MPLA_Harmony_Smart_Energy_PRIME_Stack&redirect=true) to view the online documentation of Smart Energy PRIME Stack library repository.
+Click [here](https://onlinedocs.microchip.com/v2/keyword-lookup?keyword=MPLAB_Harmony_Smart_Energy_PRIME_Stack&redirect=true) to view the online documentation of Smart Energy PRIME Stack library repository.
 
 To view the documentation offline, follow these steps:
 
