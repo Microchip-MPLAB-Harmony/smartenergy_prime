@@ -16,7 +16,7 @@
 
 ### Known Issues
 
-- Crypo_v4 Repository v1.0.0-E3, used by the Firmware Upgrade service does not work properly with Digital Signing (ECDSA algorithm) executed by Hardware in PIC32CX MT platfforn, so it is configured by software.
+- Crypo_v4 Repository v1.0.0-E3 is not fully validated in this Engineer Release for PIC32CX MT platfrom. So ECDSA and SHA, used by the Firmware Upgrade service, are executed by Software instead of Hardware.
 
 ### Development Tools
 
