@@ -16,7 +16,7 @@
 
 ### Known Issues
 
-- Crypo_v4 Repository v1.0.0-E3 is not fully validated in this Engineer Release for PIC32CX MT platfrom. So ECDSA and SHA, used by the Firmware Upgrade service, are executed by Software instead of Hardware.
+- Crypto_v4 Repository v4.0.0-E3 is not fully validated in this Engineer Release for PIC32CX MT platfrom. So ECDSA and SHA, used by the Firmware Upgrade service, are executed by Software instead of Hardware.
 
 ### Development Tools
 
