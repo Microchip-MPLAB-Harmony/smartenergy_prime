@@ -997,7 +997,7 @@ uint8_t PAL_PLC_GetCD(uint8_t *pCD, uint8_t *pRSSI, uint32_t *pTime, uint8_t *pH
 
     if (palPlcData.status != PAL_PLC_STATUS_READY)
     {
-        *pCd = 0U;
+        *pCD = 0U;
         *pRSSI = 0U;
         *pTime = 0UL;
         *pHeader = 0U;
